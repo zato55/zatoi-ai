@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zatoi AI</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    height: 100vh;
+}
+
+.app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    padding: 18px;
+    text-align: center;
+    background: #1e293b;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+#chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.message {
+    padding: 12px 15px;
+    margin: 10px 0;
+    border-radius: 15px;
+    max-width: 85%;
+    line-height: 1.5;
+}
+
+.bot {
+    background: #334155;
+    margin-right: auto;
+}
+
+.user {
+    background: #2563eb;
+    margin-left: auto;
+}
+
+.input-area {
+    display: flex;
+    padding: 10px;
+    background: #1e293b;
+    gap: 8px;
+}
+
+input {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    outline: none;
+    font-size: 16px;
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 0 18px;
+    background: #2563eb;
+    color: white;
+    font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+🤖 ZATOI AI
+</header>
+
+<div id="chat">
+    <div class="message bot">
+        Merhaba! Ben Zatoi AI 🤖<br>
+        Henüz gerçek AI modeline bağlanmadım ama yakında konuşacağız. 😎
+    </div>
+</div>
+
+<div class="input-area">
+    <input id="message" placeholder="Mesajını yaz..." />
+    <button onclick="sendMessage()">➤</button>
+</div>
+
+</div>
+
+<script>
+
+function sendMessage() {
+
+    const input = document.getElementById("message");
+    const chat = document.getElementById("chat");
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    chat.innerHTML += `
+        <div class="message user">
+            ${text}
+        </div>
+    `;
+
+    input.value = "";
+
+    setTimeout(() => {
+
+        chat.innerHTML += `
+            <div class="message bot">
+                Mesajını aldım. 🤖<br>
+                Gerçek AI modelini bağladığımızda sana burada cevap vereceğim.
+            </div>
+        `;
+
+        chat.scrollTop = chat.scrollHeight;
+
+    }, 500);
+}
+
+</script>
+
+</body>
+</html>
