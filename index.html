@@ -161,7 +161,8 @@ async function sendMessage() {
 
     const data = await response.json();
 
-    aiMessage.textContent = data.reply || "Cevap alınamadı.";
+   aiMessage.textContent =
+  data.reply || data.error || JSON.stringify(data);
 
   } catch (error) {
 
