@@ -2,7 +2,10 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Zatoi AI</title>
 
@@ -17,7 +20,7 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #0b0d12;
+      background: #0b0f14;
       color: #ffffff;
       font-family: Arial, Helvetica, sans-serif;
       overflow: hidden;
@@ -25,15 +28,19 @@
 
     button,
     textarea {
-      font: inherit;
+      font-family: inherit;
     }
 
     .app {
       width: 100%;
       height: 100vh;
       display: flex;
-      background: #0b0d12;
+      background: #0b0f14;
     }
+
+    /* =========================
+       CHAT
+    ========================= */
 
     .chat-column {
       flex: 1;
@@ -45,19 +52,20 @@
     }
 
     .chat-top {
-      height: 62px;
+      height: 58px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 18px;
-      border-bottom: 1px solid #20242d;
-      background: #10131a;
+      border-bottom: 1px solid #1c2530;
+      background: #0d1218;
     }
 
     .chat-title {
       font-size: 17px;
       font-weight: 700;
+      color: #ffffff;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -70,33 +78,38 @@
     }
 
     button {
-      border: 0;
+      border: none;
       cursor: pointer;
-      color: #fff;
     }
 
     .new-chat-btn,
     .mobile-history-btn {
-      background: #1a1f29;
-      border: 1px solid #2a303b;
+      background: #17212b;
+      color: #ffffff;
+      border: 1px solid #263442;
       border-radius: 10px;
       padding: 9px 12px;
+      font-size: 13px;
     }
 
     .new-chat-btn:hover,
     .mobile-history-btn:hover {
-      background: #242a35;
+      background: #202d39;
     }
 
     .mobile-history-btn {
       display: none;
     }
 
+    /* =========================
+       DESKTOP INPUT
+    ========================= */
+
     .desktop-input-area {
       flex-shrink: 0;
-      padding: 12px 16px;
-      border-bottom: 1px solid #20242d;
-      background: #0f1218;
+      padding: 12px 18px;
+      background: #0b0f14;
+      border-bottom: 1px solid #1c2530;
     }
 
     .input-box {
@@ -104,8 +117,8 @@
       display: flex;
       align-items: flex-end;
       gap: 8px;
-      background: #171b23;
-      border: 1px solid #2a303b;
+      background: #111820;
+      border: 1px solid #273440;
       border-radius: 14px;
       padding: 8px;
     }
@@ -113,70 +126,115 @@
     textarea {
       flex: 1;
       min-width: 0;
-      max-height: 150px;
       resize: none;
-      border: 0;
+      max-height: 130px;
+      min-height: 40px;
+      border: none;
       outline: none;
       background: transparent;
-      color: #fff;
-      padding: 9px;
+      color: #ffffff;
+      font-size: 15px;
       line-height: 1.4;
+      padding: 10px;
     }
 
     textarea::placeholder {
-      color: #858c99;
+      color: #71808f;
     }
 
-    .voice-btn,
-    .file-btn,
-    .action-btn {
-      height: 42px;
-      min-width: 42px;
+    .action-btn,
+    .voice-btn {
+      flex-shrink: 0;
+      height: 40px;
+      min-width: 40px;
       border-radius: 10px;
-      background: #242a35;
-      border: 1px solid #303744;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #1b2732;
+      color: #ffffff;
+      font-size: 14px;
       padding: 0 12px;
     }
 
-    .voice-btn:hover,
-    .file-btn:hover {
-      background: #303744;
-    }
-
     .send-btn {
-      background: #ffffff;
-      color: #111318;
+      background: #2563eb;
       font-weight: 700;
-      min-width: 70px;
     }
 
     .send-btn:hover {
-      background: #e7e7e7;
+      background: #1d4ed8;
     }
 
-    .send-btn:disabled,
-    .voice-btn:disabled,
-    .file-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .voice-btn:hover {
+      background: #263645;
     }
+
+    .voice-btn.active {
+      background: #b91c1c;
+    }
+
+    /* =========================
+       PDF
+    ========================= */
+
+    .file-input {
+      display: none;
+    }
+
+    .selected-file {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      margin: 0 18px 8px;
+      background: #101922;
+      border: 1px solid #263542;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #cbd5df;
+    }
+
+    .selected-file.show {
+      display: flex;
+    }
+
+    .selected-file-name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .remove-file-btn {
+      background: transparent;
+      color: #ff8b8b;
+      font-size: 18px;
+      padding: 2px 5px;
+    }
+
+    .pdf-btn {
+      font-size: 18px;
+      padding: 0 10px;
+    }
+
+    /* =========================
+       MESSAGES
+    ========================= */
 
     .messages {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
-      padding: 18px 16px 30px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #334454 transparent;
     }
 
     .message-row {
-      width: 100%;
       display: flex;
+      width: 100%;
     }
 
     .message-row.user {
@@ -188,69 +246,118 @@
     }
 
     .message {
-      max-width: min(760px, 85%);
+      max-width: min(78%, 850px);
       padding: 11px 14px;
       border-radius: 14px;
+      font-size: 15px;
+      line-height: 1.5;
       white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.45;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
     }
 
     .message.user {
-      background: #ffffff;
-      color: #111318;
+      background: #2563eb;
+      color: #ffffff;
       border-bottom-right-radius: 5px;
     }
 
     .message.assistant {
-      background: #191e27;
-      border: 1px solid #292f3a;
+      background: #17212b;
+      color: #e9eef3;
+      border: 1px solid #253341;
       border-bottom-left-radius: 5px;
     }
 
     .welcome {
       margin: auto;
       text-align: center;
-      color: #aeb5c1;
+      color: #8b9aaa;
       padding: 30px;
     }
 
     .welcome h1 {
-      color: #fff;
-      margin-bottom: 8px;
+      color: #ffffff;
+      font-size: 30px;
+      margin: 0 0 12px;
     }
+
+    .welcome p {
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* =========================
+       TYPING
+    ========================= */
 
     .typing-row {
       display: flex;
       justify-content: flex-start;
+      width: 100%;
     }
 
     .typing {
-      background: #191e27;
-      border: 1px solid #292f3a;
+      background: #17212b;
+      border: 1px solid #253341;
       border-radius: 14px;
-      padding: 10px 14px;
-      color: #aeb5c1;
+      padding: 11px 14px;
+      display: flex;
+      gap: 5px;
     }
 
+    .typing span {
+      width: 6px;
+      height: 6px;
+      background: #8999a8;
+      border-radius: 50%;
+      animation: typing 1.2s infinite;
+    }
+
+    .typing span:nth-child(2) {
+      animation-delay: .15s;
+    }
+
+    .typing span:nth-child(3) {
+      animation-delay: .3s;
+    }
+
+    @keyframes typing {
+      0%,
+      60%,
+      100% {
+        opacity: .3;
+        transform: translateY(0);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translateY(-3px);
+      }
+    }
+
+    /* =========================
+       SIDE PANEL
+    ========================= */
+
     .side-panel {
-      width: 290px;
+      width: 280px;
       height: 100%;
       flex-shrink: 0;
-      border-left: 1px solid #20242d;
-      background: #10131a;
+      border-left: 1px solid #1c2530;
+      background: #0d1218;
       display: flex;
       flex-direction: column;
     }
 
     .side-header {
-      height: 62px;
+      height: 58px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       padding: 0 16px;
-      border-bottom: 1px solid #20242d;
       font-weight: 700;
+      border-bottom: 1px solid #1c2530;
     }
 
     .history-list {
@@ -262,123 +369,93 @@
     .history-item {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
+      gap: 7px;
+      margin-bottom: 7px;
     }
 
     .history-open {
       flex: 1;
       min-width: 0;
       text-align: left;
-      background: #171b23;
-      border: 1px solid #252b35;
-      border-radius: 9px;
+      background: #111820;
+      color: #dce4eb;
+      border: 1px solid #202d39;
+      border-radius: 10px;
       padding: 10px;
-      color: #fff;
       overflow: hidden;
-      white-space: nowrap;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .history-open:hover {
-      background: #222833;
+      background: #18232d;
+    }
+
+    .history-open.active {
+      border-color: #2563eb;
+      background: #142338;
     }
 
     .history-delete {
       width: 34px;
       height: 34px;
       border-radius: 8px;
-      background: #1c2028;
-      color: #aaa;
+      background: #171d23;
+      color: #ff8585;
+      font-size: 16px;
     }
 
-    .history-delete:hover {
-      background: #30252a;
-      color: #fff;
+    .history-empty {
+      color: #6f7e8d;
+      font-size: 13px;
+      text-align: center;
+      padding: 25px 10px;
     }
+
+    /* =========================
+       MOBILE INPUT
+    ========================= */
 
     .mobile-input-area {
       display: none;
     }
 
-    .file-info {
-      display: none;
-      margin: 0 16px 8px;
-      padding: 9px 12px;
-      background: #171b23;
-      border: 1px solid #2a303b;
-      border-radius: 10px;
-      color: #cbd1db;
-      font-size: 13px;
-    }
-
-    .file-info.show {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .file-info-name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .file-remove {
-      background: transparent;
-      color: #aaa;
-      font-size: 16px;
-    }
-
-    .listening {
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.45;
-      }
-
-      100% {
-        opacity: 1;
-      }
-    }
+    /* =========================
+       MOBILE
+    ========================= */
 
     @media (max-width: 800px) {
-
       html,
       body {
-        overflow: hidden;
+        height: 100%;
       }
 
       .app {
-        display: block;
+        height: 100dvh;
       }
 
-      .chat-column {
-        width: 100%;
-        height: 100vh;
+      .side-panel {
+        display: none;
       }
 
       .chat-top {
-        height: 58px;
-        padding: 0 12px;
+        height: 56px;
+        padding: 0 10px;
+      }
+
+      .chat-title {
+        font-size: 15px;
       }
 
       .new-chat-btn {
-        padding: 8px 10px;
-        font-size: 13px;
+        padding: 8px 9px;
+        font-size: 12px;
       }
 
       .mobile-history-btn {
         display: block;
-        padding: 8px 10px;
-        font-size: 13px;
+        padding: 8px 9px;
+        font-size: 12px;
       }
 
       .desktop-input-area {
@@ -386,39 +463,29 @@
       }
 
       .messages {
-        padding: 14px 10px 95px;
+        padding: 12px 10px 100px;
+        gap: 8px;
       }
 
       .message {
-        max-width: 90%;
+        max-width: 88%;
+        font-size: 15px;
       }
 
-      .side-panel {
-        display: none;
-        position: fixed;
-        z-index: 100;
-        top: 0;
-        right: 0;
-        width: 85%;
-        max-width: 330px;
-        height: 100vh;
-        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
-      }
-
-      .side-panel.open {
-        display: flex;
+      .selected-file {
+        margin: 0 10px 7px;
       }
 
       .mobile-input-area {
+        display: block;
         position: fixed;
-        z-index: 50;
         left: 0;
         right: 0;
         bottom: 0;
-        display: block;
+        z-index: 20;
         padding: 8px;
-        background: rgba(15, 18, 24, 0.98);
-        border-top: 1px solid #20242d;
+        background: rgba(11, 15, 20, .97);
+        border-top: 1px solid #1c2530;
       }
 
       .mobile-input-area .input-box {
@@ -426,24 +493,84 @@
       }
 
       .mobile-input-area textarea {
-        max-height: 110px;
+        min-height: 38px;
+        max-height: 100px;
+        padding: 9px;
+        font-size: 14px;
       }
 
-      .mobile-input-area .send-btn {
-        min-width: 58px;
-        padding: 0 9px;
-      }
-
-      .mobile-input-area .voice-btn,
-      .mobile-input-area .file-btn {
+      .mobile-input-area .action-btn,
+      .mobile-input-area .voice-btn {
+        height: 38px;
         min-width: 38px;
-        width: 38px;
-        padding: 0;
+        padding: 0 8px;
       }
 
-      .file-info {
-        margin: 0 8px 7px;
+      .mobile-file-info {
+        display: none;
       }
+
+      .mobile-file-info.show {
+        display: flex;
+      }
+
+      .welcome h1 {
+        font-size: 25px;
+      }
+    }
+
+    /* =========================
+       HISTORY MOBILE OVERLAY
+    ========================= */
+
+    .mobile-history-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, .6);
+    }
+
+    .mobile-history-overlay.show {
+      display: block;
+    }
+
+    .mobile-history-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: min(320px, 85vw);
+      background: #0d1218;
+      border-right: 1px solid #26313d;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-history-header {
+      height: 58px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid #1c2530;
+      font-weight: 700;
+    }
+
+    .close-history {
+      width: 35px;
+      height: 35px;
+      border-radius: 8px;
+      background: #19222b;
+      color: #ffffff;
+      font-size: 18px;
+    }
+
+    .mobile-history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
     }
   </style>
 </head>
@@ -455,8 +582,10 @@
     <section class="chat-column">
 
       <div class="chat-top">
-
-        <div id="chatTitle" class="chat-title">
+        <div
+          id="chatTitle"
+          class="chat-title"
+        >
           Yeni Sohbet
         </div>
 
@@ -464,40 +593,44 @@
 
           <button
             class="mobile-history-btn"
-            id="mobileHistoryButton">
+            id="mobileHistoryButton"
+          >
             📚 Geçmiş
           </button>
 
           <button
             class="new-chat-btn"
-            id="newChatButton">
+            id="newChatButton"
+          >
             ➕ Yeni Sohbet
           </button>
 
         </div>
-
       </div>
 
 
-      <!-- PC DOSYA / MESAJ ALANI -->
+      <!-- DESKTOP INPUT -->
 
       <div class="desktop-input-area">
 
         <div
-          id="desktopFileInfo"
-          class="file-info">
+          id="desktopSelectedFile"
+          class="selected-file"
+        >
+          <span>📄</span>
 
           <span
-            id="desktopFileName"
-            class="file-info-name">
-          </span>
+            id="desktopSelectedFileName"
+            class="selected-file-name"
+          ></span>
 
           <button
             id="desktopRemoveFile"
-            class="file-remove">
-            ✕
+            class="remove-file-btn"
+            title="Dosyayı kaldır"
+          >
+            ×
           </button>
-
         </div>
 
         <div class="input-box">
@@ -505,70 +638,74 @@
           <textarea
             id="desktopInput"
             rows="1"
-            placeholder="Zatoi'ye bir şey sor..."></textarea>
-
-          <input
-            id="desktopFileInput"
-            type="file"
-            accept="application/pdf,.pdf"
-            hidden>
+            placeholder="Zatoi'ye bir şey sor..."
+          ></textarea>
 
           <button
-            id="desktopFileButton"
-            class="file-btn"
-            title="PDF yükle">
+            id="desktopPdfButton"
+            class="voice-btn pdf-btn"
+            title="PDF yükle"
+          >
             📎
           </button>
 
           <button
             id="micButton"
             class="voice-btn"
-            title="Sesli giriş">
+            title="Sesli konuş"
+          >
             🎤
           </button>
 
           <button
             id="voiceToggle"
             class="voice-btn"
-            title="Sesli cevap">
+            title="Sesli cevap"
+          >
             🔊
           </button>
 
           <button
             id="sendButton"
-            class="action-btn send-btn">
+            class="action-btn send-btn"
+          >
             Gönder
           </button>
 
         </div>
-
       </div>
 
 
-      <!-- MESAJLAR -->
+      <!-- MESSAGES -->
 
-      <div id="messages" class="messages"></div>
+      <div
+        id="messages"
+        class="messages"
+      ></div>
 
 
-      <!-- MOBİL MESAJ / DOSYA ALANI -->
+      <!-- MOBILE INPUT -->
 
       <div class="mobile-input-area">
 
         <div
-          id="mobileFileInfo"
-          class="file-info">
+          id="mobileSelectedFile"
+          class="selected-file mobile-file-info"
+        >
+          <span>📄</span>
 
           <span
-            id="mobileFileName"
-            class="file-info-name">
-          </span>
+            id="mobileSelectedFileName"
+            class="selected-file-name"
+          ></span>
 
           <button
             id="mobileRemoveFile"
-            class="file-remove">
-            ✕
+            class="remove-file-btn"
+            title="Dosyayı kaldır"
+          >
+            ×
           </button>
-
         </div>
 
         <div class="input-box">
@@ -576,49 +713,47 @@
           <textarea
             id="mobileInput"
             rows="1"
-            placeholder="Zatoi'ye bir şey sor..."></textarea>
-
-          <input
-            id="mobileFileInput"
-            type="file"
-            accept="application/pdf,.pdf"
-            hidden>
+            placeholder="Zatoi'ye bir şey sor..."
+          ></textarea>
 
           <button
-            id="mobileFileButton"
-            class="file-btn"
-            title="PDF yükle">
+            id="mobilePdfButton"
+            class="voice-btn pdf-btn"
+            title="PDF yükle"
+          >
             📎
           </button>
 
           <button
-            id="micButtonMobile"
+            id="mobileMicButton"
             class="voice-btn"
-            title="Sesli giriş">
+            title="Sesli konuş"
+          >
             🎤
           </button>
 
           <button
-            id="voiceToggleMobile"
+            id="mobileVoiceToggle"
             class="voice-btn"
-            title="Sesli cevap">
+            title="Sesli cevap"
+          >
             🔊
           </button>
 
           <button
-            id="sendButtonMobile"
-            class="action-btn send-btn">
-            Gönder
+            id="mobileSendButton"
+            class="action-btn send-btn"
+          >
+            ➤
           </button>
 
         </div>
-
       </div>
 
     </section>
 
 
-    <!-- GEÇMİŞ -->
+    <!-- DESKTOP HISTORY -->
 
     <aside class="side-panel">
 
@@ -628,188 +763,339 @@
 
       <div
         id="historyList"
-        class="history-list">
-      </div>
+        class="history-list"
+      ></div>
 
     </aside>
 
   </div>
 
 
-  <script>
+  <!-- HIDDEN FILE INPUT -->
 
-    /* =====================================================
-       AYARLAR
-    ===================================================== */
-
-    const WORKER_URL =
-      "https://zatoi-ai.fbboytr.workers.dev/";
-
-
-    const CHATS_KEY =
-      "zatoi_chats_v6";
-
-    const ACTIVE_CHAT_KEY =
-      "zatoi_active_chat_v6";
-
-    const GLOBAL_MEMORY_KEY =
-      "zatoi_global_memory_v6";
-
-    const VOICE_OUTPUT_KEY =
-      "zatoi_voice_output_v1";
+  <input
+    id="pdfInput"
+    class="file-input"
+    type="file"
+    accept="application/pdf,.pdf"
+  >
 
 
-    /* =====================================================
-       DOM
-    ===================================================== */
+  <!-- MOBILE HISTORY -->
 
-    const messagesElement =
-      document.getElementById("messages");
+  <div
+    id="mobileHistoryOverlay"
+    class="mobile-history-overlay"
+  >
 
-    const historyList =
-      document.getElementById("historyList");
+    <div class="mobile-history-panel">
 
-    const chatTitle =
-      document.getElementById("chatTitle");
+      <div class="mobile-history-header">
 
+        <span>💬 Zatoi Sohbetleri</span>
 
-    const desktopInput =
-      document.getElementById("desktopInput");
+        <button
+          id="closeHistoryButton"
+          class="close-history"
+        >
+          ×
+        </button>
 
-    const mobileInput =
-      document.getElementById("mobileInput");
+      </div>
 
+      <div
+        id="mobileHistoryList"
+        class="mobile-history-list"
+      ></div>
 
-    const sendButton =
-      document.getElementById("sendButton");
+    </div>
 
-    const sendButtonMobile =
-      document.getElementById("sendButtonMobile");
-
-
-    const micButton =
-      document.getElementById("micButton");
-
-    const micButtonMobile =
-      document.getElementById("micButtonMobile");
+  </div>
 
 
-    const voiceToggle =
-      document.getElementById("voiceToggle");
+<script>
 
-    const voiceToggleMobile =
-      document.getElementById("voiceToggleMobile");
+  /* =====================================================
+     AYARLAR
+  ===================================================== */
 
-
-    const newChatButton =
-      document.getElementById("newChatButton");
-
-    const mobileHistoryButton =
-      document.getElementById("mobileHistoryButton");
+  const WORKER_URL =
+    "https://zatoi-ai.fbboytr.workers.dev/";
 
 
-    /* =====================================================
-       DOSYA ELEMANLARI
-    ===================================================== */
+  const CHATS_KEY =
+    "zatoi_chats_v6";
 
-    const desktopFileInput =
-      document.getElementById("desktopFileInput");
+  const ACTIVE_CHAT_KEY =
+    "zatoi_active_chat_v6";
 
-    const mobileFileInput =
-      document.getElementById("mobileFileInput");
+  const GLOBAL_MEMORY_KEY =
+    "zatoi_global_memory_v6";
 
-
-    const desktopFileButton =
-      document.getElementById("desktopFileButton");
-
-    const mobileFileButton =
-      document.getElementById("mobileFileButton");
+  const VOICE_OUTPUT_KEY =
+    "zatoi_voice_output_v1";
 
 
-    const desktopFileInfo =
-      document.getElementById("desktopFileInfo");
+  /* =====================================================
+     ELEMENTLER
+  ===================================================== */
 
-    const mobileFileInfo =
-      document.getElementById("mobileFileInfo");
+  const messagesElement =
+    document.getElementById("messages");
+
+  const chatTitleElement =
+    document.getElementById("chatTitle");
+
+  const historyList =
+    document.getElementById("historyList");
+
+  const mobileHistoryList =
+    document.getElementById(
+      "mobileHistoryList"
+    );
+
+  const newChatButton =
+    document.getElementById(
+      "newChatButton"
+    );
+
+  const mobileHistoryButton =
+    document.getElementById(
+      "mobileHistoryButton"
+    );
+
+  const mobileHistoryOverlay =
+    document.getElementById(
+      "mobileHistoryOverlay"
+    );
+
+  const closeHistoryButton =
+    document.getElementById(
+      "closeHistoryButton"
+    );
 
 
-    const desktopFileName =
-      document.getElementById("desktopFileName");
+  const desktopInput =
+    document.getElementById(
+      "desktopInput"
+    );
 
-    const mobileFileName =
-      document.getElementById("mobileFileName");
-
-
-    const desktopRemoveFile =
-      document.getElementById("desktopRemoveFile");
-
-    const mobileRemoveFile =
-      document.getElementById("mobileRemoveFile");
+  const mobileInput =
+    document.getElementById(
+      "mobileInput"
+    );
 
 
-    /* =====================================================
-       HAFIZA
-    ===================================================== */
+  const sendButton =
+    document.getElementById(
+      "sendButton"
+    );
 
-    let globalMemory = {
-      name: "",
-      facts: [],
-      preferences: []
-    };
+  const mobileSendButton =
+    document.getElementById(
+      "mobileSendButton"
+    );
 
+
+  const micButton =
+    document.getElementById(
+      "micButton"
+    );
+
+  const mobileMicButton =
+    document.getElementById(
+      "mobileMicButton"
+    );
+
+
+  const voiceToggle =
+    document.getElementById(
+      "voiceToggle"
+    );
+
+  const mobileVoiceToggle =
+    document.getElementById(
+      "mobileVoiceToggle"
+    );
+
+
+  const pdfInput =
+    document.getElementById(
+      "pdfInput"
+    );
+
+  const desktopPdfButton =
+    document.getElementById(
+      "desktopPdfButton"
+    );
+
+  const mobilePdfButton =
+    document.getElementById(
+      "mobilePdfButton"
+    );
+
+
+  const desktopSelectedFile =
+    document.getElementById(
+      "desktopSelectedFile"
+    );
+
+  const mobileSelectedFile =
+    document.getElementById(
+      "mobileSelectedFile"
+    );
+
+
+  const desktopSelectedFileName =
+    document.getElementById(
+      "desktopSelectedFileName"
+    );
+
+  const mobileSelectedFileName =
+    document.getElementById(
+      "mobileSelectedFileName"
+    );
+
+
+  const desktopRemoveFile =
+    document.getElementById(
+      "desktopRemoveFile"
+    );
+
+  const mobileRemoveFile =
+    document.getElementById(
+      "mobileRemoveFile"
+    );
+
+
+  /* =====================================================
+     HAFIZA
+  ===================================================== */
+
+  let globalMemory = {
+    name: "",
+    facts: [],
+    preferences: []
+  };
+
+
+  function loadMemory() {
 
     try {
 
-      const savedMemory =
+      const saved =
         localStorage.getItem(
           GLOBAL_MEMORY_KEY
         );
 
-      if (savedMemory) {
+      if (saved) {
 
-        globalMemory =
-          JSON.parse(savedMemory);
+        const parsed =
+          JSON.parse(saved);
 
+        globalMemory = {
+          name:
+            parsed.name || "",
+
+          facts:
+            Array.isArray(parsed.facts)
+              ? parsed.facts
+              : [],
+
+          preferences:
+            Array.isArray(
+              parsed.preferences
+            )
+              ? parsed.preferences
+              : []
+        };
       }
 
     } catch (error) {
 
       console.log(
-        "Hafıza okunamadı:",
+        "Memory load error:",
         error
       );
 
     }
 
+  }
 
-    function saveMemory() {
+
+  function saveMemory() {
+
+    try {
 
       localStorage.setItem(
         GLOBAL_MEMORY_KEY,
         JSON.stringify(globalMemory)
       );
 
+    } catch (error) {
+
+      console.log(
+        "Memory save error:",
+        error
+      );
+
     }
 
+  }
 
-    /* =====================================================
-       SOHBETLER
-    ===================================================== */
 
-    let chats = [];
+  loadMemory();
 
-    let activeChatId = null;
 
+  /* =====================================================
+     CHAT SİSTEMİ
+  ===================================================== */
+
+  let chats = [];
+
+  let activeChatId = null;
+
+
+  function createChat() {
+
+    return {
+
+      id:
+        "chat_" +
+        Date.now() +
+        "_" +
+        Math.random()
+          .toString(36)
+          .slice(2, 8),
+
+      title: "Yeni Sohbet",
+
+      messages: [],
+
+      createdAt: Date.now(),
+
+      updatedAt: Date.now(),
+
+      document: null
+
+    };
+
+  }
+
+
+  function loadChats() {
 
     try {
 
-      const savedChats =
-        localStorage.getItem(CHATS_KEY);
+      const saved =
+        localStorage.getItem(
+          CHATS_KEY
+        );
 
-      if (savedChats) {
+      if (saved) {
 
         chats =
-          JSON.parse(savedChats);
+          JSON.parse(saved);
 
       }
 
@@ -820,439 +1106,76 @@
     }
 
 
-    try {
-
-      activeChatId =
-        localStorage.getItem(
-          ACTIVE_CHAT_KEY
-        );
-
-    } catch (error) {
-
-      activeChatId = null;
-
+    if (!Array.isArray(chats)) {
+      chats = [];
     }
 
 
-    function createChat() {
+    /*
+     * Eski sohbetleri yeni yapıya
+     * uyarlıyoruz.
+     */
+
+    chats = chats.map(chat => {
 
       return {
 
         id:
-          Date.now().toString(),
+          chat.id ||
+          (
+            "chat_" +
+            Date.now() +
+            Math.random()
+          ),
 
         title:
+          chat.title ||
           "Yeni Sohbet",
 
         messages:
-          []
+          Array.isArray(chat.messages)
+            ? chat.messages
+            : [],
+
+        createdAt:
+          chat.createdAt ||
+          Date.now(),
+
+        updatedAt:
+          chat.updatedAt ||
+          Date.now(),
+
+        document:
+          chat.document || null
 
       };
 
-    }
+    });
 
 
-    function getActiveChat() {
+    const savedActive =
+      localStorage.getItem(
+        ACTIVE_CHAT_KEY
+      );
 
-      return chats.find(
+
+    if (
+      savedActive &&
+      chats.some(
         chat =>
-          chat.id === activeChatId
-      );
+          chat.id === savedActive
+      )
+    ) {
 
-    }
+      activeChatId =
+        savedActive;
 
+    } else if (chats.length > 0) {
 
-    function saveChats() {
+      activeChatId =
+        chats[0].id;
 
-      localStorage.setItem(
-        CHATS_KEY,
-        JSON.stringify(chats)
-      );
-
-      if (activeChatId) {
-
-        localStorage.setItem(
-          ACTIVE_CHAT_KEY,
-          activeChatId
-        );
-
-      }
-
-    }
-
-
-    function ensureChat() {
-
-      if (!chats.length) {
-
-        const chat =
-          createChat();
-
-        chats.push(chat);
-
-        activeChatId =
-          chat.id;
-
-        saveChats();
-
-        return;
-
-      }
-
-
-      if (
-        !activeChatId ||
-        !getActiveChat()
-      ) {
-
-        activeChatId =
-          chats[0].id;
-
-        saveChats();
-
-      }
-
-    }
-
-
-    ensureChat();
-
-
-    /* =====================================================
-       MOBİL KONTROL
-    ===================================================== */
-
-    function isMobile() {
-
-      return window.innerWidth <= 800;
-
-    }
-
-
-    /* =====================================================
-       SCROLL
-    ===================================================== */
-
-    function scrollToBottom() {
-
-      messagesElement.scrollTop =
-        messagesElement.scrollHeight;
-
-    }
-
-
-    function scrollToTop() {
-
-      messagesElement.scrollTop = 0;
-
-    }
-
-
-    /* =====================================================
-       MESAJLARI GÖSTER
-    ===================================================== */
-
-    function renderMessages() {
-
-      messagesElement.innerHTML = "";
-
-      const chat =
-        getActiveChat();
-
-
-      if (
-        !chat ||
-        chat.messages.length === 0
-      ) {
-
-        messagesElement.innerHTML = `
-
-          <div class="welcome">
-
-            <h1>Zatoi AI 🤖</h1>
-
-            <p>
-              Merhaba! Ben Zatoi.
-              <br>
-              Sana nasıl yardımcı olabilirim?
-            </p>
-
-          </div>
-
-        `;
-
-        return;
-
-      }
-
-
-      let messagesToShow;
-
-
-      if (isMobile()) {
-
-        messagesToShow =
-          [...chat.messages];
-
-      } else {
-
-        messagesToShow =
-          [...chat.messages]
-            .reverse();
-
-      }
-
-
-      messagesToShow.forEach(
-        message => {
-
-          if (
-            message.role !== "user" &&
-            message.role !== "assistant"
-          ) {
-
-            return;
-
-          }
-
-
-          const row =
-            document.createElement(
-              "div"
-            );
-
-          row.className =
-            "message-row " +
-            message.role;
-
-
-          const bubble =
-            document.createElement(
-              "div"
-            );
-
-          bubble.className =
-            "message " +
-            message.role;
-
-          bubble.textContent =
-            message.content;
-
-
-          row.appendChild(
-            bubble
-          );
-
-          messagesElement.appendChild(
-            row
-          );
-
-        }
-      );
-
-
-      if (isMobile()) {
-
-        scrollToBottom();
-
-      } else {
-
-        scrollToTop();
-
-      }
-
-    }
-
-
-    /* =====================================================
-       GEÇMİŞİ GÖSTER
-    ===================================================== */
-
-    function renderHistory() {
-
-      historyList.innerHTML = "";
-
-
-      [...chats]
-        .reverse()
-        .forEach(chat => {
-
-          const item =
-            document.createElement(
-              "div"
-            );
-
-          item.className =
-            "history-item";
-
-
-          const openButton =
-            document.createElement(
-              "button"
-            );
-
-          openButton.className =
-            "history-open";
-
-          openButton.textContent =
-            chat.title ||
-            "Yeni Sohbet";
-
-
-          openButton.onclick =
-            () => {
-
-              activeChatId =
-                chat.id;
-
-              saveChats();
-
-              stopSpeaking();
-
-              renderAll();
-
-              if (isMobile()) {
-
-                document
-                  .querySelector(
-                    ".side-panel"
-                  )
-                  .classList.remove(
-                    "open"
-                  );
-
-              }
-
-            };
-
-
-          const deleteButton =
-            document.createElement(
-              "button"
-            );
-
-          deleteButton.className =
-            "history-delete";
-
-          deleteButton.textContent =
-            "✕";
-
-
-          deleteButton.onclick =
-            event => {
-
-              event.stopPropagation();
-
-              chats =
-                chats.filter(
-                  item =>
-                    item.id !==
-                    chat.id
-                );
-
-
-              if (
-                activeChatId ===
-                chat.id
-              ) {
-
-                if (chats.length) {
-
-                  activeChatId =
-                    chats[
-                      chats.length - 1
-                    ].id;
-
-                } else {
-
-                  const newChat =
-                    createChat();
-
-                  chats.push(
-                    newChat
-                  );
-
-                  activeChatId =
-                    newChat.id;
-
-                }
-
-              }
-
-
-              saveChats();
-
-              stopSpeaking();
-
-              renderAll();
-
-            };
-
-
-          item.appendChild(
-            openButton
-          );
-
-          item.appendChild(
-            deleteButton
-          );
-
-          historyList.appendChild(
-            item
-          );
-
-        });
-
-    }
-
-
-    /* =====================================================
-       BAŞLIK
-    ===================================================== */
-
-    function updateTitle() {
-
-      const chat =
-        getActiveChat();
-
-      if (!chat) {
-
-        chatTitle.textContent =
-          "Yeni Sohbet";
-
-        return;
-
-      }
-
-      chatTitle.textContent =
-        chat.title ||
-        "Yeni Sohbet";
-
-    }
-
-
-    /* =====================================================
-       HER ŞEYİ YENİLE
-    ===================================================== */
-
-    function renderAll() {
-
-      updateTitle();
-
-      renderHistory();
-
-      renderMessages();
-
-    }
-
-
-    /* =====================================================
-       YENİ SOHBET
-    ===================================================== */
-
-    function startNewChat() {
-
-      stopSpeaking();
+    } else {
 
       const chat =
         createChat();
@@ -1264,329 +1187,800 @@
 
       saveChats();
 
-      clearSelectedFile();
+    }
 
-      desktopInput.value = "";
+  }
 
-      mobileInput.value = "";
 
-      renderAll();
+  function saveChats() {
 
-      if (isMobile()) {
+    try {
 
-        mobileInput.focus();
+      localStorage.setItem(
+        CHATS_KEY,
+        JSON.stringify(chats)
+      );
 
-      } else {
+      localStorage.setItem(
+        ACTIVE_CHAT_KEY,
+        activeChatId || ""
+      );
 
-        desktopInput.focus();
+    } catch (error) {
 
-      }
+      console.log(
+        "Chat save error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  function getActiveChat() {
+
+    return chats.find(
+      chat =>
+        chat.id === activeChatId
+    );
+
+  }
+
+
+  function selectChat(id) {
+
+    stopSpeaking();
+
+    activeChatId = id;
+
+    saveChats();
+
+    clearSelectedFile();
+
+    renderAll();
+
+    closeMobileHistory();
+
+  }
+
+
+  function createNewChat() {
+
+    stopSpeaking();
+
+    const chat =
+      createChat();
+
+    chats.unshift(chat);
+
+    activeChatId =
+      chat.id;
+
+    saveChats();
+
+    clearSelectedFile();
+
+    renderAll();
+
+    setInputValue("");
+
+    focusInput();
+
+  }
+
+
+  function deleteChat(id) {
+
+    const index =
+      chats.findIndex(
+        chat =>
+          chat.id === id
+      );
+
+    if (index === -1) {
+      return;
+    }
+
+
+    const wasActive =
+      activeChatId === id;
+
+
+    chats.splice(index, 1);
+
+
+    if (chats.length === 0) {
+
+      const newChat =
+        createChat();
+
+      chats.push(newChat);
+
+      activeChatId =
+        newChat.id;
+
+    } else if (wasActive) {
+
+      activeChatId =
+        chats[0].id;
 
     }
 
 
-    newChatButton.onclick =
-      startNewChat;
+    saveChats();
+
+    clearSelectedFile();
+
+    renderAll();
+
+  }
 
 
-    /* =====================================================
-       MOBİL GEÇMİŞ
-    ===================================================== */
+  loadChats();
 
-    mobileHistoryButton.onclick =
-      () => {
 
-        const panel =
-          document.querySelector(
-            ".side-panel"
+  /* =====================================================
+     MOBİL KONTROL
+  ===================================================== */
+
+  function isMobile() {
+
+    return (
+      window.innerWidth <= 800
+    );
+
+  }
+
+
+  /* =====================================================
+     INPUT
+  ===================================================== */
+
+  function getInputElement() {
+
+    return isMobile()
+      ? mobileInput
+      : desktopInput;
+
+  }
+
+
+  function setInputValue(value) {
+
+    desktopInput.value = value;
+
+    mobileInput.value = value;
+
+    autoResize(
+      desktopInput
+    );
+
+    autoResize(
+      mobileInput
+    );
+
+  }
+
+
+  function focusInput() {
+
+    setTimeout(() => {
+
+      try {
+
+        getInputElement().focus();
+
+      } catch (error) {}
+
+    }, 100);
+
+  }
+
+
+  function autoResize(textarea) {
+
+    if (!textarea) {
+      return;
+    }
+
+    textarea.style.height =
+      "auto";
+
+    textarea.style.height =
+      Math.min(
+        textarea.scrollHeight,
+        130
+      ) + "px";
+
+  }
+
+
+  desktopInput.addEventListener(
+    "input",
+    () =>
+      autoResize(
+        desktopInput
+      )
+  );
+
+
+  mobileInput.addEventListener(
+    "input",
+    () =>
+      autoResize(
+        mobileInput
+      )
+  );
+
+
+  desktopInput.addEventListener(
+    "keydown",
+    event => {
+
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+      }
+
+    }
+  );
+
+
+  mobileInput.addEventListener(
+    "keydown",
+    event => {
+
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+      }
+
+    }
+  );
+
+
+  /* =====================================================
+     MESAJLAR
+  ===================================================== */
+
+  function renderMessages() {
+
+    messagesElement.innerHTML = "";
+
+    const chat =
+      getActiveChat();
+
+
+    if (
+      !chat ||
+      chat.messages.length === 0
+    ) {
+
+      messagesElement.innerHTML = `
+        <div class="welcome">
+          <h1>Zatoi AI 🤖</h1>
+          <p>
+            Merhaba! Ben Zatoi.
+            <br>
+            Sana nasıl yardımcı olabilirim?
+          </p>
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    let messagesToShow;
+
+
+    /*
+     * MOBİL:
+     * Eski → yeni
+     *
+     * PC:
+     * Yeni → eski
+     */
+
+    if (isMobile()) {
+
+      messagesToShow =
+        [...chat.messages];
+
+    } else {
+
+      messagesToShow =
+        [...chat.messages]
+          .reverse();
+
+    }
+
+
+    messagesToShow.forEach(
+      message => {
+
+        if (
+          message.role !== "user" &&
+          message.role !== "assistant"
+        ) {
+          return;
+        }
+
+
+        const row =
+          document.createElement(
+            "div"
           );
 
-        panel.classList.toggle(
-          "open"
+        row.className =
+          "message-row " +
+          message.role;
+
+
+        const bubble =
+          document.createElement(
+            "div"
+          );
+
+        bubble.className =
+          "message " +
+          message.role;
+
+        bubble.textContent =
+          message.content;
+
+
+        row.appendChild(
+          bubble
         );
-
-      };
-
-
-    /* =====================================================
-       DOSYA
-    ===================================================== */
-
-    let selectedFile = null;
-
-
-    function showSelectedFile(file) {
-
-      selectedFile =
-        file;
-
-
-      desktopFileName.textContent =
-        "📄 " + file.name;
-
-      mobileFileName.textContent =
-        "📄 " + file.name;
-
-
-      desktopFileInfo.classList.add(
-        "show"
-      );
-
-      mobileFileInfo.classList.add(
-        "show"
-      );
-
-    }
-
-
-    function clearSelectedFile() {
-
-      selectedFile = null;
-
-
-      desktopFileInput.value = "";
-
-      mobileFileInput.value = "";
-
-
-      desktopFileInfo.classList.remove(
-        "show"
-      );
-
-      mobileFileInfo.classList.remove(
-        "show"
-      );
-
-      desktopFileName.textContent =
-        "";
-
-      mobileFileName.textContent =
-        "";
-
-    }
-
-
-    function handleFile(file) {
-
-      if (!file) {
-        return;
-      }
-
-
-      const isPdf =
-        file.type ===
-          "application/pdf" ||
-        file.name
-          .toLowerCase()
-          .endsWith(".pdf");
-
-
-      if (!isPdf) {
-
-        alert(
-          "Şimdilik yalnızca PDF dosyaları destekleniyor."
-        );
-
-        return;
-
-      }
-
-
-      showSelectedFile(file);
-
-    }
-
-
-    desktopFileButton.onclick =
-      () => {
-
-        desktopFileInput.click();
-
-      };
-
-
-    mobileFileButton.onclick =
-      () => {
-
-        mobileFileInput.click();
-
-      };
-
-
-    desktopFileInput.onchange =
-      () => {
-
-        handleFile(
-          desktopFileInput.files[0]
-        );
-
-      };
-
-
-    mobileFileInput.onchange =
-      () => {
-
-        handleFile(
-          mobileFileInput.files[0]
-        );
-
-      };
-
-
-    desktopRemoveFile.onclick =
-      clearSelectedFile;
-
-
-    mobileRemoveFile.onclick =
-      clearSelectedFile;
-
-
-    /* =====================================================
-       YAZI ALANLARI
-    ===================================================== */
-
-    function resizeTextarea(textarea) {
-
-      textarea.style.height =
-        "auto";
-
-      textarea.style.height =
-        Math.min(
-          textarea.scrollHeight,
-          150
-        ) + "px";
-
-    }
-
-
-    desktopInput.addEventListener(
-      "input",
-      () => {
-
-        resizeTextarea(
-          desktopInput
-        );
-
-      }
-    );
-
-
-    mobileInput.addEventListener(
-      "input",
-      () => {
-
-        resizeTextarea(
-          mobileInput
-        );
-
-      }
-    );
-
-
-    /* =====================================================
-       TYPING
-    ===================================================== */
-
-    function showTyping() {
-
-      const row =
-        document.createElement(
-          "div"
-        );
-
-      row.className =
-        "typing-row";
-
-      row.id =
-        "typingIndicator";
-
-
-      const bubble =
-        document.createElement(
-          "div"
-        );
-
-      bubble.className =
-        "typing";
-
-      bubble.textContent =
-        "Zatoi yazıyor...";
-
-
-      row.appendChild(
-        bubble
-      );
-
-
-      if (isMobile()) {
 
         messagesElement.appendChild(
           row
         );
 
-        scrollToBottom();
-
-      } else {
-
-        messagesElement.insertBefore(
-          row,
-          messagesElement.firstChild
-        );
-
-        scrollToTop();
-
       }
+    );
+
+
+    if (isMobile()) {
+
+      scrollToBottom();
+
+    } else {
+
+      scrollToTop();
+
+    }
+
+  }
+
+
+  function scrollToBottom() {
+
+    setTimeout(() => {
+
+      messagesElement.scrollTop =
+        messagesElement.scrollHeight;
+
+    }, 20);
+
+  }
+
+
+  function scrollToTop() {
+
+    setTimeout(() => {
+
+      messagesElement.scrollTop =
+        0;
+
+    }, 20);
+
+  }
+
+
+  /* =====================================================
+     TYPING
+  ===================================================== */
+
+  function showTyping() {
+
+    hideTyping();
+
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.id =
+      "typingRow";
+
+    row.className =
+      "typing-row";
+
+
+    row.innerHTML = `
+      <div class="typing">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    `;
+
+
+    if (isMobile()) {
+
+      messagesElement.appendChild(
+        row
+      );
+
+      scrollToBottom();
+
+    } else {
+
+      messagesElement.insertBefore(
+        row,
+        messagesElement.firstChild
+      );
+
+      scrollToTop();
+
+    }
+
+  }
+
+
+  function hideTyping() {
+
+    const typing =
+      document.getElementById(
+        "typingRow"
+      );
+
+    if (typing) {
+      typing.remove();
+    }
+
+  }
+
+
+  /* =====================================================
+     CHAT BAŞLIĞI
+  ===================================================== */
+
+  function updateChatTitle() {
+
+    const chat =
+      getActiveChat();
+
+
+    if (!chat) {
+
+      chatTitleElement.textContent =
+        "Yeni Sohbet";
+
+      return;
 
     }
 
 
-    function hideTyping() {
+    chatTitleElement.textContent =
+      chat.title ||
+      "Yeni Sohbet";
 
-      const typing =
-        document.getElementById(
-          "typingIndicator"
-        );
+  }
 
-      if (typing) {
 
-        typing.remove();
+  function updateTitleFromMessage(
+    chat,
+    text
+  ) {
 
-      }
+    if (
+      chat.title !==
+        "Yeni Sohbet"
+    ) {
+      return;
+    }
+
+
+    const clean =
+      text
+        .replace(/\s+/g, " ")
+        .trim();
+
+
+    if (!clean) {
+      return;
+    }
+
+
+    chat.title =
+      clean.length > 35
+        ? clean.slice(0, 35) + "..."
+        : clean;
+
+  }
+
+
+  /* =====================================================
+     GEÇMİŞ
+  ===================================================== */
+
+  function renderHistory() {
+
+    renderHistoryInto(
+      historyList
+    );
+
+    renderHistoryInto(
+      mobileHistoryList
+    );
+
+  }
+
+
+  function renderHistoryInto(
+    element
+  ) {
+
+    element.innerHTML = "";
+
+
+    if (chats.length === 0) {
+
+      element.innerHTML = `
+        <div class="history-empty">
+          Henüz sohbet yok.
+        </div>
+      `;
+
+      return;
 
     }
 
 
-    /* =====================================================
-       PDF'Yİ WORKER'A GÖNDER
-    ===================================================== */
+    chats.forEach(chat => {
 
-    async function uploadPdf(file) {
+      const item =
+        document.createElement(
+          "div"
+        );
 
-      const formData =
-        new FormData();
+      item.className =
+        "history-item";
 
 
-      formData.append(
-        "file",
-        file
+      const openButton =
+        document.createElement(
+          "button"
+        );
+
+      openButton.className =
+        "history-open";
+
+
+      if (
+        chat.id === activeChatId
+      ) {
+
+        openButton.classList.add(
+          "active"
+        );
+
+      }
+
+
+      openButton.textContent =
+        chat.title ||
+        "Yeni Sohbet";
+
+
+      openButton.onclick =
+        () =>
+          selectChat(chat.id);
+
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+      deleteButton.className =
+        "history-delete";
+
+      deleteButton.textContent =
+        "🗑️";
+
+      deleteButton.title =
+        "Sohbeti sil";
+
+
+      deleteButton.onclick =
+        event => {
+
+          event.stopPropagation();
+
+          deleteChat(
+            chat.id
+          );
+
+        };
+
+
+      item.appendChild(
+        openButton
+      );
+
+      item.appendChild(
+        deleteButton
       );
 
 
-      formData.append(
-        "memory",
-        JSON.stringify(
-          globalMemory
-        )
+      element.appendChild(
+        item
       );
 
+    });
 
-      formData.append(
-        "messages",
-        JSON.stringify(
-          []
-        )
+  }
+
+
+  /* =====================================================
+     RENDER ALL
+  ===================================================== */
+
+  function renderAll() {
+
+    updateChatTitle();
+
+    renderMessages();
+
+    renderHistory();
+
+  }
+
+
+  /* =====================================================
+     PDF DOSYASI
+  ===================================================== */
+
+  let selectedPdf = null;
+
+  let documentData = null;
+
+
+  function updateSelectedFileUI() {
+
+    if (!selectedPdf) {
+
+      desktopSelectedFile
+        .classList.remove(
+          "show"
+        );
+
+      mobileSelectedFile
+        .classList.remove(
+          "show"
+        );
+
+      desktopSelectedFileName
+        .textContent = "";
+
+      mobileSelectedFileName
+        .textContent = "";
+
+      return;
+
+    }
+
+
+    desktopSelectedFileName
+      .textContent =
+        selectedPdf.name;
+
+
+    mobileSelectedFileName
+      .textContent =
+        selectedPdf.name;
+
+
+    desktopSelectedFile
+      .classList.add(
+        "show"
       );
 
+    mobileSelectedFile
+      .classList.add(
+        "show"
+      );
+
+  }
+
+
+  function clearSelectedFile() {
+
+    selectedPdf = null;
+
+    documentData = null;
+
+    pdfInput.value = "";
+
+    updateSelectedFileUI();
+
+  }
+
+
+  async function uploadPdf(file) {
+
+    if (!file) {
+      return null;
+    }
+
+
+    if (
+      file.type !==
+        "application/pdf" &&
+      !file.name
+        .toLowerCase()
+        .endsWith(".pdf")
+    ) {
+
+      alert(
+        "Lütfen bir PDF dosyası seç."
+      );
+
+      return null;
+
+    }
+
+
+    /*
+     * Çok büyük dosyalarda tarayıcıdan
+     * gönderim sorunları yaşanmaması için
+     * basit sınır.
+     */
+
+    if (
+      file.size >
+      25 * 1024 * 1024
+    ) {
+
+      alert(
+        "Bu PDF 25 MB'dan büyük. Daha küçük bir PDF dene."
+      );
+
+      return null;
+
+    }
+
+
+    const formData =
+      new FormData();
+
+
+    formData.append(
+      "file",
+      file
+    );
+
+
+    try {
 
       const response =
         await fetch(
@@ -1598,17 +1992,18 @@
         );
 
 
+      const data =
+        await response.json();
+
+
       if (!response.ok) {
 
         throw new Error(
-          "PDF gönderilemedi."
+          data.error ||
+          "PDF yüklenemedi."
         );
 
       }
-
-
-      const data =
-        await response.json();
 
 
       if (
@@ -1617,8 +2012,7 @@
       ) {
 
         throw new Error(
-          data.error ||
-          "PDF okunamadı."
+          "PDF'den metin alınamadı."
         );
 
       }
@@ -1635,688 +2029,800 @@
 
       };
 
+
+    } catch (error) {
+
+      console.log(
+        "PDF upload error:",
+        error
+      );
+
+
+      alert(
+        "PDF okunurken hata oluştu:\n\n" +
+        (
+          error.message ||
+          "Bilinmeyen hata"
+        )
+      );
+
+
+      return null;
+
+    }
+
+  }
+
+
+  async function handlePdfSelection(
+    event
+  ) {
+
+    const file =
+      event.target.files[0];
+
+
+    if (!file) {
+      return;
     }
 
 
-    /* =====================================================
-       MESAJ GÖNDER
-    ===================================================== */
-
-    async function sendMessage(
-      customInput = null
-    ) {
-
-      const input =
-        customInput ||
-        (
-          isMobile()
-            ? mobileInput
-            : desktopInput
-        );
+    const chat =
+      getActiveChat();
 
 
-      const text =
-        input.value.trim();
+    if (!chat) {
+      return;
+    }
 
 
-      if (
-        !text &&
-        !selectedFile
-      ) {
+    selectedPdf = file;
 
-        return;
+    documentData = null;
 
-      }
+    updateSelectedFileUI();
 
+
+    /*
+     * Yükleniyor göstergesi
+     */
+
+    desktopSelectedFileName
+      .textContent =
+        "PDF okunuyor...";
+
+    mobileSelectedFileName
+      .textContent =
+        "PDF okunuyor...";
+
+
+    const result =
+      await uploadPdf(file);
+
+
+    if (!result) {
+
+      clearSelectedFile();
+
+      return;
+
+    }
+
+
+    documentData = result;
+
+
+    /*
+     * PDF'yi aktif sohbetle ilişkilendiriyoruz.
+     * Böylece yeni mesajlarda da kullanılabilir.
+     */
+
+    chat.document = {
+
+      name:
+        result.name,
+
+      text:
+        result.text.slice(
+          0,
+          60000
+        )
+
+    };
+
+
+    chat.updatedAt =
+      Date.now();
+
+
+    saveChats();
+
+
+    updateSelectedFileUI();
+
+
+    desktopSelectedFileName
+      .textContent =
+        result.name +
+        " ✓";
+
+
+    mobileSelectedFileName
+      .textContent =
+        result.name +
+        " ✓";
+
+
+    /*
+     * Kullanıcıya ayrıca mesaj göndermiyoruz.
+     * Sadece PDF bağlama eklenmiş oluyor.
+     */
+
+    setInputValue(
+      ""
+    );
+
+    focusInput();
+
+  }
+
+
+  pdfInput.addEventListener(
+    "change",
+    handlePdfSelection
+  );
+
+
+  desktopPdfButton.onclick =
+    () => {
+
+      pdfInput.click();
+
+    };
+
+
+  mobilePdfButton.onclick =
+    () => {
+
+      pdfInput.click();
+
+    };
+
+
+  desktopRemoveFile.onclick =
+    () => {
 
       const chat =
         getActiveChat();
 
+      if (chat) {
 
-      if (!chat) {
-        return;
+        chat.document =
+          null;
+
+        saveChats();
+
+      }
+
+      clearSelectedFile();
+
+    };
+
+
+  mobileRemoveFile.onclick =
+    () => {
+
+      const chat =
+        getActiveChat();
+
+      if (chat) {
+
+        chat.document =
+          null;
+
+        saveChats();
+
+      }
+
+      clearSelectedFile();
+
+    };
+
+
+  /* =====================================================
+     MESAJ GÖNDER
+  ===================================================== */
+
+  let sending = false;
+
+
+  async function sendMessage() {
+
+    if (sending) {
+      return;
+    }
+
+
+    const input =
+      getInputElement();
+
+
+    const text =
+      input.value.trim();
+
+
+    if (!text) {
+      return;
+    }
+
+
+    const chat =
+      getActiveChat();
+
+
+    if (!chat) {
+      return;
+    }
+
+
+    sending = true;
+
+
+    /*
+     * Kullanıcı mesajını kaydet.
+     */
+
+    chat.messages.push({
+
+      role: "user",
+
+      content: text,
+
+      time: Date.now()
+
+    });
+
+
+    updateTitleFromMessage(
+      chat,
+      text
+    );
+
+
+    chat.updatedAt =
+      Date.now();
+
+
+    saveChats();
+
+    setInputValue("");
+
+    renderAll();
+
+    showTyping();
+
+
+    /*
+     * PDF bilgisi burada doğrudan
+     * Worker'a document olarak gönderiliyor.
+     *
+     * ÖNEMLİ:
+     * Önceki sistemde PDF metni sahte bir
+     * user mesajı olarak ekleniyordu.
+     *
+     * Artık bu yapılmıyor.
+     */
+
+    let documentForAI = null;
+
+
+    if (
+      chat.document &&
+      typeof chat.document.text ===
+        "string" &&
+      chat.document.text.trim()
+    ) {
+
+      documentForAI = {
+
+        name:
+          chat.document.name ||
+          "Yüklenen PDF",
+
+        text:
+          chat.document.text.slice(
+            0,
+            60000
+          )
+
+      };
+
+    }
+
+
+    try {
+
+      const recentMessages =
+        chat.messages.slice(-20);
+
+
+      const response =
+        await fetch(
+          WORKER_URL,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+
+                memory:
+                  globalMemory,
+
+                messages:
+                  recentMessages,
+
+                document:
+                  documentForAI
+
+              })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "Sunucudan hata döndü."
+        );
+
       }
 
 
       /*
-      -----------------------------------------------------
-      PDF VARSA ÖNCE OKU
-      -----------------------------------------------------
-      */
+       * HAFIZA GÜNCELLE
+       */
 
-      let documentData =
-        null;
+      if (data.memory) {
+
+        globalMemory = {
+
+          name:
+            data.memory.name ||
+            globalMemory.name ||
+            "",
+
+          facts:
+            Array.isArray(
+              data.memory.facts
+            )
+              ? data.memory.facts
+              : globalMemory.facts,
+
+          preferences:
+            Array.isArray(
+              data.memory.preferences
+            )
+              ? data.memory.preferences
+              : globalMemory.preferences
+
+        };
 
 
-      if (selectedFile) {
-
-        try {
-
-          setSendingState(true);
-
-          showTyping();
-
-
-          documentData =
-            await uploadPdf(
-              selectedFile
-            );
-
-
-          hideTyping();
-
-          setSendingState(false);
-
-
-        } catch (error) {
-
-          hideTyping();
-
-          setSendingState(false);
-
-          alert(
-            error.message ||
-            "PDF okunamadı."
-          );
-
-          return;
-
-        }
+        saveMemory();
 
       }
 
 
       /*
-      -----------------------------------------------------
-      KULLANICI MESAJI
-      -----------------------------------------------------
-      */
+       * CEVABI AL
+       */
 
-      let userContent =
-        text;
+      let reply =
+        data.reply;
+
+
+      /*
+       * Eski/alternatif AI response formatı
+       */
+
+      if (
+        !reply &&
+        data.choices &&
+        data.choices[0] &&
+        data.choices[0].message
+      ) {
+
+        reply =
+          data
+            .choices[0]
+            .message
+            .content;
+
+      }
 
 
       if (
-        documentData &&
-        !text
+        !reply &&
+        data.response
       ) {
 
-        userContent =
-          `📄 ${documentData.name} yüklendi.`;
+        reply =
+          data.response;
 
       }
 
 
+      if (!reply) {
+
+        reply =
+          "Üzgünüm, şu anda cevap oluşturamadım.";
+
+      }
+
+
+      /*
+       * Asistan mesajını kaydet
+       */
+
       chat.messages.push({
 
-        role:
-          "user",
+        role: "assistant",
 
-        content:
-          userContent
+        content: reply,
+
+        time: Date.now()
 
       });
 
 
-      /*
-      -----------------------------------------------------
-      BAŞLIK
-      -----------------------------------------------------
-      */
-
-      if (
-        chat.title ===
-        "Yeni Sohbet"
-      ) {
-
-        const titleSource =
-          text ||
-          documentData?.name ||
-          "Yeni Sohbet";
-
-
-        chat.title =
-          titleSource.length > 35
-            ? titleSource.slice(
-                0,
-                35
-              ) + "..."
-            : titleSource;
-
-      }
-
-
-      input.value = "";
-
-      resizeTextarea(input);
-
-
-      /*
-      -----------------------------------------------------
-      DOSYAYI TEMİZLE
-      -----------------------------------------------------
-      */
-
-      clearSelectedFile();
+      chat.updatedAt =
+        Date.now();
 
 
       saveChats();
+
+
+      hideTyping();
 
       renderAll();
 
 
       /*
-      -----------------------------------------------------
-      AI'YA GÖNDERİLECEK MESAJLAR
-      -----------------------------------------------------
-      */
+       * SESLİ CEVAP
+       */
 
-      let messagesForAI =
-        chat.messages;
+      if (
+        voiceOutputEnabled
+      ) {
+
+        speakText(
+          reply
+        );
+
+      }
 
 
-      if (documentData) {
+    } catch (error) {
 
-        /*
-        PDF içeriğini sadece bu isteğe
-        bağlam olarak ekliyoruz.
-        */
+      console.log(
+        "Send error:",
+        error
+      );
 
-        messagesForAI = [
 
-          ...chat.messages,
+      const errorMessage =
+        "Bağlantıda bir sorun oluştu. Lütfen tekrar dene.";
 
-          {
 
-            role:
-              "user",
+      chat.messages.push({
 
-            content:
-              `Yüklenen PDF dosyası: ${documentData.name}
+        role: "assistant",
 
-PDF içeriği:
+        content:
+          errorMessage,
 
-${documentData.text}
+        time: Date.now()
 
-Bu PDF'yi mevcut konuşmada kaynak olarak kullan. Kullanıcı PDF hakkında soru sorarsa içeriğe göre cevap ver.`
+      });
+
+
+      chat.updatedAt =
+        Date.now();
+
+
+      saveChats();
+
+
+      hideTyping();
+
+      renderAll();
+
+    } finally {
+
+      sending = false;
+
+      focusInput();
+
+    }
+
+  }
+
+
+  sendButton.onclick =
+    sendMessage;
+
+
+  mobileSendButton.onclick =
+    sendMessage;
+
+
+  /* =====================================================
+     SESLİ KONUŞMA
+  ===================================================== */
+
+  let recognition = null;
+
+  let isListening = false;
+
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+  if (SpeechRecognition) {
+
+    recognition =
+      new SpeechRecognition();
+
+
+    recognition.lang =
+      "tr-TR";
+
+    recognition.continuous =
+      false;
+
+    recognition.interimResults =
+      true;
+
+
+    recognition.onstart =
+      () => {
+
+        isListening = true;
+
+        updateMicButtons();
+
+      };
+
+
+    recognition.onend =
+      () => {
+
+        isListening = false;
+
+        updateMicButtons();
+
+      };
+
+
+    recognition.onerror =
+      event => {
+
+        isListening = false;
+
+        updateMicButtons();
+
+        console.log(
+          "Speech error:",
+          event.error
+        );
+
+      };
+
+
+    recognition.onresult =
+      event => {
+
+        let finalText = "";
+
+        let interimText = "";
+
+
+        for (
+          let i = event.resultIndex;
+          i < event.results.length;
+          i++
+        ) {
+
+          const transcript =
+            event.results[i][0].transcript;
+
+
+          if (
+            event.results[i].isFinal
+          ) {
+
+            finalText +=
+              transcript;
+
+          } else {
+
+            interimText +=
+              transcript;
 
           }
 
-        ];
-
-      }
+        }
 
 
-      const recentMessages =
-        messagesForAI.slice(-20);
+        if (finalText.trim()) {
 
-
-      /*
-      -----------------------------------------------------
-      TYPING
-      -----------------------------------------------------
-      */
-
-      showTyping();
-
-      setSendingState(true);
-
-
-      try {
-
-        const response =
-          await fetch(
-            WORKER_URL,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body:
-                JSON.stringify({
-
-                  memory:
-                    globalMemory,
-
-                  messages:
-                    recentMessages
-
-                })
-
-            }
+          setInputValue(
+            finalText.trim()
           );
 
+          sendMessage();
 
-        const data =
-          await response.json();
+        } else if (
+          interimText.trim()
+        ) {
 
-
-        if (!response.ok) {
-
-          throw new Error(
-            data.error ||
-            "Sunucu hatası oluştu."
+          setInputValue(
+            interimText
           );
 
         }
 
+      };
 
-        /*
-        ---------------------------------------------------
-        HAFIZA
-        ---------------------------------------------------
-        */
-
-        if (data.memory) {
-
-          globalMemory = {
-
-            name:
-              data.memory.name ||
-              globalMemory.name ||
-              "",
-
-            facts:
-              Array.isArray(
-                data.memory.facts
-              )
-                ? data.memory.facts
-                : globalMemory.facts,
-
-            preferences:
-              Array.isArray(
-                data.memory.preferences
-              )
-                ? data.memory.preferences
-                : globalMemory.preferences
-
-          };
+  }
 
 
-          saveMemory();
+  function toggleListening() {
 
-        }
+    if (!recognition) {
 
+      alert(
+        "Bu tarayıcı sesli konuşmayı desteklemiyor. Chrome kullanmayı deneyebilirsin."
+      );
 
-        /*
-        ---------------------------------------------------
-        CEVAP
-        ---------------------------------------------------
-        */
-
-        let reply =
-          data.reply;
-
-
-        if (
-          !reply &&
-          data.choices &&
-          data.choices[0] &&
-          data.choices[0].message
-        ) {
-
-          reply =
-            data
-              .choices[0]
-              .message
-              .content;
-
-        }
-
-
-        if (!reply) {
-
-          reply =
-            "Üzgünüm, şu anda cevap oluşturamadım.";
-
-        }
-
-
-        /*
-        ---------------------------------------------------
-        PDF İÇERİĞİ KALICI MESAJ OLARAK EKLENMİYOR
-        ---------------------------------------------------
-        */
-
-        chat.messages.push({
-
-          role:
-            "assistant",
-
-          content:
-            reply
-
-        });
-
-
-        saveChats();
-
-        hideTyping();
-
-        setSendingState(false);
-
-        renderAll();
-
-
-        /*
-        ---------------------------------------------------
-        SESLİ CEVAP
-        ---------------------------------------------------
-        */
-
-        if (
-          voiceOutputEnabled
-        ) {
-
-          speakText(reply);
-
-        }
-
-
-      } catch (error) {
-
-        console.log(
-          "Mesaj gönderme hatası:",
-          error
-        );
-
-
-        hideTyping();
-
-        setSendingState(false);
-
-
-        chat.messages.push({
-
-          role:
-            "assistant",
-
-          content:
-            "Üzgünüm, şu anda bağlantıda bir sorun oluştu."
-
-        });
-
-
-        saveChats();
-
-        renderAll();
-
-      }
+      return;
 
     }
 
 
-    /* =====================================================
-       GÖNDERME DURUMU
-    ===================================================== */
+    if (isListening) {
 
-    function setSendingState(
-      state
-    ) {
+      recognition.stop();
 
-      sendButton.disabled =
-        state;
-
-      sendButtonMobile.disabled =
-        state;
-
-      desktopFileButton.disabled =
-        state;
-
-      mobileFileButton.disabled =
-        state;
+      return;
 
     }
-
-
-    /* =====================================================
-       BUTONLAR
-    ===================================================== */
-
-    sendButton.onclick =
-      () => {
-
-        sendMessage(
-          desktopInput
-        );
-
-      };
-
-
-    sendButtonMobile.onclick =
-      () => {
-
-        sendMessage(
-          mobileInput
-        );
-
-      };
-
-
-    /* =====================================================
-       ENTER
-    ===================================================== */
-
-    desktopInput.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Enter" &&
-          !event.shiftKey
-        ) {
-
-          event.preventDefault();
-
-          sendMessage(
-            desktopInput
-          );
-
-        }
-
-      }
-    );
-
-
-    mobileInput.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Enter" &&
-          !event.shiftKey
-        ) {
-
-          event.preventDefault();
-
-          sendMessage(
-            mobileInput
-          );
-
-        }
-
-      }
-    );
-
-
-    /* =====================================================
-       SESLİ ÇIKIŞ
-    ===================================================== */
-
-    let voiceOutputEnabled =
-      true;
 
 
     try {
 
-      const savedVoice =
-        localStorage.getItem(
-          VOICE_OUTPUT_KEY
-        );
-
-      if (
-        savedVoice !== null
-      ) {
-
-        voiceOutputEnabled =
-          savedVoice === "true";
-
-      }
+      recognition.start();
 
     } catch (error) {
 
-      voiceOutputEnabled =
-        true;
+      console.log(
+        "Recognition start error:",
+        error
+      );
 
     }
 
-
-    function updateVoiceButtons() {
-
-      const icon =
-        voiceOutputEnabled
-          ? "🔊"
-          : "🔇";
+  }
 
 
-      voiceToggle.textContent =
-        icon;
+  function updateMicButtons() {
 
-      voiceToggleMobile.textContent =
-        icon;
+    if (isListening) {
 
-    }
+      micButton.textContent =
+        "⏹️";
 
-
-    function stopSpeaking() {
-
-      if (
-        "speechSynthesis"
-        in window
-      ) {
-
-        speechSynthesis.cancel();
-
-      }
-
-    }
+      mobileMicButton.textContent =
+        "⏹️";
 
 
-    function speakText(text) {
+      micButton.classList.add(
+        "active"
+      );
 
-      if (
-        !voiceOutputEnabled ||
-        !(
-          "speechSynthesis"
-          in window
-        )
-      ) {
+      mobileMicButton.classList.add(
+        "active"
+      );
 
-        return;
+    } else {
 
-      }
+      micButton.textContent =
+        "🎤";
 
-
-      stopSpeaking();
-
-
-      const cleanText =
-        String(text || "")
-          .trim();
+      mobileMicButton.textContent =
+        "🎤";
 
 
-      if (!cleanText) {
-        return;
-      }
+      micButton.classList.remove(
+        "active"
+      );
 
-
-      /*
-      Uzun cevapları parçalara böl.
-      */
-
-      const chunks = [];
-
-
-      for (
-        let i = 0;
-        i < cleanText.length;
-        i += 220
-      ) {
-
-        chunks.push(
-          cleanText.slice(
-            i,
-            i + 220
-          )
-        );
-
-      }
-
-
-      let index = 0;
-
-
-      function speakNext() {
-
-        if (
-          index >=
-          chunks.length
-        ) {
-
-          return;
-
-        }
-
-
-        const utterance =
-          new SpeechSynthesisUtterance(
-            chunks[index]
-          );
-
-
-        utterance.lang =
-          "tr-TR";
-
-        utterance.rate =
-          1.0;
-
-        utterance.pitch =
-          1.0;
-
-        utterance.volume =
-          1.0;
-
-
-        utterance.onend =
-          () => {
-
-            index++;
-
-            speakNext();
-
-          };
-
-
-        speechSynthesis.speak(
-          utterance
-        );
-
-      }
-
-
-      speakNext();
+      mobileMicButton.classList.remove(
+        "active"
+      );
 
     }
 
+  }
 
-    function toggleVoiceOutput() {
+
+  micButton.onclick =
+    toggleListening;
+
+
+  mobileMicButton.onclick =
+    toggleListening;
+
+
+  /* =====================================================
+     SESLİ CEVAP
+  ===================================================== */
+
+  let voiceOutputEnabled =
+    true;
+
+
+  try {
+
+    const savedVoice =
+      localStorage.getItem(
+        VOICE_OUTPUT_KEY
+      );
+
+
+    if (savedVoice !== null) {
 
       voiceOutputEnabled =
-        !voiceOutputEnabled;
+        savedVoice === "true";
 
+    }
+
+  } catch (error) {}
+
+
+  function updateVoiceButtons() {
+
+    const icon =
+      voiceOutputEnabled
+        ? "🔊"
+        : "🔇";
+
+
+    voiceToggle.textContent =
+      icon;
+
+    mobileVoiceToggle.textContent =
+      icon;
+
+  }
+
+
+  function saveVoiceSetting() {
+
+    try {
 
       localStorage.setItem(
         VOICE_OUTPUT_KEY,
@@ -2325,289 +2831,266 @@ Bu PDF'yi mevcut konuşmada kaynak olarak kullan. Kullanıcı PDF hakkında soru
         )
       );
 
+    } catch (error) {}
 
-      updateVoiceButtons();
-
-
-      if (
-        !voiceOutputEnabled
-      ) {
-
-        stopSpeaking();
-
-      }
-
-    }
+  }
 
 
-    voiceToggle.onclick =
-      toggleVoiceOutput;
+  function stopSpeaking() {
 
-
-    voiceToggleMobile.onclick =
-      toggleVoiceOutput;
-
-
-    updateVoiceButtons();
-
-
-    /* =====================================================
-       SESLİ GİRİŞ
-    ===================================================== */
-
-    const SpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
-
-
-    let recognition =
-      null;
-
-
-    let isListening =
-      false;
-
-
-    function getActiveInput() {
-
-      return isMobile()
-        ? mobileInput
-        : desktopInput;
-
-    }
-
-
-    function setMicVisual(
-      listening
+    if (
+      "speechSynthesis" in
+      window
     ) {
 
-      const icon =
-        listening
-          ? "⏹️"
-          : "🎤";
+      speechSynthesis.cancel();
+
+    }
+
+  }
 
 
-      micButton.textContent =
-        icon;
+  function speakText(text) {
 
-      micButtonMobile.textContent =
-        icon;
+    if (
+      !voiceOutputEnabled ||
+      !("speechSynthesis" in window)
+    ) {
 
-
-      if (listening) {
-
-        micButton.classList.add(
-          "listening"
-        );
-
-        micButtonMobile.classList.add(
-          "listening"
-        );
-
-      } else {
-
-        micButton.classList.remove(
-          "listening"
-        );
-
-        micButtonMobile.classList.remove(
-          "listening"
-        );
-
-      }
+      return;
 
     }
 
 
-    function startRecognition() {
-
-      if (!SpeechRecognition) {
-
-        alert(
-          "Bu tarayıcı sesli girişi desteklemiyor. Chrome kullanabilirsin."
-        );
-
-        return;
-
-      }
+    stopSpeaking();
 
 
-      if (isListening) {
+    /*
+     * Uzun cevapları küçük parçalara
+     * bölüyoruz.
+     */
 
-        recognition.stop();
+    const chunks = [];
 
-        return;
-
-      }
-
-
-      recognition =
-        new SpeechRecognition();
+    let current = "";
 
 
-      recognition.lang =
-        "tr-TR";
-
-      recognition.continuous =
-        false;
-
-      recognition.interimResults =
-        true;
+    const sentences =
+      text.split(
+        /(?<=[.!?])\s+/
+      );
 
 
-      const input =
-        getActiveInput();
+    sentences.forEach(
+      sentence => {
 
+        if (
+          current.length +
+            sentence.length >
+          220
+        ) {
 
-      recognition.onstart =
-        () => {
+          if (current.trim()) {
 
-          isListening =
-            true;
-
-          setMicVisual(
-            true
-          );
-
-        };
-
-
-      recognition.onresult =
-        event => {
-
-          let transcript =
-            "";
-
-
-          for (
-            let i = event.resultIndex;
-            i < event.results.length;
-            i++
-          ) {
-
-            transcript +=
-              event.results[i][0]
-                .transcript;
-
-          }
-
-
-          input.value =
-            transcript;
-
-          resizeTextarea(
-            input
-          );
-
-
-          const lastResult =
-            event.results[
-              event.results.length - 1
-            ];
-
-
-          if (
-            lastResult &&
-            lastResult.isFinal
-          ) {
-
-            setTimeout(
-              () => {
-
-                sendMessage(
-                  input
-                );
-
-              },
-              150
+            chunks.push(
+              current.trim()
             );
 
           }
 
-        };
+          current =
+            sentence;
 
+        } else {
 
-      recognition.onerror =
-        event => {
+          current +=
+            " " +
+            sentence;
 
-          console.log(
-            "Ses tanıma hatası:",
-            event.error
-          );
-
-
-          if (
-            event.error ===
-            "not-allowed"
-          ) {
-
-            alert(
-              "Mikrofon izni verilmedi."
-            );
-
-          }
-
-        };
-
-
-      recognition.onend =
-        () => {
-
-          isListening =
-            false;
-
-          setMicVisual(
-            false
-          );
-
-        };
-
-
-      try {
-
-        recognition.start();
-
-      } catch (error) {
-
-        console.log(
-          "Mikrofon başlatılamadı:",
-          error
-        );
-
-      }
-
-    }
-
-
-    micButton.onclick =
-      startRecognition;
-
-
-    micButtonMobile.onclick =
-      startRecognition;
-
-
-    /* =====================================================
-       PENCERE BOYUTU
-    ===================================================== */
-
-    window.addEventListener(
-      "resize",
-      () => {
-
-        renderMessages();
+        }
 
       }
     );
 
 
-    /* =====================================================
-       BAŞLANGIÇ
-    ===================================================== */
+    if (current.trim()) {
 
-    renderAll();
+      chunks.push(
+        current.trim()
+      );
 
-  </script>
+    }
+
+
+    let index = 0;
+
+
+    function speakNext() {
+
+      if (
+        index >=
+        chunks.length
+      ) {
+
+        return;
+
+      }
+
+
+      const utterance =
+        new SpeechSynthesisUtterance(
+          chunks[index]
+        );
+
+
+      utterance.lang =
+        "tr-TR";
+
+      utterance.rate =
+        1.0;
+
+      utterance.pitch =
+        1.0;
+
+      utterance.volume =
+        1.0;
+
+
+      utterance.onend =
+        () => {
+
+          index++;
+
+          speakNext();
+
+        };
+
+
+      speechSynthesis.speak(
+        utterance
+      );
+
+    }
+
+
+    speakNext();
+
+  }
+
+
+  function toggleVoiceOutput() {
+
+    voiceOutputEnabled =
+      !voiceOutputEnabled;
+
+
+    if (
+      !voiceOutputEnabled
+    ) {
+
+      stopSpeaking();
+
+    }
+
+
+    saveVoiceSetting();
+
+    updateVoiceButtons();
+
+  }
+
+
+  voiceToggle.onclick =
+    toggleVoiceOutput;
+
+
+  mobileVoiceToggle.onclick =
+    toggleVoiceOutput;
+
+
+  updateVoiceButtons();
+
+
+  /* =====================================================
+     MOBİL GEÇMİŞ
+  ===================================================== */
+
+  function openMobileHistory() {
+
+    mobileHistoryOverlay
+      .classList.add(
+        "show"
+      );
+
+  }
+
+
+  function closeMobileHistory() {
+
+    mobileHistoryOverlay
+      .classList.remove(
+        "show"
+      );
+
+  }
+
+
+  mobileHistoryButton.onclick =
+    openMobileHistory;
+
+
+  closeHistoryButton.onclick =
+    closeMobileHistory;
+
+
+  mobileHistoryOverlay.onclick =
+    event => {
+
+      if (
+        event.target ===
+        mobileHistoryOverlay
+      ) {
+
+        closeMobileHistory();
+
+      }
+
+    };
+
+
+  /* =====================================================
+     YENİ SOHBET
+  ===================================================== */
+
+  newChatButton.onclick =
+    createNewChat;
+
+
+  /* =====================================================
+     EKRAN BOYUTU DEĞİŞİNCE
+  ===================================================== */
+
+  window.addEventListener(
+    "resize",
+    () => {
+
+      renderMessages();
+
+    }
+  );
+
+
+  /* =====================================================
+     BAŞLANGIÇ
+  ===================================================== */
+
+  renderAll();
+
+  updateMicButtons();
+
+  focusInput();
+
+</script>
 
 </body>
 </html>
