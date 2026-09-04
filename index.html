@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -39,7 +40,7 @@
     }
 
     /* =========================
-       SOHBET ALANI
+       SOL SOHBET ALANI
     ========================= */
 
     .chat-column {
@@ -197,7 +198,7 @@
     }
 
     /* =========================
-       MESAJLAR
+       MESAJLAR - PC
     ========================= */
 
     .messages {
@@ -207,13 +208,11 @@
       padding: 18px;
 
       /*
-        PC'de en yeni mesajların üstte,
-        mesaj kutusunun hemen altında
-        görünmesini sağlıyoruz.
+        PC'de yeni mesajlar yukarıdan
+        başlıyor.
       */
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
     }
 
     .welcome {
@@ -417,18 +416,30 @@
         display: block;
       }
 
-      /* MOBİLDE KUTU ALTTA */
+      /*
+        MOBİLDE MESAJ KUTUSU ALTA SABİT
+      */
+
       .desktop-input-area {
         position: fixed;
         z-index: 20;
         left: 0;
         right: 0;
         bottom: 0;
+
         padding: 8px;
+
         padding-bottom:
-          calc(8px + env(safe-area-inset-bottom));
+          calc(
+            8px +
+            env(safe-area-inset-bottom)
+          );
+
         background: #0e141c;
-        border-top: 1px solid #202a36;
+
+        border-top:
+          1px solid #202a36;
+
         border-bottom: 0;
       }
 
@@ -451,15 +462,28 @@
         min-width: 40px;
       }
 
+      /*
+        ÖNEMLİ:
+
+        Telefonda eski sistem geri geliyor.
+        Mesajlar normal sırada:
+        eski mesajlar üstte,
+        yeni mesajlar altta.
+      */
+
       .messages {
         padding: 15px 12px;
-        padding-bottom: 85px;
 
-        /*
-          Telefonda normal sohbet düzeni.
-        */
+        padding-bottom:
+          85px;
+
         display: flex;
-        flex-direction: column;
+
+        flex-direction:
+          column;
+
+        overflow-y:
+          auto;
       }
 
       .message {
@@ -500,14 +524,17 @@
 <div class="app">
 
   <!-- =========================
-       SOL SOHBET
+       SOHBET
   ========================== -->
 
   <section class="chat-column">
 
     <div class="chat-top">
 
-      <div id="chatTitle" class="chat-title">
+      <div
+        id="chatTitle"
+        class="chat-title"
+      >
         Yeni Sohbet
       </div>
 
@@ -534,7 +561,9 @@
     </div>
 
 
-    <!-- MESAJ KUTUSU -->
+    <!-- =========================
+         MESAJ KUTUSU
+    ========================== -->
 
     <div class="desktop-input-area">
 
@@ -577,7 +606,9 @@
     </div>
 
 
-    <!-- MESAJLAR -->
+    <!-- =========================
+         MESAJLAR
+    ========================== -->
 
     <div
       id="messages"
@@ -588,7 +619,7 @@
 
 
   <!-- =========================
-       SAĞ PANEL
+       SOHBET GEÇMİŞİ
   ========================== -->
 
   <aside class="side-panel">
@@ -623,8 +654,8 @@
     "zatoi_active_chat_v6";
 
   /*
-    Hafıza kullanıcıya gösterilmiyor.
-    Tamamen arka planda çalışıyor.
+    Kullanıcı hafızası görünmez.
+    Arka planda çalışır.
   */
 
   const GLOBAL_MEMORY_KEY =
@@ -716,7 +747,9 @@
 
     localStorage.setItem(
       GLOBAL_MEMORY_KEY,
-      JSON.stringify(globalMemory)
+      JSON.stringify(
+        globalMemory
+      )
     );
   }
 
@@ -730,10 +763,12 @@
           GLOBAL_MEMORY_KEY
         );
 
+
       if (saved) {
 
         const parsed =
           JSON.parse(saved);
+
 
         globalMemory = {
 
@@ -741,12 +776,16 @@
             parsed.name || "",
 
           facts:
-            Array.isArray(parsed.facts)
+            Array.isArray(
+              parsed.facts
+            )
               ? parsed.facts
               : [],
 
           preferences:
-            Array.isArray(parsed.preferences)
+            Array.isArray(
+              parsed.preferences
+            )
               ? parsed.preferences
               : []
         };
@@ -773,6 +812,7 @@
       JSON.stringify(chats)
     );
 
+
     if (activeChatId) {
 
       localStorage.setItem(
@@ -794,17 +834,24 @@
         .replace(/\s+/g, " ")
         .trim();
 
+
     if (!title) {
 
       return "Yeni Sohbet";
     }
 
+
     if (title.length > 42) {
 
       title =
-        title.substring(0, 42)
-          .trim() + "...";
+        title.substring(
+          0,
+          42
+        )
+        .trim() +
+        "...";
     }
+
 
     return title;
   }
@@ -837,7 +884,10 @@
     };
 
 
-    chats.unshift(chat);
+    chats.unshift(
+      chat
+    );
+
 
     activeChatId =
       chat.id;
@@ -851,28 +901,34 @@
 
     updateChatTitle();
 
-    desktopInput.value = "";
+    desktopInput.value =
+      "";
+
 
     stopSpeaking();
 
 
-    setTimeout(() => {
+    setTimeout(
+      () => {
 
-      desktopInput.focus();
+        desktopInput.focus();
 
-    }, 50);
+      },
+      50
+    );
   }
 
 
   /* =========================================
-     AKTİF SOHBET
+     AKTİF SOHBETİ BUL
   ========================================= */
 
   function getActiveChat() {
 
     return chats.find(
       chat =>
-        chat.id === activeChatId
+        chat.id ===
+        activeChatId
     );
   }
 
@@ -903,12 +959,26 @@
 
 
   /* =========================================
+     MOBİL Mİ?
+  ========================================= */
+
+  function isMobile() {
+
+    return (
+      window.innerWidth <= 800
+    );
+  }
+
+
+  /* =========================================
      MESAJLARI GÖSTER
   ========================================= */
 
   function renderMessages() {
 
-    messagesElement.innerHTML = "";
+    messagesElement.innerHTML =
+      "";
+
 
     const chat =
       getActiveChat();
@@ -922,6 +992,7 @@
       messagesElement.innerHTML = `
         <div class="welcome">
           <h1>Zatoi AI 🤖</h1>
+
           <p>
             Merhaba! Ben Zatoi.
             <br>
@@ -935,78 +1006,129 @@
 
 
     /*
-      PC'de en yeni mesajın üstte görünmesi
-      için mesajları tersten ekliyoruz.
+      PC:
+      En yeni mesajlar üstte.
 
-      Böylece mesaj kutusunun hemen altında
-      en son konuşma görünüyor.
+      Telefon:
+      Eski sistem gibi normal sıra.
     */
 
-    const messages =
-      [...chat.messages].reverse();
+    let messagesToShow;
 
 
-    messages.forEach(message => {
+    if (isMobile()) {
 
-      if (
-        message.role !== "user" &&
-        message.role !== "assistant"
-      ) {
+      messagesToShow =
+        [...chat.messages];
 
-        return;
+    } else {
+
+      messagesToShow =
+        [...chat.messages]
+          .reverse();
+    }
+
+
+    messagesToShow.forEach(
+      message => {
+
+        /*
+          Başlık gibi başka kayıtlar
+          varsa ekrana mesaj olarak
+          basılmıyor.
+        */
+
+        if (
+          message.role !== "user" &&
+          message.role !== "assistant"
+        ) {
+
+          return;
+        }
+
+
+        const row =
+          document.createElement(
+            "div"
+          );
+
+
+        row.className =
+          "message-row " +
+          message.role;
+
+
+        const bubble =
+          document.createElement(
+            "div"
+          );
+
+
+        bubble.className =
+          "message " +
+          message.role;
+
+
+        bubble.textContent =
+          message.content;
+
+
+        row.appendChild(
+          bubble
+        );
+
+
+        messagesElement.appendChild(
+          row
+        );
       }
+    );
 
 
-      const row =
-        document.createElement("div");
+    if (isMobile()) {
 
-      row.className =
-        "message-row " +
-        message.role;
+      scrollToBottom();
 
+    } else {
 
-      const bubble =
-        document.createElement("div");
-
-      bubble.className =
-        "message " +
-        message.role;
-
-
-      bubble.textContent =
-        message.content;
-
-
-      row.appendChild(
-        bubble
-      );
-
-      messagesElement.appendChild(
-        row
-      );
-    });
-
-
-    /*
-      Yeni mesaj her zaman üstte olduğu
-      için scroll'u en üste getiriyoruz.
-    */
-
-    scrollToTop();
+      scrollToTop();
+    }
   }
 
 
   /* =========================================
-     ÜSTE KAYDIR
+     PC ÜSTE KAYDIR
   ========================================= */
 
   function scrollToTop() {
 
-    setTimeout(() => {
+    setTimeout(
+      () => {
 
-      messagesElement.scrollTop = 0;
+        messagesElement.scrollTop =
+          0;
 
-    }, 30);
+      },
+      30
+    );
+  }
+
+
+  /* =========================================
+     TELEFON ALTA KAYDIR
+  ========================================= */
+
+  function scrollToBottom() {
+
+    setTimeout(
+      () => {
+
+        messagesElement.scrollTop =
+          messagesElement.scrollHeight;
+
+      },
+      30
+    );
   }
 
 
@@ -1016,7 +1138,8 @@
 
   function renderHistory() {
 
-    historyList.innerHTML = "";
+    historyList.innerHTML =
+      "";
 
 
     if (chats.length === 0) {
@@ -1033,126 +1156,141 @@
     }
 
 
-    chats.forEach(chat => {
+    chats.forEach(
+      chat => {
 
-      const item =
-        document.createElement(
-          "div"
-        );
-
-      item.className =
-        "history-item";
+        const item =
+          document.createElement(
+            "div"
+          );
 
 
-      const openButton =
-        document.createElement(
-          "button"
-        );
-
-      openButton.type =
-        "button";
-
-      openButton.className =
-        "history-open" +
-        (
-          chat.id === activeChatId
-            ? " active"
-            : ""
-        );
+        item.className =
+          "history-item";
 
 
-      const date =
-        new Date(
-          chat.updatedAt
-        );
+        const openButton =
+          document.createElement(
+            "button"
+          );
 
 
-      const dateText =
-        date.toLocaleDateString(
-          "tr-TR",
-          {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
+        openButton.type =
+          "button";
+
+
+        openButton.className =
+          "history-open" +
+          (
+            chat.id ===
+            activeChatId
+              ? " active"
+              : ""
+          );
+
+
+        const date =
+          new Date(
+            chat.updatedAt
+          );
+
+
+        const dateText =
+          date.toLocaleDateString(
+            "tr-TR",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            }
+          );
+
+
+        openButton.innerHTML = `
+          <div class="history-title">
+            ${escapeHtml(
+              chat.title ||
+              "Yeni Sohbet"
+            )}
+          </div>
+
+          <div class="history-date">
+            ${dateText}
+          </div>
+        `;
+
+
+        openButton.addEventListener(
+          "click",
+          () => {
+
+            activeChatId =
+              chat.id;
+
+
+            saveChats();
+
+            renderHistory();
+
+            renderMessages();
+
+            updateChatTitle();
+
+            stopSpeaking();
           }
         );
 
 
-      openButton.innerHTML = `
-        <div class="history-title">
-          ${escapeHtml(
-            chat.title ||
-            "Yeni Sohbet"
-          )}
-        </div>
-
-        <div class="history-date">
-          ${dateText}
-        </div>
-      `;
+        const deleteButton =
+          document.createElement(
+            "button"
+          );
 
 
-      openButton.addEventListener(
-        "click",
-        () => {
-
-          activeChatId =
-            chat.id;
-
-          saveChats();
-
-          renderHistory();
-
-          renderMessages();
-
-          updateChatTitle();
-
-          stopSpeaking();
-        }
-      );
+        deleteButton.type =
+          "button";
 
 
-      const deleteButton =
-        document.createElement(
-          "button"
+        deleteButton.className =
+          "history-delete";
+
+
+        deleteButton.textContent =
+          "🗑️";
+
+
+        deleteButton.title =
+          "Sohbeti sil";
+
+
+        deleteButton.addEventListener(
+          "click",
+          event => {
+
+            event.stopPropagation();
+
+            deleteChat(
+              chat.id
+            );
+          }
         );
 
-      deleteButton.type =
-        "button";
 
-      deleteButton.className =
-        "history-delete";
-
-      deleteButton.textContent =
-        "🗑️";
-
-      deleteButton.title =
-        "Sohbeti sil";
+        item.appendChild(
+          openButton
+        );
 
 
-      deleteButton.addEventListener(
-        "click",
-        event => {
-
-          event.stopPropagation();
-
-          deleteChat(chat.id);
-        }
-      );
+        item.appendChild(
+          deleteButton
+        );
 
 
-      item.appendChild(
-        openButton
-      );
-
-      item.appendChild(
-        deleteButton
-      );
-
-      historyList.appendChild(
-        item
-      );
-    });
+        historyList.appendChild(
+          item
+        );
+      }
+    );
   }
 
 
@@ -1170,6 +1308,7 @@
 
 
     if (index === -1) {
+
       return;
     }
 
@@ -1255,6 +1394,7 @@
 
 
     if (!text) {
+
       return;
     }
 
@@ -1273,9 +1413,11 @@
 
 
     /*
-      İlk mesaj sohbet başlığı olur.
-      Fakat mesaj olarak yalnızca bir kez
-      messages içine eklenir.
+      İlk mesaj başlık olur.
+
+      Fakat başlık ayrı tutulur.
+      Mesaj sadece messages içine
+      bir kez eklenir.
     */
 
     if (
@@ -1311,19 +1453,22 @@
     renderMessages();
 
 
-    desktopInput.value = "";
+    desktopInput.value =
+      "";
+
 
     stopSpeaking();
 
 
     /* =====================================
-       ZATOI DÜŞÜNÜYOR
+       DÜŞÜNÜYOR
     ===================================== */
 
     const typingRow =
       document.createElement(
         "div"
       );
+
 
     typingRow.className =
       "message-row assistant";
@@ -1334,35 +1479,45 @@
         "div"
       );
 
+
     typingBubble.className =
       "message assistant typing";
+
 
     typingBubble.textContent =
       "Zatoi düşünüyor...";
 
 
     /*
-      Yeni mesajlar üstte olduğu için
-      typing de en üste ekleniyor.
+      PC'de en üste,
+      telefonda en alta ekle.
     */
 
-    messagesElement.insertBefore(
-      typingRow,
-      messagesElement.firstChild
-    );
+    if (isMobile()) {
 
+      messagesElement.appendChild(
+        typingRow
+      );
 
-    scrollToTop();
+      scrollToBottom();
+
+    } else {
+
+      messagesElement.insertBefore(
+        typingRow,
+        messagesElement.firstChild
+      );
+
+      scrollToTop();
+    }
 
 
     try {
 
-      /*
-        Son 20 mesaj
-      */
-
       const recentMessages =
-        chat.messages.slice(-20);
+        chat.messages.slice(
+          -20
+        );
 
 
       const response =
@@ -1374,6 +1529,7 @@
               "POST",
 
             headers: {
+
               "Content-Type":
                 "application/json"
             },
@@ -1405,7 +1561,7 @@
 
 
       /* =====================================
-         HAFIZAYI SESSİZCE GÜNCELLE
+         HAFIZAYI ARKA PLANDA GÜNCELLE
       ===================================== */
 
       if (data.memory) {
@@ -1461,8 +1617,6 @@
       }
 
 
-      /* TYPING KALDIR */
-
       typingRow.remove();
 
 
@@ -1495,12 +1649,16 @@
          SESLİ CEVAP
       ===================================== */
 
-      speakText(reply);
+      speakText(
+        reply
+      );
 
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       typingRow.remove();
@@ -1534,7 +1692,7 @@
 
 
   /* =========================================
-     ENTER
+     ENTER İLE GÖNDER
   ========================================= */
 
   desktopInput.addEventListener(
@@ -1557,7 +1715,7 @@
 
 
   /* =========================================
-     GÖNDER
+     GÖNDER BUTONU
   ========================================= */
 
   sendButton.addEventListener(
@@ -1624,6 +1782,7 @@
 
 
         if (!choice) {
+
           return;
         }
 
@@ -1650,7 +1809,9 @@
 
 
         activeChatId =
-          chats[number - 1].id;
+          chats[
+            number - 1
+          ].id;
 
 
         saveChats();
@@ -1694,11 +1855,14 @@
     recognition.lang =
       "tr-TR";
 
+
     recognition.continuous =
       false;
 
+
     recognition.interimResults =
       true;
+
 
     recognition.maxAlternatives =
       1;
@@ -1722,8 +1886,10 @@
 
 
         for (
-          let i = event.resultIndex;
-          i < event.results.length;
+          let i =
+            event.resultIndex;
+          i <
+            event.results.length;
           i++
         ) {
 
@@ -1799,6 +1965,7 @@
         isListening =
           false;
 
+
         updateMicButtons();
 
 
@@ -1868,6 +2035,7 @@
   function updateMicButtons() {
 
     if (!micButton) {
+
       return;
     }
 
@@ -1877,9 +2045,11 @@
       micButton.textContent =
         "⏹️";
 
+
       micButton.classList.add(
         "mic-listening"
       );
+
 
       micButton.title =
         "Dinlemeyi durdur";
@@ -1889,9 +2059,11 @@
       micButton.textContent =
         "🎤";
 
+
       micButton.classList.remove(
         "mic-listening"
       );
+
 
       micButton.title =
         "Sesli konuş";
@@ -1912,6 +2084,7 @@
   function updateVoiceToggle() {
 
     if (!voiceToggle) {
+
       return;
     }
 
@@ -1921,6 +2094,7 @@
       voiceToggle.textContent =
         "🔊";
 
+
       voiceToggle.title =
         "Sesli cevap açık";
 
@@ -1928,6 +2102,7 @@
 
       voiceToggle.textContent =
         "🔇";
+
 
       voiceToggle.title =
         "Sesli cevap kapalı";
@@ -1938,7 +2113,8 @@
   function stopSpeaking() {
 
     if (
-      "speechSynthesis" in window
+      "speechSynthesis" in
+      window
     ) {
 
       window.speechSynthesis.cancel();
@@ -1949,12 +2125,16 @@
   function speakText(text) {
 
     if (!voiceOutputEnabled) {
+
       return;
     }
 
 
     if (
-      !("speechSynthesis" in window)
+      !(
+        "speechSynthesis" in
+        window
+      )
     ) {
 
       return;
@@ -1962,6 +2142,7 @@
 
 
     if (!text) {
+
       return;
     }
 
@@ -1982,7 +2163,8 @@
     function speakNext() {
 
       if (
-        index >= chunks.length
+        index >=
+        chunks.length
       ) {
 
         return;
@@ -1998,11 +2180,14 @@
       utterance.lang =
         "tr-TR";
 
+
       utterance.rate =
         1.0;
 
+
       utterance.pitch =
         1.0;
+
 
       utterance.volume =
         1.0;
@@ -2040,41 +2225,46 @@
 
     const chunks = [];
 
-    let current = "";
+    let current =
+      "";
 
 
-    words.forEach(word => {
+    words.forEach(
+      word => {
 
-      if (
-        (
-          current +
-          " " +
-          word
-        )
-          .trim()
-          .length <= maxLength
-      ) {
-
-        current =
+        if (
           (
             current +
             " " +
             word
-          ).trim();
+          )
+            .trim()
+            .length <=
+          maxLength
+        ) {
 
-      } else {
+          current =
+            (
+              current +
+              " " +
+              word
+            ).trim();
 
-        if (current) {
+        } else {
 
-          chunks.push(
-            current
-          );
+          if (current) {
+
+            chunks.push(
+              current
+            );
+          }
+
+
+          current =
+            word;
         }
-
-        current =
-          word;
       }
-    });
+    );
 
 
     if (current) {
@@ -2108,7 +2298,9 @@
     updateVoiceToggle();
 
 
-    if (!voiceOutputEnabled) {
+    if (
+      !voiceOutputEnabled
+    ) {
 
       stopSpeaking();
     }
@@ -2122,7 +2314,7 @@
 
 
   /* =========================================
-     ESKİ SİSTEMİ YENİ SİSTEME TAŞI
+     ESKİ SOHBETLERİ TAŞI
   ========================================= */
 
   function migrateOldChats() {
@@ -2134,6 +2326,7 @@
 
 
     if (!oldChatsRaw) {
+
       return;
     }
 
@@ -2193,12 +2386,13 @@
               )
             ) {
 
-              globalMemory.facts = [
-                ...new Set([
-                  ...globalMemory.facts,
-                  ...oldMemory.facts
-                ])
-              ];
+              globalMemory.facts =
+                [
+                  ...new Set([
+                    ...globalMemory.facts,
+                    ...oldMemory.facts
+                  ])
+                ];
             }
 
 
@@ -2208,12 +2402,13 @@
               )
             ) {
 
-              globalMemory.preferences = [
-                ...new Set([
-                  ...globalMemory.preferences,
-                  ...oldMemory.preferences
-                ])
-              ];
+              globalMemory.preferences =
+                [
+                  ...new Set([
+                    ...globalMemory.preferences,
+                    ...oldMemory.preferences
+                  ])
+                ];
             }
           }
         }
@@ -2260,7 +2455,8 @@
         oldActive &&
         chats.some(
           chat =>
-            chat.id === oldActive
+            chat.id ===
+            oldActive
         )
       ) {
 
@@ -2353,7 +2549,8 @@
       savedActiveChat &&
       chats.some(
         chat =>
-          chat.id === savedActiveChat
+          chat.id ===
+          savedActiveChat
       )
     ) {
 
