@@ -2,8 +2,14 @@
 
 <html lang="tr">
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
+>
 
   <title>Zatoi AI</title>
 
@@ -13,17 +19,26 @@
       box-sizing: border-box;
     }
 
+
     html,
     body {
+
       margin: 0;
       padding: 0;
+
+      width: 100%;
+      height: 100%;
+
       background: #0f0f0f;
       color: white;
+
       font-family: Arial, sans-serif;
+
     }
 
+
     body {
-      min-height: 100vh;
+      overflow: hidden;
     }
 
 
@@ -32,110 +47,326 @@
     ========================= */
 
     header {
-      padding: 18px 15px;
-      text-align: center;
+
+      height: 70px;
+
+      display: flex;
+      align-items: center;
+
+      padding: 0 25px;
+
       background: #151515;
+
       border-bottom: 1px solid #292929;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+
+      position: relative;
+
+      z-index: 20;
+
     }
+
 
     header h1 {
+
       margin: 0;
-      font-size: 24px;
+
+      font-size: 23px;
+
     }
+
 
     header p {
-      margin: 5px 0 0;
-      color: #999;
+
+      margin: 4px 0 0 12px;
+
+      color: #888;
+
       font-size: 13px;
+
     }
 
 
     /* =========================
-       SOHBET
+       ANA PC ALANI
     ========================= */
 
-    #chat {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
+    #app {
 
-      /* Alt panel için boşluk */
-      padding-bottom: 190px;
-    }
+      height: calc(100vh - 70px);
 
-    .message {
-      margin-bottom: 15px;
-      padding: 13px 16px;
-      border-radius: 15px;
-      max-width: 85%;
-      white-space: pre-wrap;
-      line-height: 1.5;
-      word-wrap: break-word;
-    }
+      display: grid;
 
-    .user {
-      background: #2563eb;
-      margin-left: auto;
-    }
+      grid-template-columns:
+        minmax(0, 1fr)
+        330px;
 
-    .assistant {
-      background: #1e1e1e;
-      border: 1px solid #303030;
-      margin-right: auto;
-    }
-
-    .label {
-      font-size: 11px;
-      color: #aaa;
-      margin-bottom: 5px;
     }
 
 
     /* =========================
-       ALT PANEL
+       SOL SOHBET
+    ========================= */
+
+    #chatArea {
+
+      min-width: 0;
+
+      position: relative;
+
+      display: flex;
+
+      flex-direction: column;
+
+      background: #0f0f0f;
+
+    }
+
+
+    #chat {
+
+      flex: 1;
+
+      overflow-y: auto;
+
+      padding: 25px;
+
+      padding-bottom: 110px;
+
+      width: 100%;
+
+    }
+
+
+    .message {
+
+      margin-bottom: 16px;
+
+      padding: 13px 16px;
+
+      border-radius: 15px;
+
+      max-width: 78%;
+
+      white-space: pre-wrap;
+
+      line-height: 1.5;
+
+      word-wrap: break-word;
+
+    }
+
+
+    .user {
+
+      background: #2563eb;
+
+      margin-left: auto;
+
+    }
+
+
+    .assistant {
+
+      background: #1e1e1e;
+
+      border: 1px solid #303030;
+
+      margin-right: auto;
+
+    }
+
+
+    .label {
+
+      font-size: 11px;
+
+      color: #aaa;
+
+      margin-bottom: 5px;
+
+    }
+
+
+    /* =========================
+       PC SAĞ PANEL
+    ========================= */
+
+    #sidePanel {
+
+      border-left: 1px solid #292929;
+
+      background: #141414;
+
+      padding: 20px;
+
+      overflow-y: auto;
+
+    }
+
+
+    #sideTitle {
+
+      font-size: 18px;
+
+      font-weight: bold;
+
+      margin-bottom: 15px;
+
+    }
+
+
+    #sideDescription {
+
+      color: #888;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+
+      margin-bottom: 18px;
+
+    }
+
+
+    /* =========================
+       SAĞ PANEL BUTONLARI
+    ========================= */
+
+    #buttons {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 9px;
+
+      margin-bottom: 18px;
+
+    }
+
+
+    #buttons button {
+
+      width: 100%;
+
+      min-height: 45px;
+
+      border: 1px solid #3b3b3b;
+
+      border-radius: 11px;
+
+      background: #292929;
+
+      color: white;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: bold;
+
+    }
+
+
+    #buttons button:hover {
+
+      background: #333;
+
+    }
+
+
+    #buttons button:active {
+
+      transform: scale(0.98);
+
+    }
+
+
+    /* =========================
+       PC HAFIZA
+    ========================= */
+
+    #memoryBox {
+
+      background: #101010;
+
+      border: 1px solid #303030;
+
+      border-radius: 13px;
+
+      padding: 15px;
+
+    }
+
+
+    #memoryBoxTitle {
+
+      font-size: 15px;
+
+      font-weight: bold;
+
+      margin-bottom: 12px;
+
+    }
+
+
+    #memoryContent {
+
+      white-space: pre-wrap;
+
+      word-break: break-word;
+
+      color: #aaa;
+
+      font-size: 12px;
+
+      line-height: 1.55;
+
+      max-height: calc(100vh - 300px);
+
+      overflow-y: auto;
+
+    }
+
+
+    /* =========================
+       ALT MESAJ PANELİ
     ========================= */
 
     #bottom {
 
-      position: fixed;
+      position: absolute;
 
       left: 0;
+
       right: 0;
+
       bottom: 0;
 
-      background: #111;
-
-      border-top: 1px solid #333;
-
-      padding: 10px 12px;
+      padding: 12px 20px;
 
       padding-bottom:
-        calc(10px + env(safe-area-inset-bottom));
+        calc(12px + env(safe-area-inset-bottom));
 
-      z-index: 100;
+      background: rgba(17,17,17,0.98);
 
-      box-shadow:
-        0 -5px 20px rgba(0,0,0,0.35);
+      border-top: 1px solid #292929;
+
+      z-index: 15;
+
     }
 
 
-    /* =========================
-       MESAJ GİRİŞİ
-    ========================= */
-
     #inputArea {
 
-      max-width: 800px;
-
-      margin: auto;
+      width: 100%;
 
       display: flex;
 
       gap: 8px;
+
     }
+
 
     #messageInput {
 
@@ -156,20 +387,23 @@
       outline: none;
 
       font-size: 15px;
+
     }
+
 
     #messageInput:focus {
+
       border-color: #2563eb;
+
     }
+
 
     #messageInput::placeholder {
+
       color: #777;
+
     }
 
-
-    /* =========================
-       GÖNDER BUTONU
-    ========================= */
 
     #sendButton {
 
@@ -177,7 +411,7 @@
 
       border-radius: 12px;
 
-      padding: 12px 17px;
+      padding: 12px 20px;
 
       background: #2563eb;
 
@@ -190,145 +424,92 @@
       font-weight: bold;
 
       flex-shrink: 0;
+
     }
+
 
     #sendButton:active {
+
       transform: scale(0.97);
+
     }
 
 
     /* =========================
-       ALT BUTONLAR
-    ========================= */
-
-    #buttons {
-
-      max-width: 800px;
-
-      margin: 8px auto 0;
-
-      display: flex;
-
-      gap: 8px;
-    }
-
-    #buttons button {
-
-      flex: 1;
-
-      min-height: 42px;
-
-      border: 1px solid #444;
-
-      border-radius: 11px;
-
-      background: #292929;
-
-      color: white;
-
-      cursor: pointer;
-
-      font-size: 14px;
-
-      font-weight: bold;
-    }
-
-    #buttons button:active {
-      transform: scale(0.98);
-    }
-
-    #memoryButton {
-      background: #252525;
-    }
-
-    #clearButton {
-      background: #252525;
-    }
-
-
-    /* =========================
-       HAFIZA PANELİ
-    ========================= */
-
-    #memoryPanel {
-
-      display: none;
-
-      position: fixed;
-
-      left: 12px;
-      right: 12px;
-
-      bottom:
-        calc(115px + env(safe-area-inset-bottom));
-
-      max-width: 800px;
-
-      margin: auto;
-
-      padding: 16px;
-
-      background: #181818;
-
-      border: 1px solid #444;
-
-      border-radius: 14px;
-
-      color: #ddd;
-
-      font-size: 13px;
-
-      z-index: 90;
-
-      max-height: 55vh;
-
-      overflow-y: auto;
-
-      box-shadow:
-        0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    #memoryPanel strong {
-
-      font-size: 15px;
-
-      color: white;
-    }
-
-    #memoryPanel pre {
-
-      white-space: pre-wrap;
-
-      word-break: break-word;
-
-      margin: 0;
-
-      color: #bbb;
-
-      line-height: 1.5;
-    }
-
-
-    /* =========================
-       TELEFON
+       MOBİL
     ========================= */
 
     @media (max-width: 600px) {
 
-      header {
-        padding: 15px 12px;
+      body {
+
+        overflow: hidden;
+
       }
 
-      header h1 {
-        font-size: 21px;
+
+      header {
+
+        height: 62px;
+
+        padding: 0 15px;
+
+        justify-content: center;
+
+        flex-direction: column;
+
       }
+
+
+      header h1 {
+
+        font-size: 21px;
+
+      }
+
+
+      header p {
+
+        margin: 3px 0 0;
+
+        font-size: 12px;
+
+      }
+
+
+      #app {
+
+        height: calc(100vh - 62px);
+
+        display: block;
+
+      }
+
+
+      #chatArea {
+
+        height: 100%;
+
+      }
+
+
+      #sidePanel {
+
+        display: none;
+
+      }
+
 
       #chat {
 
         padding: 12px;
 
-        padding-bottom: 185px;
+        padding-bottom: 125px;
+
+        overflow-y: auto;
+
       }
+
 
       .message {
 
@@ -337,69 +518,106 @@
         padding: 12px 14px;
 
         font-size: 14px;
+
       }
+
+
+      #bottom {
+
+        padding: 10px 12px;
+
+        padding-bottom:
+          calc(10px + env(safe-area-inset-bottom));
+
+      }
+
 
       #inputArea {
 
         gap: 6px;
+
       }
+
 
       #messageInput {
 
         padding: 13px;
 
         font-size: 14px;
+
       }
+
 
       #sendButton {
 
         padding: 11px 13px;
 
         font-size: 13px;
+
       }
 
-      #buttons {
+
+      /* Mobilde butonları tekrar alt giriş alanının
+         hemen üstünde gösteriyoruz */
+
+      #mobileButtons {
+
+        display: flex;
 
         gap: 7px;
+
+        margin-bottom: 8px;
+
       }
 
-      #buttons button {
 
-        min-height: 44px;
+      #mobileButtons button {
+
+        flex: 1;
+
+        min-height: 43px;
+
+        border: 1px solid #444;
+
+        border-radius: 11px;
+
+        background: #292929;
+
+        color: white;
 
         font-size: 13px;
+
+        font-weight: bold;
+
       }
 
-      #memoryPanel {
-
-        bottom:
-          calc(120px + env(safe-area-inset-bottom));
-      }
     }
 
 
     /* =========================
-       ÇOK KÜÇÜK EKRAN
+       PC'DE MOBİL BUTONLAR GİZLİ
     ========================= */
 
-    @media (max-width: 380px) {
+    @media (min-width: 601px) {
 
-      #sendButton {
+      #mobileButtons {
 
-        padding: 10px;
+        display: none;
+
       }
 
-      #buttons button {
-
-        font-size: 12px;
-      }
     }
+
 
   </style>
 
 </head>
 
 <body>
+
+<!-- =========================
+     ÜST
+========================= -->
 
 <header>
 
@@ -409,71 +627,132 @@
 
 </header>
 
+<!-- =========================
+     ANA UYGULAMA
+========================= -->
+
+<div id="app">
+
+  <!-- =========================
+       SOL SOHBET
+  ========================= -->
+
+  <section id="chatArea">
+
+```
 <div id="chat"></div>
 
-<!-- =========================
-     HAFIZA PANELİ
-========================= -->
 
-<div id="memoryPanel">
-
-<strong>🧠 Zatoi Hafızası</strong>
-
-<br><br>
-
-  <pre id="memoryContent"></pre>
-
-</div>
-
-<!-- =========================
-     ALT PANEL
-========================= -->
+<!-- MOBİL BUTONLAR -->
 
 <div id="bottom">
 
-  <!-- MESAJ GİRİŞİ -->
+
+  <div id="mobileButtons">
+
+    <button
+      onclick="toggleMemory()"
+    >
+      🧠 Hafıza
+    </button>
+
+
+    <button
+      onclick="clearMemory()"
+    >
+      🗑️ Temizle
+    </button>
+
+  </div>
+
 
   <div id="inputArea">
 
-```
-<input
-  id="messageInput"
-  type="text"
-  placeholder="Zatoi'ye bir şey sor..."
-  autocomplete="off"
->
 
-<button
-  id="sendButton"
-  onclick="sendMessage()"
->
-  Gönder
-</button>
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Zatoi'ye bir şey sor..."
+      autocomplete="off"
+    >
+
+
+    <button
+      id="sendButton"
+      onclick="sendMessage()"
+    >
+      Gönder
+    </button>
+
+
+  </div>
+
+
+</div>
 ```
+
+  </section>
+
+  <!-- =========================
+       SAĞ PANEL
+  ========================= -->
+
+  <aside id="sidePanel">
+
+```
+<div id="sideTitle">
+
+  🧠 Zatoi Hafızası
+
+</div>
+
+
+<div id="sideDescription">
+
+  Zatoi'nin senin hakkında öğrendiği
+  ve gelecekte kullanabileceği bilgiler
+  burada tutulur.
+
+</div>
+
+
+<div id="buttons">
+
+
+  <button
+    onclick="toggleMemory()"
+  >
+    🧠 Hafızayı Yenile
+  </button>
+
+
+  <button
+    onclick="clearMemory()"
+  >
+    🗑️ Sohbet ve Hafızayı Temizle
+  </button>
+
+
+</div>
+
+
+<div id="memoryBox">
+
+
+  <div id="memoryBoxTitle">
+
+    Kayıtlı Bilgiler
 
   </div>
 
-  <!-- HAFIZA / TEMİZLE -->
 
-  <div id="buttons">
+  <div id="memoryContent"></div>
 
-```
-<button
-  id="memoryButton"
-  onclick="toggleMemory()"
->
-  🧠 Hafıza
-</button>
 
-<button
-  id="clearButton"
-  onclick="clearMemory()"
->
-  🗑️ Temizle
-</button>
+</div>
 ```
 
-  </div>
+  </aside>
 
 </div>
 
@@ -521,10 +800,12 @@ function loadData() {
 
   try {
 
+
     const savedConversation =
       localStorage.getItem(
         CONVERSATION_KEY
       );
+
 
     const savedMemory =
       localStorage.getItem(
@@ -595,6 +876,32 @@ function saveData() {
 
 
 /* =========================
+   HAFIZAYI GÖSTER
+========================= */
+
+function renderMemory() {
+
+  const content =
+    document.getElementById(
+      "memoryContent"
+    );
+
+
+  content.textContent =
+    JSON.stringify(
+
+      memory,
+
+      null,
+
+      2
+
+    );
+
+}
+
+
+/* =========================
    SOHBETİ GÖSTER
 ========================= */
 
@@ -611,6 +918,7 @@ function renderConversation() {
 
   conversation.forEach(
     message => {
+
 
       const div =
         document.createElement(
@@ -634,8 +942,11 @@ function renderConversation() {
 
 
       label.textContent =
+
         message.role === "user"
+
           ? "Sen"
+
           : "Zatoi";
 
 
@@ -663,17 +974,13 @@ function renderConversation() {
         div
       );
 
+
     }
   );
 
 
-  window.scrollTo(
-
-    0,
-
-    document.body.scrollHeight
-
-  );
+  chat.scrollTop =
+    chat.scrollHeight;
 
 }
 
@@ -740,14 +1047,16 @@ async function sendMessage() {
 
           },
 
-          body: JSON.stringify({
 
-            memory: memory,
+          body:
+            JSON.stringify({
 
-            messages:
-              recentMessages
+              memory: memory,
 
-          })
+              messages:
+                recentMessages
+
+            })
 
         }
 
@@ -768,17 +1077,23 @@ async function sendMessage() {
 
 
     /* =========================
-       YENİ HAFIZA
+       HAFIZA GÜNCELLE
     ========================= */
 
     if (data.memory) {
 
+
       memory = {
 
+
         name:
+
           data.memory.name ||
+
           memory.name ||
+
           "",
+
 
         facts:
 
@@ -803,11 +1118,14 @@ async function sendMessage() {
 
       };
 
+
+      renderMemory();
+
     }
 
 
     /* =========================
-       CEVAP
+       CEVABI AL
     ========================= */
 
     const reply =
@@ -863,51 +1181,40 @@ async function sendMessage() {
 
 
 /* =========================
-   HAFIZA PANELİ
+   HAFIZA
 ========================= */
 
 function toggleMemory() {
 
-
-  const panel =
-    document.getElementById(
-      "memoryPanel"
-    );
+  renderMemory();
 
 
-  const content =
-    document.getElementById(
-      "memoryContent"
-    );
-
+  /* Mobilde hafıza için
+     küçük pencere göster */
 
   if (
-    panel.style.display ===
-    "block"
+    window.innerWidth <= 600
   ) {
 
-    panel.style.display =
-      "none";
 
-    return;
+    const text =
+      JSON.stringify(
 
-  }
+        memory,
+
+        null,
+
+        2
+
+      );
 
 
-  content.textContent =
-    JSON.stringify(
-
-      memory,
-
-      null,
-
-      2
-
+    alert(
+      "🧠 Zatoi Hafızası\n\n" +
+      text
     );
 
-
-  panel.style.display =
-    "block";
+  }
 
 }
 
@@ -959,16 +1266,13 @@ function clearMemory() {
   ).innerHTML = "";
 
 
-  document.getElementById(
-    "memoryPanel"
-  ).style.display =
-    "none";
+  renderMemory();
 
 }
 
 
 /* =========================
-   ENTER TUŞU
+   ENTER
 ========================= */
 
 document
@@ -981,14 +1285,17 @@ document
 
     function(event) {
 
+
       if (
-        event.key ===
-        "Enter"
+        event.key === "Enter"
       ) {
+
 
         event.preventDefault();
 
+
         sendMessage();
+
 
       }
 
@@ -1003,7 +1310,11 @@ document
 
 loadData();
 
+
 renderConversation();
+
+
+renderMemory();
 
 
 </script>
