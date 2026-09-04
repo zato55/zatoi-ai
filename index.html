@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Zatoi AI</title>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
@@ -41,7 +39,7 @@
       max-width: 800px;
       margin: auto;
       padding: 20px;
-      padding-bottom: 120px;
+      padding-bottom: 130px;
     }
 
     .message {
@@ -113,10 +111,7 @@
       gap: 8px;
     }
 
-    #clearButton {
-      background: #333;
-    }
-
+    #clearButton,
     #memoryButton {
       background: #333;
     }
@@ -139,7 +134,6 @@
     }
 
     @media (max-width: 600px) {
-
       #chat {
         padding: 12px;
         padding-bottom: 140px;
@@ -148,13 +142,7 @@
       .message {
         max-width: 92%;
       }
-
-      #inputArea {
-        flex-direction: row;
-      }
-
     }
-
   </style>
 </head>
 
@@ -208,10 +196,10 @@ const WORKER_URL =
   "https://zatoi-ai.fbboytr.workers.dev/";
 
 const CONVERSATION_KEY =
-  "zatoi_conversation_v2";
+  "zatoi_conversation_v3";
 
 const MEMORY_KEY =
-  "zatoi_memory_v2";
+  "zatoi_memory_v3";
 
 
 let conversation = [];
@@ -224,7 +212,7 @@ let memory = {
 
 
 /* =========================
-   HAFIZAYI YÜKLE
+   VERİLERİ YÜKLE
 ========================= */
 
 function loadData() {
@@ -238,18 +226,16 @@ function loadData() {
       localStorage.getItem(MEMORY_KEY);
 
     if (savedConversation) {
-      conversation =
-        JSON.parse(savedConversation);
+      conversation = JSON.parse(savedConversation);
     }
 
     if (savedMemory) {
-      memory =
-        JSON.parse(savedMemory);
+      memory = JSON.parse(savedMemory);
     }
 
   } catch (error) {
 
-    console.log("Veri yükleme hatası:", error);
+    console.log("Hafıza yükleme hatası:", error);
 
   }
 
@@ -276,7 +262,7 @@ function saveData() {
 
 
 /* =========================
-   SOHBETİ EKRANA BAS
+   MESAJLARI GÖSTER
 ========================= */
 
 function renderConversation() {
@@ -326,40 +312,38 @@ function renderConversation() {
 
 
 /* =========================
-   HAFIZA ALGILAMA
+   İSİM ALGILAMA
 ========================= */
 
 function extractMemory(text) {
 
-  const lower =
-    text.toLocaleLowerCase("tr-TR");
-
-
   /*
-     İSİM ALGILAMA
+     "Benim adım Mesut"
+     "Adım Mesut"
   */
 
-  const nameMatch =
-    text.match(
-      /(?:benim adım|adım)\s+([A-Za-zÇĞİÖŞÜçğıöşü]+(?:\s+[A-Za-zÇĞİÖŞÜçğıöşü]+){0,2})/i
-    );
+  const nameMatch = text.match(
+    /(?:benim adım|adım)\s+([A-Za-zÇĞİÖŞÜçğıöşü]+(?:\s+[A-Za-zÇĞİÖŞÜçğıöşü]+){0,2})/i
+  );
 
   if (nameMatch) {
 
     memory.name =
-      nameMatch[1].trim();
+      nameMatch[1]
+        .trim()
+        .replace(/[.!?,]+$/, "");
 
   }
 
 
   /*
-     "BEN X'İM" / "BEN X'İM"
+     "Ben Mesut'um"
+     "Ben Mesutum"
   */
 
-  const imMatch =
-    text.match(
-      /^ben\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)\s*(?:'?(?:im|ım|üm|um))?[.!]?$/i
-    );
+  const imMatch = text.match(
+    /^ben\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)(?:'?(?:im|ım|üm|um))?[.!]?$/i
+  );
 
   if (imMatch) {
 
@@ -380,13 +364,12 @@ function extractMemory(text) {
 
 
   /*
-     "BUNU HATIRLA:"
+     "Bunu hatırla: ..."
   */
 
-  const rememberMatch =
-    text.match(
-      /(?:bunu|şunu)\s+hatırla\s*[:\-]?\s*(.+)/i
-    );
+  const rememberMatch = text.match(
+    /(?:bunu|şunu)\s+hatırla\s*[:\-]?\s*(.+)/i
+  );
 
   if (rememberMatch) {
 
@@ -406,30 +389,16 @@ function extractMemory(text) {
 
 
   /*
-     SEVİYORUM
+     Tercihler
   */
+
+  const lower =
+    text.toLocaleLowerCase("tr-TR");
 
   if (
     lower.includes("seviyorum") ||
-    lower.includes("çok seviyorum") ||
-    lower.includes("favorim")
-  ) {
-
-    if (!memory.preferences.includes(text)) {
-
-      memory.preferences.push(text);
-
-    }
-
-  }
-
-
-  /*
-     SEVMİYORUM
-  */
-
-  if (
     lower.includes("sevmiyorum") ||
+    lower.includes("favorim") ||
     lower.includes("nefret ediyorum")
   ) {
 
@@ -443,8 +412,7 @@ function extractMemory(text) {
 
 
   /*
-     HAFIZA SINIRI
-     Çok fazla bilgi birikmesini engeller.
+     Hafıza sınırı
   */
 
   memory.facts =
@@ -473,11 +441,11 @@ async function sendMessage() {
 
   if (!text) return;
 
-
   input.value = "";
 
+
   /*
-     Kullanıcı mesajını hafızada analiz et
+     Önce hafızayı güncelle
   */
 
   extractMemory(text);
@@ -492,12 +460,11 @@ async function sendMessage() {
     content: text
   });
 
-
   renderConversation();
 
 
   /*
-     Son 20 mesajı gönder
+     Sadece son 20 mesaj
   */
 
   const recentMessages =
@@ -530,6 +497,13 @@ async function sendMessage() {
       await response.json();
 
 
+    if (data.error) {
+
+      throw new Error(data.error);
+
+    }
+
+
     const reply =
       data.reply ||
       data.choices?.[0]?.message?.content ||
@@ -552,18 +526,18 @@ async function sendMessage() {
 
   } catch (error) {
 
+    console.log(error);
+
     conversation.push({
 
       role: "assistant",
 
       content:
-        "Bağlantıda bir sorun oluştu. Worker çalışıyor mu kontrol edelim. ⚠️"
+        "Bir bağlantı sorunu oluştu. ⚠️"
 
     });
 
     renderConversation();
-
-    console.log(error);
 
   }
 
@@ -606,32 +580,25 @@ function toggleMemory() {
 
 
 /* =========================
-   HER ŞEYİ TEMİZLE
+   HAFIZAYI TEMİZLE
 ========================= */
 
 function clearMemory() {
 
-  if (
-    !confirm(
+  const answer =
+    confirm(
       "Sohbet ve Zatoi'nin hafızası tamamen silinsin mi?"
-    )
-  ) {
+    );
 
-    return;
-
-  }
+  if (!answer) return;
 
 
   conversation = [];
 
   memory = {
-
     name: "",
-
     facts: [],
-
     preferences: []
-
   };
 
 
@@ -656,7 +623,7 @@ function clearMemory() {
 
 
 /* =========================
-   ENTER TUŞU
+   ENTER
 ========================= */
 
 document
