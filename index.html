@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Zatoi AI</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
       background: #0f1117;
       color: white;
+      font-family: Arial, sans-serif;
+      height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
     }
 
     .container {
@@ -56,7 +63,7 @@
 
     .ai {
       background: #252a34;
-      align-self: flex-start;
+      margin-right: auto;
     }
 
     .user {
@@ -96,8 +103,21 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    #clearButton {
+      margin: 10px 15px 0 15px;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: #252a34;
+      color: #aaa;
+      cursor: pointer;
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
@@ -107,13 +127,14 @@
       🤖 Zatoi AI
     </header>
 
-    <div id="chat">
 
-      <div class="message ai">
-        Merhaba! Ben Zatoi AI. 👋
-      </div>
+    <div id="chat"></div>
 
-    </div>
+
+    <button id="clearButton">
+      🗑️ Hafızayı Temizle
+    </button>
+
 
     <div class="input-area">
 
@@ -132,10 +153,12 @@
 
   </div>
 
+
   <script>
 
     const WORKER_URL =
       "https://zatoi-ai.fbboytr.workers.dev/";
+
 
     const chat =
       document.getElementById("chat");
@@ -146,6 +169,27 @@
     const sendButton =
       document.getElementById("sendButton");
 
+    const clearButton =
+      document.getElementById("clearButton");
+
+
+    // 🧠 HAFIZA
+
+    let conversation =
+      JSON.parse(
+        localStorage.getItem("zatoi_memory") || "[]"
+      );
+
+
+    function saveMemory() {
+
+      localStorage.setItem(
+        "zatoi_memory",
+        JSON.stringify(conversation)
+      );
+
+    }
+
 
     function addMessage(text, type) {
 
@@ -155,7 +199,8 @@
       message.className =
         "message " + type;
 
-      message.textContent = text;
+      message.textContent =
+        text;
 
       chat.appendChild(message);
 
@@ -163,6 +208,48 @@
         chat.scrollHeight;
 
       return message;
+
+    }
+
+
+    function loadMemory() {
+
+      chat.innerHTML = "";
+
+      if (conversation.length === 0) {
+
+        addMessage(
+          "Merhaba! Ben Zatoi AI. 👋",
+          "ai"
+        );
+
+        return;
+
+      }
+
+
+      conversation.forEach(function(message) {
+
+        if (message.role === "user") {
+
+          addMessage(
+            message.content,
+            "user"
+          );
+
+        }
+
+        if (message.role === "assistant") {
+
+          addMessage(
+            message.content,
+            "ai"
+          );
+
+        }
+
+      });
+
     }
 
 
@@ -173,55 +260,84 @@
 
       if (!message) return;
 
-      addMessage(message, "user");
+
+      // Kullanıcı mesajını ekle
+
+      addMessage(
+        message,
+        "user"
+      );
+
+
+      conversation.push({
+        role: "user",
+        content: message
+      });
+
+
+      saveMemory();
+
 
       messageInput.value = "";
 
       sendButton.disabled = true;
 
+
       const aiMessage =
-        addMessage("Zatoi düşünüyor...", "ai");
+        addMessage(
+          "Zatoi düşünüyor...",
+          "ai"
+        );
 
 
       try {
 
         const response =
-          await fetch(WORKER_URL, {
+          await fetch(
+            WORKER_URL,
+            {
+              method: "POST",
 
-            method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
 
-            headers: {
-              "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-              message: message
-            })
-
-          });
+              body: JSON.stringify({
+                messages:
+                  conversation
+              })
+            }
+          );
 
 
         const data =
           await response.json();
 
 
-        console.log("Zatoi cevabı:", data);
+        console.log(
+          "Zatoi:",
+          data
+        );
 
 
-        if (
-          data &&
-          data.choices &&
-          data.choices[0] &&
-          data.choices[0].message &&
-          data.choices[0].message.content
-        ) {
+        if (data.reply) {
 
           aiMessage.textContent =
-            data.choices[0].message.content;
+            data.reply;
+
+
+          conversation.push({
+            role: "assistant",
+            content: data.reply
+          });
+
+
+          saveMemory();
 
         }
 
-        else if (data && data.error) {
+        else if (data.error) {
 
           aiMessage.textContent =
             "Zatoi AI hatası: " +
@@ -232,12 +348,14 @@
         else {
 
           aiMessage.textContent =
-            "Zatoi'den geçerli bir cevap alınamadı.";
+            "Zatoi cevap veremedi.";
 
         }
 
 
-      } catch (error) {
+      }
+
+      catch (error) {
 
         console.error(error);
 
@@ -254,24 +372,64 @@
     }
 
 
+    // Gönder butonu
+
     sendButton.addEventListener(
       "click",
       sendMessage
     );
 
 
+    // Enter ile gönder
+
     messageInput.addEventListener(
       "keydown",
       function(event) {
 
         if (event.key === "Enter") {
+
           sendMessage();
+
         }
 
       }
     );
 
+
+    // Hafızayı temizle
+
+    clearButton.addEventListener(
+      "click",
+      function() {
+
+        const confirmClear =
+          confirm(
+            "Zatoi'nin tüm konuşma hafızası silinsin mi?"
+          );
+
+
+        if (confirmClear) {
+
+          conversation = [];
+
+          localStorage.removeItem(
+            "zatoi_memory"
+          );
+
+          loadMemory();
+
+        }
+
+      }
+    );
+
+
+    // Sayfa açılırken hafızayı yükle
+
+    loadMemory();
+
   </script>
 
 </body>
+
 </html>
