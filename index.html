@@ -9,7 +9,19 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Zatoi AI</title>
+
+<title>Zatoi AI</title>
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#111827">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zatoi AI">
+```
+>
+
+  
 
   <style>
 
@@ -3374,6 +3386,38 @@ function renderAll() {
 }
 
 
+/* ==========================================
+   PWA / SERVICE WORKER
+========================================== */
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", () => {
+
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then(() => {
+
+        console.log(
+          "Zatoi PWA Service Worker aktif."
+        );
+
+      })
+      .catch(error => {
+
+        console.error(
+          "Zatoi Service Worker hatası:",
+          error
+        );
+
+      });
+
+  });
+
+}
+
+
+  
 renderAll();
 
 updateMic();
