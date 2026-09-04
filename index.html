@@ -361,13 +361,23 @@
           NORMAL AI CEVABI
         */
 
-        if (data.reply) {
-
-          aiMessage.textContent =
-            data.reply;
-
-        }
-
+        if (
+  data.choices &&
+  data.choices[0] &&
+  data.choices[0].message
+) {
+  aiMessage.textContent =
+    data.choices[0].message.content;
+}
+else if (data.error) {
+  aiMessage.textContent =
+    "Zatoi AI hatası: " + data.error;
+}
+else {
+  aiMessage.textContent =
+    "Beklenmeyen cevap: " +
+    JSON.stringify(data);
+}
 
         /*
           HATA MESAJI
