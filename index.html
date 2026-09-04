@@ -1,27 +1,44 @@
 <!DOCTYPE html>
+
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Zatoi AI</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
+      padding: 0;
       background: #0f0f0f;
       color: white;
       font-family: Arial, sans-serif;
     }
 
+    body {
+      min-height: 100vh;
+    }
+
+
+    /* =========================
+       ÜST BAŞLIK
+    ========================= */
+
     header {
-      padding: 18px;
+      padding: 18px 15px;
       text-align: center;
       background: #151515;
       border-bottom: 1px solid #292929;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     header h1 {
@@ -35,11 +52,18 @@
       font-size: 13px;
     }
 
+
+    /* =========================
+       SOHBET
+    ========================= */
+
     #chat {
       max-width: 800px;
       margin: auto;
       padding: 20px;
-      padding-bottom: 135px;
+
+      /* Alt panel için boşluk */
+      padding-bottom: 190px;
     }
 
     .message {
@@ -49,6 +73,7 @@
       max-width: 85%;
       white-space: pre-wrap;
       line-height: 1.5;
+      word-wrap: break-word;
     }
 
     .user {
@@ -68,123 +93,385 @@
       margin-bottom: 5px;
     }
 
+
+    /* =========================
+       ALT PANEL
+    ========================= */
+
     #bottom {
+
       position: fixed;
-      bottom: 0;
+
       left: 0;
       right: 0;
+      bottom: 0;
+
       background: #111;
-      border-top: 1px solid #292929;
-      padding: 12px;
+
+      border-top: 1px solid #333;
+
+      padding: 10px 12px;
+
+      padding-bottom:
+        calc(10px + env(safe-area-inset-bottom));
+
+      z-index: 100;
+
+      box-shadow:
+        0 -5px 20px rgba(0,0,0,0.35);
     }
 
+
+    /* =========================
+       MESAJ GİRİŞİ
+    ========================= */
+
     #inputArea {
+
       max-width: 800px;
+
       margin: auto;
+
       display: flex;
+
       gap: 8px;
     }
 
     #messageInput {
+
       flex: 1;
+
+      min-width: 0;
+
       padding: 14px;
+
       border-radius: 12px;
-      border: 1px solid #333;
+
+      border: 1px solid #3a3a3a;
+
       background: #1b1b1b;
+
       color: white;
+
       outline: none;
+
+      font-size: 15px;
     }
 
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 15px;
-      background: #2563eb;
-      color: white;
-      cursor: pointer;
+    #messageInput:focus {
+      border-color: #2563eb;
     }
+
+    #messageInput::placeholder {
+      color: #777;
+    }
+
+
+    /* =========================
+       GÖNDER BUTONU
+    ========================= */
+
+    #sendButton {
+
+      border: none;
+
+      border-radius: 12px;
+
+      padding: 12px 17px;
+
+      background: #2563eb;
+
+      color: white;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: bold;
+
+      flex-shrink: 0;
+    }
+
+    #sendButton:active {
+      transform: scale(0.97);
+    }
+
+
+    /* =========================
+       ALT BUTONLAR
+    ========================= */
 
     #buttons {
+
       max-width: 800px;
+
       margin: 8px auto 0;
+
       display: flex;
+
       gap: 8px;
     }
 
-    #memoryButton,
-    #clearButton {
-      background: #333;
+    #buttons button {
+
+      flex: 1;
+
+      min-height: 42px;
+
+      border: 1px solid #444;
+
+      border-radius: 11px;
+
+      background: #292929;
+
+      color: white;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: bold;
     }
 
+    #buttons button:active {
+      transform: scale(0.98);
+    }
+
+    #memoryButton {
+      background: #252525;
+    }
+
+    #clearButton {
+      background: #252525;
+    }
+
+
+    /* =========================
+       HAFIZA PANELİ
+    ========================= */
+
     #memoryPanel {
+
       display: none;
+
+      position: fixed;
+
+      left: 12px;
+      right: 12px;
+
+      bottom:
+        calc(115px + env(safe-area-inset-bottom));
+
       max-width: 800px;
-      margin: 10px auto;
-      padding: 15px;
+
+      margin: auto;
+
+      padding: 16px;
+
       background: #181818;
-      border: 1px solid #333;
-      border-radius: 12px;
+
+      border: 1px solid #444;
+
+      border-radius: 14px;
+
       color: #ddd;
+
       font-size: 13px;
+
+      z-index: 90;
+
+      max-height: 55vh;
+
+      overflow-y: auto;
+
+      box-shadow:
+        0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    #memoryPanel strong {
+
+      font-size: 15px;
+
+      color: white;
     }
 
     #memoryPanel pre {
+
       white-space: pre-wrap;
+
+      word-break: break-word;
+
       margin: 0;
+
+      color: #bbb;
+
+      line-height: 1.5;
     }
 
+
+    /* =========================
+       TELEFON
+    ========================= */
+
     @media (max-width: 600px) {
+
+      header {
+        padding: 15px 12px;
+      }
+
+      header h1 {
+        font-size: 21px;
+      }
+
       #chat {
+
         padding: 12px;
-        padding-bottom: 145px;
+
+        padding-bottom: 185px;
       }
 
       .message {
+
         max-width: 92%;
+
+        padding: 12px 14px;
+
+        font-size: 14px;
+      }
+
+      #inputArea {
+
+        gap: 6px;
+      }
+
+      #messageInput {
+
+        padding: 13px;
+
+        font-size: 14px;
+      }
+
+      #sendButton {
+
+        padding: 11px 13px;
+
+        font-size: 13px;
+      }
+
+      #buttons {
+
+        gap: 7px;
+      }
+
+      #buttons button {
+
+        min-height: 44px;
+
+        font-size: 13px;
+      }
+
+      #memoryPanel {
+
+        bottom:
+          calc(120px + env(safe-area-inset-bottom));
       }
     }
+
+
+    /* =========================
+       ÇOK KÜÇÜK EKRAN
+    ========================= */
+
+    @media (max-width: 380px) {
+
+      #sendButton {
+
+        padding: 10px;
+      }
+
+      #buttons button {
+
+        font-size: 12px;
+      }
+    }
+
   </style>
+
 </head>
 
 <body>
 
 <header>
+
   <h1>🤖 Zatoi AI</h1>
+
   <p>Senin kişisel yapay zekân</p>
+
 </header>
 
 <div id="chat"></div>
 
+<!-- =========================
+     HAFIZA PANELİ
+========================= -->
+
 <div id="memoryPanel">
-  <strong>🧠 Zatoi Hafızası</strong>
-  <br><br>
+
+<strong>🧠 Zatoi Hafızası</strong>
+
+<br><br>
+
   <pre id="memoryContent"></pre>
+
 </div>
+
+<!-- =========================
+     ALT PANEL
+========================= -->
 
 <div id="bottom">
 
+  <!-- MESAJ GİRİŞİ -->
+
   <div id="inputArea">
 
-    <input
-      id="messageInput"
-      type="text"
-      placeholder="Zatoi'ye bir şey sor..."
-      autocomplete="off"
-    >
+```
+<input
+  id="messageInput"
+  type="text"
+  placeholder="Zatoi'ye bir şey sor..."
+  autocomplete="off"
+>
 
-    <button onclick="sendMessage()">Gönder</button>
+<button
+  id="sendButton"
+  onclick="sendMessage()"
+>
+  Gönder
+</button>
+```
 
   </div>
 
+  <!-- HAFIZA / TEMİZLE -->
+
   <div id="buttons">
 
-    <button id="memoryButton" onclick="toggleMemory()">
-      🧠 Hafıza
-    </button>
+```
+<button
+  id="memoryButton"
+  onclick="toggleMemory()"
+>
+  🧠 Hafıza
+</button>
 
-    <button id="clearButton" onclick="clearMemory()">
-      🗑️ Temizle
-    </button>
+<button
+  id="clearButton"
+  onclick="clearMemory()"
+>
+  🗑️ Temizle
+</button>
+```
 
   </div>
 
@@ -192,8 +479,18 @@
 
 <script>
 
+
+/* =========================
+   WORKER
+========================= */
+
 const WORKER_URL =
   "https://zatoi-ai.fbboytr.workers.dev/";
+
+
+/* =========================
+   LOCAL STORAGE
+========================= */
 
 const CONVERSATION_KEY =
   "zatoi_conversation_v4";
@@ -204,10 +501,15 @@ const MEMORY_KEY =
 
 let conversation = [];
 
+
 let memory = {
+
   name: "",
+
   facts: [],
+
   preferences: []
+
 };
 
 
@@ -220,22 +522,42 @@ function loadData() {
   try {
 
     const savedConversation =
-      localStorage.getItem(CONVERSATION_KEY);
+      localStorage.getItem(
+        CONVERSATION_KEY
+      );
 
     const savedMemory =
-      localStorage.getItem(MEMORY_KEY);
+      localStorage.getItem(
+        MEMORY_KEY
+      );
+
 
     if (savedConversation) {
-      conversation = JSON.parse(savedConversation);
+
+      conversation =
+        JSON.parse(
+          savedConversation
+        );
+
     }
 
+
     if (savedMemory) {
-      memory = JSON.parse(savedMemory);
+
+      memory =
+        JSON.parse(
+          savedMemory
+        );
+
     }
+
 
   } catch (error) {
 
-    console.log("Yükleme hatası:", error);
+    console.log(
+      "Yükleme hatası:",
+      error
+    );
 
   }
 
@@ -249,13 +571,24 @@ function loadData() {
 function saveData() {
 
   localStorage.setItem(
+
     CONVERSATION_KEY,
-    JSON.stringify(conversation)
+
+    JSON.stringify(
+      conversation
+    )
+
   );
 
+
   localStorage.setItem(
+
     MEMORY_KEY,
-    JSON.stringify(memory)
+
+    JSON.stringify(
+      memory
+    )
+
   );
 
 }
@@ -268,44 +601,78 @@ function saveData() {
 function renderConversation() {
 
   const chat =
-    document.getElementById("chat");
+    document.getElementById(
+      "chat"
+    );
+
 
   chat.innerHTML = "";
 
-  conversation.forEach(message => {
 
-    const div =
-      document.createElement("div");
+  conversation.forEach(
+    message => {
 
-    div.className =
-      "message " + message.role;
+      const div =
+        document.createElement(
+          "div"
+        );
 
-    const label =
-      document.createElement("div");
 
-    label.className = "label";
+      div.className =
+        "message " +
+        message.role;
 
-    label.textContent =
-      message.role === "user"
-        ? "Sen"
-        : "Zatoi";
 
-    const content =
-      document.createElement("div");
+      const label =
+        document.createElement(
+          "div"
+        );
 
-    content.textContent =
-      message.content;
 
-    div.appendChild(label);
-    div.appendChild(content);
+      label.className =
+        "label";
 
-    chat.appendChild(div);
 
-  });
+      label.textContent =
+        message.role === "user"
+          ? "Sen"
+          : "Zatoi";
+
+
+      const content =
+        document.createElement(
+          "div"
+        );
+
+
+      content.textContent =
+        message.content;
+
+
+      div.appendChild(
+        label
+      );
+
+
+      div.appendChild(
+        content
+      );
+
+
+      chat.appendChild(
+        div
+      );
+
+    }
+  );
+
 
   window.scrollTo(
+
     0,
+
     document.body.scrollHeight
+
   );
 
 }
@@ -317,28 +684,38 @@ function renderConversation() {
 
 async function sendMessage() {
 
+
   const input =
-    document.getElementById("messageInput");
+    document.getElementById(
+      "messageInput"
+    );
+
 
   const text =
     input.value.trim();
 
+
   if (!text) return;
+
 
   input.value = "";
 
 
-  /* Kullanıcı mesajını ekle */
+  /* Kullanıcı mesajı */
 
   conversation.push({
+
     role: "user",
+
     content: text
+
   });
+
 
   renderConversation();
 
 
-  /* Gönderilecek son 20 mesaj */
+  /* Son 20 mesaj */
 
   const recentMessages =
     conversation.slice(-20);
@@ -346,24 +723,35 @@ async function sendMessage() {
 
   try {
 
+
     const response =
-      await fetch(WORKER_URL, {
+      await fetch(
 
-        method: "POST",
+        WORKER_URL,
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+        {
 
-        body: JSON.stringify({
+          method: "POST",
 
-          memory: memory,
+          headers: {
 
-          messages: recentMessages
+            "Content-Type":
+              "application/json"
 
-        })
+          },
 
-      });
+          body: JSON.stringify({
+
+            memory: memory,
+
+            messages:
+              recentMessages
+
+          })
+
+        }
+
+      );
 
 
     const data =
@@ -371,12 +759,16 @@ async function sendMessage() {
 
 
     if (data.error) {
-      throw new Error(data.error);
+
+      throw new Error(
+        data.error
+      );
+
     }
 
 
     /* =========================
-       YENİ HAFIZAYI AL
+       YENİ HAFIZA
     ========================= */
 
     if (data.memory) {
@@ -389,13 +781,24 @@ async function sendMessage() {
           "",
 
         facts:
-          Array.isArray(data.memory.facts)
+
+          Array.isArray(
+            data.memory.facts
+          )
+
             ? data.memory.facts
+
             : memory.facts,
 
+
         preferences:
-          Array.isArray(data.memory.preferences)
+
+          Array.isArray(
+            data.memory.preferences
+          )
+
             ? data.memory.preferences
+
             : memory.preferences
 
       };
@@ -404,12 +807,17 @@ async function sendMessage() {
 
 
     /* =========================
-       CEVABI AL
+       CEVAP
     ========================= */
 
     const reply =
+
       data.reply ||
-      data.choices?.[0]?.message?.content ||
+
+      data.choices?.[0]
+        ?.message
+        ?.content ||
+
       "Zatoi cevap veremedi.";
 
 
@@ -424,12 +832,18 @@ async function sendMessage() {
 
     saveData();
 
+
     renderConversation();
 
 
   } catch (error) {
 
-    console.log("Hata:", error);
+
+    console.log(
+      "Hata:",
+      error
+    );
+
 
     conversation.push({
 
@@ -439,6 +853,7 @@ async function sendMessage() {
         "Şu anda bağlantıda bir sorun oluştu. ⚠️"
 
     });
+
 
     renderConversation();
 
@@ -453,16 +868,26 @@ async function sendMessage() {
 
 function toggleMemory() {
 
+
   const panel =
-    document.getElementById("memoryPanel");
+    document.getElementById(
+      "memoryPanel"
+    );
+
 
   const content =
-    document.getElementById("memoryContent");
+    document.getElementById(
+      "memoryContent"
+    );
 
 
-  if (panel.style.display === "block") {
+  if (
+    panel.style.display ===
+    "block"
+  ) {
 
-    panel.style.display = "none";
+    panel.style.display =
+      "none";
 
     return;
 
@@ -471,10 +896,15 @@ function toggleMemory() {
 
   content.textContent =
     JSON.stringify(
+
       memory,
+
       null,
+
       2
+
     );
+
 
   panel.style.display =
     "block";
@@ -488,15 +918,20 @@ function toggleMemory() {
 
 function clearMemory() {
 
+
   const answer =
     confirm(
+
       "Sohbet ve hafıza tamamen silinsin mi?"
+
     );
+
 
   if (!answer) return;
 
 
   conversation = [];
+
 
   memory = {
 
@@ -513,6 +948,7 @@ function clearMemory() {
     CONVERSATION_KEY
   );
 
+
   localStorage.removeItem(
     MEMORY_KEY
   );
@@ -522,9 +958,11 @@ function clearMemory() {
     "chat"
   ).innerHTML = "";
 
+
   document.getElementById(
     "memoryPanel"
-  ).style.display = "none";
+  ).style.display =
+    "none";
 
 }
 
@@ -534,18 +972,28 @@ function clearMemory() {
 ========================= */
 
 document
-  .getElementById("messageInput")
+  .getElementById(
+    "messageInput"
+  )
   .addEventListener(
+
     "keydown",
+
     function(event) {
 
-      if (event.key === "Enter") {
+      if (
+        event.key ===
+        "Enter"
+      ) {
+
+        event.preventDefault();
 
         sendMessage();
 
       }
 
     }
+
   );
 
 
@@ -556,6 +1004,7 @@ document
 loadData();
 
 renderConversation();
+
 
 </script>
 
