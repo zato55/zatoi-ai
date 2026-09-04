@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Zatoi AI</title>
 
@@ -20,443 +14,676 @@
 
     body {
       margin: 0;
-      background: #0f1117;
+      background: #0f0f0f;
       color: white;
       font-family: Arial, sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 700px;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: #171a21;
     }
 
     header {
       padding: 18px;
       text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      border-bottom: 1px solid #292d36;
+      background: #151515;
+      border-bottom: 1px solid #292929;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      color: #999;
+      font-size: 13px;
     }
 
     #chat {
-      flex: 1;
-      overflow-y: auto;
+      max-width: 800px;
+      margin: auto;
       padding: 20px;
+      padding-bottom: 120px;
     }
 
     .message {
+      margin-bottom: 15px;
+      padding: 13px 16px;
+      border-radius: 15px;
       max-width: 85%;
-      padding: 12px 15px;
-      margin-bottom: 12px;
-      border-radius: 14px;
-      line-height: 1.5;
       white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .ai {
-      background: #252a34;
-      margin-right: auto;
+      line-height: 1.5;
     }
 
     .user {
-      background: #3b82f6;
+      background: #2563eb;
       margin-left: auto;
     }
 
-    .input-area {
+    .assistant {
+      background: #1e1e1e;
+      border: 1px solid #303030;
+      margin-right: auto;
+    }
+
+    .label {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
+    #bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      border-top: 1px solid #292929;
+      padding: 12px;
+    }
+
+    #inputArea {
+      max-width: 800px;
+      margin: auto;
       display: flex;
-      gap: 10px;
-      padding: 15px;
-      border-top: 1px solid #292d36;
+      gap: 8px;
     }
 
     #messageInput {
       flex: 1;
-      padding: 13px;
-      border: none;
-      border-radius: 10px;
-      outline: none;
-      background: #252a34;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #333;
+      background: #1b1b1b;
       color: white;
-      font-size: 16px;
+      outline: none;
     }
 
-    #sendButton {
-      padding: 13px 18px;
+    button {
       border: none;
-      border-radius: 10px;
-      background: #3b82f6;
+      border-radius: 12px;
+      padding: 12px 15px;
+      background: #2563eb;
       color: white;
       cursor: pointer;
-      font-size: 16px;
     }
 
-    #sendButton:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    #buttons {
+      max-width: 800px;
+      margin: 8px auto 0;
+      display: flex;
+      gap: 8px;
     }
 
     #clearButton {
-      margin: 10px 15px 0 15px;
-      padding: 8px;
-      border: none;
-      border-radius: 8px;
-      background: #252a34;
-      color: #aaa;
-      cursor: pointer;
+      background: #333;
+    }
+
+    #memoryButton {
+      background: #333;
+    }
+
+    #memoryPanel {
+      display: none;
+      max-width: 800px;
+      margin: 10px auto;
+      padding: 15px;
+      background: #181818;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #ddd;
+      font-size: 13px;
+    }
+
+    #memoryPanel pre {
+      white-space: pre-wrap;
+      margin: 0;
+    }
+
+    @media (max-width: 600px) {
+
+      #chat {
+        padding: 12px;
+        padding-bottom: 140px;
+      }
+
+      .message {
+        max-width: 92%;
+      }
+
+      #inputArea {
+        flex-direction: row;
+      }
+
     }
 
   </style>
-
 </head>
-
 
 <body>
 
-  <div class="container">
+<header>
+  <h1>🤖 Zatoi AI</h1>
+  <p>Senin kişisel yapay zekân</p>
+</header>
 
-    <header>
-      🤖 Zatoi AI
-    </header>
+<div id="chat"></div>
 
+<div id="memoryPanel">
+  <strong>🧠 Zatoi Hafızası</strong>
+  <br><br>
+  <pre id="memoryContent"></pre>
+</div>
 
-    <div id="chat"></div>
+<div id="bottom">
 
+  <div id="inputArea">
 
-    <button id="clearButton">
-      🗑️ Hafızayı Temizle
-    </button>
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Zatoi'ye bir şey sor..."
+      autocomplete="off"
+    >
 
-
-    <div class="input-area">
-
-      <input
-        id="messageInput"
-        type="text"
-        placeholder="Zatoi'ye bir şey sor..."
-        autocomplete="off"
-      >
-
-      <button id="sendButton">
-        Gönder
-      </button>
-
-    </div>
+    <button onclick="sendMessage()">Gönder</button>
 
   </div>
 
+  <div id="buttons">
 
-  <script>
+    <button id="memoryButton" onclick="toggleMemory()">
+      🧠 Hafıza
+    </button>
 
-    const WORKER_URL =
-      "https://zatoi-ai.fbboytr.workers.dev/";
+    <button id="clearButton" onclick="clearMemory()">
+      🗑️ Hafızayı Temizle
+    </button>
 
+  </div>
 
-    const chat =
-      document.getElementById("chat");
+</div>
 
-    const messageInput =
-      document.getElementById("messageInput");
+<script>
 
-    const sendButton =
-      document.getElementById("sendButton");
+const WORKER_URL =
+  "https://zatoi-ai.fbboytr.workers.dev/";
 
-    const clearButton =
-      document.getElementById("clearButton");
+const CONVERSATION_KEY =
+  "zatoi_conversation_v2";
 
-
-    // 🧠 HAFIZA
-
-    let conversation =
-      JSON.parse(
-        localStorage.getItem("zatoi_memory") || "[]"
-      );
+const MEMORY_KEY =
+  "zatoi_memory_v2";
 
 
-    function saveMemory() {
+let conversation = [];
 
-      localStorage.setItem(
-        "zatoi_memory",
-        JSON.stringify(conversation)
-      );
+let memory = {
+  name: "",
+  facts: [],
+  preferences: []
+};
 
+
+/* =========================
+   HAFIZAYI YÜKLE
+========================= */
+
+function loadData() {
+
+  try {
+
+    const savedConversation =
+      localStorage.getItem(CONVERSATION_KEY);
+
+    const savedMemory =
+      localStorage.getItem(MEMORY_KEY);
+
+    if (savedConversation) {
+      conversation =
+        JSON.parse(savedConversation);
     }
 
-
-    function addMessage(text, type) {
-
-      const message =
-        document.createElement("div");
-
-      message.className =
-        "message " + type;
-
-      message.textContent =
-        text;
-
-      chat.appendChild(message);
-
-      chat.scrollTop =
-        chat.scrollHeight;
-
-      return message;
-
+    if (savedMemory) {
+      memory =
+        JSON.parse(savedMemory);
     }
 
+  } catch (error) {
 
-    function loadMemory() {
+    console.log("Veri yükleme hatası:", error);
 
-      chat.innerHTML = "";
+  }
 
-      if (conversation.length === 0) {
-
-        addMessage(
-          "Merhaba! Ben Zatoi AI. 👋",
-          "ai"
-        );
-
-        return;
-
-      }
+}
 
 
-      conversation.forEach(function(message) {
+/* =========================
+   VERİLERİ KAYDET
+========================= */
 
-        if (message.role === "user") {
+function saveData() {
 
-          addMessage(
-            message.content,
-            "user"
-          );
-
-        }
-
-        if (message.role === "assistant") {
-
-          addMessage(
-            message.content,
-            "ai"
-          );
-
-        }
-
-      });
-
-    }
-
-
-   ```javascript
-async function sendMessage() {
-
-  const message =
-    messageInput.value.trim();
-
-  if (!message) return;
-
-
-  // Kullanıcı mesajını ekle
-  addMessage(
-    message,
-    "user"
+  localStorage.setItem(
+    CONVERSATION_KEY,
+    JSON.stringify(conversation)
   );
 
+  localStorage.setItem(
+    MEMORY_KEY,
+    JSON.stringify(memory)
+  );
+
+}
+
+
+/* =========================
+   SOHBETİ EKRANA BAS
+========================= */
+
+function renderConversation() {
+
+  const chat =
+    document.getElementById("chat");
+
+  chat.innerHTML = "";
+
+  conversation.forEach(message => {
+
+    const div =
+      document.createElement("div");
+
+    div.className =
+      "message " + message.role;
+
+    const label =
+      document.createElement("div");
+
+    label.className = "label";
+
+    label.textContent =
+      message.role === "user"
+        ? "Sen"
+        : "Zatoi";
+
+    const content =
+      document.createElement("div");
+
+    content.textContent =
+      message.content;
+
+    div.appendChild(label);
+    div.appendChild(content);
+
+    chat.appendChild(div);
+
+  });
+
+  window.scrollTo(
+    0,
+    document.body.scrollHeight
+  );
+
+}
+
+
+/* =========================
+   HAFIZA ALGILAMA
+========================= */
+
+function extractMemory(text) {
+
+  const lower =
+    text.toLocaleLowerCase("tr-TR");
+
+
+  /*
+     İSİM ALGILAMA
+  */
+
+  const nameMatch =
+    text.match(
+      /(?:benim adım|adım)\s+([A-Za-zÇĞİÖŞÜçğıöşü]+(?:\s+[A-Za-zÇĞİÖŞÜçğıöşü]+){0,2})/i
+    );
+
+  if (nameMatch) {
+
+    memory.name =
+      nameMatch[1].trim();
+
+  }
+
+
+  /*
+     "BEN X'İM" / "BEN X'İM"
+  */
+
+  const imMatch =
+    text.match(
+      /^ben\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)\s*(?:'?(?:im|ım|üm|um))?[.!]?$/i
+    );
+
+  if (imMatch) {
+
+    const possibleName =
+      imMatch[1].trim();
+
+    if (
+      possibleName.length >= 2 &&
+      possibleName.length <= 20
+    ) {
+
+      memory.name =
+        possibleName;
+
+    }
+
+  }
+
+
+  /*
+     "BUNU HATIRLA:"
+  */
+
+  const rememberMatch =
+    text.match(
+      /(?:bunu|şunu)\s+hatırla\s*[:\-]?\s*(.+)/i
+    );
+
+  if (rememberMatch) {
+
+    const fact =
+      rememberMatch[1].trim();
+
+    if (
+      fact.length > 2 &&
+      !memory.facts.includes(fact)
+    ) {
+
+      memory.facts.push(fact);
+
+    }
+
+  }
+
+
+  /*
+     SEVİYORUM
+  */
+
+  if (
+    lower.includes("seviyorum") ||
+    lower.includes("çok seviyorum") ||
+    lower.includes("favorim")
+  ) {
+
+    if (!memory.preferences.includes(text)) {
+
+      memory.preferences.push(text);
+
+    }
+
+  }
+
+
+  /*
+     SEVMİYORUM
+  */
+
+  if (
+    lower.includes("sevmiyorum") ||
+    lower.includes("nefret ediyorum")
+  ) {
+
+    if (!memory.preferences.includes(text)) {
+
+      memory.preferences.push(text);
+
+    }
+
+  }
+
+
+  /*
+     HAFIZA SINIRI
+     Çok fazla bilgi birikmesini engeller.
+  */
+
+  memory.facts =
+    memory.facts.slice(-30);
+
+  memory.preferences =
+    memory.preferences.slice(-30);
+
+
+  saveData();
+
+}
+
+
+/* =========================
+   MESAJ GÖNDER
+========================= */
+
+async function sendMessage() {
+
+  const input =
+    document.getElementById("messageInput");
+
+  const text =
+    input.value.trim();
+
+  if (!text) return;
+
+
+  input.value = "";
+
+  /*
+     Kullanıcı mesajını hafızada analiz et
+  */
+
+  extractMemory(text);
+
+
+  /*
+     Kullanıcı mesajını ekle
+  */
 
   conversation.push({
     role: "user",
-    content: message
+    content: text
   });
 
 
-  saveMemory();
+  renderConversation();
 
 
-  messageInput.value = "";
+  /*
+     Son 20 mesajı gönder
+  */
 
-  sendButton.disabled = true;
-
-
-  const aiMessage =
-    addMessage(
-      "Zatoi düşünüyor...",
-      "ai"
-    );
+  const recentMessages =
+    conversation.slice(-20);
 
 
   try {
 
     const response =
-      await fetch(
-        WORKER_URL,
-        {
-          method: "POST",
+      await fetch(WORKER_URL, {
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+        method: "POST",
 
-          body: JSON.stringify({
-            messages: conversation
-          })
-        }
-      );
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          memory: memory,
+
+          messages: recentMessages
+
+        })
+
+      });
 
 
     const data =
       await response.json();
 
 
-    console.log(
-      "Zatoi cevabı:",
-      data
-    );
+    const reply =
+      data.reply ||
+      data.choices?.[0]?.message?.content ||
+      "Zatoi cevap veremedi.";
 
 
-    // Worker { reply: "..." } döndürürse
-    let reply =
-      data?.reply;
+    conversation.push({
+
+      role: "assistant",
+
+      content: reply
+
+    });
 
 
-    // Worker doğrudan AI cevabını döndürürse
-    if (!reply) {
+    saveData();
 
-      reply =
-        data?.choices?.[0]?.message?.content;
-
-    }
+    renderConversation();
 
 
-    // Cevap bulunduysa
-    if (reply) {
+  } catch (error) {
 
-      aiMessage.textContent =
-        reply;
+    conversation.push({
 
+      role: "assistant",
 
-      conversation.push({
-        role: "assistant",
-        content: reply
-      });
+      content:
+        "Bağlantıda bir sorun oluştu. Worker çalışıyor mu kontrol edelim. ⚠️"
 
+    });
 
-      saveMemory();
+    renderConversation();
 
-    }
-
-
-    // Worker hata döndürürse
-    else if (data?.error) {
-
-      aiMessage.textContent =
-        "Zatoi AI hatası: " +
-        data.error;
-
-    }
-
-
-    // Hiçbir cevap formatı bulunamazsa
-    else {
-
-      aiMessage.textContent =
-        "Zatoi cevap veremedi.";
-
-      console.log(
-        "Beklenmeyen cevap:",
-        data
-      );
-
-    }
-
+    console.log(error);
 
   }
-
-  catch (error) {
-
-    console.error(
-      "Bağlantı hatası:",
-      error
-    );
-
-    aiMessage.textContent =
-      "Zatoi'ye bağlanırken hata oluştu.";
-
-  }
-
-
-  sendButton.disabled = false;
-
-  messageInput.focus();
 
 }
-```
 
 
+/* =========================
+   HAFIZA PANELİ
+========================= */
 
-    // Gönder butonu
+function toggleMemory() {
 
-    sendButton.addEventListener(
-      "click",
-      sendMessage
+  const panel =
+    document.getElementById("memoryPanel");
+
+  const content =
+    document.getElementById("memoryContent");
+
+
+  if (panel.style.display === "block") {
+
+    panel.style.display = "none";
+
+    return;
+
+  }
+
+
+  content.textContent =
+    JSON.stringify(
+      memory,
+      null,
+      2
     );
 
+  panel.style.display =
+    "block";
 
-    // Enter ile gönder
+}
 
-    messageInput.addEventListener(
-      "keydown",
-      function(event) {
 
-        if (event.key === "Enter") {
+/* =========================
+   HER ŞEYİ TEMİZLE
+========================= */
 
-          sendMessage();
+function clearMemory() {
 
-        }
+  if (
+    !confirm(
+      "Sohbet ve Zatoi'nin hafızası tamamen silinsin mi?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  conversation = [];
+
+  memory = {
+
+    name: "",
+
+    facts: [],
+
+    preferences: []
+
+  };
+
+
+  localStorage.removeItem(
+    CONVERSATION_KEY
+  );
+
+  localStorage.removeItem(
+    MEMORY_KEY
+  );
+
+
+  document.getElementById(
+    "chat"
+  ).innerHTML = "";
+
+  document.getElementById(
+    "memoryPanel"
+  ).style.display = "none";
+
+}
+
+
+/* =========================
+   ENTER TUŞU
+========================= */
+
+document
+  .getElementById("messageInput")
+  .addEventListener(
+    "keydown",
+    function(event) {
+
+      if (event.key === "Enter") {
+
+        sendMessage();
 
       }
-    );
+
+    }
+  );
 
 
-    // Hafızayı temizle
+/* =========================
+   BAŞLAT
+========================= */
 
-    clearButton.addEventListener(
-      "click",
-      function() {
+loadData();
 
-        const confirmClear =
-          confirm(
-            "Zatoi'nin tüm konuşma hafızası silinsin mi?"
-          );
+renderConversation();
 
-
-        if (confirmClear) {
-
-          conversation = [];
-
-          localStorage.removeItem(
-            "zatoi_memory"
-          );
-
-          loadMemory();
-
-        }
-
-      }
-    );
-
-
-    // Sayfa açılırken hafızayı yükle
-
-    loadMemory();
-
-  </script>
+</script>
 
 </body>
-
 </html>
