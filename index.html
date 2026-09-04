@@ -1,1 +1,1563 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
+<title>Zatoi AI</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f0f0f;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  overflow: hidden;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 0 25px;
+  background: #151515;
+  border-bottom: 1px solid #292929;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 23px;
+}
+
+header p {
+  margin: 4px 0 0 12px;
+  color: #888;
+  font-size: 13px;
+}
+
+/* =========================
+   ANA ALAN
+========================= */
+
+#app {
+  height: calc(100vh - 70px);
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    330px;
+}
+
+/* =========================
+   CHAT ALANI
+========================= */
+
+#chatArea {
+  position: relative;
+
+  min-width: 0;
+  height: 100%;
+
+  background: #0f0f0f;
+
+  overflow: hidden;
+}
+
+/* =========================
+   PC MESAJ KUTUSU
+========================= */
+
+#desktopInput {
+
+  position: absolute;
+
+  top: 20px;
+  right: 25px;
+
+  width: min(500px, 65%);
+
+  display: flex;
+
+  gap: 8px;
+
+  z-index: 20;
+}
+
+#desktopInput input {
+
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  border: 1px solid #3a3a3a;
+
+  background: #1b1b1b;
+
+  color: white;
+
+  outline: none;
+
+  font-size: 15px;
+}
+
+#desktopInput input:focus {
+  border-color: #2563eb;
+}
+
+#desktopInput input::placeholder {
+  color: #777;
+}
+
+#desktopSend {
+
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 12px 20px;
+
+  background: #2563eb;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  font-weight: bold;
+
+  flex-shrink: 0;
+}
+
+#desktopSend:hover {
+  background: #1d4ed8;
+}
+
+#desktopSend:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   MESAJLAR
+========================= */
+
+#chat {
+
+  height: 100%;
+
+  overflow-y: auto;
+
+  padding:
+    115px
+    25px
+    30px;
+}
+
+.message {
+
+  margin-bottom: 16px;
+
+  padding: 13px 16px;
+
+  border-radius: 15px;
+
+  max-width: 78%;
+
+  white-space: pre-wrap;
+
+  line-height: 1.5;
+
+  word-wrap: break-word;
+}
+
+.user {
+
+  background: #2563eb;
+
+  margin-left: auto;
+}
+
+.assistant {
+
+  background: #1e1e1e;
+
+  border: 1px solid #303030;
+
+  margin-right: auto;
+}
+
+.label {
+
+  font-size: 11px;
+
+  color: #aaa;
+
+  margin-bottom: 5px;
+}
+
+/* =========================
+   SAĞ PANEL
+========================= */
+
+#sidePanel {
+
+  border-left: 1px solid #292929;
+
+  background: #141414;
+
+  padding: 20px;
+
+  overflow-y: auto;
+}
+
+#sideTitle {
+
+  font-size: 18px;
+
+  font-weight: bold;
+
+  margin-bottom: 15px;
+}
+
+#sideDescription {
+
+  color: #888;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+  margin-bottom: 18px;
+}
+
+/* =========================
+   BUTONLAR
+========================= */
+
+#buttons {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+
+  margin-bottom: 18px;
+}
+
+#buttons button {
+
+  width: 100%;
+
+  min-height: 45px;
+
+  border: 1px solid #3b3b3b;
+
+  border-radius: 11px;
+
+  background: #292929;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  font-weight: bold;
+}
+
+#buttons button:hover {
+
+  background: #333;
+}
+
+#buttons button:active {
+
+  transform: scale(0.98);
+}
+
+/* =========================
+   HAFIZA
+========================= */
+
+#memoryBox {
+
+  background: #101010;
+
+  border: 1px solid #303030;
+
+  border-radius: 13px;
+
+  padding: 15px;
+}
+
+#memoryBoxTitle {
+
+  font-size: 15px;
+
+  font-weight: bold;
+
+  margin-bottom: 12px;
+}
+
+#memoryContent {
+
+  white-space: pre-wrap;
+
+  word-break: break-word;
+
+  color: #aaa;
+
+  font-size: 12px;
+
+  line-height: 1.55;
+
+  max-height:
+    calc(100vh - 300px);
+
+  overflow-y: auto;
+}
+
+/* =========================
+   MOBİL ALT PANEL
+========================= */
+
+#mobileBottom {
+
+  display: none;
+}
+
+
+/* =========================================================
+   MOBİL
+========================================================= */
+
+@media (max-width: 600px) {
+
+  html,
+  body {
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: hidden;
+  }
+
+  /* -------------------------
+     HEADER
+  ------------------------- */
+
+  header {
+
+    height: 62px;
+
+    padding: 0 15px;
+
+    justify-content: center;
+
+    flex-direction: column;
+  }
+
+  header h1 {
+
+    font-size: 21px;
+  }
+
+  header p {
+
+    margin: 3px 0 0;
+
+    font-size: 12px;
+  }
+
+  /* -------------------------
+     ANA ALAN
+  ------------------------- */
+
+  #app {
+
+    height:
+      calc(100vh - 62px);
+
+    display: block;
+  }
+
+  /* -------------------------
+     CHAT
+  ------------------------- */
+
+  #chatArea {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: hidden;
+  }
+
+  /* -------------------------
+     SAĞ PANELİ MOBİLDE GİZLE
+  ------------------------- */
+
+  #sidePanel {
+
+    display: none;
+  }
+
+  /* -------------------------
+     PC INPUT GİZLE
+  ------------------------- */
+
+  #desktopInput {
+
+    display: none;
+  }
+
+  /* -------------------------
+     MESAJLAR
+  ------------------------- */
+
+  #chat {
+
+    height: 100%;
+
+    overflow-y: auto;
+
+    padding:
+      12px
+      12px
+      145px
+      12px;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .message {
+
+    max-width: 92%;
+
+    padding:
+      12px
+      14px;
+
+    font-size: 14px;
+  }
+
+  /* =====================================================
+     MOBİL ALT PANEL
+  ===================================================== */
+
+  #mobileBottom {
+
+    display: block;
+
+    position: fixed;
+
+    left: 0;
+
+    right: 0;
+
+    bottom: 0;
+
+    width: 100%;
+
+    padding:
+      9px
+      10px;
+
+    padding-bottom:
+      calc(
+        9px +
+        env(safe-area-inset-bottom)
+      );
+
+    background:
+      rgba(17, 17, 17, 0.98);
+
+    border-top:
+      1px solid #292929;
+
+    z-index: 9999;
+  }
+
+  /* -------------------------
+     MOBİL BUTONLAR
+  ------------------------- */
+
+  #mobileButtons {
+
+    display: flex;
+
+    width: 100%;
+
+    gap: 7px;
+
+    margin-bottom: 8px;
+  }
+
+  #mobileButtons button {
+
+    flex: 1;
+
+    min-height: 42px;
+
+    border:
+      1px solid #444;
+
+    border-radius: 11px;
+
+    background: #292929;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+  }
+
+  #mobileButtons button:active {
+
+    transform: scale(0.98);
+  }
+
+  /* -------------------------
+     MOBİL MESAJ INPUT
+  ------------------------- */
+
+  #mobileInput {
+
+    display: flex;
+
+    width: 100%;
+
+    gap: 6px;
+  }
+
+  #mobileInput input {
+
+    flex: 1;
+
+    width: 100%;
+
+    min-width: 0;
+
+    height: 46px;
+
+    padding:
+      0 13px;
+
+    border-radius: 12px;
+
+    border:
+      1px solid #3a3a3a;
+
+    background: #1b1b1b;
+
+    color: white;
+
+    outline: none;
+
+    font-size: 14px;
+  }
+
+  #mobileInput input:focus {
+
+    border-color: #2563eb;
+  }
+
+  #mobileInput input::placeholder {
+
+    color: #777;
+  }
+
+  /* -------------------------
+     MOBİL GÖNDER
+  ------------------------- */
+
+  #mobileSend {
+
+    height: 46px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding:
+      0 14px;
+
+    background: #2563eb;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    flex-shrink: 0;
+  }
+
+  #mobileSend:active {
+
+    transform: scale(0.97);
+  }
+
+}
+
+
+/* =========================================================
+   ÇOK KÜÇÜK TELEFONLAR
+========================================================= */
+
+@media (max-width: 380px) {
+
+  #mobileBottom {
+
+    padding:
+      7px
+      8px;
+
+    padding-bottom:
+      calc(
+        7px +
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  #mobileButtons {
+
+    gap: 5px;
+
+    margin-bottom: 6px;
+  }
+
+  #mobileButtons button {
+
+    min-height: 39px;
+
+    font-size: 12px;
+  }
+
+  #mobileInput {
+
+    gap: 5px;
+  }
+
+  #mobileInput input {
+
+    height: 43px;
+
+    font-size: 13px;
+
+    padding:
+      0 11px;
+  }
+
+  #mobileSend {
+
+    height: 43px;
+
+    padding:
+      0 11px;
+
+    font-size: 12px;
+  }
+
+  #chat {
+
+    padding-bottom: 135px;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header>
+
+  <h1>
+    🤖 Zatoi AI
+  </h1>
+
+  <p>
+    Senin kişisel yapay zekân
+  </p>
+
+</header>
+
+
+<!-- =====================================================
+     ANA UYGULAMA
+===================================================== -->
+
+<div id="app">
+
+
+  <!-- ===================================================
+       SOL / İLK KOLON
+  =================================================== -->
+
+  <section id="chatArea">
+
+
+    <!-- ===============================================
+         PC MESAJ KUTUSU
+    =============================================== -->
+
+    <div id="desktopInput">
+
+      <input
+        id="desktopMessageInput"
+        type="text"
+        placeholder="Zatoi'ye bir şey sor..."
+        autocomplete="off"
+      >
+
+      <button
+        id="desktopSend"
+        onclick="sendFromDesktop()"
+      >
+        Gönder
+      </button>
+
+    </div>
+
+
+    <!-- ===============================================
+         CHAT
+    =============================================== -->
+
+    <div id="chat"></div>
+
+
+    <!-- ===============================================
+         MOBİL ALT PANEL
+    =============================================== -->
+
+    <div id="mobileBottom">
+
+
+      <!-- Mobil butonlar -->
+
+      <div id="mobileButtons">
+
+        <button
+          onclick="toggleMemory()"
+        >
+          🧠 Hafıza
+        </button>
+
+        <button
+          onclick="clearMemory()"
+        >
+          🗑️ Temizle
+        </button>
+
+      </div>
+
+
+      <!-- Mobil mesaj kutusu -->
+
+      <div id="mobileInput">
+
+        <input
+          id="mobileMessageInput"
+          type="text"
+          placeholder="Zatoi'ye bir şey sor..."
+          autocomplete="off"
+        >
+
+        <button
+          id="mobileSend"
+          onclick="sendFromMobile()"
+        >
+          Gönder
+        </button>
+
+      </div>
+
+
+    </div>
+
+
+  </section>
+
+
+  <!-- ===================================================
+       SAĞ / İKİNCİ KOLON
+  =================================================== -->
+
+  <aside id="sidePanel">
+
+
+    <div id="sideTitle">
+      🧠 Zatoi Hafızası
+    </div>
+
+
+    <div id="sideDescription">
+
+      Zatoi'nin senin hakkında öğrendiği
+      ve gelecekte kullanabileceği bilgiler
+      burada tutulur.
+
+    </div>
+
+
+    <div id="buttons">
+
+      <button
+        onclick="toggleMemory()"
+      >
+        🧠 Hafızayı Yenile
+      </button>
+
+
+      <button
+        onclick="clearMemory()"
+      >
+        🗑️ Sohbet ve Hafızayı Temizle
+      </button>
+
+    </div>
+
+
+    <div id="memoryBox">
+
+      <div id="memoryBoxTitle">
+        Kayıtlı Bilgiler
+      </div>
+
+
+      <div id="memoryContent"></div>
+
+    </div>
+
+
+  </aside>
+
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   AYARLAR
+===================================================== */
+
+const WORKER_URL =
+  "https://zatoi-ai.fbboytr.workers.dev/";
+
+
+const CONVERSATION_KEY =
+  "zatoi_conversation_v4";
+
+
+const MEMORY_KEY =
+  "zatoi_memory_v4";
+
+
+/* =====================================================
+   VERİLER
+===================================================== */
+
+let conversation = [];
+
+
+let memory = {
+
+  name: "",
+
+  facts: [],
+
+  preferences: []
+
+};
+
+
+/* =====================================================
+   VERİLERİ YÜKLE
+===================================================== */
+
+function loadData() {
+
+  try {
+
+    const savedConversation =
+      localStorage.getItem(
+        CONVERSATION_KEY
+      );
+
+
+    const savedMemory =
+      localStorage.getItem(
+        MEMORY_KEY
+      );
+
+
+    if (savedConversation) {
+
+      conversation =
+        JSON.parse(
+          savedConversation
+        );
+
+    }
+
+
+    if (savedMemory) {
+
+      const parsedMemory =
+        JSON.parse(
+          savedMemory
+        );
+
+
+      memory = {
+
+        name:
+          parsedMemory.name || "",
+
+        facts:
+          Array.isArray(
+            parsedMemory.facts
+          )
+            ? parsedMemory.facts
+            : [],
+
+        preferences:
+          Array.isArray(
+            parsedMemory.preferences
+          )
+            ? parsedMemory.preferences
+            : []
+
+      };
+
+    }
+
+  } catch (error) {
+
+    console.log(
+      "Yükleme hatası:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   VERİLERİ KAYDET
+===================================================== */
+
+function saveData() {
+
+  localStorage.setItem(
+
+    CONVERSATION_KEY,
+
+    JSON.stringify(
+      conversation
+    )
+
+  );
+
+
+  localStorage.setItem(
+
+    MEMORY_KEY,
+
+    JSON.stringify(
+      memory
+    )
+
+  );
+
+}
+
+
+/* =====================================================
+   HAFIZAYI GÖSTER
+===================================================== */
+
+function renderMemory() {
+
+  const content =
+    document.getElementById(
+      "memoryContent"
+    );
+
+
+  content.textContent =
+    JSON.stringify(
+
+      memory,
+
+      null,
+
+      2
+
+    );
+
+}
+
+
+/* =====================================================
+   SOHBETİ GÖSTER
+===================================================== */
+
+function renderConversation() {
+
+  const chat =
+    document.getElementById(
+      "chat"
+    );
+
+
+  chat.innerHTML = "";
+
+
+  conversation.forEach(
+
+    message => {
+
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "message " +
+        message.role;
+
+
+      const label =
+        document.createElement(
+          "div"
+        );
+
+
+      label.className =
+        "label";
+
+
+      label.textContent =
+
+        message.role === "user"
+
+          ? "Sen"
+
+          : "Zatoi";
+
+
+      const content =
+        document.createElement(
+          "div"
+        );
+
+
+      content.textContent =
+        message.content;
+
+
+      div.appendChild(
+        label
+      );
+
+
+      div.appendChild(
+        content
+      );
+
+
+      chat.appendChild(
+        div
+      );
+
+
+    }
+
+  );
+
+
+  chat.scrollTop =
+    chat.scrollHeight;
+
+}
+
+
+/* =====================================================
+   MESAJ GÖNDER
+===================================================== */
+
+async function sendMessage(text) {
+
+
+  text =
+    text.trim();
+
+
+  if (!text) {
+
+    return;
+
+  }
+
+
+  /* Kullanıcı mesajını ekle */
+
+  conversation.push({
+
+    role: "user",
+
+    content: text
+
+  });
+
+
+  renderConversation();
+
+
+  /* Son 20 mesaj */
+
+  const recentMessages =
+    conversation.slice(-20);
+
+
+  try {
+
+
+    const response =
+      await fetch(
+
+        WORKER_URL,
+
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json"
+
+          },
+
+          body:
+
+            JSON.stringify({
+
+              memory:
+                memory,
+
+              messages:
+                recentMessages
+
+            })
+
+        }
+
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (data.error) {
+
+      throw new Error(
+        data.error
+      );
+
+    }
+
+
+    /* ================================
+       HAFIZA GÜNCELLE
+    ================================= */
+
+    if (data.memory) {
+
+
+      memory = {
+
+        name:
+          data.memory.name ||
+          memory.name ||
+          "",
+
+
+        facts:
+
+          Array.isArray(
+            data.memory.facts
+          )
+
+            ? data.memory.facts
+
+            : memory.facts,
+
+
+        preferences:
+
+          Array.isArray(
+            data.memory.preferences
+          )
+
+            ? data.memory.preferences
+
+            : memory.preferences
+
+      };
+
+
+      renderMemory();
+
+    }
+
+
+    /* ================================
+       CEVABI AL
+    ================================= */
+
+    const reply =
+
+      data.reply ||
+
+      data.choices?.[0]
+        ?.message
+        ?.content ||
+
+      "Zatoi cevap veremedi.";
+
+
+    /* ================================
+       ZATOI MESAJI
+    ================================= */
+
+    conversation.push({
+
+      role: "assistant",
+
+      content: reply
+
+    });
+
+
+    /* Kaydet */
+
+    saveData();
+
+
+    /* Ekrana bas */
+
+    renderConversation();
+
+
+  } catch (error) {
+
+
+    console.log(
+      "Hata:",
+      error
+    );
+
+
+    conversation.push({
+
+      role: "assistant",
+
+      content:
+        "Şu anda bağlantıda bir sorun oluştu. ⚠️"
+
+    });
+
+
+    renderConversation();
+
+  }
+
+}
+
+
+/* =====================================================
+   PC'DEN GÖNDER
+===================================================== */
+
+function sendFromDesktop() {
+
+
+  const input =
+    document.getElementById(
+      "desktopMessageInput"
+    );
+
+
+  const text =
+    input.value.trim();
+
+
+  if (!text) {
+
+    return;
+
+  }
+
+
+  input.value = "";
+
+
+  sendMessage(text);
+
+}
+
+
+/* =====================================================
+   MOBİLDEN GÖNDER
+===================================================== */
+
+function sendFromMobile() {
+
+
+  const input =
+    document.getElementById(
+      "mobileMessageInput"
+    );
+
+
+  const text =
+    input.value.trim();
+
+
+  if (!text) {
+
+    return;
+
+  }
+
+
+  input.value = "";
+
+
+  sendMessage(text);
+
+}
+
+
+/* =====================================================
+   HAFIZA BUTONU
+===================================================== */
+
+function toggleMemory() {
+
+
+  renderMemory();
+
+
+  if (
+    window.innerWidth <= 600
+  ) {
+
+
+    const text =
+      JSON.stringify(
+
+        memory,
+
+        null,
+
+        2
+
+      );
+
+
+    alert(
+
+      "🧠 Zatoi Hafızası\n\n" +
+
+      text
+
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   TEMİZLE
+===================================================== */
+
+function clearMemory() {
+
+
+  const answer =
+    confirm(
+
+      "Sohbet ve hafıza tamamen silinsin mi?"
+
+    );
+
+
+  if (!answer) {
+
+    return;
+
+  }
+
+
+  conversation = [];
+
+
+  memory = {
+
+    name: "",
+
+    facts: [],
+
+    preferences: []
+
+  };
+
+
+  localStorage.removeItem(
+    CONVERSATION_KEY
+  );
+
+
+  localStorage.removeItem(
+    MEMORY_KEY
+  );
+
+
+  document.getElementById(
+    "chat"
+  ).innerHTML = "";
+
+
+  renderMemory();
+
+}
+
+
+/* =====================================================
+   PC ENTER
+===================================================== */
+
+document
+  .getElementById(
+    "desktopMessageInput"
+  )
+  .addEventListener(
+
+    "keydown",
+
+    function(event) {
+
+
+      if (
+        event.key === "Enter"
+      ) {
+
+
+        event.preventDefault();
+
+
+        sendFromDesktop();
+
+      }
+
+    }
+
+  );
+
+
+/* =====================================================
+   MOBİL ENTER
+===================================================== */
+
+document
+  .getElementById(
+    "mobileMessageInput"
+  )
+  .addEventListener(
+
+    "keydown",
+
+    function(event) {
+
+
+      if (
+        event.key === "Enter"
+      ) {
+
+
+        event.preventDefault();
+
+
+        sendFromMobile();
+
+      }
+
+    }
+
+  );
+
+
+/* =====================================================
+   BAŞLANGIÇ
+===================================================== */
+
+loadData();
+
+
+renderConversation();
+
+
+renderMemory();
+
+</script>
+
+</body>
+</html>
