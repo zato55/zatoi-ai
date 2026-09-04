@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Zatoi AI</title>
 
   <style>
@@ -13,377 +12,216 @@
 
     body {
       margin: 0;
-      height: 100vh;
-      background: #0f1117;
-      color: #ffffff;
       font-family: Arial, sans-serif;
+      background: #0f1117;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
+    .container {
+      width: 100%;
+      max-width: 700px;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      background: #171a21;
     }
-
-    /* Üst başlık */
 
     header {
-      height: 65px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-bottom: 1px solid #292d38;
-
+      padding: 18px;
+      text-align: center;
       font-size: 22px;
       font-weight: bold;
-
-      background: #11141b;
+      border-bottom: 1px solid #292d36;
     }
-
-    /* Sohbet alanı */
 
     #chat {
       flex: 1;
-
       overflow-y: auto;
-
       padding: 20px;
-
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
     }
 
-    /* Mesajlar */
-
     .message {
-      max-width: 80%;
-
+      max-width: 85%;
       padding: 12px 15px;
-
-      border-radius: 15px;
-
+      margin-bottom: 12px;
+      border-radius: 14px;
       line-height: 1.5;
-
       white-space: pre-wrap;
-
       word-wrap: break-word;
     }
 
-    /* Kullanıcı */
+    .ai {
+      background: #252a34;
+      align-self: flex-start;
+    }
 
     .user {
-      align-self: flex-end;
-
-      background: #2563eb;
-
-      border-bottom-right-radius: 4px;
+      background: #3b82f6;
+      margin-left: auto;
     }
-
-    /* Zatoi */
-
-    .ai {
-      align-self: flex-start;
-
-      background: #20242e;
-
-      border-bottom-left-radius: 4px;
-    }
-
-    /* Alt bölüm */
 
     .input-area {
       display: flex;
-
       gap: 10px;
-
-      padding: 12px;
-
-      background: #11141b;
-
-      border-top: 1px solid #292d38;
+      padding: 15px;
+      border-top: 1px solid #292d36;
     }
-
-    /* Mesaj kutusu */
 
     #messageInput {
       flex: 1;
-
-      height: 50px;
-
-      padding: 0 15px;
-
+      padding: 13px;
       border: none;
-
+      border-radius: 10px;
       outline: none;
-
-      border-radius: 12px;
-
-      background: #20242e;
-
+      background: #252a34;
       color: white;
-
       font-size: 16px;
     }
-
-    #messageInput::placeholder {
-      color: #8d93a1;
-    }
-
-    /* Gönder butonu */
 
     #sendButton {
-      height: 50px;
-
-      padding: 0 20px;
-
+      padding: 13px 18px;
       border: none;
-
-      border-radius: 12px;
-
-      background: #2563eb;
-
+      border-radius: 10px;
+      background: #3b82f6;
       color: white;
-
-      font-size: 16px;
-
       cursor: pointer;
-    }
-
-    #sendButton:hover {
-      opacity: 0.9;
+      font-size: 16px;
     }
 
     #sendButton:disabled {
       opacity: 0.5;
-
       cursor: not-allowed;
-    }
-
-    /* Mobil */
-
-    @media (max-width: 600px) {
-
-      .message {
-        max-width: 90%;
-      }
-
-      #sendButton {
-        padding: 0 15px;
-      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Başlık -->
+  <div class="container">
 
-  <header>
-    🤖 Zatoi AI
-  </header>
+    <header>
+      🤖 Zatoi AI
+    </header>
 
+    <div id="chat">
 
-  <!-- Sohbet -->
+      <div class="message ai">
+        Merhaba! Ben Zatoi AI. 👋
+      </div>
 
-  <div id="chat">
+    </div>
 
-    <div class="message ai">
-      Merhaba! Ben Zatoi AI. 👋
+    <div class="input-area">
+
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Zatoi'ye bir şey sor..."
+        autocomplete="off"
+      >
+
+      <button id="sendButton">
+        Gönder
+      </button>
+
     </div>
 
   </div>
 
-
-  <!-- Mesaj gönderme -->
-
-  <div class="input-area">
-
-    <input
-      id="messageInput"
-      type="text"
-      placeholder="Zatoi'ye bir şey sor..."
-      autocomplete="off"
-    >
-
-    <button id="sendButton">
-      Gönder
-    </button>
-
-  </div>
-
-
   <script>
-
-    /*
-      CLOUDFLARE WORKER ADRESİ
-    */
 
     const WORKER_URL =
       "https://zatoi-ai.fbboytr.workers.dev/";
 
-
-    /*
-      HTML ELEMENTLERİ
-    */
-
     const chat =
       document.getElementById("chat");
 
-    const input =
+    const messageInput =
       document.getElementById("messageInput");
 
-    const button =
+    const sendButton =
       document.getElementById("sendButton");
 
 
-    /*
-      MESAJ GÖNDER
-    */
-
-    async function sendMessage() {
+    function addMessage(text, type) {
 
       const message =
-        input.value.trim();
-
-
-      // Boş mesaj gönderme
-
-      if (!message) {
-        return;
-      }
-
-
-      /*
-        KULLANICI MESAJI
-      */
-
-      const userMessage =
         document.createElement("div");
 
-      userMessage.className =
-        "message user";
+      message.className =
+        "message " + type;
 
-      userMessage.textContent =
-        message;
+      message.textContent = text;
 
-      chat.appendChild(userMessage);
-
-
-      /*
-        INPUT TEMİZLE
-      */
-
-      input.value = "";
-
-
-      /*
-        BUTONU KİLİTLE
-      */
-
-      button.disabled = true;
-
-
-      /*
-        ZATOI BEKLİYOR
-      */
-
-      const aiMessage =
-        document.createElement("div");
-
-      aiMessage.className =
-        "message ai";
-
-      aiMessage.textContent =
-        "Zatoi düşünüyor... 🤔";
-
-      chat.appendChild(aiMessage);
-
-
-      /*
-        SOHBETİ AŞAĞI KAYDIR
-      */
+      chat.appendChild(message);
 
       chat.scrollTop =
         chat.scrollHeight;
 
+      return message;
+    }
+
+
+    async function sendMessage() {
+
+      const message =
+        messageInput.value.trim();
+
+      if (!message) return;
+
+      addMessage(message, "user");
+
+      messageInput.value = "";
+
+      sendButton.disabled = true;
+
+      const aiMessage =
+        addMessage("Zatoi düşünüyor...", "ai");
+
 
       try {
 
-        /*
-          CLOUDFLARE WORKER'A İSTEK
-        */
-
         const response =
-          await fetch(
-            WORKER_URL,
-            {
-              method: "POST",
+          await fetch(WORKER_URL, {
 
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
+            method: "POST",
 
-              body:
-                JSON.stringify({
-                  message: message
-                })
-            }
-          );
+            headers: {
+              "Content-Type": "application/json"
+            },
 
+            body: JSON.stringify({
+              message: message
+            })
 
-        /*
-          GELEN CEVABI OKU
-        */
+          });
+
 
         const data =
           await response.json();
 
 
-        /*
-          HTTP HATASI
-        */
+        console.log("Zatoi cevabı:", data);
 
-        if (!response.ok) {
-
-          aiMessage.textContent =
-            "Sunucu hatası: " +
-            (
-              data.error ||
-              "Bilinmeyen hata"
-            );
-
-          return;
-        }
-
-
-        /*
-          NORMAL AI CEVABI
-        */
 
         if (
-  data.choices &&
-  data.choices[0] &&
-  data.choices[0].message
-) {
-  aiMessage.textContent =
-    data.choices[0].message.content;
-}
-else if (data.error) {
-  aiMessage.textContent =
-    "Zatoi AI hatası: " + data.error;
-}
-else {
-  aiMessage.textContent =
-    "Beklenmeyen cevap: " +
-    JSON.stringify(data);
-}
+          data &&
+          data.choices &&
+          data.choices[0] &&
+          data.choices[0].message &&
+          data.choices[0].message.content
+        ) {
 
-        /*
-          HATA MESAJI
-        */
+          aiMessage.textContent =
+            data.choices[0].message.content;
 
-        else if (data.error) {
+        }
+
+        else if (data && data.error) {
 
           aiMessage.textContent =
             "Zatoi AI hatası: " +
@@ -391,77 +229,43 @@ else {
 
         }
 
-
-        /*
-          BEKLENMEYEN CEVAP
-        */
-
         else {
 
           aiMessage.textContent =
-            "Beklenmeyen cevap: " +
-            JSON.stringify(data);
+            "Zatoi'den geçerli bir cevap alınamadı.";
 
         }
 
-      }
 
+      } catch (error) {
 
-      /*
-        BAĞLANTI HATASI
-      */
-
-      catch (error) {
+        console.error(error);
 
         aiMessage.textContent =
-          "Bağlantı hatası: " +
-          error.message;
+          "Zatoi'ye bağlanırken hata oluştu.";
 
       }
 
 
-      /*
-        BUTONU AÇ
-      */
+      sendButton.disabled = false;
 
-      finally {
-
-        button.disabled = false;
-
-        input.focus();
-
-        chat.scrollTop =
-          chat.scrollHeight;
-
-      }
+      messageInput.focus();
 
     }
 
 
-    /*
-      GÖNDER BUTONU
-    */
-
-    button.addEventListener(
+    sendButton.addEventListener(
       "click",
       sendMessage
     );
 
 
-    /*
-      ENTER TUŞU
-    */
-
-    input.addEventListener(
+    messageInput.addEventListener(
       "keydown",
       function(event) {
 
         if (event.key === "Enter") {
-
-          event.preventDefault();
-
           sendMessage();
-
         }
 
       }
