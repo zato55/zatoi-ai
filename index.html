@@ -253,123 +253,150 @@
     }
 
 
-    async function sendMessage() {
+   ```javascript
+async function sendMessage() {
 
-      const message =
-        messageInput.value.trim();
+  const message =
+    messageInput.value.trim();
 
-      if (!message) return;
+  if (!message) return;
 
 
-      // Kullanıcı mesajını ekle
+  // Kullanıcı mesajını ekle
+  addMessage(
+    message,
+    "user"
+  );
 
-      addMessage(
-        message,
-        "user"
+
+  conversation.push({
+    role: "user",
+    content: message
+  });
+
+
+  saveMemory();
+
+
+  messageInput.value = "";
+
+  sendButton.disabled = true;
+
+
+  const aiMessage =
+    addMessage(
+      "Zatoi düşünüyor...",
+      "ai"
+    );
+
+
+  try {
+
+    const response =
+      await fetch(
+        WORKER_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            messages: conversation
+          })
+        }
       );
 
 
+    const data =
+      await response.json();
+
+
+    console.log(
+      "Zatoi cevabı:",
+      data
+    );
+
+
+    // Worker { reply: "..." } döndürürse
+    let reply =
+      data?.reply;
+
+
+    // Worker doğrudan AI cevabını döndürürse
+    if (!reply) {
+
+      reply =
+        data?.choices?.[0]?.message?.content;
+
+    }
+
+
+    // Cevap bulunduysa
+    if (reply) {
+
+      aiMessage.textContent =
+        reply;
+
+
       conversation.push({
-        role: "user",
-        content: message
+        role: "assistant",
+        content: reply
       });
 
 
       saveMemory();
 
-
-      messageInput.value = "";
-
-      sendButton.disabled = true;
+    }
 
 
-      const aiMessage =
-        addMessage(
-          "Zatoi düşünüyor...",
-          "ai"
-        );
+    // Worker hata döndürürse
+    else if (data?.error) {
 
-
-      try {
-
-        const response =
-          await fetch(
-            WORKER_URL,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body: JSON.stringify({
-                messages:
-                  conversation
-              })
-            }
-          );
-
-
-        const data =
-          await response.json();
-
-
-        console.log(
-          "Zatoi:",
-          data
-        );
-
-
-        if (data.reply) {
-
-          aiMessage.textContent =
-            data.reply;
-
-
-          conversation.push({
-            role: "assistant",
-            content: data.reply
-          });
-
-
-          saveMemory();
-
-        }
-
-        else if (data.error) {
-
-          aiMessage.textContent =
-            "Zatoi AI hatası: " +
-            data.error;
-
-        }
-
-        else {
-
-          aiMessage.textContent =
-            "Zatoi cevap veremedi.";
-
-        }
-
-
-      }
-
-      catch (error) {
-
-        console.error(error);
-
-        aiMessage.textContent =
-          "Zatoi'ye bağlanırken hata oluştu.";
-
-      }
-
-
-      sendButton.disabled = false;
-
-      messageInput.focus();
+      aiMessage.textContent =
+        "Zatoi AI hatası: " +
+        data.error;
 
     }
+
+
+    // Hiçbir cevap formatı bulunamazsa
+    else {
+
+      aiMessage.textContent =
+        "Zatoi cevap veremedi.";
+
+      console.log(
+        "Beklenmeyen cevap:",
+        data
+      );
+
+    }
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Bağlantı hatası:",
+      error
+    );
+
+    aiMessage.textContent =
+      "Zatoi'ye bağlanırken hata oluştu.";
+
+  }
+
+
+  sendButton.disabled = false;
+
+  messageInput.focus();
+
+}
+```
+
 
 
     // Gönder butonu
