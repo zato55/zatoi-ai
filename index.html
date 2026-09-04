@@ -41,17 +41,13 @@
 
     button,
     textarea {
-
       font-family: inherit;
-
     }
 
 
     button {
-
       border: none;
       cursor: pointer;
-
     }
 
 
@@ -143,9 +139,7 @@
 
 
     .mobile-history-btn {
-
       display: none;
-
     }
 
 
@@ -216,9 +210,7 @@
 
 
     textarea::placeholder {
-
       color: #71808f;
-
     }
 
 
@@ -264,9 +256,7 @@
 
 
     .voice-btn.active {
-
       background: #b91c1c;
-
     }
 
 
@@ -275,9 +265,7 @@
     ================================= */
 
     .file-input {
-
       display: none;
-
     }
 
 
@@ -310,9 +298,7 @@
 
 
     .selected-file.show {
-
       display: flex;
-
     }
 
 
@@ -374,16 +360,12 @@
 
 
     .message-row.user {
-
       justify-content: flex-end;
-
     }
 
 
     .message-row.assistant {
-
       justify-content: flex-start;
-
     }
 
 
@@ -457,9 +439,7 @@
 
 
     .welcome p {
-
       line-height: 1.7;
-
     }
 
 
@@ -512,18 +492,12 @@
 
 
     .typing span:nth-child(2) {
-
-      animation-delay:
-        .15s;
-
+      animation-delay: .15s;
     }
 
 
     .typing span:nth-child(3) {
-
-      animation-delay:
-        .3s;
-
+      animation-delay: .3s;
     }
 
 
@@ -675,9 +649,7 @@
     ================================= */
 
     .mobile-input-area {
-
       display: none;
-
     }
 
 
@@ -698,9 +670,7 @@
 
 
     .mobile-history-overlay.show {
-
       display: block;
-
     }
 
 
@@ -777,16 +747,12 @@
     @media (max-width: 800px) {
 
       .app {
-
         height: 100dvh;
-
       }
 
 
       .side-panel {
-
         display: none;
-
       }
 
 
@@ -823,9 +789,7 @@
 
 
       .desktop-input-area {
-
         display: none;
-
       }
 
 
@@ -838,9 +802,7 @@
 
 
       .message {
-
         max-width: 88%;
-
       }
 
 
@@ -928,8 +890,6 @@
   <section class="chat-column">
 
 
-    <!-- TOP -->
-
     <div class="chat-top">
 
       <div
@@ -961,8 +921,6 @@
 
     </div>
 
-
-    <!-- DESKTOP INPUT -->
 
     <div class="desktop-input-area">
 
@@ -1035,15 +993,11 @@
     </div>
 
 
-    <!-- MESAJLAR -->
-
     <div
       id="messages"
       class="messages"
     ></div>
 
-
-    <!-- MOBILE INPUT -->
 
     <div class="mobile-input-area">
 
@@ -1117,8 +1071,6 @@
   </section>
 
 
-  <!-- HISTORY -->
-
   <aside class="side-panel">
 
     <div class="side-header">
@@ -1135,8 +1087,6 @@
 </div>
 
 
-<!-- PDF INPUT -->
-
 <input
   id="pdfInput"
   class="file-input"
@@ -1144,8 +1094,6 @@
   accept="application/pdf,.pdf"
 >
 
-
-<!-- MOBILE HISTORY -->
 
 <div
   id="mobileHistoryOverlay"
@@ -1205,6 +1153,44 @@ const GLOBAL_MEMORY_KEY =
 
 const VOICE_OUTPUT_KEY =
   "zatoi_voice_output_v1";
+
+
+/* ==========================================
+   D1 KULLANICI KİMLİĞİ
+========================================== */
+
+const ZATOI_USER_ID_KEY =
+  "zatoi_user_id_v1";
+
+
+function getZatoiUserId() {
+
+  let userId =
+    localStorage.getItem(
+      ZATOI_USER_ID_KEY
+    );
+
+
+  if (!userId) {
+
+    userId =
+      crypto.randomUUID();
+
+    localStorage.setItem(
+      ZATOI_USER_ID_KEY,
+      userId
+    );
+
+  }
+
+
+  return userId;
+
+}
+
+
+const zatoiUserId =
+  getZatoiUserId();
 
 
 /* ==========================================
@@ -1584,9 +1570,7 @@ function deleteChat(id) {
 
 
   if (index === -1) {
-
     return;
-
   }
 
 
@@ -1913,9 +1897,7 @@ function hideTyping() {
 
 
   if (element) {
-
     element.remove();
-
   }
 
 }
@@ -2250,9 +2232,7 @@ pdfInput.addEventListener(
 
 
     if (!file) {
-
       return;
-
     }
 
 
@@ -2461,9 +2441,7 @@ document
 async function sendMessage() {
 
   if (sending) {
-
     return;
-
   }
 
 
@@ -2476,9 +2454,7 @@ async function sendMessage() {
 
 
   if (!text) {
-
     return;
-
   }
 
 
@@ -2487,9 +2463,7 @@ async function sendMessage() {
 
 
   if (!chat) {
-
     return;
-
   }
 
 
@@ -2533,11 +2507,6 @@ async function sendMessage() {
 
   try {
 
-    /*
-     * PDF burada doğrudan
-     * document olarak Worker'a gidiyor.
-     */
-
     let documentForAI =
       null;
 
@@ -2580,6 +2549,10 @@ async function sendMessage() {
 
           body:
             JSON.stringify({
+
+              /* D1 için kullanıcı kimliği */
+              userId:
+                zatoiUserId,
 
               memory:
                 globalMemory,
