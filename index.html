@@ -9,18 +9,14 @@
     content="width=device-width, initial-scale=1.0"
   >
 
+  <title>Zatoi AI</title>
 
-<title>Zatoi AI</title>
-
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#111827">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Zatoi AI">
-
-
-  
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#111827">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Zatoi AI">
 
   <style>
 
@@ -30,56 +26,214 @@
 
     html,
     body {
-
       margin: 0;
       padding: 0;
-
       width: 100%;
       height: 100%;
-
       background: #0b0f14;
       color: white;
-
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+      font-family: Arial, Helvetica, sans-serif;
       overflow: hidden;
-
     }
-
 
     button,
-    textarea {
+    textarea,
+    input {
       font-family: inherit;
     }
-
 
     button {
       border: none;
       cursor: pointer;
     }
 
+    /* =================================
+       AUTH
+    ================================= */
+
+    .auth-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+
+      background:
+        radial-gradient(
+          circle at top,
+          #182536 0%,
+          #0b0f14 55%
+        );
+    }
+
+    .auth-screen.hidden {
+      display: none;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+
+      padding: 30px 24px;
+
+      background: #101720;
+
+      border:
+        1px solid #263442;
+
+      border-radius: 18px;
+
+      box-shadow:
+        0 20px 60px rgba(0,0,0,.45);
+
+      text-align: center;
+    }
+
+    .auth-logo {
+      width: 64px;
+      height: 64px;
+
+      margin: 0 auto 14px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 18px;
+
+      background: #17212b;
+
+      font-size: 34px;
+    }
+
+    .auth-card h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .auth-subtitle {
+      margin: 0 0 22px;
+      color: #8b9aaa;
+      font-size: 14px;
+    }
+
+    .auth-error {
+      display: none;
+
+      margin-bottom: 14px;
+      padding: 10px 12px;
+
+      border:
+        1px solid #7f3030;
+
+      border-radius: 10px;
+
+      background: #291519;
+      color: #ff9d9d;
+
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .auth-error.show {
+      display: block;
+    }
+
+    .auth-input {
+      width: 100%;
+
+      height: 46px;
+
+      margin-bottom: 10px;
+
+      padding: 0 13px;
+
+      outline: none;
+
+      border:
+        1px solid #293846;
+
+      border-radius: 10px;
+
+      background: #0b1118;
+      color: white;
+
+      font-size: 15px;
+    }
+
+    .auth-input:focus {
+      border-color: #2563eb;
+    }
+
+    .auth-submit {
+      width: 100%;
+
+      height: 46px;
+
+      margin-top: 8px;
+
+      border-radius: 10px;
+
+      background: #2563eb;
+      color: white;
+
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .auth-submit:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .auth-switch {
+      width: 100%;
+
+      margin-top: 12px;
+
+      padding: 9px;
+
+      background: transparent;
+      color: #8fb8ff;
+
+      font-size: 14px;
+    }
+
+    .auth-info {
+      margin-top: 18px;
+
+      color: #687888;
+
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* =================================
+       APP
+    ================================= */
 
     .app {
-
       width: 100%;
       height: 100vh;
 
       display: flex;
 
       background: #0b0f14;
-
     }
 
+    .app.hidden {
+      display: none;
+    }
 
     /* =================================
        CHAT
     ================================= */
 
     .chat-column {
-
       flex: 1;
       min-width: 0;
 
@@ -87,12 +241,9 @@
 
       display: flex;
       flex-direction: column;
-
     }
 
-
     .chat-top {
-
       height: 58px;
       flex-shrink: 0;
 
@@ -106,11 +257,10 @@
         1px solid #1c2530;
 
       background: #0d1218;
-
     }
 
-
     .chat-title {
+      min-width: 0;
 
       font-size: 17px;
       font-weight: 700;
@@ -118,21 +268,54 @@
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-
     }
-
 
     .top-actions {
-
       display: flex;
+      align-items: center;
       gap: 8px;
-
     }
 
+    .account-area {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-right: 2px;
+    }
+
+    .account-name {
+      max-width: 130px;
+
+      padding: 7px 9px;
+
+      border-radius: 9px;
+
+      background: #17212b;
+      color: #cbd5df;
+
+      font-size: 12px;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .logout-btn {
+      background: #171d23;
+      color: #ff9a9a;
+
+      border:
+        1px solid #29323a;
+
+      border-radius: 9px;
+
+      padding: 8px 10px;
+
+      font-size: 12px;
+    }
 
     .new-chat-btn,
     .mobile-history-btn {
-
       background: #17212b;
       color: white;
 
@@ -141,40 +324,31 @@
 
       border-radius: 10px;
 
-      padding:
-        9px 12px;
+      padding: 9px 12px;
 
       font-size: 13px;
-
     }
-
 
     .mobile-history-btn {
       display: none;
     }
-
 
     /* =================================
        INPUT
     ================================= */
 
     .desktop-input-area {
-
       flex-shrink: 0;
 
-      padding:
-        12px 18px;
+      padding: 12px 18px;
 
       background: #0b0f14;
 
       border-bottom:
         1px solid #1c2530;
-
     }
 
-
     .input-box {
-
       width: 100%;
 
       display: flex;
@@ -190,12 +364,9 @@
       border-radius: 14px;
 
       padding: 8px;
-
     }
 
-
     textarea {
-
       flex: 1;
       min-width: 0;
 
@@ -208,26 +379,20 @@
       outline: none;
 
       background: transparent;
-
       color: white;
 
       font-size: 15px;
-
       line-height: 1.4;
 
       padding: 10px;
-
     }
-
 
     textarea::placeholder {
       color: #71808f;
     }
 
-
     .action-btn,
     .voice-btn {
-
       flex-shrink: 0;
 
       height: 40px;
@@ -236,40 +401,26 @@
       border-radius: 10px;
 
       background: #1b2732;
-
       color: white;
 
       font-size: 14px;
 
-      padding:
-        0 12px;
-
+      padding: 0 12px;
     }
-
 
     .send-btn {
-
       background: #2563eb;
-
       font-weight: 700;
-
     }
-
 
     .pdf-btn {
-
       font-size: 18px;
-
-      padding:
-        0 10px;
-
+      padding: 0 10px;
     }
-
 
     .voice-btn.active {
       background: #b91c1c;
     }
-
 
     /* =================================
        PDF
@@ -279,20 +430,14 @@
       display: none;
     }
 
-
     .selected-file {
-
       display: none;
 
       align-items: center;
-
       gap: 8px;
 
-      padding:
-        8px 12px;
-
-      margin:
-        0 18px 8px;
+      padding: 8px 12px;
+      margin: 0 18px 8px;
 
       background: #101922;
 
@@ -302,48 +447,33 @@
       border-radius: 10px;
 
       font-size: 13px;
-
       color: #cbd5df;
-
     }
-
 
     .selected-file.show {
       display: flex;
     }
 
-
     .selected-file-name {
-
       flex: 1;
       min-width: 0;
 
       overflow: hidden;
-
       text-overflow: ellipsis;
-
       white-space: nowrap;
-
     }
-
 
     .remove-file-btn {
-
       background: transparent;
-
       color: #ff8b8b;
-
       font-size: 18px;
-
     }
-
 
     /* =================================
        MESSAGES
     ================================= */
 
     .messages {
-
       flex: 1;
       min-height: 0;
 
@@ -357,75 +487,50 @@
       gap: 10px;
 
       scrollbar-width: thin;
-
     }
-
 
     .message-row {
-
       display: flex;
-
       width: 100%;
-
     }
-
 
     .message-row.user {
       justify-content: flex-end;
     }
 
-
     .message-row.assistant {
       justify-content: flex-start;
     }
 
-
     .message {
+      max-width: min(78%, 850px);
 
-      max-width:
-        min(78%, 850px);
-
-      padding:
-        11px 14px;
+      padding: 11px 14px;
 
       border-radius: 14px;
 
       font-size: 15px;
-
       line-height: 1.5;
 
       white-space: pre-wrap;
-
       overflow-wrap: anywhere;
-
     }
-
 
     .message.user {
-
       background: #2563eb;
-
-      border-bottom-right-radius:
-        5px;
-
+      border-bottom-right-radius: 5px;
     }
 
-
     .message.assistant {
-
       background: #17212b;
 
       border:
         1px solid #253341;
 
-      border-bottom-left-radius:
-        5px;
-
+      border-bottom-left-radius: 5px;
     }
 
-
     .welcome {
-
       margin: auto;
 
       text-align: center;
@@ -433,43 +538,30 @@
       color: #8b9aaa;
 
       padding: 30px;
-
     }
 
-
     .welcome h1 {
-
       color: white;
 
       font-size: 30px;
 
-      margin:
-        0 0 12px;
-
+      margin: 0 0 12px;
     }
-
 
     .welcome p {
       line-height: 1.7;
     }
-
 
     /* =================================
        TYPING
     ================================= */
 
     .typing-row {
-
       display: flex;
-
-      justify-content:
-        flex-start;
-
+      justify-content: flex-start;
     }
 
-
     .typing {
-
       background: #17212b;
 
       border:
@@ -477,18 +569,13 @@
 
       border-radius: 14px;
 
-      padding:
-        11px 14px;
+      padding: 11px 14px;
 
       display: flex;
-
       gap: 5px;
-
     }
 
-
     .typing span {
-
       width: 6px;
       height: 6px;
 
@@ -496,55 +583,37 @@
 
       border-radius: 50%;
 
-      animation:
-        typing 1.2s infinite;
-
+      animation: typing 1.2s infinite;
     }
-
 
     .typing span:nth-child(2) {
       animation-delay: .15s;
     }
 
-
     .typing span:nth-child(3) {
       animation-delay: .3s;
     }
 
-
     @keyframes typing {
-
       0%,
       60%,
       100% {
-
         opacity: .3;
-
-        transform:
-          translateY(0);
-
+        transform: translateY(0);
       }
 
       30% {
-
         opacity: 1;
-
-        transform:
-          translateY(-3px);
-
+        transform: translateY(-3px);
       }
-
     }
-
 
     /* =================================
        HISTORY
     ================================= */
 
     .side-panel {
-
       width: 280px;
-
       height: 100%;
 
       flex-shrink: 0;
@@ -555,44 +624,32 @@
       background: #0d1218;
 
       display: flex;
-
       flex-direction: column;
-
     }
 
-
     .side-header {
-
       height: 58px;
 
       display: flex;
-
       align-items: center;
 
-      padding:
-        0 16px;
+      padding: 0 16px;
 
       font-weight: 700;
 
       border-bottom:
         1px solid #1c2530;
-
     }
 
-
     .history-list {
-
       flex: 1;
 
       overflow-y: auto;
 
       padding: 10px;
-
     }
 
-
     .history-item {
-
       display: flex;
 
       align-items: center;
@@ -600,20 +657,15 @@
       gap: 7px;
 
       margin-bottom: 7px;
-
     }
 
-
     .history-open {
-
       flex: 1;
-
       min-width: 0;
 
       text-align: left;
 
       background: #111820;
-
       color: #dce4eb;
 
       border:
@@ -628,21 +680,14 @@
       text-overflow: ellipsis;
 
       white-space: nowrap;
-
     }
-
 
     .history-open.active {
-
       border-color: #2563eb;
-
       background: #142338;
-
     }
 
-
     .history-delete {
-
       width: 34px;
       height: 34px;
 
@@ -651,9 +696,7 @@
       background: #171d23;
 
       color: #ff8585;
-
     }
-
 
     /* =================================
        MOBILE
@@ -663,9 +706,7 @@
       display: none;
     }
 
-
     .mobile-history-overlay {
-
       display: none;
 
       position: fixed;
@@ -674,27 +715,21 @@
 
       z-index: 100;
 
-      background:
-        rgba(0,0,0,.6);
-
+      background: rgba(0,0,0,.6);
     }
-
 
     .mobile-history-overlay.show {
       display: block;
     }
 
-
     .mobile-history-panel {
-
       position: absolute;
 
       top: 0;
       left: 0;
       bottom: 0;
 
-      width:
-        min(320px, 85vw);
+      width: min(320px, 85vw);
 
       background: #0d1218;
 
@@ -704,32 +739,24 @@
       display: flex;
 
       flex-direction: column;
-
     }
 
-
     .mobile-history-header {
-
       height: 58px;
 
       display: flex;
 
       align-items: center;
 
-      justify-content:
-        space-between;
+      justify-content: space-between;
 
-      padding:
-        0 14px;
+      padding: 0 14px;
 
       border-bottom:
         1px solid #1c2530;
-
     }
 
-
     .close-history {
-
       width: 35px;
       height: 35px;
 
@@ -740,20 +767,15 @@
       color: white;
 
       font-size: 18px;
-
     }
 
-
     .mobile-history-list {
-
       flex: 1;
 
       overflow-y: auto;
 
       padding: 10px;
-
     }
-
 
     @media (max-width: 800px) {
 
@@ -761,64 +783,57 @@
         height: 100dvh;
       }
 
-
       .side-panel {
         display: none;
       }
 
-
       .chat-top {
-
         height: 56px;
-
-        padding:
-          0 10px;
-
+        padding: 0 10px;
       }
 
+      .chat-title {
+        max-width: 130px;
+      }
 
       .mobile-history-btn {
-
         display: block;
 
-        padding:
-          8px 9px;
+        padding: 8px 9px;
 
         font-size: 12px;
-
       }
-
 
       .new-chat-btn {
-
-        padding:
-          8px 9px;
-
+        padding: 8px 9px;
         font-size: 12px;
-
       }
 
+      .account-area {
+        margin-right: 0;
+      }
+
+      .account-name {
+        display: none;
+      }
+
+      .logout-btn {
+        padding: 8px 9px;
+      }
 
       .desktop-input-area {
         display: none;
       }
 
-
       .messages {
-
-        padding:
-          12px 10px 100px;
-
+        padding: 12px 10px 100px;
       }
-
 
       .message {
         max-width: 88%;
       }
 
-
       .mobile-input-area {
-
         display: block;
 
         position: fixed;
@@ -831,58 +846,38 @@
 
         padding: 8px;
 
-        background:
-          rgba(11,15,20,.97);
+        background: rgba(11,15,20,.97);
 
         border-top:
           1px solid #1c2530;
-
       }
 
-
-      .mobile-input-area
-      .selected-file {
-
-        margin:
-          0 0 7px;
-
+      .mobile-input-area .selected-file {
+        margin: 0 0 7px;
       }
 
-
-      .mobile-input-area
-      .input-box {
-
+      .mobile-input-area .input-box {
         padding: 6px;
-
       }
 
-
-      .mobile-input-area
-      textarea {
-
+      .mobile-input-area textarea {
         min-height: 38px;
-
         max-height: 100px;
 
         padding: 9px;
 
         font-size: 14px;
-
       }
 
-
-      .mobile-input-area
-      .voice-btn,
-      .mobile-input-area
-      .action-btn {
-
+      .mobile-input-area .voice-btn,
+      .mobile-input-area .action-btn {
         height: 38px;
-
         min-width: 38px;
+        padding: 0 8px;
+      }
 
-        padding:
-          0 8px;
-
+      .auth-card {
+        padding: 26px 20px;
       }
 
     }
@@ -891,11 +886,99 @@
 
 </head>
 
-
 <body>
 
 
-<div class="app">
+<!-- ==========================================
+     AUTH EKRANI
+========================================== -->
+
+<div
+  id="authScreen"
+  class="auth-screen"
+>
+
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      🤖
+    </div>
+
+    <h1>
+      Zatoi AI
+    </h1>
+
+    <p
+      id="authSubtitle"
+      class="auth-subtitle"
+    >
+      Hesabına giriş yap
+    </p>
+
+    <div
+      id="authError"
+      class="auth-error"
+    ></div>
+
+    <input
+      id="authUsername"
+      class="auth-input"
+      type="text"
+      autocomplete="username"
+      placeholder="Kullanıcı adı"
+      maxlength="40"
+    >
+
+    <input
+      id="authPassword"
+      class="auth-input"
+      type="password"
+      autocomplete="current-password"
+      placeholder="Şifre"
+      maxlength="128"
+    >
+
+    <input
+      id="authPasswordConfirm"
+      class="auth-input"
+      type="password"
+      autocomplete="new-password"
+      placeholder="Şifre tekrar"
+      maxlength="128"
+      style="display:none;"
+    >
+
+    <button
+      id="authSubmit"
+      class="auth-submit"
+    >
+      Giriş Yap
+    </button>
+
+    <button
+      id="authSwitch"
+      class="auth-switch"
+    >
+      Hesabın yok mu? Hesap oluştur
+    </button>
+
+    <div class="auth-info">
+      E-posta veya başka kişisel bilgi gerekmiyor.
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ==========================================
+     ANA UYGULAMA
+========================================== -->
+
+<div
+  id="app"
+  class="app hidden"
+>
 
 
   <section class="chat-column">
@@ -912,6 +995,23 @@
 
 
       <div class="top-actions">
+
+        <div class="account-area">
+
+          <span
+            id="accountUsername"
+            class="account-name"
+          ></span>
+
+          <button
+            id="logoutButton"
+            class="logout-btn"
+          >
+            Çıkış
+          </button>
+
+        </div>
+
 
         <button
           id="mobileHistoryButton"
@@ -1166,47 +1266,106 @@ const VOICE_OUTPUT_KEY =
   "zatoi_voice_output_v1";
 
 
+const AUTH_TOKEN_KEY =
+  "zatoi_auth_token_v1";
+
+
+const AUTH_USER_KEY =
+  "zatoi_auth_user_v1";
+
+
 /* ==========================================
-   D1 KULLANICI KİMLİĞİ
+   AUTH DURUMU
 ========================================== */
 
-const ZATOI_USER_ID_KEY =
-  "zatoi_user_id_v1";
+let authToken =
+  localStorage.getItem(
+    AUTH_TOKEN_KEY
+  ) || "";
 
 
-function getZatoiUserId() {
+let currentUser = null;
 
-  let userId =
-    localStorage.getItem(
-      ZATOI_USER_ID_KEY
+
+try {
+
+  currentUser =
+    JSON.parse(
+      localStorage.getItem(
+        AUTH_USER_KEY
+      ) || "null"
     );
 
+} catch (error) {
 
-  if (!userId) {
-
-    userId =
-      crypto.randomUUID();
-
-    localStorage.setItem(
-      ZATOI_USER_ID_KEY,
-      userId
-    );
-
-  }
-
-
-  return userId;
+  currentUser = null;
 
 }
-
-
-const zatoiUserId =
-  getZatoiUserId();
 
 
 /* ==========================================
    ELEMENTLER
 ========================================== */
+
+const authScreen =
+  document.getElementById(
+    "authScreen"
+  );
+
+
+const app =
+  document.getElementById(
+    "app"
+  );
+
+
+const authSubtitle =
+  document.getElementById(
+    "authSubtitle"
+  );
+
+
+const authError =
+  document.getElementById(
+    "authError"
+  );
+
+
+const authUsername =
+  document.getElementById(
+    "authUsername"
+  );
+
+
+const authPassword =
+  document.getElementById(
+    "authPassword"
+  );
+
+
+const authPasswordConfirm =
+  document.getElementById(
+    "authPasswordConfirm"
+  );
+
+
+const authSubmit =
+  document.getElementById(
+    "authSubmit"
+  );
+
+
+const authSwitch =
+  document.getElementById(
+    "authSwitch"
+  );
+
+
+const accountUsername =
+  document.getElementById(
+    "accountUsername"
+  );
+
 
 const messagesElement =
   document.getElementById(
@@ -1259,6 +1418,772 @@ let selectedPdf = null;
 let documentData = null;
 
 let sending = false;
+
+let authMode = "login";
+
+
+/* ==========================================
+   AUTH HATA MESAJI
+========================================== */
+
+function showAuthError(message) {
+
+  authError.textContent =
+    message;
+
+  authError.classList.add(
+    "show"
+  );
+
+}
+
+
+function clearAuthError() {
+
+  authError.textContent =
+    "";
+
+  authError.classList.remove(
+    "show"
+  );
+
+}
+
+
+/* ==========================================
+   AUTH MODU
+========================================== */
+
+function updateAuthMode() {
+
+  clearAuthError();
+
+  authUsername.value = "";
+  authPassword.value = "";
+  authPasswordConfirm.value = "";
+
+  if (authMode === "login") {
+
+    authSubtitle.textContent =
+      "Hesabına giriş yap";
+
+    authPassword.autocomplete =
+      "current-password";
+
+    authPasswordConfirm.style.display =
+      "none";
+
+    authSubmit.textContent =
+      "Giriş Yap";
+
+    authSwitch.textContent =
+      "Hesabın yok mu? Hesap oluştur";
+
+  } else {
+
+    authSubtitle.textContent =
+      "Yeni Zatoi hesabını oluştur";
+
+    authPassword.autocomplete =
+      "new-password";
+
+    authPasswordConfirm.style.display =
+      "block";
+
+    authSubmit.textContent =
+      "Hesap Oluştur";
+
+    authSwitch.textContent =
+      "Zaten hesabın var mı? Giriş yap";
+
+  }
+
+}
+
+
+authSwitch.onclick =
+  () => {
+
+    authMode =
+      authMode === "login"
+        ? "register"
+        : "login";
+
+    updateAuthMode();
+
+  };
+
+
+/* ==========================================
+   AUTH API
+========================================== */
+
+async function authRequest(
+  action,
+  username = "",
+  password = ""
+) {
+
+  const response =
+    await fetch(
+      WORKER_URL,
+      {
+
+        method:
+          "POST",
+
+        headers: {
+
+          "Content-Type":
+            "application/json",
+
+          ...(authToken
+            ? {
+                "Authorization":
+                  `Bearer ${authToken}`
+              }
+            : {})
+
+        },
+
+        body:
+          JSON.stringify({
+
+            type:
+              "auth",
+
+            action:
+              action,
+
+            username:
+              username,
+
+            password:
+              password
+
+          })
+
+      }
+    );
+
+
+  let data = {};
+
+  try {
+
+    data =
+      await response.json();
+
+  } catch (error) {
+
+    data = {};
+
+  }
+
+
+  if (!response.ok) {
+
+    throw new Error(
+
+      data.details ||
+      data.error ||
+      "İşlem başarısız."
+
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+/* ==========================================
+   AUTH BAŞARILI
+========================================== */
+
+function saveAuth(
+  token,
+  user,
+  memory
+) {
+
+  authToken =
+    token || "";
+
+  currentUser =
+    user || null;
+
+
+  if (authToken) {
+
+    localStorage.setItem(
+      AUTH_TOKEN_KEY,
+      authToken
+    );
+
+  } else {
+
+    localStorage.removeItem(
+      AUTH_TOKEN_KEY
+    );
+
+  }
+
+
+  if (currentUser) {
+
+    localStorage.setItem(
+
+      AUTH_USER_KEY,
+
+      JSON.stringify(
+        currentUser
+      )
+
+    );
+
+  } else {
+
+    localStorage.removeItem(
+      AUTH_USER_KEY
+    );
+
+  }
+
+
+  if (memory) {
+
+    globalMemory = {
+
+      name:
+        memory.name || "",
+
+      facts:
+        Array.isArray(
+          memory.facts
+        )
+          ? memory.facts
+          : [],
+
+      preferences:
+        Array.isArray(
+          memory.preferences
+        )
+          ? memory.preferences
+          : []
+
+    };
+
+
+    saveMemory();
+
+  }
+
+
+  if (currentUser) {
+
+    accountUsername.textContent =
+      "👤 " +
+      currentUser.username;
+
+  } else {
+
+    accountUsername.textContent =
+      "";
+
+  }
+
+}
+
+
+/* ==========================================
+   UYGULAMAYI GÖSTER
+========================================== */
+
+function showApp() {
+
+  authScreen.classList.add(
+    "hidden"
+  );
+
+  app.classList.remove(
+    "hidden"
+  );
+
+  renderAll();
+
+  updateMic();
+
+  updateVoiceButton();
+
+  focusInput();
+
+}
+
+
+/* ==========================================
+   AUTH EKRANINI GÖSTER
+========================================== */
+
+function showAuthScreen() {
+
+  stopSpeaking();
+
+  app.classList.add(
+    "hidden"
+  );
+
+  authScreen.classList.remove(
+    "hidden"
+  );
+
+  authMode =
+    "login";
+
+  updateAuthMode();
+
+}
+
+
+/* ==========================================
+   REGISTER
+========================================== */
+
+async function registerAccount() {
+
+  clearAuthError();
+
+
+  const username =
+    authUsername.value.trim();
+
+
+  const password =
+    authPassword.value;
+
+
+  const confirm =
+    authPasswordConfirm.value;
+
+
+  if (!username) {
+
+    showAuthError(
+      "Kullanıcı adı gir."
+    );
+
+    return;
+
+  }
+
+
+  if (password.length < 8) {
+
+    showAuthError(
+      "Şifre en az 8 karakter olmalı."
+    );
+
+    return;
+
+  }
+
+
+  if (password !== confirm) {
+
+    showAuthError(
+      "Şifreler aynı değil."
+    );
+
+    return;
+
+  }
+
+
+  authSubmit.disabled =
+    true;
+
+
+  authSubmit.textContent =
+    "Oluşturuluyor...";
+
+
+  try {
+
+    const data =
+      await authRequest(
+        "register",
+        username,
+        password
+      );
+
+
+    if (
+      !data.token ||
+      !data.user
+    ) {
+
+      throw new Error(
+        "Hesap oluşturuldu ancak oturum başlatılamadı."
+      );
+
+    }
+
+
+    saveAuth(
+      data.token,
+      data.user,
+      data.memory
+    );
+
+
+    authUsername.value = "";
+    authPassword.value = "";
+    authPasswordConfirm.value = "";
+
+
+    showApp();
+
+
+  } catch (error) {
+
+    console.log(
+      "Register error:",
+      error
+    );
+
+
+    showAuthError(
+      error.message ||
+      "Hesap oluşturulamadı."
+    );
+
+  }
+
+
+  authSubmit.disabled =
+    false;
+
+
+  authSubmit.textContent =
+    "Hesap Oluştur";
+
+}
+
+
+/* ==========================================
+   LOGIN
+========================================== */
+
+async function loginAccount() {
+
+  clearAuthError();
+
+
+  const username =
+    authUsername.value.trim();
+
+
+  const password =
+    authPassword.value;
+
+
+  if (!username) {
+
+    showAuthError(
+      "Kullanıcı adı gir."
+    );
+
+    return;
+
+  }
+
+
+  if (!password) {
+
+    showAuthError(
+      "Şifreni gir."
+    );
+
+    return;
+
+  }
+
+
+  authSubmit.disabled =
+    true;
+
+
+  authSubmit.textContent =
+    "Giriş yapılıyor...";
+
+
+  try {
+
+    const data =
+      await authRequest(
+        "login",
+        username,
+        password
+      );
+
+
+    if (
+      !data.token ||
+      !data.user
+    ) {
+
+      throw new Error(
+        "Giriş başarılı ancak oturum bilgisi alınamadı."
+      );
+
+    }
+
+
+    saveAuth(
+      data.token,
+      data.user,
+      data.memory
+    );
+
+
+    authUsername.value = "";
+    authPassword.value = "";
+
+
+    showApp();
+
+
+  } catch (error) {
+
+    console.log(
+      "Login error:",
+      error
+    );
+
+
+    showAuthError(
+      error.message ||
+      "Giriş yapılamadı."
+    );
+
+  }
+
+
+  authSubmit.disabled =
+    false;
+
+
+  authSubmit.textContent =
+    "Giriş Yap";
+
+}
+
+
+/* ==========================================
+   AUTH SUBMIT
+========================================== */
+
+authSubmit.onclick =
+  () => {
+
+    if (
+      authMode ===
+      "register"
+    ) {
+
+      registerAccount();
+
+    } else {
+
+      loginAccount();
+
+    }
+
+  };
+
+
+authPassword.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key ===
+      "Enter"
+    ) {
+
+      if (
+        authMode ===
+        "login"
+      ) {
+
+        loginAccount();
+
+      } else {
+
+        authPasswordConfirm.focus();
+
+      }
+
+    }
+
+  }
+);
+
+
+authPasswordConfirm.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key ===
+      "Enter"
+    ) {
+
+      registerAccount();
+
+    }
+
+  }
+);
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
+async function logoutAccount() {
+
+  if (!authToken) {
+
+    showAuthScreen();
+
+    return;
+
+  }
+
+
+  try {
+
+    await authRequest(
+      "logout"
+    );
+
+  } catch (error) {
+
+    console.log(
+      "Logout error:",
+      error
+    );
+
+  }
+
+
+  authToken = "";
+
+  currentUser = null;
+
+
+  localStorage.removeItem(
+    AUTH_TOKEN_KEY
+  );
+
+  localStorage.removeItem(
+    AUTH_USER_KEY
+  );
+
+
+  showAuthScreen();
+
+}
+
+
+document
+  .getElementById(
+    "logoutButton"
+  )
+  .onclick =
+    logoutAccount;
+
+
+/* ==========================================
+   AUTH KONTROL
+========================================== */
+
+async function checkAuth() {
+
+  if (!authToken) {
+
+    showAuthScreen();
+
+    return false;
+
+  }
+
+
+  try {
+
+    const data =
+      await authRequest(
+        "me"
+      );
+
+
+    if (
+      !data.success ||
+      !data.user
+    ) {
+
+      throw new Error(
+        "Oturum geçersiz."
+      );
+
+    }
+
+
+    saveAuth(
+      authToken,
+      data.user,
+      data.memory
+    );
+
+
+    showApp();
+
+
+    return true;
+
+  } catch (error) {
+
+    console.log(
+      "Auth check error:",
+      error
+    );
+
+
+    authToken = "";
+
+    currentUser = null;
+
+
+    localStorage.removeItem(
+      AUTH_TOKEN_KEY
+    );
+
+    localStorage.removeItem(
+      AUTH_USER_KEY
+    );
+
+
+    showAuthScreen();
+
+
+    return false;
+
+  }
+
+}
 
 
 /* ==========================================
@@ -1693,6 +2618,16 @@ function focusInput() {
 
   setTimeout(
     () => {
+
+      if (
+        app.classList.contains(
+          "hidden"
+        )
+      ) {
+
+        return;
+
+      }
 
       getInput().focus();
 
@@ -2163,6 +3098,15 @@ function clearSelectedFile() {
 
 async function uploadPdf(file) {
 
+  if (!authToken) {
+
+    throw new Error(
+      "Oturum açman gerekiyor."
+    );
+
+  }
+
+
   const formData =
     new FormData();
 
@@ -2181,11 +3125,32 @@ async function uploadPdf(file) {
         method:
           "POST",
 
+        headers: {
+
+          "Authorization":
+            `Bearer ${authToken}`
+
+        },
+
         body:
           formData
 
       }
     );
+
+
+  if (
+    response.status ===
+    401
+  ) {
+
+    await forceLogout();
+
+    throw new Error(
+      "Oturum süren dolmuş. Tekrar giriş yap."
+    );
+
+  }
 
 
   const data =
@@ -2352,15 +3317,22 @@ pdfInput.addEventListener(
       );
 
 
-      alert(
+      if (
+        error.message !==
+        "Oturum süren dolmuş. Tekrar giriş yap."
+      ) {
 
-        "PDF okunurken hata oluştu:\n\n" +
-        (
-          error.message ||
-          "Bilinmeyen hata"
-        )
+        alert(
 
-      );
+          "PDF okunurken hata oluştu:\n\n" +
+          (
+            error.message ||
+            "Bilinmeyen hata"
+          )
+
+        );
+
+      }
 
 
       clearSelectedFile();
@@ -2446,6 +3418,33 @@ document
 
 
 /* ==========================================
+   ZORUNLU ÇIKIŞ
+========================================== */
+
+async function forceLogout() {
+
+  authToken = "";
+
+  currentUser = null;
+
+
+  localStorage.removeItem(
+    AUTH_TOKEN_KEY
+  );
+
+  localStorage.removeItem(
+    AUTH_USER_KEY
+  );
+
+
+  hideTyping();
+
+  showAuthScreen();
+
+}
+
+
+/* ==========================================
    MESAJ GÖNDER
 ========================================== */
 
@@ -2453,6 +3452,15 @@ async function sendMessage() {
 
   if (sending) {
     return;
+  }
+
+
+  if (!authToken) {
+
+    showAuthScreen();
+
+    return;
+
   }
 
 
@@ -2554,16 +3562,20 @@ async function sendMessage() {
           headers: {
 
             "Content-Type":
-              "application/json"
+              "application/json",
+
+            "Authorization":
+              `Bearer ${authToken}`
 
           },
 
           body:
             JSON.stringify({
 
-              /* D1 için kullanıcı kimliği */
-              userId:
-                zatoiUserId,
+              /*
+                Worker artık userId'yi
+                token üzerinden alıyor.
+              */
 
               memory:
                 globalMemory,
@@ -2582,8 +3594,42 @@ async function sendMessage() {
       );
 
 
-    const data =
-      await response.json();
+    let data = {};
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch (error) {
+
+      data = {};
+
+    }
+
+
+    /* =============================
+       OTURUM GEÇERSİZ
+    ============================= */
+
+    if (
+      response.status ===
+      401
+    ) {
+
+      hideTyping();
+
+      sending = false;
+
+      await forceLogout();
+
+      alert(
+        "Oturum süren dolmuş. Lütfen tekrar giriş yap."
+      );
+
+      return;
+
+    }
 
 
     if (!response.ok) {
@@ -2695,6 +3741,9 @@ async function sendMessage() {
     );
 
 
+    hideTyping();
+
+
     chat.messages.push({
 
       role:
@@ -2710,9 +3759,6 @@ async function sendMessage() {
 
 
     saveChats();
-
-
-    hideTyping();
 
     renderAll();
 
@@ -2962,6 +4008,11 @@ function updateMic() {
 
   buttons.forEach(
     button => {
+
+      if (!button) {
+        return;
+      }
+
 
       if (isListening) {
 
@@ -3364,7 +4415,15 @@ window.addEventListener(
   "resize",
   () => {
 
-    renderMessages();
+    if (
+      !app.classList.contains(
+        "hidden"
+      )
+    ) {
+
+      renderMessages();
+
+    }
 
   }
 );
@@ -3416,12 +4475,13 @@ if ("serviceWorker" in navigator) {
 }
 
 
-  
-renderAll();
+/* ==========================================
+   AUTH KONTROLÜ İLE BAŞLAT
+========================================== */
 
-updateMic();
+updateAuthMode();
 
-focusInput();
+checkAuth();
 
 </script>
 
