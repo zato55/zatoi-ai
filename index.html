@@ -882,6 +882,74 @@
 
     }
 
+
+
+  /* V8 - WEB KAYNAK KARTLARI */
+  .source-cards {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #2a3947;
+  }
+
+  .source-card {
+    display: block;
+    padding: 10px 11px;
+    border: 1px solid #2b3b49;
+    border-radius: 10px;
+    background: #101922;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .source-card:hover {
+    border-color: #3b82f6;
+    background: #13202c;
+  }
+
+  .source-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .source-number {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .source-host {
+    min-width: 0;
+    color: #8fa4b7;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .source-title {
+    color: #e7edf3;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .source-open {
+    margin-top: 5px;
+    color: #7fb0ff;
+    font-size: 11px;
+  }
+
   </style>
 
 </head>
@@ -2639,6 +2707,328 @@ function focusInput() {
 
 
 /* ==========================================
+   V8 - WEB KAYNAKLARI
+========================================== */
+
+function normalizeSources(sources) {
+
+  if (!Array.isArray(sources)) {
+    return [];
+  }
+
+  const seen = new Set();
+
+  return sources
+    .map((source, index) => ({
+      index: Number(source?.index) || index + 1,
+      title: String(source?.title || `Kaynak ${index + 1}`).trim(),
+      url: String(source?.url || "").trim()
+    }))
+    .filter(source => {
+
+      if (!source.url) {
+        return false;
+      }
+
+      try {
+
+        const url =
+          new URL(source.url);
+
+        if (
+          url.protocol !== "http:" &&
+          url.protocol !== "https:"
+        ) {
+          return false;
+        }
+
+        if (
+          seen.has(
+            url.href
+          )
+        ) {
+          return false;
+        }
+
+        seen.add(
+          url.href
+        );
+
+        return true;
+
+      } catch {
+
+        return false;
+
+      }
+
+    })
+    .slice(
+      0,
+      6
+    );
+
+}
+
+
+function stripWorkerSourceList(
+  reply,
+  sources
+) {
+
+  const text =
+    String(
+      reply || ""
+    )
+      .replace(
+        /\r\n/g,
+        "\n"
+      )
+      .trim();
+
+
+  if (
+    !sources.length
+  ) {
+
+    return text;
+
+  }
+
+
+  const lines =
+    text.split(
+      "\n"
+    );
+
+
+  const sourceHeadingIndex =
+    lines.findIndex(
+      line => {
+
+        const cleaned =
+          line
+            .replace(
+              /#{1,6}|\*\*|__|`/g,
+              ""
+            )
+            .trim();
+
+
+        return /^(kaynaklar|kaynakça|kaynakca|sources|references)\s*:?\s*$/i.test(
+          cleaned
+        );
+
+      }
+    );
+
+
+  if (
+    sourceHeadingIndex === -1
+  ) {
+
+    return text;
+
+  }
+
+
+  return lines
+    .slice(
+      0,
+      sourceHeadingIndex
+    )
+    .join(
+      "\n"
+    )
+    .replace(
+      /\n{3,}/g,
+      "\n\n"
+    )
+    .trim();
+
+}
+
+
+function createSourceCards(
+  sources
+) {
+
+  const normalized =
+    normalizeSources(
+      sources
+    );
+
+
+  if (
+    !normalized.length
+  ) {
+
+    return null;
+
+  }
+
+
+  const wrapper =
+    document.createElement(
+      "div"
+    );
+
+
+  wrapper.className =
+    "source-cards";
+
+
+  normalized.forEach(
+    source => {
+
+      const link =
+        document.createElement(
+          "a"
+        );
+
+
+      link.className =
+        "source-card";
+
+
+      link.href =
+        source.url;
+
+
+      link.target =
+        "_blank";
+
+
+      link.rel =
+        "noopener noreferrer";
+
+
+      let hostname =
+        "Kaynak";
+
+
+      try {
+
+        hostname =
+          new URL(
+            source.url
+          )
+            .hostname
+            .replace(
+              /^www\./,
+              ""
+            );
+
+      } catch {}
+
+
+      const top =
+        document.createElement(
+          "div"
+        );
+
+
+      top.className =
+        "source-card-top";
+
+
+      const number =
+        document.createElement(
+          "span"
+        );
+
+
+      number.className =
+        "source-number";
+
+
+      number.textContent =
+        String(
+          source.index
+        );
+
+
+      const host =
+        document.createElement(
+          "span"
+        );
+
+
+      host.className =
+        "source-host";
+
+
+      host.textContent =
+        hostname;
+
+
+      top.appendChild(
+        number
+      );
+
+
+      top.appendChild(
+        host
+      );
+
+
+      const title =
+        document.createElement(
+          "div"
+        );
+
+
+      title.className =
+        "source-title";
+
+
+      title.textContent =
+        source.title;
+
+
+      const open =
+        document.createElement(
+          "div"
+        );
+
+
+      open.className =
+        "source-open";
+
+
+      open.textContent =
+        "Kaynağı aç ↗";
+
+
+      link.appendChild(
+        top
+      );
+
+
+      link.appendChild(
+        title
+      );
+
+
+      link.appendChild(
+        open
+      );
+
+
+      wrapper.appendChild(
+        link
+      );
+
+    }
+  );
+
+
+  return wrapper;
+
+}
+
+
+/* ==========================================
    MESAJLAR
 ========================================== */
 
@@ -2734,8 +3124,45 @@ function renderMessages() {
         message.role;
 
 
-      bubble.textContent =
+      const content =
+        document.createElement(
+          "div"
+        );
+
+
+      content.textContent =
         message.content;
+
+
+      bubble.appendChild(
+        content
+      );
+
+
+      if (
+        message.role ===
+          "assistant" &&
+        Array.isArray(
+          message.sources
+        ) &&
+        message.sources.length
+      ) {
+
+        const cards =
+          createSourceCards(
+            message.sources
+          );
+
+
+        if (cards) {
+
+          bubble.appendChild(
+            cards
+          );
+
+        }
+
+      }
 
 
       row.appendChild(
@@ -3281,7 +3708,7 @@ pdfInput.addEventListener(
           text:
             result.text.slice(
               0,
-              60000
+              500000
             )
 
         };
@@ -3543,7 +3970,7 @@ async function sendMessage() {
         text:
           chat.document.text.slice(
             0,
-            60000
+            500000
           )
 
       };
@@ -3572,6 +3999,11 @@ async function sendMessage() {
           body:
             JSON.stringify({
 
+              /*
+                Worker artık userId'yi
+                token üzerinden alıyor.
+              */
+
               memory:
                 globalMemory,
 
@@ -3591,7 +4023,6 @@ async function sendMessage() {
 
     let data = {};
     let rawResponse = "";
-
 
     try {
 
@@ -3637,7 +4068,8 @@ async function sendMessage() {
 
       hideTyping();
 
-      sending = false;
+      sending =
+        false;
 
       await forceLogout();
 
@@ -3726,13 +4158,31 @@ async function sendMessage() {
     }
 
 
+    const sources =
+      normalizeSources(
+        data.sources
+      );
+
+
+    const cleanReply =
+      stripWorkerSourceList(
+        reply,
+        sources
+      );
+
+
     chat.messages.push({
 
       role:
         "assistant",
 
       content:
-        reply,
+        cleanReply || reply,
+
+      sources,
+
+      searchedWeb:
+        !!data.searchedWeb,
 
       time:
         Date.now()
@@ -3804,7 +4254,9 @@ async function sendMessage() {
   }
 
 
-  sending = false;
+  sending =
+    false;
+
 
   focusInput();
 
