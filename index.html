@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
+
   <title>Zatoi AI</title>
 
   <link rel="manifest" href="./manifest.json">
@@ -16,6 +19,7 @@
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -43,14 +47,21 @@
       cursor: pointer;
     }
 
+    /* =================================
+       AUTH
+    ================================= */
+
     .auth-screen {
       position: fixed;
       inset: 0;
       z-index: 1000;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       padding: 20px;
+
       background:
         radial-gradient(
           circle at top,
@@ -66,23 +77,36 @@
     .auth-card {
       width: 100%;
       max-width: 400px;
+
       padding: 30px 24px;
+
       background: #101720;
-      border: 1px solid #263442;
+
+      border:
+        1px solid #263442;
+
       border-radius: 18px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+
+      box-shadow:
+        0 20px 60px rgba(0,0,0,.45);
+
       text-align: center;
     }
 
     .auth-logo {
       width: 64px;
       height: 64px;
+
       margin: 0 auto 14px;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       border-radius: 18px;
+
       background: #17212b;
+
       font-size: 34px;
     }
 
@@ -99,12 +123,18 @@
 
     .auth-error {
       display: none;
+
       margin-bottom: 14px;
       padding: 10px 12px;
-      border: 1px solid #7f3030;
+
+      border:
+        1px solid #7f3030;
+
       border-radius: 10px;
+
       background: #291519;
       color: #ff9d9d;
+
       font-size: 13px;
       line-height: 1.4;
     }
@@ -115,14 +145,23 @@
 
     .auth-input {
       width: 100%;
+
       height: 46px;
+
       margin-bottom: 10px;
+
       padding: 0 13px;
+
       outline: none;
-      border: 1px solid #293846;
+
+      border:
+        1px solid #293846;
+
       border-radius: 10px;
+
       background: #0b1118;
       color: white;
+
       font-size: 15px;
     }
 
@@ -132,11 +171,16 @@
 
     .auth-submit {
       width: 100%;
+
       height: 46px;
+
       margin-top: 8px;
+
       border-radius: 10px;
+
       background: #2563eb;
       color: white;
+
       font-size: 15px;
       font-weight: 700;
     }
@@ -148,24 +192,36 @@
 
     .auth-switch {
       width: 100%;
+
       margin-top: 12px;
+
       padding: 9px;
+
       background: transparent;
       color: #8fb8ff;
+
       font-size: 14px;
     }
 
     .auth-info {
       margin-top: 18px;
+
       color: #687888;
+
       font-size: 12px;
       line-height: 1.5;
     }
 
+    /* =================================
+       APP
+    ================================= */
+
     .app {
       width: 100%;
       height: 100vh;
+
       display: flex;
+
       background: #0b0f14;
     }
 
@@ -173,10 +229,16 @@
       display: none;
     }
 
+    /* =================================
+       CHAT
+    ================================= */
+
     .chat-column {
       flex: 1;
       min-width: 0;
+
       height: 100%;
+
       display: flex;
       flex-direction: column;
     }
@@ -184,18 +246,25 @@
     .chat-top {
       height: 58px;
       flex-shrink: 0;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       padding: 0 18px;
-      border-bottom: 1px solid #1c2530;
+
+      border-bottom:
+        1px solid #1c2530;
+
       background: #0d1218;
     }
 
     .chat-title {
       min-width: 0;
+
       font-size: 17px;
       font-weight: 700;
+
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -216,11 +285,16 @@
 
     .account-name {
       max-width: 130px;
+
       padding: 7px 9px;
+
       border-radius: 9px;
+
       background: #17212b;
       color: #cbd5df;
+
       font-size: 12px;
+
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -229,9 +303,14 @@
     .logout-btn {
       background: #171d23;
       color: #ff9a9a;
-      border: 1px solid #29323a;
+
+      border:
+        1px solid #29323a;
+
       border-radius: 9px;
+
       padding: 8px 10px;
+
       font-size: 12px;
     }
 
@@ -239,9 +318,14 @@
     .mobile-history-btn {
       background: #17212b;
       color: white;
-      border: 1px solid #263442;
+
+      border:
+        1px solid #263442;
+
       border-radius: 10px;
+
       padding: 9px 12px;
+
       font-size: 13px;
     }
 
@@ -249,36 +333,57 @@
       display: none;
     }
 
+    /* =================================
+       INPUT
+    ================================= */
+
     .desktop-input-area {
       flex-shrink: 0;
+
       padding: 12px 18px;
+
       background: #0b0f14;
-      border-bottom: 1px solid #1c2530;
+
+      border-bottom:
+        1px solid #1c2530;
     }
 
     .input-box {
       width: 100%;
+
       display: flex;
       align-items: flex-end;
+
       gap: 8px;
+
       background: #111820;
-      border: 1px solid #273440;
+
+      border:
+        1px solid #273440;
+
       border-radius: 14px;
+
       padding: 8px;
     }
 
     textarea {
       flex: 1;
       min-width: 0;
+
       resize: none;
+
       max-height: 130px;
       min-height: 40px;
+
       border: none;
       outline: none;
+
       background: transparent;
       color: white;
+
       font-size: 15px;
       line-height: 1.4;
+
       padding: 10px;
     }
 
@@ -289,12 +394,17 @@
     .action-btn,
     .voice-btn {
       flex-shrink: 0;
+
       height: 40px;
       min-width: 40px;
+
       border-radius: 10px;
+
       background: #1b2732;
       color: white;
+
       font-size: 14px;
+
       padding: 0 12px;
     }
 
@@ -312,19 +422,30 @@
       background: #b91c1c;
     }
 
+    /* =================================
+       PDF
+    ================================= */
+
     .file-input {
       display: none;
     }
 
     .selected-file {
       display: none;
+
       align-items: center;
       gap: 8px;
+
       padding: 8px 12px;
       margin: 0 18px 8px;
+
       background: #101922;
-      border: 1px solid #263542;
+
+      border:
+        1px solid #263542;
+
       border-radius: 10px;
+
       font-size: 13px;
       color: #cbd5df;
     }
@@ -336,6 +457,7 @@
     .selected-file-name {
       flex: 1;
       min-width: 0;
+
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -347,14 +469,23 @@
       font-size: 18px;
     }
 
+    /* =================================
+       MESSAGES
+    ================================= */
+
     .messages {
       flex: 1;
       min-height: 0;
+
       overflow-y: auto;
+
       padding: 18px;
+
       display: flex;
       flex-direction: column;
+
       gap: 10px;
+
       scrollbar-width: thin;
     }
 
@@ -373,10 +504,14 @@
 
     .message {
       max-width: min(78%, 850px);
+
       padding: 11px 14px;
+
       border-radius: 14px;
+
       font-size: 15px;
       line-height: 1.5;
+
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
@@ -388,26 +523,38 @@
 
     .message.assistant {
       background: #17212b;
-      border: 1px solid #253341;
+
+      border:
+        1px solid #253341;
+
       border-bottom-left-radius: 5px;
     }
 
     .welcome {
       margin: auto;
+
       text-align: center;
+
       color: #8b9aaa;
+
       padding: 30px;
     }
 
     .welcome h1 {
       color: white;
+
       font-size: 30px;
+
       margin: 0 0 12px;
     }
 
     .welcome p {
       line-height: 1.7;
     }
+
+    /* =================================
+       TYPING
+    ================================= */
 
     .typing-row {
       display: flex;
@@ -416,9 +563,14 @@
 
     .typing {
       background: #17212b;
-      border: 1px solid #253341;
+
+      border:
+        1px solid #253341;
+
       border-radius: 14px;
+
       padding: 11px 14px;
+
       display: flex;
       gap: 5px;
     }
@@ -426,8 +578,11 @@
     .typing span {
       width: 6px;
       height: 6px;
+
       background: #8999a8;
+
       border-radius: 50%;
+
       animation: typing 1.2s infinite;
     }
 
@@ -437,6 +592,29 @@
 
     .typing span:nth-child(3) {
       animation-delay: .3s;
+    }
+
+    .mobile-thinking-text {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      color: #9fb0c0;
+      font-size: 13px;
+      padding: 2px 2px 0;
+    }
+
+    .mobile-thinking-text::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #9fb0c0;
+      animation: thinkingPulse 1s infinite ease-in-out;
+    }
+
+    @keyframes thinkingPulse {
+      0%, 100% { opacity: .35; transform: scale(.8); }
+      50% { opacity: 1; transform: scale(1.15); }
     }
 
     @keyframes typing {
@@ -453,49 +631,77 @@
       }
     }
 
+    /* =================================
+       HISTORY
+    ================================= */
+
     .side-panel {
       width: 280px;
       height: 100%;
+
       flex-shrink: 0;
-      border-left: 1px solid #1c2530;
+
+      border-left:
+        1px solid #1c2530;
+
       background: #0d1218;
+
       display: flex;
       flex-direction: column;
     }
 
     .side-header {
       height: 58px;
+
       display: flex;
       align-items: center;
+
       padding: 0 16px;
+
       font-weight: 700;
-      border-bottom: 1px solid #1c2530;
+
+      border-bottom:
+        1px solid #1c2530;
     }
 
     .history-list {
       flex: 1;
+
       overflow-y: auto;
+
       padding: 10px;
     }
 
     .history-item {
       display: flex;
+
       align-items: center;
+
       gap: 7px;
+
       margin-bottom: 7px;
     }
 
     .history-open {
       flex: 1;
       min-width: 0;
+
       text-align: left;
+
       background: #111820;
       color: #dce4eb;
-      border: 1px solid #202d39;
+
+      border:
+        1px solid #202d39;
+
       border-radius: 10px;
+
       padding: 10px;
+
       overflow: hidden;
+
       text-overflow: ellipsis;
+
       white-space: nowrap;
     }
 
@@ -507,10 +713,17 @@
     .history-delete {
       width: 34px;
       height: 34px;
+
       border-radius: 8px;
+
       background: #171d23;
+
       color: #ff8585;
     }
+
+    /* =================================
+       MOBILE
+    ================================= */
 
     .mobile-input-area {
       display: none;
@@ -518,9 +731,13 @@
 
     .mobile-history-overlay {
       display: none;
+
       position: fixed;
+
       inset: 0;
+
       z-index: 100;
+
       background: rgba(0,0,0,.6);
     }
 
@@ -530,41 +747,61 @@
 
     .mobile-history-panel {
       position: absolute;
+
       top: 0;
       left: 0;
       bottom: 0;
+
       width: min(320px, 85vw);
+
       background: #0d1218;
-      border-right: 1px solid #26313d;
+
+      border-right:
+        1px solid #26313d;
+
       display: flex;
+
       flex-direction: column;
     }
 
     .mobile-history-header {
       height: 58px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       padding: 0 14px;
-      border-bottom: 1px solid #1c2530;
+
+      border-bottom:
+        1px solid #1c2530;
     }
 
     .close-history {
       width: 35px;
       height: 35px;
+
       border-radius: 8px;
+
       background: #19222b;
+
       color: white;
+
       font-size: 18px;
     }
 
     .mobile-history-list {
       flex: 1;
+
       overflow-y: auto;
+
       padding: 10px;
     }
 
     @media (max-width: 800px) {
+
       .app {
         height: 100dvh;
       }
@@ -584,7 +821,9 @@
 
       .mobile-history-btn {
         display: block;
+
         padding: 8px 9px;
+
         font-size: 12px;
       }
 
@@ -619,14 +858,21 @@
 
       .mobile-input-area {
         display: block;
+
         position: fixed;
+
         left: 0;
         right: 0;
         bottom: 0;
+
         z-index: 20;
+
         padding: 8px;
+
         background: rgba(11,15,20,.97);
-        border-top: 1px solid #1c2530;
+
+        border-top:
+          1px solid #1c2530;
       }
 
       .mobile-input-area .selected-file {
@@ -640,7 +886,9 @@
       .mobile-input-area textarea {
         min-height: 38px;
         max-height: 100px;
+
         padding: 9px;
+
         font-size: 14px;
       }
 
@@ -651,91 +899,125 @@
         padding: 0 8px;
       }
 
+      .mobile-thinking-text {
+        display: flex;
+      }
+
+      .typing-row.mobile-thinking-row .typing {
+        display: none;
+      }
+
       .auth-card {
         padding: 26px 20px;
       }
+
     }
 
-    .source-cards {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid #2a3947;
-    }
 
-    .source-card {
-      display: block;
-      padding: 10px 11px;
-      border: 1px solid #2b3b49;
-      border-radius: 10px;
-      background: #101922;
-      color: inherit;
-      text-decoration: none;
-    }
 
-    .source-card:hover {
-      border-color: #3b82f6;
-      background: #13202c;
-    }
+  /* V8 - WEB KAYNAK KARTLARI */
+  .source-cards {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #2a3947;
+  }
 
-    .source-card-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
+  .source-card {
+    display: block;
+    padding: 10px 11px;
+    border: 1px solid #2b3b49;
+    border-radius: 10px;
+    background: #101922;
+    color: inherit;
+    text-decoration: none;
+  }
 
-    .source-number {
-      display: inline-grid;
-      place-items: center;
-      min-width: 22px;
-      height: 22px;
-      padding: 0 6px;
-      border-radius: 999px;
-      background: #2563eb;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-    }
+  .source-card:hover {
+    border-color: #3b82f6;
+    background: #13202c;
+  }
 
-    .source-host {
-      min-width: 0;
-      color: #8fa4b7;
-      font-size: 11px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  .source-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
 
-    .source-title {
-      color: #e7edf3;
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.35;
-    }
+  .source-number {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
 
-    .source-open {
-      margin-top: 5px;
-      color: #7fb0ff;
-      font-size: 11px;
-    }
+  .source-host {
+    min-width: 0;
+    color: #8fa4b7;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .source-title {
+    color: #e7edf3;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .source-open {
+    margin-top: 5px;
+    color: #7fb0ff;
+    font-size: 11px;
+  }
+
   </style>
+
 </head>
 
 <body>
 
-<div id="authScreen" class="auth-screen">
+
+<!-- ==========================================
+     AUTH EKRANI
+========================================== -->
+
+<div
+  id="authScreen"
+  class="auth-screen"
+>
+
   <div class="auth-card">
-    <div class="auth-logo">🤖</div>
 
-    <h1>Zatoi AI</h1>
+    <div class="auth-logo">
+      🤖
+    </div>
 
-    <p id="authSubtitle" class="auth-subtitle">
+    <h1>
+      Zatoi AI
+    </h1>
+
+    <p
+      id="authSubtitle"
+      class="auth-subtitle"
+    >
       Hesabına giriş yap
     </p>
 
-    <div id="authError" class="auth-error"></div>
+    <div
+      id="authError"
+      class="auth-error"
+    ></div>
 
     <input
       id="authUsername"
@@ -765,32 +1047,56 @@
       style="display:none;"
     >
 
-    <button id="authSubmit" class="auth-submit">
+    <button
+      id="authSubmit"
+      class="auth-submit"
+    >
       Giriş Yap
     </button>
 
-    <button id="authSwitch" class="auth-switch">
+    <button
+      id="authSwitch"
+      class="auth-switch"
+    >
       Hesabın yok mu? Hesap oluştur
     </button>
 
     <div class="auth-info">
       E-posta veya başka kişisel bilgi gerekmiyor.
     </div>
+
   </div>
+
 </div>
 
-<div id="app" class="app hidden">
+
+<!-- ==========================================
+     ANA UYGULAMA
+========================================== -->
+
+<div
+  id="app"
+  class="app hidden"
+>
+
 
   <section class="chat-column">
 
+
     <div class="chat-top">
-      <div id="chatTitle" class="chat-title">
+
+      <div
+        id="chatTitle"
+        class="chat-title"
+      >
         Yeni Sohbet
       </div>
+
 
       <div class="top-actions">
 
         <div class="account-area">
+
           <span
             id="accountUsername"
             class="account-name"
@@ -802,7 +1108,9 @@
           >
             Çıkış
           </button>
+
         </div>
+
 
         <button
           id="mobileHistoryButton"
@@ -810,6 +1118,7 @@
         >
           📚 Geçmiş
         </button>
+
 
         <button
           id="newChatButton"
@@ -819,14 +1128,18 @@
         </button>
 
       </div>
+
     </div>
 
+
     <div class="desktop-input-area">
+
 
       <div
         id="desktopSelectedFile"
         class="selected-file"
       >
+
         <span>📄</span>
 
         <span
@@ -840,7 +1153,9 @@
         >
           ×
         </button>
+
       </div>
+
 
       <div class="input-box">
 
@@ -850,6 +1165,7 @@
           placeholder="Zatoi'ye bir şey sor..."
         ></textarea>
 
+
         <button
           id="desktopPdfButton"
           class="voice-btn pdf-btn"
@@ -858,6 +1174,7 @@
           📎
         </button>
 
+
         <button
           id="micButton"
           class="voice-btn"
@@ -865,12 +1182,14 @@
           🎤
         </button>
 
+
         <button
           id="voiceToggle"
           class="voice-btn"
         >
           🔊
         </button>
+
 
         <button
           id="sendButton"
@@ -880,19 +1199,24 @@
         </button>
 
       </div>
+
     </div>
+
 
     <div
       id="messages"
       class="messages"
     ></div>
 
+
     <div class="mobile-input-area">
+
 
       <div
         id="mobileSelectedFile"
         class="selected-file"
       >
+
         <span>📄</span>
 
         <span
@@ -906,7 +1230,9 @@
         >
           ×
         </button>
+
       </div>
+
 
       <div class="input-box">
 
@@ -916,12 +1242,14 @@
           placeholder="Zatoi'ye bir şey sor..."
         ></textarea>
 
+
         <button
           id="mobilePdfButton"
           class="voice-btn pdf-btn"
         >
           📎
         </button>
+
 
         <button
           id="mobileMicButton"
@@ -930,12 +1258,14 @@
           🎤
         </button>
 
+
         <button
           id="mobileVoiceToggle"
           class="voice-btn"
         >
           🔊
         </button>
+
 
         <button
           id="mobileSendButton"
@@ -945,9 +1275,11 @@
         </button>
 
       </div>
+
     </div>
 
   </section>
+
 
   <aside class="side-panel">
 
@@ -964,12 +1296,14 @@
 
 </div>
 
+
 <input
   id="pdfInput"
   class="file-input"
   type="file"
   accept="application/pdf,.pdf"
 >
+
 
 <div
   id="mobileHistoryOverlay"
@@ -993,6 +1327,7 @@
 
     </div>
 
+
     <div
       id="mobileHistoryList"
       class="mobile-history-list"
@@ -1002,158 +1337,224 @@
 
 </div>
 
+
 <script>
+
+
+/* ==========================================
+   AYARLAR
+========================================== */
 
 const WORKER_URL =
   "https://zatoi-ai.fbboytr.workers.dev/";
 
+
 const CHATS_KEY =
   "zatoi_chats_v6";
+
 
 const ACTIVE_CHAT_KEY =
   "zatoi_active_chat_v6";
 
+
 const GLOBAL_MEMORY_KEY =
   "zatoi_global_memory_v6";
+
 
 const VOICE_OUTPUT_KEY =
   "zatoi_voice_output_v1";
 
+
 const AUTH_TOKEN_KEY =
   "zatoi_auth_token_v1";
 
+
 const AUTH_USER_KEY =
   "zatoi_auth_user_v1";
+
+
+/* ==========================================
+   AUTH DURUMU
+========================================== */
 
 let authToken =
   localStorage.getItem(
     AUTH_TOKEN_KEY
   ) || "";
 
+
 let currentUser = null;
 
+
 try {
+
   currentUser =
     JSON.parse(
       localStorage.getItem(
         AUTH_USER_KEY
       ) || "null"
     );
-} catch {
+
+} catch (error) {
+
   currentUser = null;
+
 }
+
+
+/* ==========================================
+   ELEMENTLER
+========================================== */
 
 const authScreen =
   document.getElementById(
     "authScreen"
   );
 
+
 const app =
   document.getElementById(
     "app"
   );
+
 
 const authSubtitle =
   document.getElementById(
     "authSubtitle"
   );
 
+
 const authError =
   document.getElementById(
     "authError"
   );
+
 
 const authUsername =
   document.getElementById(
     "authUsername"
   );
 
+
 const authPassword =
   document.getElementById(
     "authPassword"
   );
+
 
 const authPasswordConfirm =
   document.getElementById(
     "authPasswordConfirm"
   );
 
+
 const authSubmit =
   document.getElementById(
     "authSubmit"
   );
+
 
 const authSwitch =
   document.getElementById(
     "authSwitch"
   );
 
+
 const accountUsername =
   document.getElementById(
     "accountUsername"
   );
+
 
 const messagesElement =
   document.getElementById(
     "messages"
   );
 
+
 const chatTitleElement =
   document.getElementById(
     "chatTitle"
   );
+
 
 const historyList =
   document.getElementById(
     "historyList"
   );
 
+
 const mobileHistoryList =
   document.getElementById(
     "mobileHistoryList"
   );
+
 
 const desktopInput =
   document.getElementById(
     "desktopInput"
   );
 
+
 const mobileInput =
   document.getElementById(
     "mobileInput"
   );
+
 
 const pdfInput =
   document.getElementById(
     "pdfInput"
   );
 
+
 let chats = [];
+
 let activeChatId = null;
+
 let selectedPdf = null;
+
 let documentData = null;
+
 let sending = false;
+
 let authMode = "login";
 
+
+/* ==========================================
+   AUTH HATA MESAJI
+========================================== */
+
 function showAuthError(message) {
+
   authError.textContent =
     message;
 
   authError.classList.add(
     "show"
   );
+
 }
 
+
 function clearAuthError() {
+
   authError.textContent =
     "";
 
   authError.classList.remove(
     "show"
   );
+
 }
 
+
+/* ==========================================
+   AUTH MODU
+========================================== */
+
 function updateAuthMode() {
+
   clearAuthError();
 
   authUsername.value = "";
@@ -1161,6 +1562,7 @@ function updateAuthMode() {
   authPasswordConfirm.value = "";
 
   if (authMode === "login") {
+
     authSubtitle.textContent =
       "Hesabına giriş yap";
 
@@ -1177,6 +1579,7 @@ function updateAuthMode() {
       "Hesabın yok mu? Hesap oluştur";
 
   } else {
+
     authSubtitle.textContent =
       "Yeni Zatoi hesabını oluştur";
 
@@ -1191,18 +1594,28 @@ function updateAuthMode() {
 
     authSwitch.textContent =
       "Zaten hesabın var mı? Giriş yap";
+
   }
+
 }
+
 
 authSwitch.onclick =
   () => {
+
     authMode =
       authMode === "login"
         ? "register"
         : "login";
 
     updateAuthMode();
+
   };
+
+
+/* ==========================================
+   AUTH API
+========================================== */
 
 async function authRequest(
   action,
@@ -1214,9 +1627,12 @@ async function authRequest(
     await fetch(
       WORKER_URL,
       {
-        method: "POST",
+
+        method:
+          "POST",
 
         headers: {
+
           "Content-Type":
             "application/json",
 
@@ -1226,97 +1642,65 @@ async function authRequest(
                   `Bearer ${authToken}`
               }
             : {})
+
         },
 
         body:
           JSON.stringify({
+
             type:
               "auth",
 
-            action,
-            username,
-            password
+            action:
+              action,
+
+            username:
+              username,
+
+            password:
+              password
+
           })
+
       }
     );
+
 
   let data = {};
 
   try {
+
     data =
       await response.json();
-  } catch {
+
+  } catch (error) {
+
     data = {};
+
   }
 
+
   if (!response.ok) {
+
     throw new Error(
+
       data.details ||
       data.error ||
       "İşlem başarısız."
+
     );
+
   }
+
 
   return data;
+
 }
 
-let globalMemory = {
-  name: "",
-  facts: [],
-  preferences: []
-};
 
-function saveMemory() {
-  localStorage.setItem(
-    GLOBAL_MEMORY_KEY,
-    JSON.stringify(
-      globalMemory
-    )
-  );
-}
-
-function loadMemory() {
-  try {
-    const saved =
-      localStorage.getItem(
-        GLOBAL_MEMORY_KEY
-      );
-
-    if (!saved) {
-      return;
-    }
-
-    const parsed =
-      JSON.parse(saved);
-
-    globalMemory = {
-      name:
-        parsed.name || "",
-
-      facts:
-        Array.isArray(
-          parsed.facts
-        )
-          ? parsed.facts
-          : [],
-
-      preferences:
-        Array.isArray(
-          parsed.preferences
-        )
-          ? parsed.preferences
-          : []
-    };
-
-  } catch (error) {
-    console.log(
-      "Memory error:",
-      error
-    );
-  }
-}
-
-loadMemory();
+/* ==========================================
+   AUTH BAŞARILI
+========================================== */
 
 function saveAuth(
   token,
@@ -1330,32 +1714,48 @@ function saveAuth(
   currentUser =
     user || null;
 
+
   if (authToken) {
+
     localStorage.setItem(
       AUTH_TOKEN_KEY,
       authToken
     );
+
   } else {
+
     localStorage.removeItem(
       AUTH_TOKEN_KEY
     );
+
   }
 
+
   if (currentUser) {
+
     localStorage.setItem(
+
       AUTH_USER_KEY,
+
       JSON.stringify(
         currentUser
       )
+
     );
+
   } else {
+
     localStorage.removeItem(
       AUTH_USER_KEY
     );
+
   }
 
+
   if (memory) {
+
     globalMemory = {
+
       name:
         memory.name || "",
 
@@ -1372,22 +1772,37 @@ function saveAuth(
         )
           ? memory.preferences
           : []
+
     };
 
+
     saveMemory();
+
   }
 
+
   if (currentUser) {
+
     accountUsername.textContent =
       "👤 " +
       currentUser.username;
+
   } else {
+
     accountUsername.textContent =
       "";
+
   }
+
 }
 
+
+/* ==========================================
+   UYGULAMAYI GÖSTER
+========================================== */
+
 function showApp() {
+
   authScreen.classList.add(
     "hidden"
   );
@@ -1397,12 +1812,22 @@ function showApp() {
   );
 
   renderAll();
+
   updateMic();
+
   updateVoiceButton();
+
   focusInput();
+
 }
 
+
+/* ==========================================
+   AUTH EKRANINI GÖSTER
+========================================== */
+
 function showAuthScreen() {
+
   stopSpeaking();
 
   app.classList.add(
@@ -1417,48 +1842,74 @@ function showAuthScreen() {
     "login";
 
   updateAuthMode();
+
 }
 
+
+/* ==========================================
+   REGISTER
+========================================== */
+
 async function registerAccount() {
+
   clearAuthError();
+
 
   const username =
     authUsername.value.trim();
 
+
   const password =
     authPassword.value;
+
 
   const confirm =
     authPasswordConfirm.value;
 
+
   if (!username) {
+
     showAuthError(
       "Kullanıcı adı gir."
     );
+
     return;
+
   }
 
+
   if (password.length < 8) {
+
     showAuthError(
       "Şifre en az 8 karakter olmalı."
     );
+
     return;
+
   }
 
+
   if (password !== confirm) {
+
     showAuthError(
       "Şifreler aynı değil."
     );
+
     return;
+
   }
+
 
   authSubmit.disabled =
     true;
 
+
   authSubmit.textContent =
     "Oluşturuluyor...";
 
+
   try {
+
     const data =
       await authRequest(
         "register",
@@ -1466,14 +1917,18 @@ async function registerAccount() {
         password
       );
 
+
     if (
       !data.token ||
       !data.user
     ) {
+
       throw new Error(
         "Hesap oluşturuldu ancak oturum başlatılamadı."
       );
+
     }
+
 
     saveAuth(
       data.token,
@@ -1481,63 +1936,92 @@ async function registerAccount() {
       data.memory
     );
 
+
     authUsername.value = "";
     authPassword.value = "";
     authPasswordConfirm.value = "";
+
 
     await syncChatsWithCloud();
 
     showApp();
 
+
   } catch (error) {
+
     console.log(
       "Register error:",
       error
     );
 
+
     showAuthError(
       error.message ||
       "Hesap oluşturulamadı."
     );
+
   }
+
 
   authSubmit.disabled =
     false;
 
+
   authSubmit.textContent =
     "Hesap Oluştur";
+
 }
 
+
+/* ==========================================
+   LOGIN
+========================================== */
+
 async function loginAccount() {
+
   clearAuthError();
+
 
   const username =
     authUsername.value.trim();
 
+
   const password =
     authPassword.value;
 
+
   if (!username) {
+
     showAuthError(
       "Kullanıcı adı gir."
     );
+
     return;
+
   }
 
+
   if (!password) {
+
     showAuthError(
       "Şifreni gir."
     );
+
     return;
+
   }
+
 
   authSubmit.disabled =
     true;
 
+
   authSubmit.textContent =
     "Giriş yapılıyor...";
 
+
   try {
+
     const data =
       await authRequest(
         "login",
@@ -1545,14 +2029,18 @@ async function loginAccount() {
         password
       );
 
+
     if (
       !data.token ||
       !data.user
     ) {
+
       throw new Error(
         "Giriş başarılı ancak oturum bilgisi alınamadı."
       );
+
     }
+
 
     saveAuth(
       data.token,
@@ -1560,94 +2048,145 @@ async function loginAccount() {
       data.memory
     );
 
+
     authUsername.value = "";
     authPassword.value = "";
+
 
     await syncChatsWithCloud();
 
     showApp();
 
+
   } catch (error) {
+
     console.log(
       "Login error:",
       error
     );
 
+
     showAuthError(
       error.message ||
       "Giriş yapılamadı."
     );
+
   }
+
 
   authSubmit.disabled =
     false;
 
+
   authSubmit.textContent =
     "Giriş Yap";
+
 }
+
+
+/* ==========================================
+   AUTH SUBMIT
+========================================== */
 
 authSubmit.onclick =
   () => {
+
     if (
       authMode ===
       "register"
     ) {
+
       registerAccount();
+
     } else {
+
       loginAccount();
+
     }
+
   };
+
 
 authPassword.addEventListener(
   "keydown",
   event => {
+
     if (
       event.key ===
       "Enter"
     ) {
+
       if (
         authMode ===
         "login"
       ) {
+
         loginAccount();
+
       } else {
+
         authPasswordConfirm.focus();
+
       }
+
     }
+
   }
 );
+
 
 authPasswordConfirm.addEventListener(
   "keydown",
   event => {
+
     if (
       event.key ===
       "Enter"
     ) {
+
       registerAccount();
+
     }
+
   }
 );
 
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
 async function logoutAccount() {
+
   if (!authToken) {
+
     showAuthScreen();
+
     return;
+
   }
 
+
   try {
+
     await authRequest(
       "logout"
     );
+
   } catch (error) {
+
     console.log(
       "Logout error:",
       error
     );
+
   }
 
+
   authToken = "";
+
   currentUser = null;
+
 
   localStorage.removeItem(
     AUTH_TOKEN_KEY
@@ -1657,8 +2196,11 @@ async function logoutAccount() {
     AUTH_USER_KEY
   );
 
+
   showAuthScreen();
+
 }
+
 
 document
   .getElementById(
@@ -1667,26 +2209,41 @@ document
   .onclick =
     logoutAccount;
 
+
+/* ==========================================
+   AUTH KONTROL
+========================================== */
+
 async function checkAuth() {
+
   if (!authToken) {
+
     showAuthScreen();
+
     return false;
+
   }
 
+
   try {
+
     const data =
       await authRequest(
         "me"
       );
 
+
     if (
       !data.success ||
       !data.user
     ) {
+
       throw new Error(
         "Oturum geçersiz."
       );
+
     }
+
 
     saveAuth(
       authToken,
@@ -1694,20 +2251,26 @@ async function checkAuth() {
       data.memory
     );
 
+
     await syncChatsWithCloud();
 
     showApp();
 
+
     return true;
 
   } catch (error) {
+
     console.log(
       "Auth check error:",
       error
     );
 
+
     authToken = "";
+
     currentUser = null;
+
 
     localStorage.removeItem(
       AUTH_TOKEN_KEY
@@ -1717,14 +2280,109 @@ async function checkAuth() {
       AUTH_USER_KEY
     );
 
+
     showAuthScreen();
 
+
     return false;
+
   }
+
 }
 
+
+/* ==========================================
+   HAFIZA
+========================================== */
+
+let globalMemory = {
+
+  name: "",
+
+  facts: [],
+
+  preferences: []
+
+};
+
+
+function loadMemory() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(
+        GLOBAL_MEMORY_KEY
+      );
+
+
+    if (saved) {
+
+      const parsed =
+        JSON.parse(saved);
+
+
+      globalMemory = {
+
+        name:
+          parsed.name || "",
+
+        facts:
+          Array.isArray(
+            parsed.facts
+          )
+            ? parsed.facts
+            : [],
+
+        preferences:
+          Array.isArray(
+            parsed.preferences
+          )
+            ? parsed.preferences
+            : []
+
+      };
+
+    }
+
+  } catch (error) {
+
+    console.log(
+      "Memory error:",
+      error
+    );
+
+  }
+
+}
+
+
+function saveMemory() {
+
+  localStorage.setItem(
+
+    GLOBAL_MEMORY_KEY,
+
+    JSON.stringify(
+      globalMemory
+    )
+
+  );
+
+}
+
+
+loadMemory();
+
+
+/* ==========================================
+   CHAT
+========================================== */
+
 function createChat() {
+
   return {
+
     id:
       "chat_" +
       Date.now() +
@@ -1746,46 +2404,71 @@ function createChat() {
 
     document:
       null
+
   };
+
 }
 
+
 function saveChats() {
+
   localStorage.setItem(
+
     CHATS_KEY,
+
     JSON.stringify(
       chats
     )
+
   );
+
 
   localStorage.setItem(
+
     ACTIVE_CHAT_KEY,
+
     activeChatId || ""
+
   );
+
 }
 
+
 function loadChats() {
+
   try {
+
     const saved =
       localStorage.getItem(
         CHATS_KEY
       );
 
+
     if (saved) {
+
       chats =
         JSON.parse(saved);
+
     }
 
-  } catch {
+  } catch (error) {
+
     chats = [];
+
   }
 
+
   if (!Array.isArray(chats)) {
+
     chats = [];
+
   }
+
 
   chats =
     chats.map(
       chat => ({
+
         id:
           chat.id ||
           "chat_" +
@@ -1813,32 +2496,38 @@ function loadChats() {
         document:
           chat.document ||
           null
+
       })
     );
+
 
   const savedActive =
     localStorage.getItem(
       ACTIVE_CHAT_KEY
     );
 
+
   if (
     savedActive &&
     chats.some(
-      chat =>
-        chat.id ===
+      c =>
+        c.id ===
         savedActive
     )
   ) {
+
     activeChatId =
       savedActive;
 
   } else if (
     chats.length
   ) {
+
     activeChatId =
       chats[0].id;
 
   } else {
+
     const chat =
       createChat();
 
@@ -1848,65 +2537,51 @@ function loadChats() {
       chat.id;
 
     saveChats();
+
   }
+
 }
+
 
 loadChats();
 
-async function cloudChatRequest(
-  action,
-  payload = {}
-) {
+
+/* ==========================================
+   V10 - BULUT SOHBET GEÇMİŞİ
+========================================== */
+
+async function cloudChatRequest(action, payload = {}) {
 
   if (!authToken) {
-    throw new Error(
-      "AUTH_REQUIRED"
-    );
+    throw new Error("AUTH_REQUIRED");
   }
 
-  const response =
-    await fetch(
-      WORKER_URL,
-      {
-        method:
-          "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json",
-
-          "Authorization":
-            `Bearer ${authToken}`
-        },
-
-        body:
-          JSON.stringify({
-            type:
-              "chat_history",
-
-            action,
-
-            ...payload
-          })
-      }
-    );
+  const response = await fetch(
+    WORKER_URL,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        type: "chat_history",
+        action,
+        ...payload
+      })
+    }
+  );
 
   let data = {};
 
   try {
-    data =
-      await response.json();
+    data = await response.json();
   } catch {
     data = {};
   }
 
-  if (
-    response.status ===
-    401
-  ) {
-    throw new Error(
-      "AUTH_REQUIRED"
-    );
+  if (response.status === 401) {
+    throw new Error("AUTH_REQUIRED");
   }
 
   if (!response.ok) {
@@ -1920,192 +2595,87 @@ async function cloudChatRequest(
   return data;
 }
 
+
 function normalizeCloudChatForLocal(chat) {
-  if (
-    !chat ||
-    !chat.id
-  ) {
+
+  if (!chat || !chat.id) {
     return null;
   }
 
   return {
-    id:
-      String(
-        chat.id
-      ),
-
-    title:
-      String(
-        chat.title ||
-        "Yeni Sohbet"
-      ),
-
-    messages:
-      Array.isArray(
-        chat.messages
-      )
-        ? chat.messages
-        : [],
-
-    createdAt:
-      Number(
-        chat.createdAt
-      ) ||
-      Date.now(),
-
-    updatedAt:
-      Number(
-        chat.updatedAt
-      ) ||
-      Number(
-        chat.createdAt
-      ) ||
-      Date.now(),
-
-    document:
-      chat.document &&
-      typeof chat.document ===
-        "object"
-        ? {
-            name:
-              String(
-                chat.document.name ||
-                "Yüklenen PDF"
-              ),
-
-            text:
-              String(
-                chat.document.text ||
-                ""
-              )
-                .slice(
-                  0,
-                  500000
-                )
-          }
-        : null
+    id: String(chat.id),
+    title: String(chat.title || "Yeni Sohbet"),
+    messages: Array.isArray(chat.messages)
+      ? chat.messages
+      : [],
+    createdAt: Number(chat.createdAt) || Date.now(),
+    updatedAt: Number(chat.updatedAt) || Number(chat.createdAt) || Date.now(),
+    document: chat.document && typeof chat.document === "object"
+      ? {
+          name: String(chat.document.name || "Yüklenen PDF"),
+          text: String(chat.document.text || "").slice(0, 500000)
+        }
+      : null
   };
 }
 
+
 function isEmptyPlaceholderChat(chat) {
-  return (
-    !!chat &&
-    (
-      !Array.isArray(
-        chat.messages
-      ) ||
-      chat.messages.length === 0
-    ) &&
+
+  return !!chat &&
+    (!Array.isArray(chat.messages) || chat.messages.length === 0) &&
     !chat.document &&
-    (
-      chat.title ===
-        "Yeni Sohbet" ||
-      !chat.title
-    )
-  );
+    (chat.title === "Yeni Sohbet" || !chat.title);
 }
 
+
 async function saveChatToCloud(chat) {
-  if (
-    !authToken ||
-    !chat
-  ) {
+
+  if (!authToken || !chat) {
     return;
   }
 
   const payloadChat = {
-    id:
-      chat.id,
-
-    title:
-      chat.title ||
-      "Yeni Sohbet",
-
-    messages:
-      Array.isArray(
-        chat.messages
-      )
-        ? chat.messages.slice(
-            -100
-          )
-        : [],
-
-    createdAt:
-      Number(
-        chat.createdAt
-      ) ||
-      Date.now(),
-
-    updatedAt:
-      Number(
-        chat.updatedAt
-      ) ||
-      Date.now(),
-
-    document:
-      chat.document
-        ? {
-            name:
-              chat.document.name ||
-              "Yüklenen PDF",
-
-            text:
-              String(
-                chat.document.text ||
-                ""
-              )
-                .slice(
-                  0,
-                  500000
-                )
-          }
-        : null
+    id: chat.id,
+    title: chat.title || "Yeni Sohbet",
+    messages: Array.isArray(chat.messages)
+      ? chat.messages.slice(-100)
+      : [],
+    createdAt: Number(chat.createdAt) || Date.now(),
+    updatedAt: Number(chat.updatedAt) || Date.now(),
+    document: chat.document
+      ? {
+          name: chat.document.name || "Yüklenen PDF",
+          text: String(chat.document.text || "").slice(0, 500000)
+        }
+      : null
   };
 
   await cloudChatRequest(
     "upsert",
-    {
-      chat:
-        payloadChat
-    }
+    { chat: payloadChat }
   );
 }
 
+
 function queueCloudSave(chat) {
-  if (
-    !authToken ||
-    !chat
-  ) {
+
+  if (!authToken || !chat) {
     return;
   }
 
-  saveChatToCloud(
-    chat
-  )
-    .catch(
-      error => {
-        if (
-          error?.message !==
-          "AUTH_REQUIRED"
-        ) {
-          console.log(
-            "Cloud save error:",
-            error
-          );
-        }
+  saveChatToCloud(chat)
+    .catch(error => {
+      if (error?.message !== "AUTH_REQUIRED") {
+        console.log("Cloud save error:", error);
       }
-    );
+    });
 }
 
-async function deleteChatFromCloud(
-  chatId,
-  updatedAt = Date.now()
-) {
 
-  if (
-    !authToken ||
-    !chatId
-  ) {
+async function deleteChatFromCloud(chatId, updatedAt = Date.now()) {
+
+  if (!authToken || !chatId) {
     return;
   }
 
@@ -2117,289 +2687,162 @@ async function deleteChatFromCloud(
         updatedAt
       }
     );
-
   } catch (error) {
-    if (
-      error?.message !==
-      "AUTH_REQUIRED"
-    ) {
-      console.log(
-        "Cloud delete error:",
-        error
-      );
+    if (error?.message !== "AUTH_REQUIRED") {
+      console.log("Cloud delete error:", error);
     }
   }
 }
 
+
 async function syncChatsWithCloud() {
+
   if (!authToken) {
     return;
   }
 
   try {
-    const data =
-      await cloudChatRequest(
-        "list"
-      );
 
-    const remoteChats =
-      Array.isArray(
-        data.chats
-      )
-        ? data.chats
-            .map(
-              normalizeCloudChatForLocal
-            )
-            .filter(Boolean)
-        : [];
+    const data = await cloudChatRequest("list");
 
-    const deletedMap =
-      new Map(
-        (
-          Array.isArray(
-            data.deleted
-          )
-            ? data.deleted
-            : []
-        )
-          .filter(
-            item =>
-              item &&
-              item.id
-          )
-          .map(
-            item => [
-              String(
-                item.id
-              ),
-              Number(
-                item.updatedAt
-              ) ||
-              0
-            ]
-          )
-      );
+    const remoteChats = Array.isArray(data.chats)
+      ? data.chats
+          .map(normalizeCloudChatForLocal)
+          .filter(Boolean)
+      : [];
 
-    let localChats =
-      Array.isArray(chats)
-        ? chats
-            .map(
-              normalizeCloudChatForLocal
-            )
-            .filter(Boolean)
-        : [];
+    const deletedMap = new Map(
+      (Array.isArray(data.deleted) ? data.deleted : [])
+        .filter(item => item && item.id)
+        .map(item => [
+          String(item.id),
+          Number(item.updatedAt) || 0
+        ])
+    );
 
-    localChats =
-      localChats.filter(
-        chat => {
-          const deletedAt =
-            deletedMap.get(
-              chat.id
-            );
+    let localChats = Array.isArray(chats)
+      ? chats
+          .map(normalizeCloudChatForLocal)
+          .filter(Boolean)
+      : [];
 
-          return !(
-            deletedAt &&
-            deletedAt >=
-            (
-              Number(
-                chat.updatedAt
-              ) ||
-              0
-            )
-          );
-        }
-      );
+    // Başka cihazda silinen daha eski yerel kopyayı geri getirme.
+    localChats = localChats.filter(chat => {
+      const deletedAt = deletedMap.get(chat.id);
+      return !(deletedAt && deletedAt >= (Number(chat.updatedAt) || 0));
+    });
 
-    if (
-      remoteChats.length
-    ) {
-      localChats =
-        localChats.filter(
-          chat =>
-            !isEmptyPlaceholderChat(
-              chat
-            )
-        );
+    // Bulutta gerçek sohbet varsa bu cihazın otomatik boş sohbetini taşıma.
+    if (remoteChats.length) {
+      localChats = localChats.filter(chat => !isEmptyPlaceholderChat(chat));
     }
 
-    const merged =
-      new Map();
+    const merged = new Map();
+    const uploadAfterMerge = [];
 
-    const uploadAfterMerge =
-      [];
-
-    for (
-      const remote of
-      remoteChats
-    ) {
-      merged.set(
-        remote.id,
-        remote
-      );
+    for (const remote of remoteChats) {
+      merged.set(remote.id, remote);
     }
 
-    for (
-      const local of
-      localChats
-    ) {
-      const remote =
-        merged.get(
-          local.id
-        );
+    for (const local of localChats) {
+
+      const remote = merged.get(local.id);
 
       if (!remote) {
-        merged.set(
-          local.id,
-          local
-        );
-
-        uploadAfterMerge.push(
-          local
-        );
-
+        merged.set(local.id, local);
+        uploadAfterMerge.push(local);
         continue;
       }
 
-      if (
-        (
-          Number(
-            local.updatedAt
-          ) ||
-          0
-        ) >
-        (
-          Number(
-            remote.updatedAt
-          ) ||
-          0
-        )
-      ) {
-        merged.set(
-          local.id,
-          local
-        );
-
-        uploadAfterMerge.push(
-          local
-        );
+      if ((Number(local.updatedAt) || 0) > (Number(remote.updatedAt) || 0)) {
+        merged.set(local.id, local);
+        uploadAfterMerge.push(local);
       }
     }
 
-    chats =
-      [...merged.values()]
-        .sort(
-          (a, b) =>
-            (
-              Number(
-                b.updatedAt
-              ) ||
-              0
-            ) -
-            (
-              Number(
-                a.updatedAt
-              ) ||
-              0
-            )
-        )
-        .slice(
-          0,
-          50
-        );
+    chats = [...merged.values()]
+      .sort((a, b) =>
+        (Number(b.updatedAt) || 0) -
+        (Number(a.updatedAt) || 0)
+      )
+      .slice(0, 50);
 
-    if (
-      !chats.length
-    ) {
-      const chat =
-        createChat();
-
-      chats = [
-        chat
-      ];
-
-      uploadAfterMerge.push(
-        chat
-      );
+    if (!chats.length) {
+      const chat = createChat();
+      chats = [chat];
+      uploadAfterMerge.push(chat);
     }
 
-    if (
-      !chats.some(
-        chat =>
-          chat.id ===
-          activeChatId
-      )
-    ) {
-      activeChatId =
-        chats[0].id;
+    if (!chats.some(chat => chat.id === activeChatId)) {
+      activeChatId = chats[0].id;
     }
 
     saveChats();
     renderAll();
 
-    for (
-      const chat of
-      uploadAfterMerge
-    ) {
+    // Eski tarayıcı sohbetlerini ilk senkron sırasında buluta taşı.
+    for (const chat of uploadAfterMerge) {
       try {
-        await saveChatToCloud(
-          chat
-        );
-
+        await saveChatToCloud(chat);
       } catch (error) {
-        console.log(
-          "Initial cloud upload error:",
-          error
-        );
+        console.log("Initial cloud upload error:", error);
       }
     }
 
   } catch (error) {
-    console.log(
-      "Cloud sync error:",
-      error
-    );
+
+    console.log("Cloud sync error:", error);
+
+    // Bulut erişilemezse yerel sohbetler çalışmaya devam eder.
   }
 }
 
+
 function getActiveChat() {
+
   return chats.find(
     chat =>
       chat.id ===
       activeChatId
   );
+
 }
 
+
 function createNewChat() {
+
   stopSpeaking();
 
   const chat =
     createChat();
 
-  chats.unshift(
-    chat
-  );
+
+  chats.unshift(chat);
 
   activeChatId =
     chat.id;
 
+
   saveChats();
 
-  queueCloudSave(
-    chat
-  );
+  queueCloudSave(chat);
 
   clearSelectedFile();
 
   renderAll();
 
   setInput("");
+
 }
 
+
 function selectChat(id) {
+
   stopSpeaking();
 
   activeChatId =
     id;
+
 
   saveChats();
 
@@ -2408,51 +2851,46 @@ function selectChat(id) {
   renderAll();
 
   closeMobileHistory();
+
 }
 
+
 function deleteChat(id) {
+
   const index =
     chats.findIndex(
       chat =>
-        chat.id ===
-        id
+        chat.id === id
     );
 
-  if (
-    index ===
-    -1
-  ) {
+
+  if (index === -1) {
     return;
   }
 
-  const deletedChat =
-    chats[index];
 
-  const deletedAt =
-    Date.now();
+  const deletedChat = chats[index];
+  const deletedAt = Date.now();
 
   const wasActive =
-    activeChatId ===
-    id;
+    activeChatId === id;
+
 
   chats.splice(
     index,
     1
   );
 
-  let newChat =
-    null;
+
+  let newChat = null;
 
   if (
-    chats.length ===
-    0
+    chats.length === 0
   ) {
-    newChat =
-      createChat();
 
-    chats.push(
-      newChat
-    );
+    newChat = createChat();
+
+    chats.push(newChat);
 
     activeChatId =
       newChat.id;
@@ -2460,9 +2898,12 @@ function deleteChat(id) {
   } else if (
     wasActive
   ) {
+
     activeChatId =
       chats[0].id;
+
   }
+
 
   saveChats();
 
@@ -2471,38 +2912,52 @@ function deleteChat(id) {
     deletedAt
   );
 
-  if (
-    newChat
-  ) {
-    queueCloudSave(
-      newChat
-    );
+  if (newChat) {
+    queueCloudSave(newChat);
   }
 
   clearSelectedFile();
 
   renderAll();
+
 }
 
+
+/* ==========================================
+   MOBİL
+========================================== */
+
 function isMobile() {
+
   return (
     window.innerWidth <=
     800
   );
+
 }
 
+
+/* ==========================================
+   INPUT
+========================================== */
+
 function getInput() {
+
   return isMobile()
     ? mobileInput
     : desktopInput;
+
 }
 
+
 function setInput(value) {
+
   desktopInput.value =
     value;
 
   mobileInput.value =
     value;
+
 
   autoResize(
     desktopInput
@@ -2511,407 +2966,250 @@ function setInput(value) {
   autoResize(
     mobileInput
   );
+
 }
 
+
 function autoResize(textarea) {
+
   textarea.style.height =
     "auto";
+
 
   textarea.style.height =
     Math.min(
       textarea.scrollHeight,
       130
-    ) +
-    "px";
+    ) + "px";
+
 }
 
+
 function focusInput() {
+
   setTimeout(
     () => {
+
       if (
         app.classList.contains(
           "hidden"
         )
       ) {
+
         return;
+
       }
 
       getInput().focus();
+
     },
     100
   );
+
 }
 
+
+
+
+/* ==========================================
+   V8 - WEB KAYNAKLARI
+========================================== */
+
 function normalizeSources(sources) {
-  if (
-    !Array.isArray(
-      sources
-    )
-  ) {
+
+  if (!Array.isArray(sources)) {
     return [];
   }
 
-  const seen =
-    new Set();
+  const seen = new Set();
 
   return sources
-    .map(
-      (
-        source,
-        index
-      ) => ({
-        index:
-          Number(
-            source?.index
-          ) ||
-          index + 1,
-
-        title:
-          String(
-            source?.title ||
-            `Kaynak ${index + 1}`
-          ).trim(),
-
-        url:
-          String(
-            source?.url ||
-            ""
-          ).trim()
-      })
-    )
-    .filter(
-      source => {
-        if (
-          !source.url
-        ) {
-          return false;
-        }
-
-        try {
-          const url =
-            new URL(
-              source.url
-            );
-
-          if (
-            url.protocol !==
-              "http:" &&
-            url.protocol !==
-              "https:"
-          ) {
-            return false;
-          }
-
-          if (
-            seen.has(
-              url.href
-            )
-          ) {
-            return false;
-          }
-
-          seen.add(
-            url.href
-          );
-
-          return true;
-
-        } catch {
-          return false;
-        }
-      }
-    )
-    .slice(
-      0,
-      6
-    );
-}
-
-function stripWorkerSourceList(
-  reply,
-  sources
-) {
-  const text =
-    String(
-      reply ||
-      ""
-    )
-      .replace(
-        /\r\n/g,
-        "\n"
-      )
-      .trim();
-
-  if (
-    !sources.length
-  ) {
-    return text;
-  }
-
-  const lines =
-    text.split(
-      "\n"
-    );
-
-  const sourceHeadingIndex =
-    lines.findIndex(
-      line => {
-        const cleaned =
-          line
-            .replace(
-              /#{1,6}|\*\*|__|`/g,
-              ""
-            )
-            .trim();
-
-        return /^(kaynaklar|kaynakça|kaynakca|sources|references)\s*:?\s*$/i.test(
-          cleaned
-        );
-      }
-    );
-
-  if (
-    sourceHeadingIndex ===
-    -1
-  ) {
-    return text;
-  }
-
-  return lines
-    .slice(
-      0,
-      sourceHeadingIndex
-    )
-    .join(
-      "\n"
-    )
-    .replace(
-      /\n{3,}/g,
-      "\n\n"
-    )
-    .trim();
-}
-
-function createSourceCards(
-  sources
-) {
-  const normalized =
-    normalizeSources(
-      sources
-    );
-
-  if (
-    !normalized.length
-  ) {
-    return null;
-  }
-
-  const wrapper =
-    document.createElement(
-      "div"
-    );
-
-  wrapper.className =
-    "source-cards";
-
-  normalized.forEach(
-    source => {
-      const link =
-        document.createElement(
-          "a"
-        );
-
-      link.className =
-        "source-card";
-
-      link.href =
-        source.url;
-
-      link.target =
-        "_blank";
-
-      link.rel =
-        "noopener noreferrer";
-
-      let hostname =
-        "Kaynak";
+    .map((source, index) => ({
+      index: Number(source?.index) || index + 1,
+      title: String(source?.title || `Kaynak ${index + 1}`).trim(),
+      url: String(source?.url || "").trim()
+    }))
+    .filter(source => {
+      if (!source.url) return false;
 
       try {
-        hostname =
-          new URL(
-            source.url
-          )
-            .hostname
-            .replace(
-              /^www\./,
-              ""
-            );
-      } catch {}
+        const url = new URL(source.url);
+        if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+        if (seen.has(url.href)) return false;
+        seen.add(url.href);
+        return true;
+      } catch {
+        return false;
+      }
+    })
+    .slice(0, 6);
+}
 
-      const top =
-        document.createElement(
-          "div"
-        );
+function stripWorkerSourceList(reply, sources) {
+  const text = String(reply || "").replace(/\r\n/g, "\n").trim();
+  if (!sources.length) return text;
+  const lines = text.split("\n");
+  const sourceHeadingIndex = lines.findIndex(line => {
+    const cleaned = line.replace(/#{1,6}|\*\*|__|`/g, "").trim();
+    return /^(kaynaklar|kaynakça|kaynakca|sources|references)\s*:?\s*$/i.test(cleaned);
+  });
+  if (sourceHeadingIndex === -1) return text;
+  return lines.slice(0, sourceHeadingIndex).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
 
-      top.className =
-        "source-card-top";
+function createSourceCards(sources) {
+  const normalized = normalizeSources(sources);
+  if (!normalized.length) return null;
+  const wrapper = document.createElement("div");
+  wrapper.className = "source-cards";
 
-      const number =
-        document.createElement(
-          "span"
-        );
+  normalized.forEach(source => {
+    const link = document.createElement("a");
+    link.className = "source-card";
+    link.href = source.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
 
-      number.className =
-        "source-number";
+    let hostname = "Kaynak";
+    try { hostname = new URL(source.url).hostname.replace(/^www\./, ""); } catch {}
 
-      number.textContent =
-        String(
-          source.index
-        );
+    const top = document.createElement("div");
+    top.className = "source-card-top";
+    const number = document.createElement("span");
+    number.className = "source-number";
+    number.textContent = String(source.index);
+    const host = document.createElement("span");
+    host.className = "source-host";
+    host.textContent = hostname;
+    top.appendChild(number);
+    top.appendChild(host);
 
-      const host =
-        document.createElement(
-          "span"
-        );
+    const title = document.createElement("div");
+    title.className = "source-title";
+    title.textContent = source.title;
+    const open = document.createElement("div");
+    open.className = "source-open";
+    open.textContent = "Kaynağı aç ↗";
 
-      host.className =
-        "source-host";
-
-      host.textContent =
-        hostname;
-
-      top.appendChild(
-        number
-      );
-
-      top.appendChild(
-        host
-      );
-
-      const title =
-        document.createElement(
-          "div"
-        );
-
-      title.className =
-        "source-title";
-
-      title.textContent =
-        source.title;
-
-      const open =
-        document.createElement(
-          "div"
-        );
-
-      open.className =
-        "source-open";
-
-      open.textContent =
-        "Kaynağı aç ↗";
-
-      link.appendChild(
-        top
-      );
-
-      link.appendChild(
-        title
-      );
-
-      link.appendChild(
-        open
-      );
-
-      wrapper.appendChild(
-        link
-      );
-    }
-  );
+    link.appendChild(top);
+    link.appendChild(title);
+    link.appendChild(open);
+    wrapper.appendChild(link);
+  });
 
   return wrapper;
 }
 
+/* ==========================================
+   MESAJLAR
+========================================== */
+
 function renderMessages() {
+
   messagesElement.innerHTML =
     "";
+
 
   const chat =
     getActiveChat();
 
+
   if (
     !chat ||
-    chat.messages.length ===
-    0
+    chat.messages.length === 0
   ) {
+
     messagesElement.innerHTML = `
+
       <div class="welcome">
-        <h1>Zatoi AI 🤖</h1>
+
+        <h1>
+          Zatoi AI 🤖
+        </h1>
 
         <p>
           Merhaba! Ben Zatoi.
           <br>
           Sana nasıl yardımcı olabilirim?
         </p>
+
       </div>
+
     `;
 
     return;
+
   }
+
 
   let messages;
 
-  if (
-    isMobile()
-  ) {
+
+  if (isMobile()) {
+
     messages =
       [...chat.messages];
 
   } else {
+
     messages =
       [...chat.messages]
         .reverse();
+
   }
+
 
   messages.forEach(
     message => {
+
       if (
         message.role !==
           "user" &&
         message.role !==
           "assistant"
       ) {
+
         return;
+
       }
+
 
       const row =
         document.createElement(
           "div"
         );
 
+
       row.className =
         "message-row " +
         message.role;
+
 
       const bubble =
         document.createElement(
           "div"
         );
 
+
       bubble.className =
         "message " +
         message.role;
+
 
       const content =
         document.createElement(
           "div"
         );
 
+
       content.textContent =
         message.content;
+
 
       bubble.appendChild(
         content
       );
+
 
       if (
         message.role ===
@@ -2921,33 +3219,114 @@ function renderMessages() {
         ) &&
         message.sources.length
       ) {
+
         const cards =
           createSourceCards(
             message.sources
           );
 
-        if (
-          cards
-        ) {
+
+        if (cards) {
           bubble.appendChild(
             cards
           );
         }
+
       }
+
 
       row.appendChild(
         bubble
       );
 
+
       messagesElement.appendChild(
         row
       );
+
     }
   );
 
-  if (
-    isMobile()
-  ) {
+
+  if (isMobile()) {
+
+    setTimeout(
+      () => {
+
+        messagesElement.scrollTop =
+          messagesElement.scrollHeight;
+
+      },
+      20
+    );
+
+  } else {
+
+    setTimeout(
+      () => {
+
+        messagesElement.scrollTop =
+          0;
+
+      },
+      20
+    );
+
+  }
+
+}
+
+
+/* ==========================================
+   TYPING
+========================================== */
+
+function showTyping() {
+
+  hideTyping();
+
+
+  const row =
+    document.createElement(
+      "div"
+    );
+
+
+  row.id =
+    "typingRow";
+
+
+  row.className =
+    "typing-row";
+
+
+  row.innerHTML = `
+
+    <div class="typing">
+
+      <span></span>
+      <span></span>
+      <span></span>
+
+    </div>
+
+    <div class="mobile-thinking-text">
+      Düşünüyor...
+    </div>
+
+  `;
+
+
+  if (isMobile()) {
+
+    row.classList.add(
+      "mobile-thinking-row"
+    );
+
+    messagesElement.appendChild(
+      row
+    );
+
     setTimeout(
       () => {
         messagesElement.scrollTop =
@@ -2957,76 +3336,50 @@ function renderMessages() {
     );
 
   } else {
-    setTimeout(
-      () => {
-        messagesElement.scrollTop =
-          0;
-      },
-      20
-    );
-  }
-}
 
-function showTyping() {
-  hideTyping();
-
-  const row =
-    document.createElement(
-      "div"
-    );
-
-  row.id =
-    "typingRow";
-
-  row.className =
-    "typing-row";
-
-  row.innerHTML = `
-    <div class="typing">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  `;
-
-  if (
-    isMobile()
-  ) {
-    messagesElement.appendChild(
-      row
-    );
-
-  } else {
     messagesElement.insertBefore(
       row,
       messagesElement.firstChild
     );
+
   }
+
 }
 
+
 function hideTyping() {
+
   const element =
     document.getElementById(
       "typingRow"
     );
 
-  if (
-    element
-  ) {
+
+  if (element) {
     element.remove();
   }
+
 }
+
+
+/* ==========================================
+   BAŞLIK
+========================================== */
 
 function updateTitle(
   chat,
   text
 ) {
+
   if (
     chat.title !==
     "Yeni Sohbet"
   ) {
+
     return;
+
   }
+
 
   const clean =
     text
@@ -3036,27 +3389,35 @@ function updateTitle(
       )
       .trim();
 
+
   chat.title =
     clean.length > 35
-      ? clean.slice(
-          0,
-          35
-        ) +
-        "..."
+      ? clean.slice(0,35) + "..."
       : clean;
+
 }
 
+
 function updateChatTitle() {
+
   const chat =
     getActiveChat();
+
 
   chatTitleElement.textContent =
     chat
       ? chat.title
       : "Yeni Sohbet";
+
 }
 
+
+/* ==========================================
+   HISTORY
+========================================== */
+
 function renderHistory() {
+
   renderHistoryList(
     historyList
   );
@@ -3064,44 +3425,57 @@ function renderHistory() {
   renderHistoryList(
     mobileHistoryList
   );
+
 }
+
 
 function renderHistoryList(
   element
 ) {
+
   element.innerHTML =
     "";
 
+
   chats.forEach(
     chat => {
+
       const item =
         document.createElement(
           "div"
         );
 
+
       item.className =
         "history-item";
+
 
       const open =
         document.createElement(
           "button"
         );
 
+
       open.className =
         "history-open";
+
 
       if (
         chat.id ===
         activeChatId
       ) {
+
         open.classList.add(
           "active"
         );
+
       }
+
 
       open.textContent =
         chat.title ||
         "Yeni Sohbet";
+
 
       open.onclick =
         () =>
@@ -3109,25 +3483,32 @@ function renderHistoryList(
             chat.id
           );
 
+
       const del =
         document.createElement(
           "button"
         );
 
+
       del.className =
         "history-delete";
+
 
       del.textContent =
         "🗑️";
 
+
       del.onclick =
         event => {
+
           event.stopPropagation();
 
           deleteChat(
             chat.id
           );
+
         };
+
 
       item.appendChild(
         open
@@ -3137,37 +3518,49 @@ function renderHistoryList(
         del
       );
 
+
       element.appendChild(
         item
       );
+
     }
   );
+
 }
 
+
+/* ==========================================
+   PDF
+========================================== */
+
 function updateFileUI() {
+
   const desktopBox =
     document.getElementById(
       "desktopSelectedFile"
     );
+
 
   const mobileBox =
     document.getElementById(
       "mobileSelectedFile"
     );
 
+
   const desktopName =
     document.getElementById(
       "desktopSelectedFileName"
     );
+
 
   const mobileName =
     document.getElementById(
       "mobileSelectedFileName"
     );
 
-  if (
-    !selectedPdf
-  ) {
+
+  if (!selectedPdf) {
+
     desktopBox.classList.remove(
       "show"
     );
@@ -3177,132 +3570,166 @@ function updateFileUI() {
     );
 
     return;
+
   }
+
 
   desktopBox.classList.add(
     "show"
   );
 
+
   mobileBox.classList.add(
     "show"
   );
 
+
   desktopName.textContent =
     selectedPdf.name;
 
+
   mobileName.textContent =
     selectedPdf.name;
+
 }
 
-function clearSelectedFile() {
-  selectedPdf =
-    null;
 
-  documentData =
-    null;
+function clearSelectedFile() {
+
+  selectedPdf = null;
+
+  documentData = null;
 
   pdfInput.value =
     "";
 
+
   updateFileUI();
+
 }
 
+
 async function uploadPdf(file) {
-  if (
-    !authToken
-  ) {
+
+  if (!authToken) {
+
     throw new Error(
       "Oturum açman gerekiyor."
     );
+
   }
+
 
   const formData =
     new FormData();
+
 
   formData.append(
     "file",
     file
   );
 
+
   const response =
     await fetch(
       WORKER_URL,
       {
+
         method:
           "POST",
 
         headers: {
+
           "Authorization":
             `Bearer ${authToken}`
+
         },
 
         body:
           formData
+
       }
     );
+
 
   if (
     response.status ===
     401
   ) {
+
     await forceLogout();
 
     throw new Error(
       "Oturum süren dolmuş. Tekrar giriş yap."
     );
+
   }
+
 
   const data =
     await response.json();
 
-  if (
-    !response.ok
-  ) {
+
+  if (!response.ok) {
+
     throw new Error(
+
       data.details ||
       data.error ||
       "PDF yüklenemedi."
+
     );
+
   }
+
 
   if (
     !data.success ||
     !data.text
   ) {
+
     throw new Error(
+
       data.error ||
       "PDF'den metin çıkarılamadı."
+
     );
+
   }
 
+
   return {
+
     name:
       data.name ||
       file.name,
 
     text:
       data.text
+
   };
+
 }
+
 
 pdfInput.addEventListener(
   "change",
   async event => {
+
     const file =
       event.target.files[0];
 
-    if (
-      !file
-    ) {
+
+    if (!file) {
       return;
     }
 
+
     if (
       file.size >
-      25 *
-      1024 *
-      1024
+      25 * 1024 * 1024
     ) {
+
       alert(
         "PDF 25 MB'dan büyük olamaz."
       );
@@ -3310,45 +3737,57 @@ pdfInput.addEventListener(
       clearSelectedFile();
 
       return;
+
     }
+
 
     selectedPdf =
       file;
 
+
     updateFileUI();
+
 
     const desktopName =
       document.getElementById(
         "desktopSelectedFileName"
       );
 
+
     const mobileName =
       document.getElementById(
         "mobileSelectedFileName"
       );
 
+
     desktopName.textContent =
       "PDF okunuyor...";
+
 
     mobileName.textContent =
       "PDF okunuyor...";
 
+
     try {
+
       const result =
         await uploadPdf(
           file
         );
 
+
       documentData =
         result;
+
 
       const chat =
         getActiveChat();
 
-      if (
-        chat
-      ) {
+
+      if (chat) {
+
         chat.document = {
+
           name:
             result.name,
 
@@ -3357,51 +3796,71 @@ pdfInput.addEventListener(
               0,
               500000
             )
+
         };
+
 
         chat.updatedAt =
           Date.now();
 
+
         saveChats();
 
-        queueCloudSave(
-          chat
-        );
+        queueCloudSave(chat);
+
       }
+
 
       desktopName.textContent =
         result.name +
         " ✓";
 
+
       mobileName.textContent =
         result.name +
         " ✓";
 
+
       focusInput();
 
+
     } catch (error) {
+
       console.log(
         "PDF error:",
         error
       );
 
+
       if (
         error.message !==
         "Oturum süren dolmuş. Tekrar giriş yap."
       ) {
+
         alert(
+
           "PDF okunurken hata oluştu:\n\n" +
           (
             error.message ||
             "Bilinmeyen hata"
           )
+
         );
+
       }
 
+
       clearSelectedFile();
+
     }
+
   }
 );
+
+
+/* ==========================================
+   PDF BUTONLARI
+========================================== */
 
 document
   .getElementById(
@@ -3411,6 +3870,7 @@ document
     () =>
       pdfInput.click();
 
+
 document
   .getElementById(
     "mobilePdfButton"
@@ -3419,18 +3879,20 @@ document
     () =>
       pdfInput.click();
 
+
 document
   .getElementById(
     "desktopRemoveFile"
   )
   .onclick =
     () => {
+
       const chat =
         getActiveChat();
 
-      if (
-        chat
-      ) {
+
+      if (chat) {
+
         chat.document =
           null;
 
@@ -3439,13 +3901,15 @@ document
 
         saveChats();
 
-        queueCloudSave(
-          chat
-        );
+        queueCloudSave(chat);
+
       }
 
+
       clearSelectedFile();
+
     };
+
 
 document
   .getElementById(
@@ -3453,12 +3917,13 @@ document
   )
   .onclick =
     () => {
+
       const chat =
         getActiveChat();
 
-      if (
-        chat
-      ) {
+
+      if (chat) {
+
         chat.document =
           null;
 
@@ -3467,20 +3932,26 @@ document
 
         saveChats();
 
-        queueCloudSave(
-          chat
-        );
+        queueCloudSave(chat);
+
       }
 
+
       clearSelectedFile();
+
     };
 
-async function forceLogout() {
-  authToken =
-    "";
 
-  currentUser =
-    null;
+/* ==========================================
+   ZORUNLU ÇIKIŞ
+========================================== */
+
+async function forceLogout() {
+
+  authToken = "";
+
+  currentUser = null;
+
 
   localStorage.removeItem(
     AUTH_TOKEN_KEY
@@ -3490,50 +3961,61 @@ async function forceLogout() {
     AUTH_USER_KEY
   );
 
+
   hideTyping();
 
   showAuthScreen();
+
 }
 
+
+/* ==========================================
+   MESAJ GÖNDER
+========================================== */
+
 async function sendMessage() {
-  if (
-    sending
-  ) {
+
+  if (sending) {
     return;
   }
 
-  if (
-    !authToken
-  ) {
+
+  if (!authToken) {
+
     showAuthScreen();
+
     return;
+
   }
+
 
   const input =
     getInput();
 
+
   const text =
     input.value.trim();
 
-  if (
-    !text
-  ) {
+
+  if (!text) {
     return;
   }
+
 
   const chat =
     getActiveChat();
 
-  if (
-    !chat
-  ) {
+
+  if (!chat) {
     return;
   }
 
-  sending =
-    true;
+
+  sending = true;
+
 
   chat.messages.push({
+
     role:
       "user",
 
@@ -3542,37 +4024,46 @@ async function sendMessage() {
 
     time:
       Date.now()
+
   });
+
 
   updateTitle(
     chat,
     text
   );
 
+
   chat.updatedAt =
     Date.now();
 
+
   saveChats();
 
-  queueCloudSave(
-    chat
-  );
+  queueCloudSave(chat);
+
 
   setInput("");
+
 
   renderAll();
 
   showTyping();
 
+
   try {
+
     let documentForAI =
       null;
+
 
     if (
       chat.document &&
       chat.document.text
     ) {
+
       documentForAI = {
+
         name:
           chat.document.name,
 
@@ -3581,26 +4072,38 @@ async function sendMessage() {
             0,
             500000
           )
+
       };
+
     }
+
 
     const response =
       await fetch(
         WORKER_URL,
         {
+
           method:
             "POST",
 
           headers: {
+
             "Content-Type":
               "application/json",
 
             "Authorization":
               `Bearer ${authToken}`
+
           },
 
           body:
             JSON.stringify({
+
+              /*
+                Worker artık userId'yi
+                token üzerinden alıyor.
+              */
+
               memory:
                 globalMemory,
 
@@ -3611,48 +4114,43 @@ async function sendMessage() {
 
               document:
                 documentForAI
+
             })
+
         }
       );
 
-    let data = {};
 
-    let rawResponse =
-      "";
+    let data = {};
+    let rawResponse = "";
 
     try {
-      rawResponse =
-        await response.text();
+      rawResponse = await response.text();
 
-      if (
-        rawResponse
-      ) {
+      if (rawResponse) {
         try {
-          data =
-            JSON.parse(
-              rawResponse
-            );
-
-        } catch {
+          data = JSON.parse(rawResponse);
+        } catch (parseError) {
           data = {};
         }
       }
-
     } catch (readError) {
-      console.log(
-        "Response read error:",
-        readError
-      );
+      console.log("Response read error:", readError);
     }
+
+
+    /* =============================
+       OTURUM GEÇERSİZ
+    ============================= */
 
     if (
       response.status ===
       401
     ) {
+
       hideTyping();
 
-      sending =
-        false;
+      sending = false;
 
       await forceLogout();
 
@@ -3661,11 +4159,12 @@ async function sendMessage() {
       );
 
       return;
+
     }
 
-    if (
-      !response.ok
-    ) {
+
+    if (!response.ok) {
+
       const serverMessage =
         data.details ||
         data.error ||
@@ -3675,12 +4174,18 @@ async function sendMessage() {
       throw new Error(
         `HTTP ${response.status} ${response.statusText || ""}\n${serverMessage}`.trim()
       );
+
     }
 
-    if (
-      data.memory
-    ) {
+
+    /* =============================
+       HAFIZA
+    ============================= */
+
+    if (data.memory) {
+
       globalMemory = {
+
         name:
           data.memory.name ||
           globalMemory.name ||
@@ -3699,17 +4204,25 @@ async function sendMessage() {
           )
             ? data.memory.preferences
             : globalMemory.preferences
+
       };
 
+
       saveMemory();
+
     }
+
+
+    /* =============================
+       CEVAP
+    ============================= */
 
     let reply =
       data.reply;
 
-    if (
-      !reply
-    ) {
+
+    if (!reply) {
+
       const debugInfo =
         data.error ||
         data.details ||
@@ -3718,12 +4231,15 @@ async function sendMessage() {
 
       reply =
         `⚠️ Zatoi cevap üretemedi.\n\n${debugInfo}`;
+
     }
+
 
     const sources =
       normalizeSources(
         data.sources
       );
+
 
     const cleanReply =
       stripWorkerSourceList(
@@ -3731,13 +4247,14 @@ async function sendMessage() {
         sources
       );
 
+
     chat.messages.push({
+
       role:
         "assistant",
 
       content:
-        cleanReply ||
-        reply,
+        cleanReply || reply,
 
       sources,
 
@@ -3746,48 +4263,53 @@ async function sendMessage() {
 
       time:
         Date.now()
+
     });
+
 
     chat.updatedAt =
       Date.now();
 
+
     saveChats();
 
-    queueCloudSave(
-      chat
-    );
+    queueCloudSave(chat);
+
 
     hideTyping();
 
     renderAll();
 
+
     if (
       voiceOutputEnabled
     ) {
+
       speakText(
-        cleanReply ||
         reply
       );
+
     }
 
+
   } catch (error) {
+
     console.log(
       "Chat error:",
       error
     );
 
+
     hideTyping();
 
+
     const errorText =
-      error &&
-      error.message
+      error && error.message
         ? error.message
-        : String(
-            error ||
-            "Bilinmeyen hata"
-          );
+        : String(error || "Bilinmeyen hata");
 
     chat.messages.push({
+
       role:
         "assistant",
 
@@ -3796,25 +4318,32 @@ async function sendMessage() {
 
       time:
         Date.now()
+
     });
+
 
     chat.updatedAt =
       Date.now();
 
     saveChats();
 
-    queueCloudSave(
-      chat
-    );
+    queueCloudSave(chat);
 
     renderAll();
+
   }
 
-  sending =
-    false;
+
+  sending = false;
 
   focusInput();
+
 }
+
+
+/* ==========================================
+   GÖNDER BUTONLARI
+========================================== */
 
 document
   .getElementById(
@@ -3823,6 +4352,7 @@ document
   .onclick =
     sendMessage;
 
+
 document
   .getElementById(
     "mobileSendButton"
@@ -3830,35 +4360,50 @@ document
   .onclick =
     sendMessage;
 
+
+/* ==========================================
+   ENTER
+========================================== */
+
 desktopInput.addEventListener(
   "keydown",
   event => {
+
     if (
       event.key ===
         "Enter" &&
       !event.shiftKey
     ) {
+
       event.preventDefault();
 
       sendMessage();
+
     }
+
   }
 );
+
 
 mobileInput.addEventListener(
   "keydown",
   event => {
+
     if (
       event.key ===
         "Enter" &&
       !event.shiftKey
     ) {
+
       event.preventDefault();
 
       sendMessage();
+
     }
+
   }
 );
+
 
 desktopInput.addEventListener(
   "input",
@@ -3868,6 +4413,7 @@ desktopInput.addEventListener(
     )
 );
 
+
 mobileInput.addEventListener(
   "input",
   () =>
@@ -3876,6 +4422,11 @@ mobileInput.addEventListener(
     )
 );
 
+
+/* ==========================================
+   YENİ SOHBET
+========================================== */
+
 document
   .getElementById(
     "newChatButton"
@@ -3883,82 +4434,111 @@ document
   .onclick =
     createNewChat;
 
+
+/* ==========================================
+   SESLİ KONUŞMA
+========================================== */
+
 let recognition =
   null;
 
 let isListening =
   false;
 
+
 const SpeechRecognition =
   window.SpeechRecognition ||
   window.webkitSpeechRecognition;
 
-if (
-  SpeechRecognition
-) {
+
+if (SpeechRecognition) {
+
   recognition =
     new SpeechRecognition();
+
 
   recognition.lang =
     "tr-TR";
 
+
   recognition.continuous =
     false;
+
 
   recognition.interimResults =
     true;
 
+
   recognition.onstart =
     () => {
+
       isListening =
         true;
 
       updateMic();
+
     };
+
 
   recognition.onend =
     () => {
+
       isListening =
         false;
 
       updateMic();
+
     };
+
 
   recognition.onresult =
     event => {
+
       let finalText =
         "";
+
 
       let interimText =
         "";
 
+
       for (
         let i =
           event.resultIndex;
+
         i <
           event.results.length;
+
         i++
       ) {
+
         const transcript =
           event.results[i][0]
             .transcript;
+
 
         if (
           event.results[i]
             .isFinal
         ) {
+
           finalText +=
             transcript;
 
         } else {
+
           interimText +=
             transcript;
+
         }
+
       }
+
 
       if (
         finalText.trim()
       ) {
+
         setInput(
           finalText.trim()
         );
@@ -3968,15 +4548,22 @@ if (
       } else if (
         interimText.trim()
       ) {
+
         setInput(
           interimText
         );
+
       }
+
     };
+
 }
 
+
 function updateMic() {
+
   const buttons = [
+
     document.getElementById(
       "micButton"
     ),
@@ -3984,19 +4571,20 @@ function updateMic() {
     document.getElementById(
       "mobileMicButton"
     )
+
   ];
+
 
   buttons.forEach(
     button => {
-      if (
-        !button
-      ) {
+
+      if (!button) {
         return;
       }
 
-      if (
-        isListening
-      ) {
+
+      if (isListening) {
+
         button.textContent =
           "⏹️";
 
@@ -4005,44 +4593,57 @@ function updateMic() {
         );
 
       } else {
+
         button.textContent =
           "🎤";
 
         button.classList.remove(
           "active"
         );
+
       }
+
     }
   );
+
 }
 
+
 function toggleMic() {
-  if (
-    !recognition
-  ) {
+
+  if (!recognition) {
+
     alert(
       "Bu tarayıcı sesli konuşmayı desteklemiyor. Chrome kullanmayı dene."
     );
 
     return;
+
   }
 
-  if (
-    isListening
-  ) {
+
+  if (isListening) {
+
     recognition.stop();
 
   } else {
+
     try {
+
       recognition.start();
 
     } catch (error) {
+
       console.log(
         error
       );
+
     }
+
   }
+
 }
+
 
 document
   .getElementById(
@@ -4051,6 +4652,7 @@ document
   .onclick =
     toggleMic;
 
+
 document
   .getElementById(
     "mobileMicButton"
@@ -4058,31 +4660,42 @@ document
   .onclick =
     toggleMic;
 
+
+/* ==========================================
+   SESLİ CEVAP
+========================================== */
+
 let voiceOutputEnabled =
   true;
 
+
 try {
+
   const saved =
     localStorage.getItem(
       VOICE_OUTPUT_KEY
     );
 
+
   if (
-    saved !==
-    null
+    saved !== null
   ) {
+
     voiceOutputEnabled =
-      saved ===
-      "true";
+      saved === "true";
+
   }
 
-} catch {}
+} catch (error) {}
+
 
 function updateVoiceButton() {
+
   const icon =
     voiceOutputEnabled
       ? "🔊"
       : "🔇";
+
 
   document
     .getElementById(
@@ -4091,143 +4704,193 @@ function updateVoiceButton() {
     .textContent =
       icon;
 
+
   document
     .getElementById(
       "mobileVoiceToggle"
     )
     .textContent =
       icon;
+
 }
 
+
 function stopSpeaking() {
+
   if (
     "speechSynthesis" in
     window
   ) {
+
     speechSynthesis.cancel();
+
   }
+
 }
 
+
 function speakText(text) {
+
   if (
     !voiceOutputEnabled ||
-    !(
-      "speechSynthesis" in
-      window
-    )
+    !("speechSynthesis" in window)
   ) {
+
     return;
+
   }
+
 
   stopSpeaking();
 
-  const chunks =
-    [];
 
-  let current =
-    "";
+  const chunks = [];
+
+  let current = "";
+
 
   const sentences =
     text.split(
       /(?<=[.!?])\s+/
     );
 
+
   sentences.forEach(
     sentence => {
+
       if (
         current.length +
         sentence.length >
         220
       ) {
+
         if (
           current.trim()
         ) {
+
           chunks.push(
             current.trim()
           );
+
         }
+
 
         current =
           sentence;
 
       } else {
+
         current +=
           " " +
           sentence;
+
       }
+
     }
   );
+
 
   if (
     current.trim()
   ) {
+
     chunks.push(
       current.trim()
     );
+
   }
+
 
   let index =
     0;
 
+
   function next() {
+
     if (
       index >=
       chunks.length
     ) {
+
       return;
+
     }
+
 
     const utterance =
       new SpeechSynthesisUtterance(
         chunks[index]
       );
 
+
     utterance.lang =
       "tr-TR";
+
 
     utterance.rate =
       1.0;
 
+
     utterance.pitch =
       1.0;
+
 
     utterance.volume =
       1.0;
 
+
     utterance.onend =
       () => {
+
         index++;
 
         next();
+
       };
+
 
     speechSynthesis.speak(
       utterance
     );
+
   }
 
+
   next();
+
 }
 
+
 function toggleVoice() {
+
   voiceOutputEnabled =
     !voiceOutputEnabled;
+
 
   if (
     !voiceOutputEnabled
   ) {
+
     stopSpeaking();
+
   }
 
+
   localStorage.setItem(
+
     VOICE_OUTPUT_KEY,
+
     String(
       voiceOutputEnabled
     )
+
   );
 
+
   updateVoiceButton();
+
 }
+
 
 document
   .getElementById(
@@ -4236,6 +4899,7 @@ document
   .onclick =
     toggleVoice;
 
+
 document
   .getElementById(
     "mobileVoiceToggle"
@@ -4243,9 +4907,16 @@ document
   .onclick =
     toggleVoice;
 
+
 updateVoiceButton();
 
+
+/* ==========================================
+   MOBİL GEÇMİŞ
+========================================== */
+
 function openMobileHistory() {
+
   document
     .getElementById(
       "mobileHistoryOverlay"
@@ -4253,9 +4924,12 @@ function openMobileHistory() {
     .classList.add(
       "show"
     );
+
 }
 
+
 function closeMobileHistory() {
+
   document
     .getElementById(
       "mobileHistoryOverlay"
@@ -4263,7 +4937,9 @@ function closeMobileHistory() {
     .classList.remove(
       "show"
     );
+
 }
+
 
 document
   .getElementById(
@@ -4272,6 +4948,7 @@ document
   .onclick =
     openMobileHistory;
 
+
 document
   .getElementById(
     "closeHistoryButton"
@@ -4279,70 +4956,97 @@ document
   .onclick =
     closeMobileHistory;
 
+
 document
   .getElementById(
     "mobileHistoryOverlay"
   )
   .onclick =
     event => {
+
       if (
         event.target.id ===
         "mobileHistoryOverlay"
       ) {
+
         closeMobileHistory();
+
       }
+
     };
+
+
+/* ==========================================
+   RESIZE
+========================================== */
 
 window.addEventListener(
   "resize",
   () => {
+
     if (
       !app.classList.contains(
         "hidden"
       )
     ) {
+
       renderMessages();
+
     }
+
   }
 );
 
+
+/* ==========================================
+   BAŞLANGIÇ
+========================================== */
+
 function renderAll() {
+
   updateChatTitle();
 
   renderMessages();
 
   renderHistory();
+
 }
 
-if (
-  "serviceWorker" in
-  navigator
-) {
-  window.addEventListener(
-    "load",
-    () => {
-      navigator.serviceWorker
-        .register(
-          "./service-worker.js"
-        )
-        .then(
-          () => {
-            console.log(
-              "Zatoi PWA Service Worker aktif."
-            );
-          }
-        )
-        .catch(
-          error => {
-            console.error(
-              "Zatoi Service Worker hatası:",
-              error
-            );
-          }
+
+/* ==========================================
+   PWA / SERVICE WORKER
+========================================== */
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", () => {
+
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then(() => {
+
+        console.log(
+          "Zatoi PWA Service Worker aktif."
         );
-    }
-  );
+
+      })
+      .catch(error => {
+
+        console.error(
+          "Zatoi Service Worker hatası:",
+          error
+        );
+
+      });
+
+  });
+
 }
+
+
+/* ==========================================
+   AUTH KONTROLÜ İLE BAŞLAT
+========================================== */
 
 updateAuthMode();
 
