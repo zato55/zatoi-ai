@@ -776,7 +776,7 @@
 
     .history-item {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 38px;
+      grid-template-columns: minmax(0, 1fr) 36px 36px;
 
       align-items: center;
 
@@ -817,6 +817,7 @@
       background: #142338;
     }
 
+    .history-rename,
     .history-delete {
       width: 36px;
       height: 36px;
@@ -824,7 +825,13 @@
       border-radius: 8px;
 
       background: #171d23;
+    }
 
+    .history-rename {
+      color: #9fc2ff;
+    }
+
+    .history-delete {
       color: #ff8585;
     }
 
@@ -1734,6 +1741,9 @@ let sending = false;
 
 let authMode = "login";
 
+let cloudSyncTimer = null;
+let cloudSyncInFlight = false;
+
 
 /* ==========================================
    AUTH HATA MESAJI
@@ -2072,6 +2082,7 @@ function showApp() {
 function showAuthScreen() {
 
   stopSpeaking();
+  stopCloudSyncWatcher();
 
   app.classList.add(
     "hidden"
@@ -2938,15 +2949,19 @@ async function deleteChatFromCloud(chatId, updatedAt = Date.now()) {
 }
 
 
-async function syncChatsWithCloud() {
+async function syncChatsWithCloud(silent = false) {
 
-  if (!authToken) {
+  if (!authToken || cloudSyncInFlight) {
     return;
   }
 
-  showSyncStatus(
-    "Sohbetler yükleniyor..."
-  );
+  cloudSyncInFlight = true;
+
+  if (!silent) {
+    showSyncStatus(
+      "Sohbetler yükleniyor..."
+    );
+  }
 
   try {
 
@@ -2973,11 +2988,9 @@ async function syncChatsWithCloud() {
           .filter(Boolean)
       : [];
 
-    // Başka cihazda silinen daha eski yerel kopyayı geri getirme.
-    localChats = localChats.filter(chat => {
-      const deletedAt = deletedMap.get(chat.id);
-      return !(deletedAt && deletedAt >= (Number(chat.updatedAt) || 0));
-    });
+    // Buluttaki silme kaydı (tombstone) kesin yetkilidir.
+    // Böylece başka cihazdaki eski yerel kopya sohbeti tekrar diriltemez.
+    localChats = localChats.filter(chat => !deletedMap.has(chat.id));
 
     // Bulutta gerçek sohbet varsa bu cihazın otomatik boş sohbetini taşıma.
     if (remoteChats.length) {
@@ -3044,10 +3057,72 @@ async function syncChatsWithCloud() {
 
   } finally {
 
-    hideSyncStatus();
+    cloudSyncInFlight = false;
+
+    if (!silent) {
+      hideSyncStatus();
+    }
 
   }
 }
+
+
+function startCloudSyncWatcher() {
+
+  stopCloudSyncWatcher();
+
+  if (!authToken) {
+    return;
+  }
+
+  cloudSyncTimer = window.setInterval(
+    () => {
+      if (
+        document.visibilityState === "visible" &&
+        !sending
+      ) {
+        syncChatsWithCloud(true);
+      }
+    },
+    20000
+  );
+}
+
+
+function stopCloudSyncWatcher() {
+
+  if (cloudSyncTimer) {
+    clearInterval(cloudSyncTimer);
+    cloudSyncTimer = null;
+  }
+}
+
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if (
+      document.visibilityState === "visible" &&
+      authToken &&
+      !sending
+    ) {
+      syncChatsWithCloud(true);
+    }
+  }
+);
+
+
+window.addEventListener(
+  "focus",
+  () => {
+    if (
+      authToken &&
+      !sending
+    ) {
+      syncChatsWithCloud(true);
+    }
+  }
+);
 
 
 function getActiveChat() {
@@ -3104,6 +3179,51 @@ function selectChat(id) {
 
   closeMobileHistory();
 
+}
+
+
+function renameChat(id) {
+
+  const chat = chats.find(
+    item => item.id === id
+  );
+
+  if (!chat) {
+    return;
+  }
+
+  const currentTitle =
+    chat.title || "Yeni Sohbet";
+
+  const value = window.prompt(
+    "Sohbetin yeni adını yaz:",
+    currentTitle
+  );
+
+  if (value === null) {
+    return;
+  }
+
+  const newTitle = String(value)
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60);
+
+  if (!newTitle) {
+    alert("Sohbet adı boş olamaz.");
+    return;
+  }
+
+  if (newTitle === currentTitle) {
+    return;
+  }
+
+  chat.title = newTitle;
+  chat.updatedAt = Date.now();
+
+  saveChats();
+  renderAll();
+  queueCloudSave(chat);
 }
 
 
@@ -3808,6 +3928,38 @@ function renderHistoryList(
           );
 
 
+      const rename =
+        document.createElement(
+          "button"
+        );
+
+
+      rename.className =
+        "history-rename";
+
+
+      rename.textContent =
+        "✏️";
+
+
+      rename.setAttribute(
+        "aria-label",
+        `Sohbeti yeniden adlandır: ${chat.title || "Yeni Sohbet"}`
+      );
+
+
+      rename.onclick =
+        event => {
+
+          event.stopPropagation();
+
+          renameChat(
+            chat.id
+          );
+
+        };
+
+
       const del =
         document.createElement(
           "button"
@@ -3842,6 +3994,10 @@ function renderHistoryList(
 
       item.appendChild(
         open
+      );
+
+      item.appendChild(
+        rename
       );
 
       item.appendChild(
