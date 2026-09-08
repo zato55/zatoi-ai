@@ -1239,8 +1239,18 @@
 
 
     /* =================================
-       V10.8 GÖRSEL ÖNİZLEME
+       V10.9 ÇOKLU GÖRSEL
     ================================= */
+    .selected-image-list {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+      max-width: 220px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
     .selected-image-preview {
       width: 44px;
       height: 44px;
@@ -1252,12 +1262,25 @@
       cursor: zoom-in;
     }
 
+    .message-image-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      width: min(360px, 100%);
+      margin-bottom: 8px;
+    }
+
+    .message-image-grid.single {
+      grid-template-columns: 1fr;
+      width: min(280px, 100%);
+    }
+
     .message-image-preview {
       display: block;
       width: min(280px, 100%);
       max-height: 220px;
       object-fit: cover;
-      margin-bottom: 8px;
+      margin-bottom: 0;
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,.16);
       cursor: zoom-in;
@@ -1744,7 +1767,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.8 • Görsel Önizleme</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.9 • Çoklu Görsel</span></div>
       </div>
     </div>
   </section>
@@ -1756,6 +1779,7 @@
   class="file-input"
   type="file"
   accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+  multiple
 >
 
 
@@ -1997,7 +2021,7 @@ let activeChatId = null;
 
 let selectedPdf = null;
 
-let selectedImage = null;
+let selectedImages = [];
 
 let documentData = null;
 
@@ -3842,23 +3866,42 @@ function renderMessages() {
         message.content;
 
 
-      if (message.imagePreview) {
-        const messageImage = document.createElement("img");
-        messageImage.className = "message-image-preview";
-        messageImage.src = message.imagePreview;
-        messageImage.alt = message.imageName || "Gönderilen görsel";
-        messageImage.title = "Büyütmek için dokun";
-        messageImage.onclick = () =>
-          openImageViewer(message.imagePreview, message.imageName || "Görsel");
-        bubble.appendChild(messageImage);
+      const messagePreviews = Array.isArray(message.imagePreviews)
+        ? message.imagePreviews.filter(Boolean).slice(0, 4)
+        : (message.imagePreview ? [message.imagePreview] : []);
+
+      const messageNames = Array.isArray(message.imageNames)
+        ? message.imageNames.filter(Boolean).slice(0, 4)
+        : (message.imageName ? [message.imageName] : []);
+
+      if (messagePreviews.length) {
+        const imageGrid = document.createElement("div");
+        imageGrid.className = "message-image-grid" +
+          (messagePreviews.length === 1 ? " single" : "");
+
+        messagePreviews.forEach((previewSrc, index) => {
+          const messageImage = document.createElement("img");
+          const imageName = messageNames[index] || `Görsel ${index + 1}`;
+          messageImage.className = "message-image-preview";
+          messageImage.src = previewSrc;
+          messageImage.alt = imageName;
+          messageImage.title = "Büyütmek için dokun";
+          messageImage.onclick = () =>
+            openImageViewer(previewSrc, imageName);
+          imageGrid.appendChild(messageImage);
+        });
+
+        bubble.appendChild(imageGrid);
       }
 
-      if (message.imageName) {
+      if (messageNames.length) {
         const imageBadge = document.createElement("div");
         imageBadge.style.marginBottom = "7px";
         imageBadge.style.fontSize = "12px";
         imageBadge.style.opacity = "0.8";
-        imageBadge.textContent = "🖼️ " + message.imageName;
+        imageBadge.textContent = messageNames.length === 1
+          ? "🖼️ " + messageNames[0]
+          : `🖼️ ${messageNames.length} görsel: ` + messageNames.join(", ");
         bubble.appendChild(imageBadge);
       }
 
@@ -4300,7 +4343,7 @@ function renderHistoryList(
 
 
 /* ==========================================
-   V10.8 GÖRSEL ÖNİZLEME
+   V10.9 ÇOKLU GÖRSEL
 ========================================== */
 
 function openImageViewer(src, altText = "Görsel") {
@@ -4388,16 +4431,17 @@ function updateFileUI() {
   const desktopIcon = document.getElementById("desktopSelectedFileIcon");
   const mobileIcon = document.getElementById("mobileSelectedFileIcon");
 
-  const activeFile = selectedImage || selectedPdf;
+  const hasImages = selectedImages.length > 0;
+  const activeFile = hasImages ? selectedImages[0] : selectedPdf;
 
-  const removePreview = box => {
-    const oldPreview = box.querySelector(".selected-image-preview");
-    if (oldPreview) oldPreview.remove();
+  const removePreviewList = box => {
+    const oldList = box.querySelector(".selected-image-list");
+    if (oldList) oldList.remove();
   };
 
   if (!activeFile) {
-    removePreview(desktopBox);
-    removePreview(mobileBox);
+    removePreviewList(desktopBox);
+    removePreviewList(mobileBox);
     desktopIcon.style.display = "";
     mobileIcon.style.display = "";
     desktopBox.classList.remove("show");
@@ -4408,47 +4452,59 @@ function updateFileUI() {
   desktopBox.classList.add("show");
   mobileBox.classList.add("show");
 
-  const isImage = !!selectedImage;
-  desktopIcon.textContent = isImage ? "🖼️" : "📄";
-  mobileIcon.textContent = isImage ? "🖼️" : "📄";
-  desktopName.textContent = activeFile.name;
-  mobileName.textContent = activeFile.name;
+  desktopIcon.textContent = hasImages ? "🖼️" : "📄";
+  mobileIcon.textContent = hasImages ? "🖼️" : "📄";
+
+  const label = hasImages
+    ? (selectedImages.length === 1
+        ? selectedImages[0].name
+        : `${selectedImages.length} görsel seçildi`)
+    : activeFile.name;
+
+  desktopName.textContent = label;
+  mobileName.textContent = label;
 
   [
     [desktopBox, desktopIcon],
     [mobileBox, mobileIcon]
   ].forEach(([box, icon]) => {
-    removePreview(box);
+    removePreviewList(box);
 
-    if (!isImage) {
+    if (!hasImages) {
       icon.style.display = "";
       return;
     }
 
     icon.style.display = "none";
 
-    const preview = document.createElement("img");
-    preview.className = "selected-image-preview";
-    preview.src = selectedImage.preview || selectedImage.data;
-    preview.alt = activeFile.name || "Seçilen görsel";
-    preview.title = "Büyütmek için dokun";
-    preview.onclick = () =>
-      openImageViewer(selectedImage.data, activeFile.name || "Görsel");
+    const list = document.createElement("div");
+    list.className = "selected-image-list";
 
-    box.insertBefore(preview, icon);
+    selectedImages.forEach((selected, index) => {
+      const preview = document.createElement("img");
+      preview.className = "selected-image-preview";
+      preview.src = selected.preview || selected.data;
+      preview.alt = selected.name || `Seçilen görsel ${index + 1}`;
+      preview.title = "Büyütmek için dokun";
+      preview.onclick = () =>
+        openImageViewer(selected.data, selected.name || `Görsel ${index + 1}`);
+      list.appendChild(preview);
+    });
+
+    box.insertBefore(list, icon);
   });
 }
 
 function clearSelectedFile() {
   selectedPdf = null;
-  selectedImage = null;
+  selectedImages = [];
   documentData = null;
   pdfInput.value = "";
   updateFileUI();
 }
 
-function clearSelectedImage() {
-  selectedImage = null;
+function clearSelectedImages() {
+  selectedImages = [];
   pdfInput.value = "";
   updateFileUI();
 }
@@ -4568,80 +4624,107 @@ async function uploadPdf(file) {
 pdfInput.addEventListener(
   "change",
   async event => {
-    const file = event.target.files[0];
-    if (!file) return;
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
 
-    const lowerName = String(file.name || "").toLowerCase();
-    const isPdf = file.type === "application/pdf" || lowerName.endsWith(".pdf");
-    const isImage = ["image/jpeg", "image/png", "image/webp"].includes(file.type) || /\.(jpe?g|png|webp)$/.test(lowerName);
+    const pdfFiles = files.filter(file => {
+      const lowerName = String(file.name || "").toLowerCase();
+      return file.type === "application/pdf" || lowerName.endsWith(".pdf");
+    });
 
-    if (!isPdf && !isImage) {
-      alert("Yalnızca PDF, JPG, PNG veya WebP yükleyebilirsin.");
-      clearSelectedFile();
+    const imageFiles = files.filter(file => {
+      const lowerName = String(file.name || "").toLowerCase();
+      return ["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+        /\.(jpe?g|png|webp)$/.test(lowerName);
+    });
+
+    if (pdfFiles.length && imageFiles.length) {
+      alert("PDF ile görselleri aynı anda seçemezsin.");
+      pdfInput.value = "";
       return;
     }
 
-    if (isImage) {
-      if (file.size > 4 * 1024 * 1024) {
-        alert("Görsel 4 MB'dan büyük olamaz.");
+    if (!pdfFiles.length && !imageFiles.length) {
+      alert("Yalnızca PDF, JPG, PNG veya WebP yükleyebilirsin.");
+      pdfInput.value = "";
+      return;
+    }
+
+    if (pdfFiles.length) {
+      if (pdfFiles.length > 1) {
+        alert("Aynı anda yalnızca 1 PDF yükleyebilirsin.");
+        pdfInput.value = "";
+        return;
+      }
+
+      const file = pdfFiles[0];
+
+      if (file.size > 25 * 1024 * 1024) {
+        alert("PDF 25 MB'dan büyük olamaz.");
         clearSelectedFile();
         return;
       }
 
+      selectedImages = [];
+      selectedPdf = file;
+      updateFileUI();
+
+      const desktopName = document.getElementById("desktopSelectedFileName");
+      const mobileName = document.getElementById("mobileSelectedFileName");
+      desktopName.textContent = "PDF yükleniyor...";
+      mobileName.textContent = "PDF yükleniyor...";
+
       try {
+        documentData = await uploadPdf(file);
+        selectedPdf = file;
+        updateFileUI();
+        focusInput();
+      } catch (error) {
+        alert(error.message || "PDF yüklenemedi.");
+        clearSelectedFile();
+      }
+
+      return;
+    }
+
+    if (selectedImages.length + imageFiles.length > 4) {
+      alert("Aynı mesajda en fazla 4 görsel gönderebilirsin.");
+      pdfInput.value = "";
+      return;
+    }
+
+    for (const file of imageFiles) {
+      if (file.size > 4 * 1024 * 1024) {
+        alert(`${file.name || "Görsel"} 4 MB'dan büyük olamaz.`);
+        pdfInput.value = "";
+        return;
+      }
+    }
+
+    try {
+      const addedImages = [];
+
+      for (const file of imageFiles) {
         const dataUrl = await readImageAsDataURL(file);
         const previewUrl = await createImagePreview(dataUrl);
-        selectedPdf = null;
-        documentData = null;
-        selectedImage = {
+
+        addedImages.push({
           name: file.name || "gorsel",
           type: file.type || "image/jpeg",
           data: dataUrl,
           preview: previewUrl
-        };
-        updateFileUI();
-        focusInput();
-      } catch (error) {
-        alert(error.message || "Görsel okunamadı.");
-        clearSelectedFile();
+        });
       }
-      return;
-    }
 
-    if (file.size > 25 * 1024 * 1024) {
-      alert("PDF 25 MB'dan büyük olamaz.");
-      clearSelectedFile();
-      return;
-    }
-
-    selectedImage = null;
-    selectedPdf = file;
-    updateFileUI();
-
-    const desktopName = document.getElementById("desktopSelectedFileName");
-    const mobileName = document.getElementById("mobileSelectedFileName");
-    desktopName.textContent = "PDF okunuyor...";
-    mobileName.textContent = "PDF okunuyor...";
-
-    try {
-      const result = await uploadPdf(file);
-      documentData = result;
-      const chat = getActiveChat();
-      if (chat) {
-        chat.document = { name: result.name, text: result.text.slice(0, 500000) };
-        chat.updatedAt = Date.now();
-        saveChats();
-        queueCloudSave(chat);
-      }
-      desktopName.textContent = result.name + " ✓";
-      mobileName.textContent = result.name + " ✓";
+      selectedPdf = null;
+      documentData = null;
+      selectedImages = [...selectedImages, ...addedImages].slice(0, 4);
+      pdfInput.value = "";
+      updateFileUI();
       focusInput();
     } catch (error) {
-      console.log("PDF error:", error);
-      if (error.message !== "Oturum süren dolmuş. Tekrar giriş yap.") {
-        alert("PDF okunurken hata oluştu:\n\n" + (error.message || "Bilinmeyen hata"));
-      }
-      clearSelectedFile();
+      alert(error.message || "Görsel okunamadı.");
+      pdfInput.value = "";
     }
   }
 );
@@ -4675,8 +4758,8 @@ document
   .onclick =
     () => {
 
-      if (selectedImage) {
-        clearSelectedImage();
+      if (selectedImages.length) {
+        clearSelectedImages();
         return;
       }
 
@@ -4699,8 +4782,8 @@ document
   .onclick =
     () => {
 
-      if (selectedImage) {
-        clearSelectedImage();
+      if (selectedImages.length) {
+        clearSelectedImages();
         return;
       }
 
@@ -4771,27 +4854,24 @@ async function sendMessage() {
     input.value.trim();
 
 
-  if (!text && !selectedImage) {
+  if (!text && !selectedImages.length) {
     return;
   }
 
 
-  if (!text && selectedImage) {
+  if (!text && selectedImages.length) {
     text = "Bu görseli açıkla.";
   }
 
 
-  const imageForAI = selectedImage
-    ? { ...selectedImage }
-    : null;
+  const imagesForAI = selectedImages.map(image => ({ ...image }));
 
 
-  // V10.7.1: Görseli istek için kopyaladıktan sonra
-  // seçim alanını temizle. Böylece aynı görsel istemeden
-  // sonraki mesaja tekrar eklenmez. imageForAI kopyası
-  // Worker isteği tamamlanana kadar bellekte kalır.
-  if (imageForAI) {
-    selectedImage = null;
+  // V10.9: Görselleri istek için kopyaladıktan sonra
+  // seçim alanını temizle. imagesForAI kopyaları Worker
+  // isteği tamamlanana kadar bellekte kalır.
+  if (imagesForAI.length) {
+    selectedImages = [];
     pdfInput.value = "";
     updateFileUI();
   }
@@ -4817,11 +4897,11 @@ async function sendMessage() {
     content:
       text,
 
-    imageName:
-      imageForAI ? imageForAI.name : "",
+    imageNames:
+      imagesForAI.map(image => image.name || "gorsel"),
 
-    imagePreview:
-      imageForAI ? (imageForAI.preview || "") : "",
+    imagePreviews:
+      imagesForAI.map(image => image.preview || ""),
 
     time:
       Date.now()
@@ -4916,8 +4996,12 @@ async function sendMessage() {
               document:
                 documentForAI,
 
-              image:
-                imageForAI
+              images:
+                imagesForAI.map(image => ({
+                  name: image.name,
+                  type: image.type,
+                  data: image.data
+                }))
 
             })
 
