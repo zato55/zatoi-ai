@@ -4562,6 +4562,17 @@ async function sendMessage() {
     : null;
 
 
+  // V10.7.1: Görseli istek için kopyaladıktan sonra
+  // seçim alanını temizle. Böylece aynı görsel istemeden
+  // sonraki mesaja tekrar eklenmez. imageForAI kopyası
+  // Worker isteği tamamlanana kadar bellekte kalır.
+  if (imageForAI) {
+    selectedImage = null;
+    pdfInput.value = "";
+    updateFileUI();
+  }
+
+
   const chat =
     getActiveChat();
 
