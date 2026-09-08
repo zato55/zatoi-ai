@@ -1139,6 +1139,99 @@
     font-size: 11px;
   }
 
+  
+
+    /* =================================
+       V10.6 AYARLAR
+    ================================= */
+    .settings-btn {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: #17212b; color: #fff; border: 1px solid #263442;
+      font-size: 18px; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .settings-overlay {
+      position: fixed; inset: 0; z-index: 3000; display: none;
+      align-items: center; justify-content: center; padding: 18px;
+      background: rgba(0,0,0,.68); backdrop-filter: blur(5px);
+    }
+    .settings-overlay.show { display: flex; }
+    .settings-panel {
+      width: min(520px, 100%); max-height: min(760px, calc(100vh - 36px)); overflow-y: auto;
+      background: #10171f; color: #fff; border: 1px solid #2a3947; border-radius: 18px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.5);
+    }
+    .settings-header {
+      position: sticky; top: 0; z-index: 2; display: flex; align-items: center;
+      justify-content: space-between; padding: 17px 18px; background: #10171f;
+      border-bottom: 1px solid #25323e; border-radius: 18px 18px 0 0;
+    }
+    .settings-title { font-size: 18px; font-weight: 800; }
+    .settings-close { width: 36px; height: 36px; border-radius: 10px; background:#1b2732; color:#fff; font-size:22px; }
+    .settings-content { padding: 14px; }
+    .settings-section { padding: 14px; margin-bottom: 10px; border: 1px solid #24323e; border-radius: 14px; background:#0d141b; }
+    .settings-section:last-child { margin-bottom: 0; }
+    .settings-section-title { font-size: 13px; font-weight: 800; color:#93c5fd; margin-bottom: 11px; text-transform: uppercase; letter-spacing:.04em; }
+    .setting-row { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:46px; }
+    .setting-row + .setting-row { border-top:1px solid #202c36; margin-top:8px; padding-top:8px; }
+    .setting-info { min-width:0; }
+    .setting-label { font-size:14px; font-weight:700; }
+    .setting-desc { margin-top:3px; font-size:12px; line-height:1.35; color:#8fa0b0; }
+    .setting-control { flex:0 0 auto; }
+    .settings-select { min-width:132px; padding:9px 10px; border-radius:9px; border:1px solid #314252; background:#17212b; color:#fff; outline:none; }
+    .settings-switch { position:relative; width:48px; height:27px; border-radius:999px; background:#33404c; transition:.2s; }
+    .settings-switch::after { content:""; position:absolute; width:21px; height:21px; left:3px; top:3px; border-radius:50%; background:#fff; transition:.2s; }
+    .settings-switch.active { background:#2563eb; }
+    .settings-switch.active::after { transform:translateX(21px); }
+    .settings-status { display:inline-flex; align-items:center; gap:7px; padding:7px 10px; border-radius:999px; background:#13251d; color:#86efac; font-size:12px; font-weight:700; }
+    .settings-status-dot { width:7px; height:7px; border-radius:50%; background:#22c55e; }
+    .settings-username { color:#dbeafe; font-weight:700; word-break:break-word; }
+    .settings-logout { padding:9px 12px; border-radius:9px; background:#2a1719; color:#fca5a5; border:1px solid #4a2529; font-weight:700; }
+    .settings-about { font-size:13px; color:#aebdca; line-height:1.55; }
+    .settings-version { display:inline-block; margin-top:8px; padding:5px 8px; border-radius:7px; background:#17212b; color:#93c5fd; font-weight:700; }
+
+    body.font-small .message { font-size: 13px; }
+    body.font-small textarea { font-size: 13px; }
+    body.font-large .message { font-size: 17px; line-height: 1.58; }
+    body.font-large textarea { font-size: 17px; }
+    body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after {
+      animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important; scroll-behavior: auto !important;
+    }
+
+    body.light-theme { background:#f3f6f9; color:#17202a; }
+    body.light-theme .app, body.light-theme .chat-column { background:#f3f6f9; }
+    body.light-theme .chat-top, body.light-theme .desktop-input-area, body.light-theme .mobile-input-area { background:#fff; border-color:#d9e1e8; }
+    body.light-theme .messages { background:#f3f6f9; }
+    body.light-theme .input-box { background:#fff; border-color:#cbd5df; }
+    body.light-theme textarea { color:#17202a; }
+    body.light-theme .message.assistant { background:#fff; color:#17202a; border-color:#d9e1e8; }
+    body.light-theme .message.user { color:#fff; }
+    body.light-theme .side-panel, body.light-theme .mobile-history-panel { background:#fff; border-color:#d9e1e8; color:#17202a; }
+    body.light-theme .side-header, body.light-theme .mobile-history-header { background:#f8fafc; border-color:#d9e1e8; }
+    body.light-theme .history-open, body.light-theme .history-delete, body.light-theme .history-rename { color:#17202a; }
+    body.light-theme .history-item { border-color:#e2e8f0; }
+    body.light-theme .account-name, body.light-theme .new-chat-btn, body.light-theme .mobile-history-btn, body.light-theme .settings-btn,
+    body.light-theme .voice-btn, body.light-theme .action-btn:not(.send-btn) { background:#eef2f6; color:#17202a; border-color:#d3dce5; }
+    body.light-theme .settings-panel, body.light-theme .settings-header { background:#fff; color:#17202a; border-color:#d9e1e8; }
+    body.light-theme .settings-section { background:#f8fafc; border-color:#dce4eb; }
+    body.light-theme .setting-row + .setting-row { border-color:#e2e8f0; }
+    body.light-theme .setting-desc, body.light-theme .settings-about { color:#5f6f7e; }
+    body.light-theme .settings-select { background:#fff; color:#17202a; border-color:#cbd5df; }
+    body.light-theme .settings-close { background:#eef2f6; color:#17202a; }
+    body.light-theme .selected-file { background:#fff; color:#334155; border-color:#d9e1e8; }
+    body.light-theme .sync-status { background:rgba(255,255,255,.97); color:#1e3a5f; border-color:#cbd5df; }
+
+    @media (max-width:800px) {
+      .settings-btn { width:36px; height:36px; font-size:17px; }
+      .settings-overlay { padding:0; align-items:flex-end; }
+      .settings-panel { width:100%; max-height:92vh; border-radius:18px 18px 0 0; border-bottom:0; }
+      .settings-header { border-radius:18px 18px 0 0; }
+      .settings-content { padding:10px; }
+      .settings-section { padding:12px; }
+      .setting-row { gap:10px; }
+      .settings-select { min-width:112px; max-width:125px; }
+    }
+
   </style>
 
 </head>
@@ -1288,6 +1381,16 @@
           </button>
 
         </div>
+
+
+        <button
+          id="settingsButton"
+          class="settings-btn"
+          aria-label="Ayarları aç"
+          title="Ayarlar"
+        >
+          ⚙️
+        </button>
 
 
         <button
@@ -1507,6 +1610,58 @@
 </div>
 
 
+<div id="settingsOverlay" class="settings-overlay" aria-hidden="true">
+  <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="settings-header">
+      <div id="settingsTitle" class="settings-title">⚙️ Ayarlar</div>
+      <button id="settingsCloseButton" class="settings-close" aria-label="Ayarları kapat">×</button>
+    </div>
+    <div class="settings-content">
+      <div class="settings-section">
+        <div class="settings-section-title">Ses</div>
+        <div class="setting-row">
+          <div class="setting-info"><div class="setting-label">Sesli Yanıt</div><div class="setting-desc">Bu oturumda Zatoi cevaplarını sesli okusun. Uygulama yeniden açıldığında otomatik kapanır.</div></div>
+          <button id="settingsVoiceToggle" class="settings-switch setting-control" role="switch" aria-checked="false" aria-label="Sesli yanıt"></button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Görünüm</div>
+        <div class="setting-row">
+          <div class="setting-info"><div class="setting-label">Tema</div><div class="setting-desc">Zatoi'nin görünümünü seç.</div></div>
+          <select id="themeSetting" class="settings-select setting-control" aria-label="Tema"><option value="dark">Koyu</option><option value="light">Açık</option><option value="system">Sistem</option></select>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info"><div class="setting-label">Yazı Boyutu</div><div class="setting-desc">Sohbet metinlerinin boyutunu ayarla.</div></div>
+          <select id="fontSizeSetting" class="settings-select setting-control" aria-label="Yazı boyutu"><option value="small">Küçük</option><option value="normal">Normal</option><option value="large">Büyük</option></select>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info"><div class="setting-label">Animasyonlar</div><div class="setting-desc">Arayüz hareketlerini ve geçişlerini kullan.</div></div>
+          <button id="animationsSetting" class="settings-switch active setting-control" role="switch" aria-checked="true" aria-label="Animasyonlar"></button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Bulut</div>
+        <div class="setting-row">
+          <div class="setting-info"><div class="setting-label">Sohbet Senkronizasyonu</div><div class="setting-desc">Sohbetlerin hesabınla cihazlar arasında otomatik eşitlenir.</div></div>
+          <div class="settings-status"><span class="settings-status-dot"></span><span>Aktif</span></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Hesap</div>
+        <div class="setting-row">
+          <div class="setting-info"><div class="setting-label">Kullanıcı</div><div id="settingsUsername" class="setting-desc settings-username">—</div></div>
+          <button id="settingsLogoutButton" class="settings-logout">Çıkış Yap</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Zatoi Hakkında</div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.6 • Ayarlar</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
 <input
   id="pdfInput"
   class="file-input"
@@ -1570,6 +1725,10 @@ const ACTIVE_CHAT_KEY =
 
 const GLOBAL_MEMORY_KEY =
   "zatoi_global_memory_v6";
+
+const THEME_SETTING_KEY = "zatoi_theme_v1";
+const FONT_SIZE_SETTING_KEY = "zatoi_font_size_v1";
+const ANIMATIONS_SETTING_KEY = "zatoi_animations_v1";
 
 
 
@@ -5380,6 +5539,7 @@ function toggleVoice() {
   // Bilerek localStorage'a kaydetmiyoruz.
   // Uygulama yeniden açıldığında sesli cevap tekrar kapalı gelir.
   updateVoiceButton();
+  if (typeof updateSettingsVoice === "function") updateSettingsVoice();
 
 }
 
@@ -5467,6 +5627,86 @@ document
 
     };
 
+
+/* ==========================================
+   V10.6 AYARLAR
+========================================== */
+const settingsOverlay = document.getElementById("settingsOverlay");
+const settingsButton = document.getElementById("settingsButton");
+const settingsCloseButton = document.getElementById("settingsCloseButton");
+const settingsVoiceToggle = document.getElementById("settingsVoiceToggle");
+const themeSetting = document.getElementById("themeSetting");
+const fontSizeSetting = document.getElementById("fontSizeSetting");
+const animationsSetting = document.getElementById("animationsSetting");
+const settingsUsername = document.getElementById("settingsUsername");
+const settingsLogoutButton = document.getElementById("settingsLogoutButton");
+
+let selectedTheme = localStorage.getItem(THEME_SETTING_KEY) || "dark";
+let selectedFontSize = localStorage.getItem(FONT_SIZE_SETTING_KEY) || "normal";
+let animationsEnabled = localStorage.getItem(ANIMATIONS_SETTING_KEY) !== "false";
+
+function applyTheme() {
+  const systemLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+  const useLight = selectedTheme === "light" || (selectedTheme === "system" && systemLight);
+  document.body.classList.toggle("light-theme", useLight);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", useLight ? "#ffffff" : "#111827");
+}
+
+function applyFontSize() {
+  document.body.classList.remove("font-small", "font-large");
+  if (selectedFontSize === "small") document.body.classList.add("font-small");
+  if (selectedFontSize === "large") document.body.classList.add("font-large");
+}
+
+function applyAnimations() {
+  document.body.classList.toggle("reduce-motion", !animationsEnabled);
+  animationsSetting?.classList.toggle("active", animationsEnabled);
+  animationsSetting?.setAttribute("aria-checked", String(animationsEnabled));
+}
+
+function updateSettingsVoice() {
+  settingsVoiceToggle?.classList.toggle("active", voiceOutputEnabled);
+  settingsVoiceToggle?.setAttribute("aria-checked", String(voiceOutputEnabled));
+}
+
+function openSettings() {
+  settingsUsername.textContent = currentUser?.username || "—";
+  themeSetting.value = selectedTheme;
+  fontSizeSetting.value = selectedFontSize;
+  applyAnimations();
+  updateSettingsVoice();
+  settingsOverlay.classList.add("show");
+  settingsOverlay.setAttribute("aria-hidden", "false");
+  settingsCloseButton.focus();
+}
+
+function closeSettings() {
+  settingsOverlay.classList.remove("show");
+  settingsOverlay.setAttribute("aria-hidden", "true");
+  settingsButton?.focus();
+}
+
+settingsButton.onclick = openSettings;
+settingsCloseButton.onclick = closeSettings;
+settingsOverlay.addEventListener("click", event => { if (event.target === settingsOverlay) closeSettings(); });
+document.addEventListener("keydown", event => { if (event.key === "Escape" && settingsOverlay.classList.contains("show")) closeSettings(); });
+
+settingsVoiceToggle.onclick = () => { toggleVoice(); updateSettingsVoice(); };
+themeSetting.onchange = () => { selectedTheme = themeSetting.value; localStorage.setItem(THEME_SETTING_KEY, selectedTheme); applyTheme(); };
+fontSizeSetting.onchange = () => { selectedFontSize = fontSizeSetting.value; localStorage.setItem(FONT_SIZE_SETTING_KEY, selectedFontSize); applyFontSize(); };
+animationsSetting.onclick = () => { animationsEnabled = !animationsEnabled; localStorage.setItem(ANIMATIONS_SETTING_KEY, String(animationsEnabled)); applyAnimations(); };
+settingsLogoutButton.onclick = async () => { closeSettings(); await logoutAccount(); };
+
+if (window.matchMedia) {
+  const systemThemeMedia = window.matchMedia("(prefers-color-scheme: light)");
+  const onSystemThemeChange = () => { if (selectedTheme === "system") applyTheme(); };
+  if (systemThemeMedia.addEventListener) systemThemeMedia.addEventListener("change", onSystemThemeChange);
+  else if (systemThemeMedia.addListener) systemThemeMedia.addListener(onSystemThemeChange);
+}
+
+applyTheme();
+applyFontSize();
+applyAnimations();
 
 /* ==========================================
    RESIZE
