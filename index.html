@@ -1236,6 +1236,91 @@
       .settings-select { min-width:112px; max-width:125px; }
     }
 
+
+
+    /* =================================
+       V10.8 GÖRSEL ÖNİZLEME
+    ================================= */
+    .selected-image-preview {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      object-fit: cover;
+      border-radius: 9px;
+      border: 1px solid #314151;
+      background: #0b1118;
+      cursor: zoom-in;
+    }
+
+    .message-image-preview {
+      display: block;
+      width: min(280px, 100%);
+      max-height: 220px;
+      object-fit: cover;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      cursor: zoom-in;
+      background: rgba(0,0,0,.15);
+    }
+
+    .image-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(0,0,0,.9);
+    }
+
+    .image-viewer.show { display: flex; }
+
+    .image-viewer img {
+      max-width: min(1100px, 96vw);
+      max-height: 88vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+    }
+
+    .image-viewer-close {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(28,36,44,.92);
+      color: #fff;
+      border: 1px solid #3a4651;
+      font-size: 25px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    body.light-theme .selected-image-preview {
+      border-color: #cbd5df;
+      background: #f8fafc;
+    }
+
+    body.light-theme .message-image-preview {
+      border-color: rgba(15,23,42,.18);
+    }
+
+    @media (max-width: 800px) {
+      .selected-image-preview {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+      }
+
+      .image-viewer { padding: 10px; }
+      .image-viewer img { max-width: 98vw; max-height: 84vh; }
+    }
+
   </style>
 
 </head>
@@ -1457,8 +1542,8 @@
         <button
           id="desktopPdfButton"
           class="voice-btn pdf-btn"
-          aria-label="PDF veya görsel yükle"
-          title="PDF veya görsel yükle"
+          aria-label="PDF, kamera veya galeriden görsel ekle"
+          title="PDF veya görsel ekle"
         >
           📎
         </button>
@@ -1659,7 +1744,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.7 • Görsel Anlama</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.8 • Görsel Önizleme</span></div>
       </div>
     </div>
   </section>
@@ -1707,6 +1792,23 @@
 
 </div>
 
+
+
+
+<div
+  id="imageViewer"
+  class="image-viewer"
+  aria-hidden="true"
+  role="dialog"
+  aria-label="Görsel önizleme"
+>
+  <button
+    id="imageViewerClose"
+    class="image-viewer-close"
+    aria-label="Görseli kapat"
+  >×</button>
+  <img id="imageViewerImage" alt="Büyütülmüş görsel">
+</div>
 
 <script>
 
@@ -3740,6 +3842,17 @@ function renderMessages() {
         message.content;
 
 
+      if (message.imagePreview) {
+        const messageImage = document.createElement("img");
+        messageImage.className = "message-image-preview";
+        messageImage.src = message.imagePreview;
+        messageImage.alt = message.imageName || "Gönderilen görsel";
+        messageImage.title = "Büyütmek için dokun";
+        messageImage.onclick = () =>
+          openImageViewer(message.imagePreview, message.imageName || "Görsel");
+        bubble.appendChild(messageImage);
+      }
+
       if (message.imageName) {
         const imageBadge = document.createElement("div");
         imageBadge.style.marginBottom = "7px";
@@ -4187,7 +4300,83 @@ function renderHistoryList(
 
 
 /* ==========================================
-   PDF
+   V10.8 GÖRSEL ÖNİZLEME
+========================================== */
+
+function openImageViewer(src, altText = "Görsel") {
+  if (!src) return;
+
+  const viewer = document.getElementById("imageViewer");
+  const viewerImage = document.getElementById("imageViewerImage");
+
+  viewerImage.src = src;
+  viewerImage.alt = altText;
+  viewer.classList.add("show");
+  viewer.setAttribute("aria-hidden", "false");
+}
+
+function closeImageViewer() {
+  const viewer = document.getElementById("imageViewer");
+  const viewerImage = document.getElementById("imageViewerImage");
+
+  viewer.classList.remove("show");
+  viewer.setAttribute("aria-hidden", "true");
+  viewerImage.removeAttribute("src");
+}
+
+document.getElementById("imageViewerClose").onclick = closeImageViewer;
+
+document.getElementById("imageViewer").addEventListener("click", event => {
+  if (event.target.id === "imageViewer") {
+    closeImageViewer();
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    closeImageViewer();
+  }
+});
+
+function createImagePreview(dataUrl, maxSize = 360, quality = 0.72) {
+  return new Promise(resolve => {
+    const image = new Image();
+
+    image.onload = () => {
+      try {
+        const width = image.naturalWidth || image.width;
+        const height = image.naturalHeight || image.height;
+
+        if (!width || !height) {
+          resolve(dataUrl);
+          return;
+        }
+
+        const scale = Math.min(1, maxSize / Math.max(width, height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(width * scale));
+        canvas.height = Math.max(1, Math.round(height * scale));
+
+        const context = canvas.getContext("2d");
+        if (!context) {
+          resolve(dataUrl);
+          return;
+        }
+
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      } catch {
+        resolve(dataUrl);
+      }
+    };
+
+    image.onerror = () => resolve(dataUrl);
+    image.src = dataUrl;
+  });
+}
+
+/* ==========================================
+   PDF / GÖRSEL
 ========================================== */
 
 function updateFileUI() {
@@ -4201,7 +4390,16 @@ function updateFileUI() {
 
   const activeFile = selectedImage || selectedPdf;
 
+  const removePreview = box => {
+    const oldPreview = box.querySelector(".selected-image-preview");
+    if (oldPreview) oldPreview.remove();
+  };
+
   if (!activeFile) {
+    removePreview(desktopBox);
+    removePreview(mobileBox);
+    desktopIcon.style.display = "";
+    mobileIcon.style.display = "";
     desktopBox.classList.remove("show");
     mobileBox.classList.remove("show");
     return;
@@ -4215,6 +4413,30 @@ function updateFileUI() {
   mobileIcon.textContent = isImage ? "🖼️" : "📄";
   desktopName.textContent = activeFile.name;
   mobileName.textContent = activeFile.name;
+
+  [
+    [desktopBox, desktopIcon],
+    [mobileBox, mobileIcon]
+  ].forEach(([box, icon]) => {
+    removePreview(box);
+
+    if (!isImage) {
+      icon.style.display = "";
+      return;
+    }
+
+    icon.style.display = "none";
+
+    const preview = document.createElement("img");
+    preview.className = "selected-image-preview";
+    preview.src = selectedImage.preview || selectedImage.data;
+    preview.alt = activeFile.name || "Seçilen görsel";
+    preview.title = "Büyütmek için dokun";
+    preview.onclick = () =>
+      openImageViewer(selectedImage.data, activeFile.name || "Görsel");
+
+    box.insertBefore(preview, icon);
+  });
 }
 
 function clearSelectedFile() {
@@ -4368,12 +4590,14 @@ pdfInput.addEventListener(
 
       try {
         const dataUrl = await readImageAsDataURL(file);
+        const previewUrl = await createImagePreview(dataUrl);
         selectedPdf = null;
         documentData = null;
         selectedImage = {
           name: file.name || "gorsel",
           type: file.type || "image/jpeg",
-          data: dataUrl
+          data: dataUrl,
+          preview: previewUrl
         };
         updateFileUI();
         focusInput();
@@ -4595,6 +4819,9 @@ async function sendMessage() {
 
     imageName:
       imageForAI ? imageForAI.name : "",
+
+    imagePreview:
+      imageForAI ? (imageForAI.preview || "") : "",
 
     time:
       Date.now()
