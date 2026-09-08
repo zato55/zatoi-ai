@@ -1572,9 +1572,6 @@ const GLOBAL_MEMORY_KEY =
   "zatoi_global_memory_v6";
 
 
-const VOICE_OUTPUT_KEY =
-  "zatoi_voice_output_v1";
-
 
 const AUTH_TOKEN_KEY =
   "zatoi_auth_token_v1";
@@ -5161,28 +5158,10 @@ document
    SESLİ CEVAP
 ========================================== */
 
+// Sesli cevap her uygulama/sayfa açılışında kapalı başlar.
+// Kullanıcının seçimi yalnızca mevcut oturum boyunca geçerlidir.
 let voiceOutputEnabled =
-  true;
-
-
-try {
-
-  const saved =
-    localStorage.getItem(
-      VOICE_OUTPUT_KEY
-    );
-
-
-  if (
-    saved !== null
-  ) {
-
-    voiceOutputEnabled =
-      saved === "true";
-
-  }
-
-} catch (error) {}
+  false;
 
 
 function updateVoiceButton() {
@@ -5398,17 +5377,8 @@ function toggleVoice() {
   }
 
 
-  localStorage.setItem(
-
-    VOICE_OUTPUT_KEY,
-
-    String(
-      voiceOutputEnabled
-    )
-
-  );
-
-
+  // Bilerek localStorage'a kaydetmiyoruz.
+  // Uygulama yeniden açıldığında sesli cevap tekrar kapalı gelir.
   updateVoiceButton();
 
 }
