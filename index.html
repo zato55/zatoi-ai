@@ -734,7 +734,7 @@
     ================================= */
 
     .side-panel {
-      width: 280px;
+      width: 320px;
       height: 100%;
 
       flex-shrink: 0;
@@ -754,9 +754,13 @@
       display: flex;
       align-items: center;
 
-      padding: 0 16px;
+      padding: 0 18px;
 
       font-weight: 700;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       border-bottom:
         1px solid #1c2530;
@@ -767,17 +771,18 @@
 
       overflow-y: auto;
 
-      padding: 10px;
+      padding: 12px;
     }
 
     .history-item {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 38px;
 
       align-items: center;
 
-      gap: 7px;
+      gap: 8px;
 
-      margin-bottom: 7px;
+      margin-bottom: 8px;
     }
 
     .history-open {
@@ -794,7 +799,11 @@
 
       border-radius: 10px;
 
-      padding: 10px;
+      width: 100%;
+      min-height: 40px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.3;
 
       overflow: hidden;
 
@@ -809,14 +818,60 @@
     }
 
     .history-delete {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
 
       border-radius: 8px;
 
       background: #171d23;
 
       color: #ff8585;
+    }
+
+    .mobile-thinking-indicator {
+      display: none;
+    }
+
+    @media (max-width: 800px) {
+      .mobile-thinking-indicator {
+        position: fixed;
+        left: 12px;
+        bottom: calc(82px + env(safe-area-inset-bottom));
+        z-index: 45;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px 12px;
+        border: 1px solid #2b3b49;
+        border-radius: 12px;
+        background: rgba(16, 25, 34, .97);
+        color: #c8d4df;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, .28);
+        font-size: 13px;
+        pointer-events: none;
+      }
+
+      .mobile-thinking-dots {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .mobile-thinking-dots span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #9fb0c0;
+        animation: typing 1.2s infinite;
+      }
+
+      .mobile-thinking-dots span:nth-child(2) {
+        animation-delay: .15s;
+      }
+
+      .mobile-thinking-dots span:nth-child(3) {
+        animation-delay: .3s;
+      }
     }
 
     /* =================================
@@ -3469,6 +3524,60 @@ function showTyping() {
   hideTyping();
 
 
+  if (isMobile()) {
+
+    const mobileIndicator =
+      document.createElement(
+        "div"
+      );
+
+
+    mobileIndicator.id =
+      "mobileThinkingIndicator";
+
+
+    mobileIndicator.className =
+      "mobile-thinking-indicator";
+
+
+    mobileIndicator.setAttribute(
+      "role",
+      "status"
+    );
+
+
+    mobileIndicator.setAttribute(
+      "aria-live",
+      "polite"
+    );
+
+
+    mobileIndicator.setAttribute(
+      "aria-label",
+      "Zatoi düşünüyor"
+    );
+
+
+    mobileIndicator.innerHTML = `
+      <span>Zatoi düşünüyor</span>
+      <span class="mobile-thinking-dots" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    `;
+
+
+    document.body.appendChild(
+      mobileIndicator
+    );
+
+
+    return;
+
+  }
+
+
   const row =
     document.createElement(
       "div"
@@ -3488,10 +3597,12 @@ function showTyping() {
     "status"
   );
 
+
   row.setAttribute(
     "aria-live",
     "polite"
   );
+
 
   row.setAttribute(
     "aria-label",
@@ -3500,62 +3611,43 @@ function showTyping() {
 
 
   row.innerHTML = `
-
     <div class="typing" aria-hidden="true">
-
       <span></span>
       <span></span>
       <span></span>
-
     </div>
-
-    <div class="mobile-thinking-text">
-      Düşünüyor...
-    </div>
-
   `;
 
 
-  if (isMobile()) {
-
-    row.classList.add(
-      "mobile-thinking-row"
-    );
-
-    messagesElement.appendChild(
-      row
-    );
-
-    setTimeout(
-      () => {
-        messagesElement.scrollTop =
-          messagesElement.scrollHeight;
-      },
-      20
-    );
-
-  } else {
-
-    messagesElement.insertBefore(
-      row,
-      messagesElement.firstChild
-    );
-
-  }
+  messagesElement.insertBefore(
+    row,
+    messagesElement.firstChild
+  );
 
 }
 
 
 function hideTyping() {
 
-  const element =
+  const desktopElement =
     document.getElementById(
       "typingRow"
     );
 
 
-  if (element) {
-    element.remove();
+  if (desktopElement) {
+    desktopElement.remove();
+  }
+
+
+  const mobileElement =
+    document.getElementById(
+      "mobileThinkingIndicator"
+    );
+
+
+  if (mobileElement) {
+    mobileElement.remove();
   }
 
 }
