@@ -9,7 +9,36 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Zatoi AI</title>
+  <title>Zatoi AI | Yapay Zeka Asistanı</title>
+
+  <meta
+    name="description"
+    content="Zatoi AI; sohbet, web araştırması, PDF analizi ve kişisel hafıza özelliklerine sahip yapay zeka asistanıdır."
+  >
+  <meta name="robots" content="index,follow">
+
+  <link rel="canonical" href="https://zato55.github.io/zatoi-ai/">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Zatoi AI">
+  <meta property="og:title" content="Zatoi AI | Yapay Zeka Asistanı">
+  <meta
+    property="og:description"
+    content="Sohbet et, güncel web bilgilerini araştır, PDF'leri analiz et ve Zatoi'nin seni hatırlamasına izin ver."
+  >
+  <meta property="og:url" content="https://zato55.github.io/zatoi-ai/">
+  <meta property="og:image" content="https://zato55.github.io/zatoi-ai/icon-512.png">
+  <meta property="og:locale" content="tr_TR">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Zatoi AI | Yapay Zeka Asistanı">
+  <meta
+    name="twitter:description"
+    content="Sohbet, web araştırması, PDF analizi ve kişisel hafıza özellikleriyle Zatoi AI."
+  >
+  <meta name="twitter:image" content="https://zato55.github.io/zatoi-ai/icon-512.png">
 
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#111827">
@@ -45,6 +74,75 @@
     button {
       border: none;
       cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible {
+      outline: 2px solid #60a5fa;
+      outline-offset: 2px;
+    }
+
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    .sync-status {
+      position: fixed;
+      left: 50%;
+      top: 18px;
+      z-index: 2000;
+      transform: translate(-50%, -12px);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: calc(100vw - 28px);
+      padding: 10px 14px;
+      border: 1px solid #2d4154;
+      border-radius: 999px;
+      background: rgba(16, 25, 34, .96);
+      box-shadow: 0 12px 35px rgba(0,0,0,.35);
+      color: #dbeafe;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .sync-status.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .sync-spinner {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
+      border: 2px solid #314356;
+      border-top-color: #60a5fa;
+      border-radius: 50%;
+      animation: syncSpin .8s linear infinite;
+    }
+
+    @keyframes syncSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .history-empty {
+      padding: 18px 12px;
+      color: #7f91a3;
+      font-size: 13px;
+      line-height: 1.55;
+      text-align: center;
     }
 
     /* =================================
@@ -999,7 +1097,7 @@
 
   <div class="auth-card">
 
-    <div class="auth-logo">
+    <div class="auth-logo" aria-hidden="true">
       🤖
     </div>
 
@@ -1011,7 +1109,7 @@
       id="authSubtitle"
       class="auth-subtitle"
     >
-      Hesabına giriş yap
+      Kullanıcı adın ve şifrenle hesabına giriş yap
     </p>
 
     <div
@@ -1019,8 +1117,11 @@
       class="auth-error"
     ></div>
 
+    <label for="authUsername" class="sr-only">Kullanıcı adı</label>
+
     <input
       id="authUsername"
+      aria-describedby="authHelp"
       class="auth-input"
       type="text"
       autocomplete="username"
@@ -1028,14 +1129,19 @@
       maxlength="40"
     >
 
+    <label for="authPassword" class="sr-only">Şifre</label>
+
     <input
       id="authPassword"
+      aria-describedby="authHelp"
       class="auth-input"
       type="password"
       autocomplete="current-password"
       placeholder="Şifre"
       maxlength="128"
     >
+
+    <label for="authPasswordConfirm" class="sr-only">Şifre tekrar</label>
 
     <input
       id="authPasswordConfirm"
@@ -1061,14 +1167,25 @@
       Hesabın yok mu? Hesap oluştur
     </button>
 
-    <div class="auth-info">
-      E-posta veya başka kişisel bilgi gerekmiyor.
+    <div id="authHelp" class="auth-info">
+      Hesabın yoksa ücretsiz oluşturabilirsin. E-posta gerekmez; yalnızca bir kullanıcı adı ve en az 8 karakterlik şifre yeterlidir.
     </div>
 
   </div>
 
 </div>
 
+
+<div
+  id="syncStatus"
+  class="sync-status"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+>
+  <span class="sync-spinner" aria-hidden="true"></span>
+  <span id="syncStatusText">Sohbetler yükleniyor...</span>
+</div>
 
 <!-- ==========================================
      ANA UYGULAMA
@@ -1105,6 +1222,7 @@
           <button
             id="logoutButton"
             class="logout-btn"
+            aria-label="Hesaptan çıkış yap"
           >
             Çıkış
           </button>
@@ -1115,6 +1233,7 @@
         <button
           id="mobileHistoryButton"
           class="mobile-history-btn"
+          aria-label="Sohbet geçmişini aç"
         >
           📚 Geçmiş
         </button>
@@ -1123,6 +1242,7 @@
         <button
           id="newChatButton"
           class="new-chat-btn"
+          aria-label="Yeni sohbet başlat"
         >
           ➕ Yeni Sohbet
         </button>
@@ -1150,6 +1270,7 @@
         <button
           id="desktopRemoveFile"
           class="remove-file-btn"
+          aria-label="PDF dosyasını kaldır"
         >
           ×
         </button>
@@ -1169,6 +1290,7 @@
         <button
           id="desktopPdfButton"
           class="voice-btn pdf-btn"
+          aria-label="PDF yükle"
           title="PDF yükle"
         >
           📎
@@ -1178,6 +1300,7 @@
         <button
           id="micButton"
           class="voice-btn"
+          aria-label="Sesli mesaj başlat"
         >
           🎤
         </button>
@@ -1186,6 +1309,7 @@
         <button
           id="voiceToggle"
           class="voice-btn"
+          aria-label="Sesli cevapları aç veya kapat"
         >
           🔊
         </button>
@@ -1194,6 +1318,7 @@
         <button
           id="sendButton"
           class="action-btn send-btn"
+          aria-label="Mesajı gönder"
         >
           Gönder
         </button>
@@ -1206,6 +1331,10 @@
     <div
       id="messages"
       class="messages"
+      role="log"
+      aria-live="polite"
+      aria-relevant="additions text"
+      aria-label="Sohbet mesajları"
     ></div>
 
 
@@ -1227,6 +1356,7 @@
         <button
           id="mobileRemoveFile"
           class="remove-file-btn"
+          aria-label="PDF dosyasını kaldır"
         >
           ×
         </button>
@@ -1246,6 +1376,7 @@
         <button
           id="mobilePdfButton"
           class="voice-btn pdf-btn"
+          aria-label="PDF yükle"
         >
           📎
         </button>
@@ -1254,6 +1385,7 @@
         <button
           id="mobileMicButton"
           class="voice-btn"
+          aria-label="Sesli mesaj başlat"
         >
           🎤
         </button>
@@ -1262,6 +1394,7 @@
         <button
           id="mobileVoiceToggle"
           class="voice-btn"
+          aria-label="Sesli cevapları aç veya kapat"
         >
           🔊
         </button>
@@ -1270,6 +1403,7 @@
         <button
           id="mobileSendButton"
           class="action-btn send-btn"
+          aria-label="Mesajı gönder"
         >
           ➤
         </button>
@@ -1321,6 +1455,7 @@
       <button
         id="closeHistoryButton"
         class="close-history"
+        aria-label="Sohbet geçmişini kapat"
       >
         ×
       </button>
@@ -1465,6 +1600,16 @@ const accountUsername =
     "accountUsername"
   );
 
+const syncStatus =
+  document.getElementById(
+    "syncStatus"
+  );
+
+const syncStatusText =
+  document.getElementById(
+    "syncStatusText"
+  );
+
 
 const messagesElement =
   document.getElementById(
@@ -1564,7 +1709,7 @@ function updateAuthMode() {
   if (authMode === "login") {
 
     authSubtitle.textContent =
-      "Hesabına giriş yap";
+      "Kullanıcı adın ve şifrenle hesabına giriş yap";
 
     authPassword.autocomplete =
       "current-password";
@@ -1581,7 +1726,7 @@ function updateAuthMode() {
   } else {
 
     authSubtitle.textContent =
-      "Yeni Zatoi hesabını oluştur";
+      "Kullanıcı adını ve en az 8 karakterlik şifreni belirle";
 
     authPassword.autocomplete =
       "new-password";
@@ -1793,6 +1938,35 @@ function saveAuth(
       "";
 
   }
+
+}
+
+
+function showSyncStatus(message = "Sohbetler yükleniyor...") {
+
+  if (!syncStatus || !syncStatusText) {
+    return;
+  }
+
+  syncStatusText.textContent =
+    message;
+
+  syncStatus.classList.add(
+    "show"
+  );
+
+}
+
+
+function hideSyncStatus() {
+
+  if (!syncStatus) {
+    return;
+  }
+
+  syncStatus.classList.remove(
+    "show"
+  );
 
 }
 
@@ -2701,6 +2875,10 @@ async function syncChatsWithCloud() {
     return;
   }
 
+  showSyncStatus(
+    "Sohbetler yükleniyor..."
+  );
+
   try {
 
     const data = await cloudChatRequest("list");
@@ -2794,6 +2972,11 @@ async function syncChatsWithCloud() {
     console.log("Cloud sync error:", error);
 
     // Bulut erişilemezse yerel sohbetler çalışmaya devam eder.
+
+  } finally {
+
+    hideSyncStatus();
+
   }
 }
 
@@ -3300,9 +3483,25 @@ function showTyping() {
     "typing-row";
 
 
+  row.setAttribute(
+    "role",
+    "status"
+  );
+
+  row.setAttribute(
+    "aria-live",
+    "polite"
+  );
+
+  row.setAttribute(
+    "aria-label",
+    "Zatoi düşünüyor"
+  );
+
+
   row.innerHTML = `
 
-    <div class="typing">
+    <div class="typing" aria-hidden="true">
 
       <span></span>
       <span></span>
@@ -3437,7 +3636,38 @@ function renderHistoryList(
     "";
 
 
-  chats.forEach(
+  const visibleChats =
+    chats.filter(
+      chat =>
+        !isEmptyPlaceholderChat(
+          chat
+        )
+    );
+
+
+  if (!visibleChats.length) {
+
+    const empty =
+      document.createElement(
+        "div"
+      );
+
+    empty.className =
+      "history-empty";
+
+    empty.textContent =
+      "Henüz sohbet geçmişin yok. İlk mesajını gönderdiğinde sohbetin burada görünecek.";
+
+    element.appendChild(
+      empty
+    );
+
+    return;
+
+  }
+
+
+  visibleChats.forEach(
     chat => {
 
       const item =
@@ -3477,6 +3707,12 @@ function renderHistoryList(
         "Yeni Sohbet";
 
 
+      open.setAttribute(
+        "aria-label",
+        `Sohbeti aç: ${chat.title || "Yeni Sohbet"}`
+      );
+
+
       open.onclick =
         () =>
           selectChat(
@@ -3496,6 +3732,12 @@ function renderHistoryList(
 
       del.textContent =
         "🗑️";
+
+
+      del.setAttribute(
+        "aria-label",
+        `Sohbeti sil: ${chat.title || "Yeni Sohbet"}`
+      );
 
 
       del.onclick =
@@ -4588,6 +4830,11 @@ function updateMic() {
         button.textContent =
           "⏹️";
 
+        button.setAttribute(
+          "aria-label",
+          "Sesli mesajı durdur"
+        );
+
         button.classList.add(
           "active"
         );
@@ -4596,6 +4843,11 @@ function updateMic() {
 
         button.textContent =
           "🎤";
+
+        button.setAttribute(
+          "aria-label",
+          "Sesli mesaj başlat"
+        );
 
         button.classList.remove(
           "active"
@@ -4697,20 +4949,46 @@ function updateVoiceButton() {
       : "🔇";
 
 
-  document
-    .getElementById(
+  const desktopVoiceButton =
+    document.getElementById(
       "voiceToggle"
-    )
-    .textContent =
-      icon;
+    );
+
+  desktopVoiceButton.textContent =
+    icon;
+
+  desktopVoiceButton.setAttribute(
+    "aria-pressed",
+    String(voiceOutputEnabled)
+  );
+
+  desktopVoiceButton.setAttribute(
+    "aria-label",
+    voiceOutputEnabled
+      ? "Sesli cevapları kapat"
+      : "Sesli cevapları aç"
+  );
 
 
-  document
-    .getElementById(
+  const mobileVoiceButton =
+    document.getElementById(
       "mobileVoiceToggle"
-    )
-    .textContent =
-      icon;
+    );
+
+  mobileVoiceButton.textContent =
+    icon;
+
+  mobileVoiceButton.setAttribute(
+    "aria-pressed",
+    String(voiceOutputEnabled)
+  );
+
+  mobileVoiceButton.setAttribute(
+    "aria-label",
+    voiceOutputEnabled
+      ? "Sesli cevapları kapat"
+      : "Sesli cevapları aç"
+  );
 
 }
 
