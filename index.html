@@ -1427,7 +1427,7 @@
         class="selected-file"
       >
 
-        <span>📄</span>
+        <span id="desktopSelectedFileIcon">📄</span>
 
         <span
           id="desktopSelectedFileName"
@@ -1437,7 +1437,7 @@
         <button
           id="desktopRemoveFile"
           class="remove-file-btn"
-          aria-label="PDF dosyasını kaldır"
+          aria-label="Ekli dosyayı kaldır"
         >
           ×
         </button>
@@ -1457,8 +1457,8 @@
         <button
           id="desktopPdfButton"
           class="voice-btn pdf-btn"
-          aria-label="PDF yükle"
-          title="PDF yükle"
+          aria-label="PDF veya görsel yükle"
+          title="PDF veya görsel yükle"
         >
           📎
         </button>
@@ -1513,7 +1513,7 @@
         class="selected-file"
       >
 
-        <span>📄</span>
+        <span id="mobileSelectedFileIcon">📄</span>
 
         <span
           id="mobileSelectedFileName"
@@ -1523,7 +1523,7 @@
         <button
           id="mobileRemoveFile"
           class="remove-file-btn"
-          aria-label="PDF dosyasını kaldır"
+          aria-label="Ekli dosyayı kaldır"
         >
           ×
         </button>
@@ -1559,7 +1559,7 @@
         <button
           id="mobilePdfButton"
           class="voice-btn pdf-btn"
-          aria-label="PDF yükle"
+          aria-label="PDF veya görsel yükle"
         >
           📎
         </button>
@@ -1659,7 +1659,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.6 • Ayarlar</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.7 • Görsel Anlama</span></div>
       </div>
     </div>
   </section>
@@ -1670,7 +1670,7 @@
   id="pdfInput"
   class="file-input"
   type="file"
-  accept="application/pdf,.pdf"
+  accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
 >
 
 
@@ -1894,6 +1894,8 @@ let chats = [];
 let activeChatId = null;
 
 let selectedPdf = null;
+
+let selectedImage = null;
 
 let documentData = null;
 
@@ -3738,6 +3740,15 @@ function renderMessages() {
         message.content;
 
 
+      if (message.imageName) {
+        const imageBadge = document.createElement("div");
+        imageBadge.style.marginBottom = "7px";
+        imageBadge.style.fontSize = "12px";
+        imageBadge.style.opacity = "0.8";
+        imageBadge.textContent = "🖼️ " + message.imageName;
+        bubble.appendChild(imageBadge);
+      }
+
       bubble.appendChild(
         content
       );
@@ -4181,79 +4192,53 @@ function renderHistoryList(
 
 function updateFileUI() {
 
-  const desktopBox =
-    document.getElementById(
-      "desktopSelectedFile"
-    );
+  const desktopBox = document.getElementById("desktopSelectedFile");
+  const mobileBox = document.getElementById("mobileSelectedFile");
+  const desktopName = document.getElementById("desktopSelectedFileName");
+  const mobileName = document.getElementById("mobileSelectedFileName");
+  const desktopIcon = document.getElementById("desktopSelectedFileIcon");
+  const mobileIcon = document.getElementById("mobileSelectedFileIcon");
 
+  const activeFile = selectedImage || selectedPdf;
 
-  const mobileBox =
-    document.getElementById(
-      "mobileSelectedFile"
-    );
-
-
-  const desktopName =
-    document.getElementById(
-      "desktopSelectedFileName"
-    );
-
-
-  const mobileName =
-    document.getElementById(
-      "mobileSelectedFileName"
-    );
-
-
-  if (!selectedPdf) {
-
-    desktopBox.classList.remove(
-      "show"
-    );
-
-    mobileBox.classList.remove(
-      "show"
-    );
-
+  if (!activeFile) {
+    desktopBox.classList.remove("show");
+    mobileBox.classList.remove("show");
     return;
-
   }
 
+  desktopBox.classList.add("show");
+  mobileBox.classList.add("show");
 
-  desktopBox.classList.add(
-    "show"
-  );
-
-
-  mobileBox.classList.add(
-    "show"
-  );
-
-
-  desktopName.textContent =
-    selectedPdf.name;
-
-
-  mobileName.textContent =
-    selectedPdf.name;
-
+  const isImage = !!selectedImage;
+  desktopIcon.textContent = isImage ? "🖼️" : "📄";
+  mobileIcon.textContent = isImage ? "🖼️" : "📄";
+  desktopName.textContent = activeFile.name;
+  mobileName.textContent = activeFile.name;
 }
-
 
 function clearSelectedFile() {
-
   selectedPdf = null;
-
+  selectedImage = null;
   documentData = null;
-
-  pdfInput.value =
-    "";
-
-
+  pdfInput.value = "";
   updateFileUI();
-
 }
 
+function clearSelectedImage() {
+  selectedImage = null;
+  pdfInput.value = "";
+  updateFileUI();
+}
+
+function readImageAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Görsel okunamadı."));
+    reader.readAsDataURL(file);
+  });
+}
 
 async function uploadPdf(file) {
 
@@ -4361,148 +4346,81 @@ async function uploadPdf(file) {
 pdfInput.addEventListener(
   "change",
   async event => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    const file =
-      event.target.files[0];
+    const lowerName = String(file.name || "").toLowerCase();
+    const isPdf = file.type === "application/pdf" || lowerName.endsWith(".pdf");
+    const isImage = ["image/jpeg", "image/png", "image/webp"].includes(file.type) || /\.(jpe?g|png|webp)$/.test(lowerName);
 
-
-    if (!file) {
-      return;
-    }
-
-
-    if (
-      file.size >
-      25 * 1024 * 1024
-    ) {
-
-      alert(
-        "PDF 25 MB'dan büyük olamaz."
-      );
-
+    if (!isPdf && !isImage) {
+      alert("Yalnızca PDF, JPG, PNG veya WebP yükleyebilirsin.");
       clearSelectedFile();
-
       return;
-
     }
 
+    if (isImage) {
+      if (file.size > 4 * 1024 * 1024) {
+        alert("Görsel 4 MB'dan büyük olamaz.");
+        clearSelectedFile();
+        return;
+      }
 
-    selectedPdf =
-      file;
+      try {
+        const dataUrl = await readImageAsDataURL(file);
+        selectedPdf = null;
+        documentData = null;
+        selectedImage = {
+          name: file.name || "gorsel",
+          type: file.type || "image/jpeg",
+          data: dataUrl
+        };
+        updateFileUI();
+        focusInput();
+      } catch (error) {
+        alert(error.message || "Görsel okunamadı.");
+        clearSelectedFile();
+      }
+      return;
+    }
 
+    if (file.size > 25 * 1024 * 1024) {
+      alert("PDF 25 MB'dan büyük olamaz.");
+      clearSelectedFile();
+      return;
+    }
 
+    selectedImage = null;
+    selectedPdf = file;
     updateFileUI();
 
-
-    const desktopName =
-      document.getElementById(
-        "desktopSelectedFileName"
-      );
-
-
-    const mobileName =
-      document.getElementById(
-        "mobileSelectedFileName"
-      );
-
-
-    desktopName.textContent =
-      "PDF okunuyor...";
-
-
-    mobileName.textContent =
-      "PDF okunuyor...";
-
+    const desktopName = document.getElementById("desktopSelectedFileName");
+    const mobileName = document.getElementById("mobileSelectedFileName");
+    desktopName.textContent = "PDF okunuyor...";
+    mobileName.textContent = "PDF okunuyor...";
 
     try {
-
-      const result =
-        await uploadPdf(
-          file
-        );
-
-
-      documentData =
-        result;
-
-
-      const chat =
-        getActiveChat();
-
-
+      const result = await uploadPdf(file);
+      documentData = result;
+      const chat = getActiveChat();
       if (chat) {
-
-        chat.document = {
-
-          name:
-            result.name,
-
-          text:
-            result.text.slice(
-              0,
-              500000
-            )
-
-        };
-
-
-        chat.updatedAt =
-          Date.now();
-
-
+        chat.document = { name: result.name, text: result.text.slice(0, 500000) };
+        chat.updatedAt = Date.now();
         saveChats();
-
         queueCloudSave(chat);
-
       }
-
-
-      desktopName.textContent =
-        result.name +
-        " ✓";
-
-
-      mobileName.textContent =
-        result.name +
-        " ✓";
-
-
+      desktopName.textContent = result.name + " ✓";
+      mobileName.textContent = result.name + " ✓";
       focusInput();
-
-
     } catch (error) {
-
-      console.log(
-        "PDF error:",
-        error
-      );
-
-
-      if (
-        error.message !==
-        "Oturum süren dolmuş. Tekrar giriş yap."
-      ) {
-
-        alert(
-
-          "PDF okunurken hata oluştu:\n\n" +
-          (
-            error.message ||
-            "Bilinmeyen hata"
-          )
-
-        );
-
+      console.log("PDF error:", error);
+      if (error.message !== "Oturum süren dolmuş. Tekrar giriş yap.") {
+        alert("PDF okunurken hata oluştu:\n\n" + (error.message || "Bilinmeyen hata"));
       }
-
-
       clearSelectedFile();
-
     }
-
   }
 );
-
 
 /* ==========================================
    PDF BUTONLARI
@@ -4533,27 +4451,20 @@ document
   .onclick =
     () => {
 
-      const chat =
-        getActiveChat();
-
-
-      if (chat) {
-
-        chat.document =
-          null;
-
-        chat.updatedAt =
-          Date.now();
-
-        saveChats();
-
-        queueCloudSave(chat);
-
+      if (selectedImage) {
+        clearSelectedImage();
+        return;
       }
 
+      const chat = getActiveChat();
+      if (chat) {
+        chat.document = null;
+        chat.updatedAt = Date.now();
+        saveChats();
+        queueCloudSave(chat);
+      }
 
       clearSelectedFile();
-
     };
 
 
@@ -4564,27 +4475,20 @@ document
   .onclick =
     () => {
 
-      const chat =
-        getActiveChat();
-
-
-      if (chat) {
-
-        chat.document =
-          null;
-
-        chat.updatedAt =
-          Date.now();
-
-        saveChats();
-
-        queueCloudSave(chat);
-
+      if (selectedImage) {
+        clearSelectedImage();
+        return;
       }
 
+      const chat = getActiveChat();
+      if (chat) {
+        chat.document = null;
+        chat.updatedAt = Date.now();
+        saveChats();
+        queueCloudSave(chat);
+      }
 
       clearSelectedFile();
-
     };
 
 
@@ -4639,13 +4543,23 @@ async function sendMessage() {
     getInput();
 
 
-  const text =
+  let text =
     input.value.trim();
 
 
-  if (!text) {
+  if (!text && !selectedImage) {
     return;
   }
+
+
+  if (!text && selectedImage) {
+    text = "Bu görseli açıkla.";
+  }
+
+
+  const imageForAI = selectedImage
+    ? { ...selectedImage }
+    : null;
 
 
   const chat =
@@ -4667,6 +4581,9 @@ async function sendMessage() {
 
     content:
       text,
+
+    imageName:
+      imageForAI ? imageForAI.name : "",
 
     time:
       Date.now()
@@ -4759,7 +4676,10 @@ async function sendMessage() {
                 ),
 
               document:
-                documentForAI
+                documentForAI,
+
+              image:
+                imageForAI
 
             })
 
