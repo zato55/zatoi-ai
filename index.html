@@ -1330,16 +1330,28 @@
     }
 
     .auth-tools, .message-tools, .account-tools { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .auth-tools button, .message-tool, .account-tool {
+    .auth-tools button, .account-tool {
       padding:7px 10px; border-radius:9px; background:#202a34; color:#dce5ee;
       border:1px solid #34424f; font-size:12px;
     }
+    .password-visibility { display:flex; align-items:center; gap:7px; width:100%; margin:-3px 0 9px;
+      color:#aebbc7; font-size:12px; cursor:pointer; user-select:none; }
+    .password-visibility input { width:16px; height:16px; margin:0; accent-color:#3b82f6; cursor:pointer; }
+    .message-tools { justify-content:flex-end; margin-top:5px; opacity:.58; }
+    .message-row:hover .message-tools, .message-tools:focus-within { opacity:1; }
+    .message-tool { width:28px; height:28px; display:grid; place-items:center; padding:0; border-radius:50%;
+      background:transparent; color:#b9c6d2; border:1px solid transparent; font-size:14px; line-height:1; }
+    .message-tool:hover, .message-tool:focus-visible { background:#26323d; border-color:#40505f; color:#fff; }
     .account-tool.danger { background:#3a171c; border-color:#7f1d1d; color:#fecaca; }
     .network-banner { display:none; position:fixed; z-index:3000; top:0; left:50%; transform:translateX(-50%);
       padding:8px 15px; background:#7f1d1d; color:white; border-radius:0 0 10px 10px; font-size:13px; }
     .network-banner.show { display:block; }
-    body.light-theme .auth-tools button, body.light-theme .message-tool, body.light-theme .account-tool {
+    body.light-theme .auth-tools button, body.light-theme .account-tool {
       background:#eef4f8; color:#1f2937; border-color:#cbd5e1;
+    }
+    body.light-theme .message-tool { color:#64748b; }
+    body.light-theme .message-tool:hover, body.light-theme .message-tool:focus-visible {
+      background:#e2e8f0; border-color:#cbd5e1; color:#0f172a;
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
@@ -1422,6 +1434,11 @@
       maxlength="128"
     >
 
+    <label class="password-visibility" for="passwordVisibilityCheck">
+      <input id="passwordVisibilityCheck" type="checkbox">
+      <span>Şifreyi göster</span>
+    </label>
+
     <label for="authPasswordConfirm" class="sr-only">Şifre tekrar</label>
 
     <input
@@ -1450,7 +1467,6 @@
 
     <div class="auth-tools">
       <button id="forgotPasswordButton" type="button">Kurtarma koduyla şifremi yenile</button>
-      <button id="passwordVisibilityButton" type="button">Şifreyi göster</button>
       <button id="installAppButton" type="button" hidden>Uygulamayı yükle</button>
     </div>
 
@@ -2341,11 +2357,10 @@ function saveAuth(
 
 }
 
-document.getElementById("passwordVisibilityButton").onclick = () => {
-  const show = authPassword.type === "password";
+document.getElementById("passwordVisibilityCheck").onchange = event => {
+  const show = event.target.checked;
   authPassword.type = show ? "text" : "password";
   authPasswordConfirm.type = show ? "text" : "password";
-  document.getElementById("passwordVisibilityButton").textContent = show ? "Şifreyi gizle" : "Şifreyi göster";
 };
 
 let deferredInstallPrompt = null;
@@ -4014,9 +4029,11 @@ function renderMessages() {
       tools.className = "message-tools";
       const copyButton = document.createElement("button");
       copyButton.className = "message-tool";
-      copyButton.textContent = "Kopyala";
+      copyButton.textContent = "⧉";
+      copyButton.title = "Mesajı kopyala";
+      copyButton.setAttribute("aria-label", "Mesajı kopyala");
       copyButton.onclick = async () => {
-        try { await navigator.clipboard.writeText(message.content || ""); copyButton.textContent = "Kopyalandı"; }
+        try { await navigator.clipboard.writeText(message.content || ""); copyButton.textContent = "✓"; setTimeout(() => copyButton.textContent = "⧉", 1200); }
         catch { alert("Metin kopyalanamadı."); }
       };
       tools.appendChild(copyButton);
@@ -4024,7 +4041,9 @@ function renderMessages() {
       if (message.role === "user") {
         const editButton = document.createElement("button");
         editButton.className = "message-tool";
-        editButton.textContent = "Düzenle";
+        editButton.textContent = "✎";
+        editButton.title = "Mesajı düzenle";
+        editButton.setAttribute("aria-label", "Mesajı düzenle");
         editButton.onclick = () => {
           const next = prompt("Mesajı düzenle:", message.content || "");
           if (!next?.trim()) return;
@@ -4039,7 +4058,9 @@ function renderMessages() {
       } else {
         const retryButton = document.createElement("button");
         retryButton.className = "message-tool";
-        retryButton.textContent = "Yeniden oluştur";
+        retryButton.textContent = "↻";
+        retryButton.title = "Yanıtı yeniden oluştur";
+        retryButton.setAttribute("aria-label", "Yanıtı yeniden oluştur");
         retryButton.onclick = () => {
           if (sending) return;
           const assistantIndex = chat.messages.indexOf(message);
