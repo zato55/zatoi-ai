@@ -4893,7 +4893,7 @@ pdfInput.addEventListener(
 
         addedImages.push({
           name: file.name || "gorsel",
-          type: file.type || "image/jpeg",
+          type: "image/jpeg",
           data: dataUrl,
           preview: previewUrl
         });
@@ -4935,9 +4935,33 @@ document
 
 function imagePromptFromText(text) {
   const value = String(text || "").trim();
-  const pattern = /^(?:bana\s+)?(?:bir\s+)?(?:görsel|resim|fotoğraf|foto)\s*(?:oluştur|üret|çiz|yap)\s*[:,-]?\s*/i;
-  if (!pattern.test(value)) return null;
-  return value.replace(pattern, "").trim();
+  const direct = /^(?:bana\s+)?(?:bir\s+)?(?:görsel|resim|fotoğraf|foto)\s*(?:oluştur|üret|çiz|yap)\s*[:,-]?\s*/i;
+  if (direct.test(value)) return value.replace(direct, "").trim();
+
+  const visualEnding = /^(?:bana\s+)?(.+?)\s+(?:görselini|resmini|fotoğrafını|fotosunu)\s+(?:oluştur|üret|çiz|yap)\s*$/i;
+  const visualMatch = value.match(visualEnding);
+  if (visualMatch) return visualMatch[1].trim();
+
+  const drawEnding = /^(?:bana\s+)?(.+?)\s+çiz\s*$/i;
+  const drawMatch = value.match(drawEnding);
+  if (drawMatch) return drawMatch[1].trim();
+
+  if (/^(?:sen\s+)?(?:oluştur|üret|çiz|yap)\s+(?:bunu|onu|bu\s+görseli|bu\s+resmi|görseli|resmi)\s*$/i.test(value) ||
+      /^(?:bunu|onu|bu\s+görseli|bu\s+resmi)\s+(?:oluştur|üret|çiz|yap)\s*$/i.test(value)) {
+    return "__PREVIOUS_IMAGE_REQUEST__";
+  }
+
+  return null;
+}
+
+function findPreviousImagePrompt(chat) {
+  const messages = Array.isArray(chat?.messages) ? [...chat.messages].reverse() : [];
+  for (const message of messages) {
+    if (message?.role !== "user") continue;
+    const found = imagePromptFromText(message.content);
+    if (found && found !== "__PREVIOUS_IMAGE_REQUEST__") return found;
+  }
+  return "";
 }
 
 async function generateImage(promptText = "") {
@@ -5118,7 +5142,10 @@ async function sendMessage() {
   const requestedImagePrompt = !imagesForAI.length ? imagePromptFromText(text) : null;
   if (requestedImagePrompt !== null) {
     setInput("");
-    await generateImage(requestedImagePrompt);
+    const resolvedPrompt = requestedImagePrompt === "__PREVIOUS_IMAGE_REQUEST__"
+      ? findPreviousImagePrompt(chat)
+      : requestedImagePrompt;
+    await generateImage(resolvedPrompt);
     return;
   }
 
