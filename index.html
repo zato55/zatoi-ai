@@ -1329,6 +1329,22 @@
       background: #f8fafc;
     }
 
+    .auth-tools, .message-tools, .account-tools { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .auth-tools button, .message-tool, .account-tool {
+      padding:7px 10px; border-radius:9px; background:#202a34; color:#dce5ee;
+      border:1px solid #34424f; font-size:12px;
+    }
+    .account-tool.danger { background:#3a171c; border-color:#7f1d1d; color:#fecaca; }
+    .network-banner { display:none; position:fixed; z-index:3000; top:0; left:50%; transform:translateX(-50%);
+      padding:8px 15px; background:#7f1d1d; color:white; border-radius:0 0 10px 10px; font-size:13px; }
+    .network-banner.show { display:block; }
+    body.light-theme .auth-tools button, body.light-theme .message-tool, body.light-theme .account-tool {
+      background:#eef4f8; color:#1f2937; border-color:#cbd5e1;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+    }
+
     body.light-theme .message-image-preview {
       border-color: rgba(15,23,42,.18);
     }
@@ -1432,13 +1448,22 @@
       Hesabın yok mu? Hesap oluştur
     </button>
 
+    <div class="auth-tools">
+      <button id="forgotPasswordButton" type="button">Kurtarma koduyla şifremi yenile</button>
+      <button id="passwordVisibilityButton" type="button">Şifreyi göster</button>
+      <button id="installAppButton" type="button" hidden>Uygulamayı yükle</button>
+    </div>
+
     <div id="authHelp" class="auth-info">
-      Hesabın yoksa ücretsiz oluşturabilirsin. E-posta gerekmez; yalnızca bir kullanıcı adı ve en az 8 karakterlik şifre yeterlidir.
+      Sohbet • Web araştırması • PDF ve görsel analizi • Kişisel hafıza<br>
+      Hesabın yoksa ücretsiz oluşturabilirsin. Kayıt sonunda verilen kurtarma kodunu güvenli bir yerde sakla.
     </div>
 
   </div>
 
 </div>
+
+<div id="networkBanner" class="network-banner" role="status" aria-live="polite">İnternet bağlantısı yok. Mesaj gönderilemez.</div>
 
 
 <div
@@ -1764,10 +1789,15 @@
           <div class="setting-info"><div class="setting-label">Kullanıcı</div><div id="settingsUsername" class="setting-desc settings-username">—</div></div>
           <button id="settingsLogoutButton" class="settings-logout">Çıkış Yap</button>
         </div>
+        <div class="account-tools">
+          <button id="exportChatButton" class="account-tool">Aktif sohbeti dışa aktar</button>
+          <button id="clearDataButton" class="account-tool">Sohbetleri ve hafızayı temizle</button>
+          <button id="deleteAccountButton" class="account-tool danger">Hesabı kalıcı sil</button>
+        </div>
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştiren yapay zeka asistanıdır.<br><span class="settings-version">V10.9 • Çoklu Görsel</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.0 • Güvenlik ve PWA</span></div>
       </div>
     </div>
   </section>
@@ -2132,7 +2162,8 @@ authSwitch.onclick =
 async function authRequest(
   action,
   username = "",
-  password = ""
+  password = "",
+  extra = {}
 ) {
 
   const response =
@@ -2170,7 +2201,9 @@ async function authRequest(
               username,
 
             password:
-              password
+              password,
+
+            ...extra
 
           })
 
@@ -2307,6 +2340,42 @@ function saveAuth(
   }
 
 }
+
+document.getElementById("passwordVisibilityButton").onclick = () => {
+  const show = authPassword.type === "password";
+  authPassword.type = show ? "text" : "password";
+  authPasswordConfirm.type = show ? "text" : "password";
+  document.getElementById("passwordVisibilityButton").textContent = show ? "Şifreyi gizle" : "Şifreyi göster";
+};
+
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  document.getElementById("installAppButton").hidden = false;
+});
+document.getElementById("installAppButton").onclick = async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  document.getElementById("installAppButton").hidden = true;
+};
+
+document.getElementById("forgotPasswordButton").onclick = async () => {
+  const username = prompt("Kullanıcı adını yaz:", authUsername.value.trim());
+  if (!username) return;
+  const recoveryCode = prompt("Kayıt sırasında verilen kurtarma kodunu yaz:");
+  if (!recoveryCode) return;
+  const newPassword = prompt("Yeni şifreni yaz (en az 8 karakter):");
+  if (!newPassword) return;
+  try {
+    await authRequest("recover", username, "", { recoveryCode, newPassword });
+    alert("Şifren yenilendi. Şimdi yeni şifrenle giriş yapabilirsin.");
+  } catch (error) {
+    showAuthError(error.message || "Şifre yenilenemedi.");
+  }
+};
 
 
 function showSyncStatus(message = "Sohbetler yükleniyor...") {
@@ -2478,6 +2547,10 @@ async function registerAccount() {
       data.memory
     );
 
+    if (data.recoveryCode) {
+      alert(`KURTARMA KODUN:\n\n${data.recoveryCode}\n\nBu kod yalnızca şimdi gösterilir. Ekran görüntüsü al veya güvenli bir yere kaydet.`);
+    }
+
 
     authUsername.value = "";
     authPassword.value = "";
@@ -2589,6 +2662,10 @@ async function loginAccount() {
       data.user,
       data.memory
     );
+
+    if (data.recoveryCode) {
+      alert(`HESAP KURTARMA KODUN:\n\n${data.recoveryCode}\n\nBu kod yalnızca şimdi gösterilir. Güvenli bir yere kaydet.`);
+    }
 
 
     authUsername.value = "";
@@ -3933,6 +4010,50 @@ function renderMessages() {
 
       }
 
+      const tools = document.createElement("div");
+      tools.className = "message-tools";
+      const copyButton = document.createElement("button");
+      copyButton.className = "message-tool";
+      copyButton.textContent = "Kopyala";
+      copyButton.onclick = async () => {
+        try { await navigator.clipboard.writeText(message.content || ""); copyButton.textContent = "Kopyalandı"; }
+        catch { alert("Metin kopyalanamadı."); }
+      };
+      tools.appendChild(copyButton);
+
+      if (message.role === "user") {
+        const editButton = document.createElement("button");
+        editButton.className = "message-tool";
+        editButton.textContent = "Düzenle";
+        editButton.onclick = () => {
+          const next = prompt("Mesajı düzenle:", message.content || "");
+          if (!next?.trim()) return;
+          const index = chat.messages.indexOf(message);
+          if (index < 0) return;
+          chat.messages.splice(index + 1);
+          message.content = next.trim();
+          chat.updatedAt = Date.now();
+          saveChats(); queueCloudSave(chat); renderAll();
+        };
+        tools.appendChild(editButton);
+      } else {
+        const retryButton = document.createElement("button");
+        retryButton.className = "message-tool";
+        retryButton.textContent = "Yeniden oluştur";
+        retryButton.onclick = () => {
+          if (sending) return;
+          const assistantIndex = chat.messages.indexOf(message);
+          let userIndex = assistantIndex - 1;
+          while (userIndex >= 0 && chat.messages[userIndex].role !== "user") userIndex--;
+          if (userIndex < 0) return;
+          const userText = chat.messages[userIndex].content;
+          chat.messages.splice(userIndex);
+          saveChats(); queueCloudSave(chat); setInput(userText); sendMessage();
+        };
+        tools.appendChild(retryButton);
+      }
+      bubble.appendChild(tools);
+
 
       row.appendChild(
         bubble
@@ -4518,6 +4639,27 @@ function readImageAsDataURL(file) {
   });
 }
 
+async function compressImageFile(file, maxDimension = 2048, quality = 0.82) {
+  if (file.size > 50 * 1024 * 1024) throw new Error("Görsel 50 MB'dan büyük olamaz.");
+  const original = await readImageAsDataURL(file);
+  const image = new Image();
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = () => reject(new Error("Görsel açılamadı."));
+    image.src = original;
+  });
+  const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const context = canvas.getContext("2d");
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+  let result = canvas.toDataURL("image/jpeg", quality);
+  if (result.length > 5.2 * 1024 * 1024) result = canvas.toDataURL("image/jpeg", 0.65);
+  if (result.length > 5.2 * 1024 * 1024) throw new Error("Görsel sıkıştırıldıktan sonra hâlâ çok büyük.");
+  return result;
+}
+
 async function uploadPdf(file) {
 
   if (!authToken) {
@@ -4693,19 +4835,11 @@ pdfInput.addEventListener(
       return;
     }
 
-    for (const file of imageFiles) {
-      if (file.size > 4 * 1024 * 1024) {
-        alert(`${file.name || "Görsel"} 4 MB'dan büyük olamaz.`);
-        pdfInput.value = "";
-        return;
-      }
-    }
-
     try {
       const addedImages = [];
 
       for (const file of imageFiles) {
-        const dataUrl = await readImageAsDataURL(file);
+        const dataUrl = await compressImageFile(file);
         const previewUrl = await createImagePreview(dataUrl);
 
         addedImages.push({
@@ -4833,6 +4967,11 @@ async function forceLogout() {
 async function sendMessage() {
 
   if (sending) {
+    return;
+  }
+
+  if (!navigator.onLine) {
+    alert("İnternet bağlantısı yok. Mesajın gönderilmedi.");
     return;
   }
 
@@ -5886,6 +6025,9 @@ const fontSizeSetting = document.getElementById("fontSizeSetting");
 const animationsSetting = document.getElementById("animationsSetting");
 const settingsUsername = document.getElementById("settingsUsername");
 const settingsLogoutButton = document.getElementById("settingsLogoutButton");
+const exportChatButton = document.getElementById("exportChatButton");
+const clearDataButton = document.getElementById("clearDataButton");
+const deleteAccountButton = document.getElementById("deleteAccountButton");
 
 let selectedTheme = localStorage.getItem(THEME_SETTING_KEY) || "dark";
 let selectedFontSize = localStorage.getItem(FONT_SIZE_SETTING_KEY) || "normal";
@@ -5943,6 +6085,45 @@ fontSizeSetting.onchange = () => { selectedFontSize = fontSizeSetting.value; loc
 animationsSetting.onclick = () => { animationsEnabled = !animationsEnabled; localStorage.setItem(ANIMATIONS_SETTING_KEY, String(animationsEnabled)); applyAnimations(); };
 settingsLogoutButton.onclick = async () => { closeSettings(); await logoutAccount(); };
 
+exportChatButton.onclick = () => {
+  const chat = getActiveChat();
+  if (!chat?.messages?.length) return alert("Dışa aktarılacak mesaj yok.");
+  const text = [`# ${chat.title || "Zatoi Sohbeti"}`, "", ...chat.messages.map(message =>
+    `${message.role === "user" ? "Sen" : "Zatoi"}:\n${message.content || ""}\n`
+  )].join("\n");
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${String(chat.title || "zatoi-sohbeti").replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ_-]+/gi, "-")}.txt`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+clearDataButton.onclick = async () => {
+  const password = prompt("Sohbetleri ve hafızayı temizlemek için şifreni yaz:");
+  if (!password || !confirm("Tüm sohbetler ve kişisel hafıza silinecek. Devam edilsin mi?")) return;
+  try {
+    await authRequest("clear_data", "", password);
+    chats = [createChat()]; activeChatId = chats[0].id;
+    globalMemory = { name: "", facts: [], preferences: [] };
+    saveChats(); saveMemory(); renderAll(); closeSettings();
+    alert("Sohbetler ve hafıza temizlendi.");
+  } catch (error) { alert(error.message || "Veriler temizlenemedi."); }
+};
+
+deleteAccountButton.onclick = async () => {
+  const password = prompt("Hesabını kalıcı silmek için şifreni yaz:");
+  if (!password || !confirm("Hesap ve tüm bulut verileri kalıcı olarak silinecek. Bu işlem geri alınamaz.")) return;
+  try {
+    await authRequest("delete_account", "", password);
+    localStorage.removeItem(CHATS_KEY); localStorage.removeItem(ACTIVE_CHAT_KEY);
+    localStorage.removeItem(GLOBAL_MEMORY_KEY); localStorage.removeItem(AUTH_TOKEN_KEY); localStorage.removeItem(AUTH_USER_KEY);
+    authToken = ""; currentUser = null; chats = []; showAuthScreen();
+    alert("Hesabın silindi.");
+  } catch (error) { alert(error.message || "Hesap silinemedi."); }
+};
+
 if (window.matchMedia) {
   const systemThemeMedia = window.matchMedia("(prefers-color-scheme: light)");
   const onSystemThemeChange = () => { if (selectedTheme === "system") applyTheme(); };
@@ -5953,6 +6134,14 @@ if (window.matchMedia) {
 applyTheme();
 applyFontSize();
 applyAnimations();
+
+const networkBanner = document.getElementById("networkBanner");
+function updateNetworkState() {
+  networkBanner.classList.toggle("show", !navigator.onLine);
+}
+window.addEventListener("online", updateNetworkState);
+window.addEventListener("offline", updateNetworkState);
+updateNetworkState();
 
 /* ==========================================
    RESIZE
@@ -6001,11 +6190,20 @@ if ("serviceWorker" in navigator) {
 
     navigator.serviceWorker
       .register("./service-worker.js")
-      .then(() => {
+      .then(registration => {
 
         console.log(
           "Zatoi PWA Service Worker aktif."
         );
+
+        registration.addEventListener("updatefound", () => {
+          const installing = registration.installing;
+          installing?.addEventListener("statechange", () => {
+            if (installing.state === "installed" && navigator.serviceWorker.controller) {
+              if (confirm("Zatoi AI için yeni sürüm hazır. Şimdi yenilensin mi?")) location.reload();
+            }
+          });
+        });
 
       })
       .catch(error => {
