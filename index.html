@@ -1342,6 +1342,11 @@
     .message-tool { width:28px; height:28px; display:grid; place-items:center; padding:0; border-radius:50%;
       background:transparent; color:#b9c6d2; border:1px solid transparent; font-size:14px; line-height:1; }
     .message-tool:hover, .message-tool:focus-visible { background:#26323d; border-color:#40505f; color:#fff; }
+    .generated-image { display:block; width:min(512px, 100%); border-radius:14px; margin:0 0 9px;
+      border:1px solid rgba(255,255,255,.14); cursor:pointer; }
+    .generated-image-actions { display:flex; gap:8px; margin:7px 0; }
+    .generated-image-actions a { display:inline-flex; align-items:center; gap:5px; padding:7px 10px;
+      border-radius:9px; background:#2563eb; color:#fff; text-decoration:none; font-size:12px; }
     .account-tool.danger { background:#3a171c; border-color:#7f1d1d; color:#fecaca; }
     .network-banner { display:none; position:fixed; z-index:3000; top:0; left:50%; transform:translateX(-50%);
       padding:8px 15px; background:#7f1d1d; color:white; border-radius:0 0 10px 10px; font-size:13px; }
@@ -1612,6 +1617,8 @@
           📎
         </button>
 
+        <button id="desktopImageGenerateButton" class="voice-btn" aria-label="Yapay zekâyla görsel oluştur" title="Görsel oluştur">🎨</button>
+
 
         <button
           id="micButton"
@@ -1712,6 +1719,8 @@
         >
           📎
         </button>
+
+        <button id="mobileImageGenerateButton" class="voice-btn" aria-label="Yapay zekâyla görsel oluştur" title="Görsel oluştur">🎨</button>
 
 
         <button
@@ -3051,7 +3060,8 @@ function saveChats() {
     CHATS_KEY,
 
     JSON.stringify(
-      chats
+      chats,
+      (key, value) => key === "generatedImage" ? undefined : value
     )
 
   );
@@ -4001,6 +4011,24 @@ function renderMessages() {
         content
       );
 
+      if (message.role === "assistant" && message.generatedImage) {
+        const generated = document.createElement("img");
+        generated.className = "generated-image";
+        generated.src = message.generatedImage;
+        generated.alt = message.imagePrompt ? `Oluşturulan görsel: ${message.imagePrompt}` : "Zatoi tarafından oluşturulan görsel";
+        generated.onclick = () => openImageViewer(message.generatedImage, generated.alt);
+        bubble.insertBefore(generated, content);
+
+        const actions = document.createElement("div");
+        actions.className = "generated-image-actions";
+        const download = document.createElement("a");
+        download.href = message.generatedImage;
+        download.download = `zatoi-gorsel-${Date.now()}.jpg`;
+        download.textContent = "⬇ İndir";
+        actions.appendChild(download);
+        bubble.insertBefore(actions, content.nextSibling);
+      }
+
 
       if (
         message.role ===
@@ -4905,6 +4933,48 @@ document
     () =>
       pdfInput.click();
 
+function imagePromptFromText(text) {
+  const value = String(text || "").trim();
+  const pattern = /^(?:bana\s+)?(?:bir\s+)?(?:görsel|resim|fotoğraf|foto)\s*(?:oluştur|üret|çiz|yap)\s*[:,-]?\s*/i;
+  if (!pattern.test(value)) return null;
+  return value.replace(pattern, "").trim();
+}
+
+async function generateImage(promptText = "") {
+  if (sending) return;
+  let description = String(promptText || "").trim();
+  if (!description) description = window.prompt("Nasıl bir görsel oluşturulsun?");
+  if (!description) return;
+  if (!navigator.onLine) return alert("İnternet bağlantısı yok.");
+  const chat = getActiveChat();
+  if (!chat) return;
+
+  sending = true;
+  chat.messages.push({ role: "user", content: `Görsel oluştur: ${description}`, time: Date.now() });
+  updateTitle(chat, description); chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat);
+  setInput(""); renderAll(); showTyping();
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
+      body: JSON.stringify({ type: "image_generate", prompt: description })
+    });
+    const data = await response.json();
+    if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
+    if (!response.ok || !data.image) throw new Error(data.details || data.error || "Görsel üretilemedi.");
+    chat.messages.push({ role: "assistant", content: "Görselin hazır. Kalıcı saklamak için indirebilirsin.", generatedImage: data.image, imagePrompt: description, time: Date.now() });
+    chat.updatedAt = Date.now();
+    renderAll();
+  } catch (error) {
+    alert(error.message || "Görsel üretilemedi.");
+  } finally {
+    hideTyping(); sending = false;
+  }
+}
+
+document.getElementById("desktopImageGenerateButton").onclick = () => generateImage();
+document.getElementById("mobileImageGenerateButton").onclick = () => generateImage();
+
 
 document
   .getElementById(
@@ -5042,6 +5112,13 @@ async function sendMessage() {
 
 
   if (!chat) {
+    return;
+  }
+
+  const requestedImagePrompt = !imagesForAI.length ? imagePromptFromText(text) : null;
+  if (requestedImagePrompt !== null) {
+    setInput("");
+    await generateImage(requestedImagePrompt);
     return;
   }
 
