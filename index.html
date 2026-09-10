@@ -2187,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.4 • Son 5 Görsel Kalıcı Hafıza</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.6 • Referans 413 Fix + Son 6 Görsel Hafıza</span></div>
       </div>
     </div>
   </section>
@@ -4508,7 +4508,7 @@ function renderMessages() {
           generated.className = "generated-image";
           if (imageExpired) {
             generated.style.cssText = "aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;background:#0b1118;color:#94a3b8;font-size:12px;border:1px dashed #34424f";
-            generated.textContent = "Bu eski görsel son 5 görsel hafızası dışında kaldı.";
+            generated.textContent = "Bu eski görsel son 6 görsel hafızası dışında kaldı.";
           } else {
             generated.src = imageSrc;
             generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
@@ -5284,6 +5284,41 @@ async function compressImageFile(file, maxDimension = 1280, quality = 0.78) {
   return result;
 }
 
+
+async function prepareReferenceImageForGeneration(dataUrl, maxDimension = 768) {
+  const source = String(dataUrl || "");
+  if (!source.startsWith("data:image/")) return source;
+
+  const image = new Image();
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = () => reject(new Error("Referans görsel hazırlanamadı."));
+    image.src = source;
+  });
+
+  let scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+  const canvas = document.createElement("canvas");
+  const targetDataUrlLength = 850 * 1024;
+  let result = source;
+
+  for (let resizeAttempt = 0; resizeAttempt < 4; resizeAttempt++) {
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d", { alpha: false });
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    for (const q of [0.88, 0.82, 0.76, 0.70]) {
+      result = canvas.toDataURL("image/jpeg", q);
+      if (result.length <= targetDataUrlLength) return result;
+    }
+    scale *= 0.82;
+  }
+
+  return result;
+}
+
 async function ensurePdfJs() {
   if (window.pdfjsLib) return window.pdfjsLib;
 
@@ -6053,7 +6088,7 @@ async function hydratePersistedImagesForChats(targetChats = chats) {
               message.generatedImages[index] = dataUrl;
               changed = true;
             } else {
-              // Son 5 sınırı nedeniyle silinmiş eski görsel için kırık img yerine boş işaret bırak.
+              // Son 6 sınırı nedeniyle silinmiş eski görsel için kırık img yerine boş işaret bırak.
               message.generatedImages[index] = "__ZATOI_EXPIRED_IMAGE__";
               changed = true;
             }
@@ -6081,6 +6116,17 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
   const chat = getActiveChat();
   if (!chat) return;
 
+  // Referans görseli yalnızca üretim isteği için güvenli boyuta indir.
+  // Sohbette gösterilen önizleme ve KV'ye kaydedilen üretilmiş görsellerin kalitesi etkilenmez.
+  let safeReferenceImage = referenceImage;
+  if (referenceImage) {
+    try {
+      safeReferenceImage = await prepareReferenceImageForGeneration(referenceImage);
+    } catch {
+      safeReferenceImage = referenceImage;
+    }
+  }
+
   sending = true;
   chat.messages.push({
     role: "user",
@@ -6093,8 +6139,8 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
   setInput(""); renderAll(); showTyping();
   try {
     const generationId = crypto.randomUUID();
-    const imageA = await requestGeneratedImage(description, "A", referenceImage, generationId);
-    const imageB = await requestGeneratedImage(description, "B", referenceImage, generationId);
+    const imageA = await requestGeneratedImage(description, "A", safeReferenceImage, generationId);
+    const imageB = await requestGeneratedImage(description, "B", safeReferenceImage, generationId);
     chat.messages.push({
       role: "assistant",
       content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
@@ -6107,7 +6153,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
       preferenceChoiceId: crypto.randomUUID(),
       generationId,
       imagePrompt: description,
-      sourceReferenceImage: referenceImage,
+      sourceReferenceImage: safeReferenceImage,
       sourceReferencePreview: referencePreview,
       sourceReferenceName: referenceName,
       time: Date.now()
