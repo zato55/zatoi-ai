@@ -3081,7 +3081,7 @@ function saveChats() {
 
     JSON.stringify(
       chats,
-      (key, value) => (key === "generatedImage" || key === "generatedImages") ? undefined : value
+      (key, value) => (key === "generatedImage" || key === "generatedImages" || key === "sourceReferenceImage" || key === "sourceReferencePreview") ? undefined : value
     )
 
   );
@@ -5013,6 +5013,23 @@ function findPreviousImagePrompt(chat) {
   return "";
 }
 
+function isImageRevisionRequest(text) {
+  const value = String(text || "").toLocaleLowerCase("tr-TR");
+  const mentionsProblem = /(yüz|surat|benze|kimlik|göz|burun|ağız|saç|kafa|portre|görsel|resim)/i.test(value);
+  const asksCorrection = /(düzelt|daha doğru|yeniden|tekrar|iyileştir|olmamış|olmamis|olmadı|olmadi|yanlış|yanlis|benzemiyor|benzememiş|benzememis)/i.test(value);
+  return mentionsProblem && asksCorrection;
+}
+
+function findLatestGeneratedMessage(chat) {
+  const messages = Array.isArray(chat?.messages) ? [...chat.messages].reverse() : [];
+  return messages.find(message =>
+    message?.role === "assistant" &&
+    Array.isArray(message.generatedImages) &&
+    message.generatedImages.length &&
+    message.imagePrompt
+  ) || null;
+}
+
 function getImagePreferenceText() {
   if (!imagePreference.choices) {
     return "Main subject large and dominant, clean background, high detail.";
@@ -5153,6 +5170,9 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
       generatedImages: [imageA, imageB],
       preferenceChoiceId: crypto.randomUUID(),
       imagePrompt: description,
+      sourceReferenceImage: referenceImage,
+      sourceReferencePreview: referencePreview,
+      sourceReferenceName: referenceName,
       time: Date.now()
     });
     chat.updatedAt = Date.now();
@@ -5305,6 +5325,25 @@ async function sendMessage() {
 
   if (!chat) {
     return;
+  }
+
+  if (!imagesForAI.length && isImageRevisionRequest(text)) {
+    const previousGeneration = findLatestGeneratedMessage(chat);
+    if (previousGeneration) {
+      if (!Number.isInteger(previousGeneration.chosenImage)) {
+        alert("Önce düzeltilmesini istediğin iki görselden birini seç.");
+        return;
+      }
+      setInput("");
+      const revisionPrompt = `${previousGeneration.imagePrompt}. Önceki sonuç için düzeltme isteği: ${text}. Ana kişinin yüz kimliğini güvenilir referansa göre yeniden araştır ve yüzü daha doğru, tanınabilir ve gerçekçi biçimde oluştur. Yanlış üretilmiş önceki yüzü kopyalama.`;
+      await generateImage(
+        revisionPrompt,
+        previousGeneration.sourceReferenceImage || "",
+        previousGeneration.sourceReferencePreview || "",
+        previousGeneration.sourceReferenceName || ""
+      );
+      return;
+    }
   }
 
   const requestedImagePrompt = imagePromptFromText(text);
