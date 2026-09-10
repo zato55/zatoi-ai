@@ -1387,7 +1387,7 @@
   
 
     /* =================================
-       V11.2 GIZLILIK + DRAG DROP
+       V11.3 PDF FIX + GIZLILIK + DRAG DROP
     ================================= */
     .privacy-link-btn {
       background: transparent; color: #8fb8ff; border: 0; padding: 6px 4px;
@@ -1883,7 +1883,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.2 • Hesap İzolasyonu ve UX</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.3 • PDF Bağlam Düzeltmesi</span></div>
       </div>
     </div>
   </section>
@@ -5066,9 +5066,25 @@ async function processSelectedFiles(fileList) {
       desktopName.textContent = "PDF yükleniyor...";
       mobileName.textContent = "PDF yükleniyor...";
 
+      const targetChatId = getActiveChat()?.id || "";
+
       try {
         documentData = await uploadPdf(file);
         selectedPdf = file;
+
+        // PDF metnini yalnızca geçici seçimde tutma; aktif sohbetin
+        // document alanına da bağla ki sonraki mesajlarda modele gönderilsin.
+        const targetChat = chats.find(chat => chat.id === targetChatId) || getActiveChat();
+        if (targetChat && documentData?.text) {
+          targetChat.document = {
+            name: documentData.name || file.name || "Yüklenen PDF",
+            text: String(documentData.text || "").slice(0, 500000)
+          };
+          targetChat.updatedAt = Date.now();
+          saveChats();
+          queueCloudSave(targetChat);
+        }
+
         updateFileUI();
         focusInput();
       } catch (error) {
@@ -5506,13 +5522,30 @@ async function sendMessage() {
     input.value.trim();
 
 
-  if (!text && !selectedImages.length) {
+  const chat =
+    getActiveChat();
+
+
+  if (!chat) {
+    return;
+  }
+
+
+  const hasDocumentContext = !!(
+    (documentData && documentData.text) ||
+    (chat.document && chat.document.text)
+  );
+
+
+  if (!text && !selectedImages.length && !hasDocumentContext) {
     return;
   }
 
 
   if (!text && selectedImages.length) {
     text = "Bu görseli açıkla.";
+  } else if (!text && hasDocumentContext) {
+    text = "Bu PDF'yi özetle.";
   }
 
 
@@ -5528,14 +5561,6 @@ async function sendMessage() {
     updateFileUI();
   }
 
-
-  const chat =
-    getActiveChat();
-
-
-  if (!chat) {
-    return;
-  }
 
   if (!imagesForAI.length && isImageRevisionRequest(text)) {
     const previousGeneration = findLatestGeneratedMessage(chat);
