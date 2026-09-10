@@ -1829,7 +1829,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.0 • Güvenlik ve PWA</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.1 • Hesap İzolasyonu</span></div>
       </div>
     </div>
   </section>
@@ -1946,11 +1946,39 @@ let authToken =
 
 let currentUser = null;
 
+// V11.1 - HESAP BAZLI YEREL VERİ AYRIMI
+// Aynı cihazda farklı hesapların sohbet/hafıza verileri birbirine karışmasın.
+function scopedStorageKey(baseKey) {
+  let userId =
+    currentUser?.userId ||
+    currentUser?.username ||
+    "";
+
+  if (!userId) {
+    try {
+      const storedUser = JSON.parse(
+        localStorage.getItem(AUTH_USER_KEY) || "null"
+      );
+
+      userId =
+        storedUser?.userId ||
+        storedUser?.username ||
+        "";
+    } catch {}
+  }
+
+  const suffix = userId
+    ? encodeURIComponent(String(userId))
+    : "guest";
+
+  return `${baseKey}__user_${suffix}`;
+}
+
 let imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
 let pendingImageChoices = [];
 try {
-  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(IMAGE_PREFERENCE_KEY) || "{}") };
-  const pending = JSON.parse(localStorage.getItem(PENDING_IMAGE_CHOICES_KEY) || "[]");
+  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(scopedStorageKey(IMAGE_PREFERENCE_KEY)) || "{}") };
+  const pending = JSON.parse(localStorage.getItem(scopedStorageKey(PENDING_IMAGE_CHOICES_KEY)) || "[]");
   pendingImageChoices = Array.isArray(pending) ? pending : [];
 } catch {}
 
@@ -2289,17 +2317,78 @@ async function authRequest(
    AUTH BAŞARILI
 ========================================== */
 
+function reloadScopedAccountState() {
+  // Hesap değiştiğinde önceki hesabın RAM'de kalan verilerini temizle.
+  chats = [];
+  activeChatId = null;
+
+  globalMemory = {
+    name: "",
+    facts: [],
+    preferences: []
+  };
+
+  imagePreference = {
+    realistic: 0,
+    cinematic: 0,
+    choices: 0
+  };
+
+  pendingImageChoices = [];
+
+  try {
+    imagePreference = {
+      ...imagePreference,
+      ...JSON.parse(
+        localStorage.getItem(
+          scopedStorageKey(IMAGE_PREFERENCE_KEY)
+        ) || "{}"
+      )
+    };
+
+    const pending = JSON.parse(
+      localStorage.getItem(
+        scopedStorageKey(PENDING_IMAGE_CHOICES_KEY)
+      ) || "[]"
+    );
+
+    pendingImageChoices = Array.isArray(pending)
+      ? pending
+      : [];
+  } catch {}
+
+  loadMemory();
+  loadChats();
+}
+
 function saveAuth(
   token,
   user,
   memory
 ) {
 
+  const previousUserId =
+    currentUser?.userId ||
+    currentUser?.username ||
+    "";
+
   authToken =
     token || "";
 
   currentUser =
     user || null;
+
+  const nextUserId =
+    currentUser?.userId ||
+    currentUser?.username ||
+    "";
+
+  if (
+    nextUserId &&
+    String(previousUserId) !== String(nextUserId)
+  ) {
+    reloadScopedAccountState();
+  }
 
 
   if (authToken) {
@@ -2975,7 +3064,7 @@ function loadMemory() {
 
     const saved =
       localStorage.getItem(
-        GLOBAL_MEMORY_KEY
+        scopedStorageKey(GLOBAL_MEMORY_KEY)
       );
 
 
@@ -3024,7 +3113,7 @@ function saveMemory() {
 
   localStorage.setItem(
 
-    GLOBAL_MEMORY_KEY,
+    scopedStorageKey(GLOBAL_MEMORY_KEY),
 
     JSON.stringify(
       globalMemory
@@ -3077,7 +3166,7 @@ function saveChats() {
 
   localStorage.setItem(
 
-    CHATS_KEY,
+    scopedStorageKey(CHATS_KEY),
 
     JSON.stringify(
       chats,
@@ -3089,7 +3178,7 @@ function saveChats() {
 
   localStorage.setItem(
 
-    ACTIVE_CHAT_KEY,
+    scopedStorageKey(ACTIVE_CHAT_KEY),
 
     activeChatId || ""
 
@@ -3104,7 +3193,7 @@ function loadChats() {
 
     const saved =
       localStorage.getItem(
-        CHATS_KEY
+        scopedStorageKey(CHATS_KEY)
       );
 
 
@@ -3167,7 +3256,7 @@ function loadChats() {
 
   const savedActive =
     localStorage.getItem(
-      ACTIVE_CHAT_KEY
+      scopedStorageKey(ACTIVE_CHAT_KEY)
     );
 
 
@@ -5075,11 +5164,11 @@ function storeImagePreference(preference) {
     cinematic: Math.max(0, Number(preference?.cinematic) || 0),
     choices: Math.max(0, Number(preference?.choices) || 0)
   };
-  localStorage.setItem(IMAGE_PREFERENCE_KEY, JSON.stringify(imagePreference));
+  localStorage.setItem(scopedStorageKey(IMAGE_PREFERENCE_KEY), JSON.stringify(imagePreference));
 }
 
 function savePendingImageChoices() {
-  localStorage.setItem(PENDING_IMAGE_CHOICES_KEY, JSON.stringify(pendingImageChoices));
+  localStorage.setItem(scopedStorageKey(PENDING_IMAGE_CHOICES_KEY), JSON.stringify(pendingImageChoices));
 }
 
 async function syncImagePreference() {
@@ -5112,7 +5201,7 @@ function chooseGeneratedImage(message, index) {
   if (index === 0) imagePreference.realistic += 1;
   if (index === 1) imagePreference.cinematic += 1;
   message.chosenImage = index;
-  localStorage.setItem(IMAGE_PREFERENCE_KEY, JSON.stringify(imagePreference));
+  localStorage.setItem(scopedStorageKey(IMAGE_PREFERENCE_KEY), JSON.stringify(imagePreference));
   const choiceId = message.preferenceChoiceId || (message.preferenceChoiceId = crypto.randomUUID());
   const userId = currentUser?.userId || "";
   pendingImageChoices = pendingImageChoices.filter(item => !(item.userId === userId && item.choiceId === choiceId));
@@ -6492,7 +6581,7 @@ clearDataButton.onclick = async () => {
     globalMemory = { name: "", facts: [], preferences: [] };
     imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
     pendingImageChoices = pendingImageChoices.filter(item => item.userId !== currentUser?.userId);
-    localStorage.setItem(IMAGE_PREFERENCE_KEY, JSON.stringify(imagePreference));
+    localStorage.setItem(scopedStorageKey(IMAGE_PREFERENCE_KEY), JSON.stringify(imagePreference));
     savePendingImageChoices();
     saveChats(); saveMemory(); renderAll(); closeSettings();
     alert("Sohbetler ve hafıza temizlendi.");
@@ -6504,9 +6593,9 @@ deleteAccountButton.onclick = async () => {
   if (!password || !confirm("Hesap ve tüm bulut verileri kalıcı olarak silinecek. Bu işlem geri alınamaz.")) return;
   try {
     await authRequest("delete_account", "", password);
-    localStorage.removeItem(CHATS_KEY); localStorage.removeItem(ACTIVE_CHAT_KEY);
-    localStorage.removeItem(GLOBAL_MEMORY_KEY); localStorage.removeItem(AUTH_TOKEN_KEY); localStorage.removeItem(AUTH_USER_KEY);
-    localStorage.removeItem(IMAGE_PREFERENCE_KEY); localStorage.removeItem(PENDING_IMAGE_CHOICES_KEY);
+    localStorage.removeItem(scopedStorageKey(CHATS_KEY)); localStorage.removeItem(scopedStorageKey(ACTIVE_CHAT_KEY));
+    localStorage.removeItem(scopedStorageKey(GLOBAL_MEMORY_KEY)); localStorage.removeItem(AUTH_TOKEN_KEY); localStorage.removeItem(AUTH_USER_KEY);
+    localStorage.removeItem(scopedStorageKey(IMAGE_PREFERENCE_KEY)); localStorage.removeItem(scopedStorageKey(PENDING_IMAGE_CHOICES_KEY));
     authToken = ""; currentUser = null; chats = []; showAuthScreen();
     alert("Hesabın silindi.");
   } catch (error) { alert(error.message || "Hesap silinemedi."); }
