@@ -4983,10 +4983,24 @@ async function generateImage(promptText = "") {
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
       body: JSON.stringify({ type: "image_generate", prompt: description })
     });
-    const data = await response.json();
     if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
-    if (!response.ok || !data.image) throw new Error(data.details || data.error || "Görsel üretilemedi.");
-    chat.messages.push({ role: "assistant", content: "Görselin hazır. Kalıcı saklamak için indirebilirsin.", generatedImage: data.image, imagePrompt: description, time: Date.now() });
+    if (!response.ok) {
+      let message = "Görsel üretilemedi.";
+      try {
+        const errorData = await response.json();
+        message = errorData.details || errorData.error || message;
+      } catch {}
+      throw new Error(message);
+    }
+    const imageBlob = await response.blob();
+    if (!imageBlob.type.startsWith("image/")) throw new Error("Worker geçerli bir görsel döndürmedi.");
+    const imageData = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("Üretilen görsel okunamadı."));
+      reader.readAsDataURL(imageBlob);
+    });
+    chat.messages.push({ role: "assistant", content: "Görselin hazır. Kalıcı saklamak için indirebilirsin.", generatedImage: imageData, imagePrompt: description, time: Date.now() });
     chat.updatedAt = Date.now();
     renderAll();
   } catch (error) {
