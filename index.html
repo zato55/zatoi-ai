@@ -2187,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.10 • PDF Batch Vision + Akıllı Router + Son 6 Görsel</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14 • Sağlamlık + Zeka • Akıllı Router + PDF Vision + Hata Kurtarma + Son 6 Görsel</span></div>
       </div>
     </div>
   </section>
@@ -5345,7 +5345,7 @@ async function ensurePdfJs() {
   return window.pdfjsLib;
 }
 
-async function renderScannedPdfPages(file, maxPages = 30, onProgress = null) {
+async function renderScannedPdfPages(file, maxPages = 30) {
   const pdfjsLib = await ensurePdfJs();
   const bytes = new Uint8Array(await file.arrayBuffer());
   const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
@@ -5356,7 +5356,7 @@ async function renderScannedPdfPages(file, maxPages = 30, onProgress = null) {
     const page = await pdf.getPage(pageNumber);
     const baseViewport = page.getViewport({ scale: 1 });
     const maxSide = Math.max(baseViewport.width, baseViewport.height);
-    const scale = Math.min(1.45, 1100 / Math.max(1, maxSide));
+    const scale = Math.min(1.6, 1280 / Math.max(1, maxSide));
     const viewport = page.getViewport({ scale });
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(viewport.width));
@@ -5365,18 +5365,26 @@ async function renderScannedPdfPages(file, maxPages = 30, onProgress = null) {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     await page.render({ canvasContext: ctx, viewport }).promise;
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.68));
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.72));
     if (blob) pages.push({ pageNumber, blob });
     page.cleanup();
-    if (typeof onProgress === "function") onProgress(pageNumber, count, "render");
   }
 
   return { pages, totalPages: pdf.numPages, limited: pdf.numPages > count };
 }
 
-async function uploadPdfRequest(file) {
+async function uploadPdfRequest(file, scannedPages = null) {
   const formData = new FormData();
   formData.append("file", file);
+
+  if (scannedPages?.pages?.length) {
+    for (const item of scannedPages.pages) {
+      formData.append("scanPage", item.blob, `page-${item.pageNumber}.jpg`);
+      formData.append("scanPageNumber", String(item.pageNumber));
+    }
+    formData.append("scanTotalPages", String(scannedPages.totalPages || scannedPages.pages.length));
+    formData.append("scanLimited", scannedPages.limited ? "1" : "0");
+  }
 
   return fetch(WORKER_URL, {
     method: "POST",
@@ -5385,123 +5393,95 @@ async function uploadPdfRequest(file) {
   });
 }
 
-async function uploadPdfScanBatch(items, totalPages) {
-  const formData = new FormData();
-  formData.append("scanOnly", "1");
-  formData.append("scanTotalPages", String(totalPages || items.length));
-
-  for (const item of items) {
-    formData.append("scanPage", item.blob, `page-${item.pageNumber}.jpg`);
-    formData.append("scanPageNumber", String(item.pageNumber));
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 90000);
-
-  try {
-    return await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${authToken}` },
-      body: formData,
-      signal: controller.signal
-    });
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-async function uploadPdf(file, onProgress = null) {
+async function uploadPdf(file) {
 
   if (!authToken) {
-    throw new Error("Oturum açman gerekiyor.");
+
+    throw new Error(
+      "Oturum açman gerekiyor."
+    );
+
   }
+
 
   let response = await uploadPdfRequest(file);
 
-  if (response.status === 401) {
-    await forceLogout();
-    throw new Error("Oturum süren dolmuş. Tekrar giriş yap.");
-  }
-
+  // Normal PDF'den hiç metin çıkmazsa veya yalnızca Contents/başlık gibi
+  // yetersiz metin çıkarsa sayfaları görsele çevirip
+  // aynı PDF uç noktasına tekrar gönder. Böylece taranmış PDF'ler
+  // de Workers AI görsel okuma hattından geçer.
   if (response.status === 422) {
     let firstError = null;
     try { firstError = await response.clone().json(); } catch {}
     const message = String(firstError?.error || firstError?.details || "");
-    const needsVision = !!firstError?.needsVisionScan || /metin çıkarılamadı|yeterli metin|görsel okuma gerekli|dönüştürülürken/i.test(message);
-
-    if (needsVision) {
-      if (typeof onProgress === "function") onProgress(0, 30, "start");
-      const scannedPages = await renderScannedPdfPages(file, 30, onProgress);
-
-      if (!scannedPages.pages.length) {
-        throw new Error("PDF sayfaları görsel olarak hazırlanamadı.");
+    if (/metin çıkarılamadı|yeterli metin|görsel okuma gerekli|dönüştürülürken/i.test(message)) {
+      const scannedPages = await renderScannedPdfPages(file, 30);
+      if (scannedPages.pages.length) {
+        response = await uploadPdfRequest(file, scannedPages);
       }
-
-      const batchSize = 4;
-      const pageTexts = [];
-
-      for (let start = 0; start < scannedPages.pages.length; start += batchSize) {
-        const batch = scannedPages.pages.slice(start, start + batchSize);
-        if (typeof onProgress === "function") {
-          onProgress(Math.min(start + batch.length, scannedPages.pages.length), scannedPages.pages.length, "scan");
-        }
-
-        const batchResponse = await uploadPdfScanBatch(batch, scannedPages.totalPages);
-
-        if (batchResponse.status === 401) {
-          await forceLogout();
-          throw new Error("Oturum süren dolmuş. Tekrar giriş yap.");
-        }
-
-        let batchData = null;
-        try { batchData = await batchResponse.json(); } catch {}
-
-        if (!batchResponse.ok || !batchData?.success || !batchData?.text) {
-          throw new Error(
-            batchData?.details ||
-            batchData?.error ||
-            `PDF'nin ${batch[0]?.pageNumber || "?"}. sayfasından başlayan bölümü okunamadı.`
-          );
-        }
-
-        pageTexts.push(batchData.text);
-      }
-
-      const combinedText = pageTexts.join("\n\n").trim();
-      if (!combinedText) throw new Error("PDF sayfalarından içerik okunamadı.");
-
-      if (typeof onProgress === "function") {
-        onProgress(scannedPages.pages.length, scannedPages.pages.length, "done");
-      }
-
-      return {
-        success: true,
-        type: "pdf",
-        name: file.name || "Yüklenen PDF",
-        text: combinedText,
-        meta: {
-          chars: combinedText.length,
-          scanned: true,
-          pagesRead: scannedPages.pages.length,
-          totalPages: scannedPages.totalPages,
-          limited: scannedPages.limited
-        }
-      };
     }
   }
 
-  const data = await response.json();
+
+  if (
+    response.status ===
+    401
+  ) {
+
+    await forceLogout();
+
+    throw new Error(
+      "Oturum süren dolmuş. Tekrar giriş yap."
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
 
   if (!response.ok) {
-    throw new Error(data.details || data.error || "PDF yüklenemedi.");
+
+    throw new Error(
+
+      data.details ||
+      data.error ||
+      "PDF yüklenemedi."
+
+    );
+
   }
 
-  if (!data.success || !data.text) {
-    throw new Error(data.error || "PDF'den metin çıkarılamadı.");
+
+  if (
+    !data.success ||
+    !data.text
+  ) {
+
+    throw new Error(
+
+      data.error ||
+      "PDF'den metin çıkarılamadı."
+
+    );
+
   }
 
-  return data;
+
+  return {
+
+    name:
+      data.name ||
+      file.name,
+
+    text:
+      data.text
+
+  };
+
 }
+
 
 async function processSelectedFiles(fileList) {
     const files = Array.from(fileList || []);
@@ -5557,15 +5537,7 @@ async function processSelectedFiles(fileList) {
       const targetChatId = getActiveChat()?.id || "";
 
       try {
-        documentData = await uploadPdf(file, (current, total, phase) => {
-          let status = "PDF yükleniyor...";
-          if (phase === "start") status = "PDF taranmış görünüyor, sayfalar hazırlanıyor...";
-          if (phase === "render") status = `PDF sayfaları hazırlanıyor... ${current}/${total}`;
-          if (phase === "scan") status = `PDF okunuyor... ${current}/${total}`;
-          if (phase === "done") status = "PDF hazır.";
-          desktopName.textContent = status;
-          mobileName.textContent = status;
-        });
+        documentData = await uploadPdf(file);
         selectedPdf = file;
 
         // PDF metnini yalnızca geçici seçimde tutma; aktif sohbetin
