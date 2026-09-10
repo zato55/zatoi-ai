@@ -712,6 +712,18 @@
       display: grid;
     }
 
+    /* Masaüstünde mesaj alanı üstte olduğu için araçlar menüsü aşağı açılsın. */
+    #desktopToolsMenu {
+      top: calc(100% + 10px);
+      bottom: auto;
+    }
+
+    /* Mobilde mevcut davranış korunur: menü yukarı açılır. */
+    #mobileToolsMenu {
+      top: auto;
+      bottom: calc(100% + 10px);
+    }
+
     .tools-menu-item {
       width: 100%;
       min-height: 52px;
@@ -2175,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.5 • Ekleme Araçları Menüsü</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.0 • Akıllı Taranmış PDF Okuma</span></div>
       </div>
     </div>
   </section>
@@ -5255,6 +5267,80 @@ async function compressImageFile(file, maxDimension = 1280, quality = 0.78) {
   return result;
 }
 
+async function ensurePdfJs() {
+  if (window.pdfjsLib) return window.pdfjsLib;
+
+  await new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-zatoi-pdfjs="1"]');
+    if (existing) {
+      existing.addEventListener("load", resolve, { once: true });
+      existing.addEventListener("error", () => reject(new Error("PDF görsel okuyucu yüklenemedi.")), { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js";
+    script.async = true;
+    script.dataset.zatoiPdfjs = "1";
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("PDF görsel okuyucu yüklenemedi."));
+    document.head.appendChild(script);
+  });
+
+  if (!window.pdfjsLib) throw new Error("PDF görsel okuyucu başlatılamadı.");
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+  return window.pdfjsLib;
+}
+
+async function renderScannedPdfPages(file, maxPages = 30) {
+  const pdfjsLib = await ensurePdfJs();
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const count = Math.min(pdf.numPages, maxPages);
+  const pages = [];
+
+  for (let pageNumber = 1; pageNumber <= count; pageNumber++) {
+    const page = await pdf.getPage(pageNumber);
+    const baseViewport = page.getViewport({ scale: 1 });
+    const maxSide = Math.max(baseViewport.width, baseViewport.height);
+    const scale = Math.min(1.6, 1280 / Math.max(1, maxSide));
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(viewport.width));
+    canvas.height = Math.max(1, Math.round(viewport.height));
+    const ctx = canvas.getContext("2d", { alpha: false });
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.72));
+    if (blob) pages.push({ pageNumber, blob });
+    page.cleanup();
+  }
+
+  return { pages, totalPages: pdf.numPages, limited: pdf.numPages > count };
+}
+
+async function uploadPdfRequest(file, scannedPages = null) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  if (scannedPages?.pages?.length) {
+    for (const item of scannedPages.pages) {
+      formData.append("scanPage", item.blob, `page-${item.pageNumber}.jpg`);
+      formData.append("scanPageNumber", String(item.pageNumber));
+    }
+    formData.append("scanTotalPages", String(scannedPages.totalPages || scannedPages.pages.length));
+    formData.append("scanLimited", scannedPages.limited ? "1" : "0");
+  }
+
+  return fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${authToken}` },
+    body: formData
+  });
+}
+
 async function uploadPdf(file) {
 
   if (!authToken) {
@@ -5266,36 +5352,23 @@ async function uploadPdf(file) {
   }
 
 
-  const formData =
-    new FormData();
+  let response = await uploadPdfRequest(file);
 
-
-  formData.append(
-    "file",
-    file
-  );
-
-
-  const response =
-    await fetch(
-      WORKER_URL,
-      {
-
-        method:
-          "POST",
-
-        headers: {
-
-          "Authorization":
-            `Bearer ${authToken}`
-
-        },
-
-        body:
-          formData
-
+  // Normal PDF'den hiç metin çıkmazsa veya yalnızca Contents/başlık gibi
+  // yetersiz metin çıkarsa sayfaları görsele çevirip
+  // aynı PDF uç noktasına tekrar gönder. Böylece taranmış PDF'ler
+  // de Workers AI görsel okuma hattından geçer.
+  if (response.status === 422) {
+    let firstError = null;
+    try { firstError = await response.clone().json(); } catch {}
+    const message = String(firstError?.error || firstError?.details || "");
+    if (/metin çıkarılamadı|yeterli metin|görsel okuma gerekli|dönüştürülürken/i.test(message)) {
+      const scannedPages = await renderScannedPdfPages(file, 30);
+      if (scannedPages.pages.length) {
+        response = await uploadPdfRequest(file, scannedPages);
       }
-    );
+    }
+  }
 
 
   if (
