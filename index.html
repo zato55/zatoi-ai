@@ -7483,37 +7483,48 @@ function renderAll() {
 
 if ("serviceWorker" in navigator) {
 
-  window.addEventListener("load", () => {
+  let zatoiReloadingForUpdate = false;
 
-    navigator.serviceWorker
-      .register("./service-worker.js")
-      .then(registration => {
-
-        console.log(
-          "Zatoi PWA Service Worker aktif."
-        );
-
-        registration.addEventListener("updatefound", () => {
-          const installing = registration.installing;
-          installing?.addEventListener("statechange", () => {
-            if (installing.state === "installed" && navigator.serviceWorker.controller) {
-              if (confirm("Zatoi AI için yeni sürüm hazır. Şimdi yenilensin mi?")) location.reload();
-            }
-          });
-        });
-
-      })
-      .catch(error => {
-
-        console.error(
-          "Zatoi Service Worker hatası:",
-          error
-        );
-
-      });
-
+  // Yeni Service Worker kontrolü tamamlandığında uygulamayı yalnızca bir kez yenile.
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (zatoiReloadingForUpdate) return;
+    zatoiReloadingForUpdate = true;
+    window.location.reload();
   });
 
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register(
+        "./service-worker.js",
+        { updateViaCache: "none" }
+      );
+
+      console.log("Zatoi PWA Service Worker aktif.");
+
+      // Uygulama her açıldığında GitHub/CDN önbelleğini kullanmadan yeni SW kontrolü yap.
+      await registration.update();
+
+      registration.addEventListener("updatefound", () => {
+        const installing = registration.installing;
+        if (!installing) return;
+
+        installing.addEventListener("statechange", () => {
+          if (installing.state === "installed" && navigator.serviceWorker.controller) {
+            // Yeni SW skipWaiting kullandığı için controllerchange olayı otomatik yenileyecek.
+            console.log("Zatoi AI yeni sürümü bulundu; otomatik güncelleniyor.");
+          }
+        });
+      });
+
+      // Uygulama uzun süre açık kalırsa da güncellemeleri yakala.
+      window.setInterval(() => {
+        registration.update().catch(() => {});
+      }, 60 * 60 * 1000);
+
+    } catch (error) {
+      console.error("Zatoi Service Worker hatası:", error);
+    }
+  });
 }
 
 
