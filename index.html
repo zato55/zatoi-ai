@@ -4042,6 +4042,13 @@ function renderMessages() {
           generated.src = imageSrc;
           generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
           generated.onclick = () => openImageViewer(imageSrc, generated.alt);
+          const meta = message.generationMeta?.[index] || {};
+          const metaText = document.createElement("div");
+          metaText.style.cssText = "margin:0 0 7px;text-align:center;color:#94a3b8;font-size:11px;word-break:break-word";
+          const referenceLabel = meta.referenceMode === "user"
+            ? "yüklenen referans"
+            : (meta.referenceMode === "automatic" ? "internet referansı" : "referans yok");
+          metaText.textContent = meta.model ? `${meta.model} • ${referenceLabel}` : `Model bilgisi yok • ${referenceLabel}`;
           const choose = document.createElement("button");
           choose.className = "choice-button";
           choose.textContent = message.chosenImage === index ? "✓ Seçildi" : `Seçenek ${index + 1}'i seç`;
@@ -4051,7 +4058,7 @@ function renderMessages() {
           download.download = `zatoi-gorsel-${index + 1}-${Date.now()}.jpg`;
           download.textContent = "⬇ İndir";
           download.style.cssText = "display:block;text-align:center;margin-top:6px;color:#93c5fd;font-size:12px;text-decoration:none";
-          choice.append(generated, choose, download);
+          choice.append(generated, metaText, choose, download);
           pair.appendChild(choice);
         });
         bubble.insertBefore(pair, content);
@@ -5134,12 +5141,17 @@ async function requestGeneratedImage(description, variant, referenceImage = "") 
   }
   const imageBlob = await response.blob();
   if (!imageBlob.type.startsWith("image/")) throw new Error("Worker geçerli bir görsel döndürmedi.");
-  return new Promise((resolve, reject) => {
+  const dataUrl = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result || ""));
     reader.onerror = () => reject(new Error("Üretilen görsel okunamadı."));
     reader.readAsDataURL(imageBlob);
   });
+  return {
+    dataUrl,
+    model: response.headers.get("X-Zatoi-Image-Model") || "",
+    referenceMode: response.headers.get("X-Zatoi-Reference-Mode") || "none"
+  };
 }
 
 async function generateImage(promptText = "", referenceImage = "", referencePreview = "", referenceName = "") {
@@ -5167,7 +5179,11 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
     chat.messages.push({
       role: "assistant",
       content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
-      generatedImages: [imageA, imageB],
+      generatedImages: [imageA.dataUrl, imageB.dataUrl],
+      generationMeta: [
+        { model: imageA.model, referenceMode: imageA.referenceMode },
+        { model: imageB.model, referenceMode: imageB.referenceMode }
+      ],
       preferenceChoiceId: crypto.randomUUID(),
       imagePrompt: description,
       sourceReferenceImage: referenceImage,
