@@ -2187,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.1 • Akıllı Taranmış PDF Okuma</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.3 • Son 5 Görsel Kalıcı Hafıza</span></div>
       </div>
     </div>
   </section>
@@ -3911,6 +3911,7 @@ async function syncChatsWithCloud(silent = false) {
 
     saveChats();
     renderAll();
+    hydratePersistedImagesForChats(chats).catch(() => {});
 
     // Eski tarayıcı sohbetlerini ilk senkron sırasında buluta taşı.
     for (const chat of uploadAfterMerge) {
@@ -4048,6 +4049,9 @@ function selectChat(id) {
   clearSelectedFile();
 
   renderAll();
+
+  const selectedChat = getActiveChat();
+  if (selectedChat) hydratePersistedImagesForChats([selectedChat]).catch(() => {});
 
   closeMobileHistory();
 
@@ -4499,11 +4503,17 @@ function renderMessages() {
         message.generatedImages.forEach((imageSrc, index) => {
           const choice = document.createElement("div");
           choice.className = "generated-choice" + (message.chosenImage === index ? " selected" : "");
-          const generated = document.createElement("img");
+          const imageExpired = !imageSrc || imageSrc === "__ZATOI_EXPIRED_IMAGE__";
+          const generated = document.createElement(imageExpired ? "div" : "img");
           generated.className = "generated-image";
-          generated.src = imageSrc;
-          generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
-          generated.onclick = () => openImageViewer(imageSrc, generated.alt);
+          if (imageExpired) {
+            generated.style.cssText = "aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;background:#0b1118;color:#94a3b8;font-size:12px;border:1px dashed #34424f";
+            generated.textContent = "Bu eski görsel son 5 görsel hafızası dışında kaldı.";
+          } else {
+            generated.src = imageSrc;
+            generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
+            generated.onclick = () => openImageViewer(imageSrc, generated.alt);
+          }
           const meta = message.generationMeta?.[index] || {};
           const metaText = document.createElement("div");
           metaText.style.cssText = "margin:0 0 7px;text-align:center;color:#94a3b8;font-size:11px;word-break:break-word";
@@ -4514,7 +4524,10 @@ function renderMessages() {
           const choose = document.createElement("button");
           choose.className = "choice-button";
           choose.textContent = message.chosenImage === index ? "✓ Seçildi" : `Seçenek ${index + 1}'i seç`;
-          choose.onclick = () => chooseGeneratedImage(message, index);
+          choose.disabled = imageExpired;
+          choose.onclick = () => {
+            if (!imageExpired) chooseGeneratedImage(message, index);
+          };
 
           const regenerate = document.createElement("button");
           regenerate.className = "choice-button";
@@ -4522,7 +4535,7 @@ function renderMessages() {
           regenerate.title = `Seçenek ${index + 1}'i yerinde yeniden oluştur`;
           regenerate.setAttribute("aria-label", `Seçenek ${index + 1}'i yerinde yeniden oluştur`);
           const isRegenerating = message.regeneratingIndex === index;
-          regenerate.disabled = isRegenerating;
+          regenerate.disabled = isRegenerating || imageExpired;
           regenerate.textContent = isRegenerating ? "↻ Yeniden oluşturuluyor..." : "↻ Yeniden Oluştur";
           regenerate.onclick = async () => {
             if (regenerate.disabled) return;
@@ -4532,10 +4545,14 @@ function renderMessages() {
           };
 
           const download = document.createElement("a");
-          download.href = imageSrc;
-          download.download = `zatoi-gorsel-${index + 1}-${Date.now()}.jpg`;
-          download.textContent = "⬇ İndir";
+          download.href = imageExpired ? "#" : imageSrc;
+          download.download = imageExpired ? "" : `zatoi-gorsel-${index + 1}-${Date.now()}.png`;
+          download.textContent = imageExpired ? "Hafızadan temizlendi" : "⬇ İndir";
           download.style.cssText = "display:block;text-align:center;margin-top:6px;color:#93c5fd;font-size:12px;text-decoration:none";
+          if (imageExpired) {
+            download.style.pointerEvents = "none";
+            download.style.opacity = "0.6";
+          }
           choice.append(generated, metaText, choose, regenerate, download);
           pair.appendChild(choice);
         });
@@ -5894,6 +5911,11 @@ async function regenerateGeneratedImage(message, index) {
 
     targetMessage.generatedImages[index] = replacement.dataUrl;
 
+    if (!Array.isArray(targetMessage.generatedImageIds)) {
+      targetMessage.generatedImageIds = [];
+    }
+    targetMessage.generatedImageIds[index] = replacement.imageId || "";
+
     if (!Array.isArray(targetMessage.generationMeta)) {
       targetMessage.generationMeta = [];
     }
@@ -5952,10 +5974,95 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
   });
   return {
     dataUrl,
+    imageId: response.headers.get("X-Zatoi-Image-Id") || "",
     model: response.headers.get("X-Zatoi-Image-Model") || "",
     referenceMode: response.headers.get("X-Zatoi-Reference-Mode") || "none"
   };
 }
+
+async function fetchStoredGeneratedImage(imageId) {
+  const id = String(imageId || "").trim();
+  if (!id || !authToken) return "";
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ type: "image_get", imageId: id })
+    });
+
+    if (response.status === 401) {
+      await forceLogout();
+      return "";
+    }
+
+    if (!response.ok) return "";
+    const blob = await response.blob();
+    if (!blob.type.startsWith("image/")) return "";
+
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("Kayıtlı görsel okunamadı."));
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return "";
+  }
+}
+
+const hydratingStoredImages = new Set();
+
+async function hydratePersistedImagesForChats(targetChats = chats) {
+  if (!authToken || !Array.isArray(targetChats)) return;
+
+  let changed = false;
+  const jobs = [];
+
+  for (const chat of targetChats) {
+    if (!chat || !Array.isArray(chat.messages)) continue;
+
+    for (const message of chat.messages) {
+      if (message?.role !== "assistant" || !Array.isArray(message.generatedImageIds) || !message.generatedImageIds.length) continue;
+
+      if (!Array.isArray(message.generatedImages)) {
+        message.generatedImages = new Array(message.generatedImageIds.length).fill("");
+      }
+
+      message.generatedImageIds.forEach((imageId, index) => {
+        if (!imageId || message.generatedImages[index]) return;
+        const key = `${chat.id}:${message.generationId || message.preferenceChoiceId || message.time || "msg"}:${index}:${imageId}`;
+        if (hydratingStoredImages.has(key)) return;
+        hydratingStoredImages.add(key);
+
+        jobs.push((async () => {
+          try {
+            const dataUrl = await fetchStoredGeneratedImage(imageId);
+            if (dataUrl) {
+              message.generatedImages[index] = dataUrl;
+              changed = true;
+            } else {
+              // Son 5 sınırı nedeniyle silinmiş eski görsel için kırık img yerine boş işaret bırak.
+              message.generatedImages[index] = "__ZATOI_EXPIRED_IMAGE__";
+              changed = true;
+            }
+          } finally {
+            hydratingStoredImages.delete(key);
+          }
+        })());
+      });
+    }
+  }
+
+  if (jobs.length) {
+    await Promise.all(jobs);
+    if (changed) renderAll();
+  }
+}
+
 
 async function generateImage(promptText = "", referenceImage = "", referencePreview = "", referenceName = "") {
   if (sending) return;
@@ -5984,6 +6091,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
       role: "assistant",
       content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
       generatedImages: [imageA.dataUrl, imageB.dataUrl],
+      generatedImageIds: [imageA.imageId, imageB.imageId],
       generationMeta: [
         { model: imageA.model, referenceMode: imageA.referenceMode },
         { model: imageB.model, referenceMode: imageB.referenceMode }
