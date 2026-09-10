@@ -1347,6 +1347,13 @@
     .generated-image-actions { display:flex; gap:8px; margin:7px 0; }
     .generated-image-actions a { display:inline-flex; align-items:center; gap:5px; padding:7px 10px;
       border-radius:9px; background:#2563eb; color:#fff; text-decoration:none; font-size:12px; }
+    .generated-pair { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+    .generated-choice { padding:7px; border:1px solid #34424f; border-radius:13px; background:#101821; }
+    .generated-choice.selected { border:2px solid #3b82f6; }
+    .generated-choice .generated-image { width:100%; margin:0 0 7px; }
+    .choice-button { width:100%; padding:8px; border-radius:9px; background:#253444; color:#fff; }
+    .generated-choice.selected .choice-button { background:#2563eb; }
+    @media (max-width:520px) { .generated-pair { grid-template-columns:1fr; } }
     .account-tool.danger { background:#3a171c; border-color:#7f1d1d; color:#fecaca; }
     .network-banner { display:none; position:fixed; z-index:3000; top:0; left:50%; transform:translateX(-50%);
       padding:8px 15px; background:#7f1d1d; color:white; border-radius:0 0 10px 10px; font-size:13px; }
@@ -1914,6 +1921,8 @@ const GLOBAL_MEMORY_KEY =
 const THEME_SETTING_KEY = "zatoi_theme_v1";
 const FONT_SIZE_SETTING_KEY = "zatoi_font_size_v1";
 const ANIMATIONS_SETTING_KEY = "zatoi_animations_v1";
+const IMAGE_PREFERENCE_KEY = "zatoi_image_preference_v1";
+const PENDING_IMAGE_CHOICES_KEY = "zatoi_pending_image_choices_v1";
 
 
 
@@ -1936,6 +1945,14 @@ let authToken =
 
 
 let currentUser = null;
+
+let imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+let pendingImageChoices = [];
+try {
+  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(IMAGE_PREFERENCE_KEY) || "{}") };
+  const pending = JSON.parse(localStorage.getItem(PENDING_IMAGE_CHOICES_KEY) || "[]");
+  pendingImageChoices = Array.isArray(pending) ? pending : [];
+} catch {}
 
 
 try {
@@ -2581,6 +2598,7 @@ async function registerAccount() {
     authPasswordConfirm.value = "";
 
 
+    await syncImagePreference();
     await syncChatsWithCloud();
 
     showApp();
@@ -2696,6 +2714,7 @@ async function loginAccount() {
     authPassword.value = "";
 
 
+    await syncImagePreference();
     await syncChatsWithCloud();
 
     showApp();
@@ -2895,6 +2914,7 @@ async function checkAuth() {
     );
 
 
+    await syncImagePreference();
     await syncChatsWithCloud();
 
     showApp();
@@ -3061,7 +3081,7 @@ function saveChats() {
 
     JSON.stringify(
       chats,
-      (key, value) => key === "generatedImage" ? undefined : value
+      (key, value) => (key === "generatedImage" || key === "generatedImages") ? undefined : value
     )
 
   );
@@ -4011,7 +4031,31 @@ function renderMessages() {
         content
       );
 
-      if (message.role === "assistant" && message.generatedImage) {
+      if (message.role === "assistant" && Array.isArray(message.generatedImages) && message.generatedImages.length) {
+        const pair = document.createElement("div");
+        pair.className = "generated-pair";
+        message.generatedImages.forEach((imageSrc, index) => {
+          const choice = document.createElement("div");
+          choice.className = "generated-choice" + (message.chosenImage === index ? " selected" : "");
+          const generated = document.createElement("img");
+          generated.className = "generated-image";
+          generated.src = imageSrc;
+          generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
+          generated.onclick = () => openImageViewer(imageSrc, generated.alt);
+          const choose = document.createElement("button");
+          choose.className = "choice-button";
+          choose.textContent = message.chosenImage === index ? "✓ Seçildi" : `Seçenek ${index + 1}'i seç`;
+          choose.onclick = () => chooseGeneratedImage(message, index);
+          const download = document.createElement("a");
+          download.href = imageSrc;
+          download.download = `zatoi-gorsel-${index + 1}-${Date.now()}.jpg`;
+          download.textContent = "⬇ İndir";
+          download.style.cssText = "display:block;text-align:center;margin-top:6px;color:#93c5fd;font-size:12px;text-decoration:none";
+          choice.append(generated, choose, download);
+          pair.appendChild(choice);
+        });
+        bubble.insertBefore(pair, content);
+      } else if (message.role === "assistant" && message.generatedImage) {
         const generated = document.createElement("img");
         generated.className = "generated-image";
         generated.src = message.generatedImage;
@@ -4969,6 +5013,117 @@ function findPreviousImagePrompt(chat) {
   return "";
 }
 
+function getImagePreferenceText() {
+  if (!imagePreference.choices) {
+    return "Main subject large and dominant, clean background, high detail.";
+  }
+  if (imagePreference.realistic >= imagePreference.cinematic) {
+    return "Prefer photorealistic rendering, natural lighting, close subject-focused framing and a simple background.";
+  }
+  return "Prefer cinematic lighting and dynamic composition with rich detail, while keeping the main subject large and dominant.";
+}
+
+async function imagePreferenceRequest(action, payload = {}) {
+  if (!authToken) throw new Error("AUTH_REQUIRED");
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
+    body: JSON.stringify({ type: "image_preference", action, ...payload })
+  });
+  let data = {};
+  try { data = await response.json(); } catch {}
+  if (response.status === 401) throw new Error("AUTH_REQUIRED");
+  if (!response.ok) throw new Error(data.error || "Görsel tercihi kaydedilemedi.");
+  return data;
+}
+
+function storeImagePreference(preference) {
+  imagePreference = {
+    realistic: Math.max(0, Number(preference?.realistic) || 0),
+    cinematic: Math.max(0, Number(preference?.cinematic) || 0),
+    choices: Math.max(0, Number(preference?.choices) || 0)
+  };
+  localStorage.setItem(IMAGE_PREFERENCE_KEY, JSON.stringify(imagePreference));
+}
+
+function savePendingImageChoices() {
+  localStorage.setItem(PENDING_IMAGE_CHOICES_KEY, JSON.stringify(pendingImageChoices));
+}
+
+async function syncImagePreference() {
+  if (!authToken || !currentUser?.userId) return;
+  const userId = currentUser.userId;
+  const mine = pendingImageChoices.filter(item => item.userId === userId);
+  for (const item of mine) {
+    try {
+      const data = await imagePreferenceRequest("choose", { choiceId: item.choiceId, choice: item.choice });
+      pendingImageChoices = pendingImageChoices.filter(pending =>
+        !(pending.userId === userId && pending.choiceId === item.choiceId)
+      );
+      savePendingImageChoices();
+      if (data.preference) storeImagePreference(data.preference);
+    } catch (error) {
+      if (error.message === "AUTH_REQUIRED") throw error;
+      break;
+    }
+  }
+  const data = await imagePreferenceRequest("get");
+  if (data.preference) storeImagePreference(data.preference);
+}
+
+function chooseGeneratedImage(message, index) {
+  const previous = Number.isInteger(message.chosenImage) ? message.chosenImage : null;
+  if (previous === index) return;
+  if (previous === 0) imagePreference.realistic = Math.max(0, imagePreference.realistic - 1);
+  if (previous === 1) imagePreference.cinematic = Math.max(0, imagePreference.cinematic - 1);
+  if (previous === null) imagePreference.choices += 1;
+  if (index === 0) imagePreference.realistic += 1;
+  if (index === 1) imagePreference.cinematic += 1;
+  message.chosenImage = index;
+  localStorage.setItem(IMAGE_PREFERENCE_KEY, JSON.stringify(imagePreference));
+  const choiceId = message.preferenceChoiceId || (message.preferenceChoiceId = crypto.randomUUID());
+  const userId = currentUser?.userId || "";
+  pendingImageChoices = pendingImageChoices.filter(item => !(item.userId === userId && item.choiceId === choiceId));
+  pendingImageChoices.push({ userId, choiceId, choice: index === 0 ? "A" : "B" });
+  savePendingImageChoices();
+  const chat = getActiveChat();
+  if (chat) { chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat); }
+  renderMessages();
+  syncImagePreference().then(() => renderMessages()).catch(error => {
+    if (error.message === "AUTH_REQUIRED") forceLogout();
+  });
+}
+
+async function requestGeneratedImage(description, variant) {
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
+    body: JSON.stringify({
+      type: "image_generate",
+      prompt: description,
+      variant,
+      preference: getImagePreferenceText()
+    })
+  });
+  if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
+  if (!response.ok) {
+    let message = "Görsel üretilemedi.";
+    try {
+      const errorData = await response.json();
+      message = errorData.details || errorData.error || message;
+    } catch {}
+    throw new Error(message);
+  }
+  const imageBlob = await response.blob();
+  if (!imageBlob.type.startsWith("image/")) throw new Error("Worker geçerli bir görsel döndürmedi.");
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Üretilen görsel okunamadı."));
+    reader.readAsDataURL(imageBlob);
+  });
+}
+
 async function generateImage(promptText = "") {
   if (sending) return;
   let description = String(promptText || "").trim();
@@ -4983,29 +5138,16 @@ async function generateImage(promptText = "") {
   updateTitle(chat, description); chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat);
   setInput(""); renderAll(); showTyping();
   try {
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
-      body: JSON.stringify({ type: "image_generate", prompt: description })
+    const imageA = await requestGeneratedImage(description, "A");
+    const imageB = await requestGeneratedImage(description, "B");
+    chat.messages.push({
+      role: "assistant",
+      content: "İki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
+      generatedImages: [imageA, imageB],
+      preferenceChoiceId: crypto.randomUUID(),
+      imagePrompt: description,
+      time: Date.now()
     });
-    if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
-    if (!response.ok) {
-      let message = "Görsel üretilemedi.";
-      try {
-        const errorData = await response.json();
-        message = errorData.details || errorData.error || message;
-      } catch {}
-      throw new Error(message);
-    }
-    const imageBlob = await response.blob();
-    if (!imageBlob.type.startsWith("image/")) throw new Error("Worker geçerli bir görsel döndürmedi.");
-    const imageData = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = () => reject(new Error("Üretilen görsel okunamadı."));
-      reader.readAsDataURL(imageBlob);
-    });
-    chat.messages.push({ role: "assistant", content: "Görselin hazır. Kalıcı saklamak için indirebilirsin.", generatedImage: imageData, imagePrompt: description, time: Date.now() });
     chat.updatedAt = Date.now();
     renderAll();
   } catch (error) {
@@ -6271,6 +6413,10 @@ clearDataButton.onclick = async () => {
     await authRequest("clear_data", "", password);
     chats = [createChat()]; activeChatId = chats[0].id;
     globalMemory = { name: "", facts: [], preferences: [] };
+    imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+    pendingImageChoices = pendingImageChoices.filter(item => item.userId !== currentUser?.userId);
+    localStorage.setItem(IMAGE_PREFERENCE_KEY, JSON.stringify(imagePreference));
+    savePendingImageChoices();
     saveChats(); saveMemory(); renderAll(); closeSettings();
     alert("Sohbetler ve hafıza temizlendi.");
   } catch (error) { alert(error.message || "Veriler temizlenemedi."); }
@@ -6283,6 +6429,7 @@ deleteAccountButton.onclick = async () => {
     await authRequest("delete_account", "", password);
     localStorage.removeItem(CHATS_KEY); localStorage.removeItem(ACTIVE_CHAT_KEY);
     localStorage.removeItem(GLOBAL_MEMORY_KEY); localStorage.removeItem(AUTH_TOKEN_KEY); localStorage.removeItem(AUTH_USER_KEY);
+    localStorage.removeItem(IMAGE_PREFERENCE_KEY); localStorage.removeItem(PENDING_IMAGE_CHOICES_KEY);
     authToken = ""; currentUser = null; chats = []; showAuthScreen();
     alert("Hesabın silindi.");
   } catch (error) { alert(error.message || "Hesap silinemedi."); }
