@@ -2187,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.6 • Referans 413 Fix + Son 6 Görsel Hafıza</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.7 • Akıllı Router + Sağlam PDF + Hata Kurtarma + Son 6 Görsel</span></div>
       </div>
     </div>
   </section>
@@ -5556,7 +5556,7 @@ async function processSelectedFiles(fileList) {
         updateFileUI();
         focusInput();
       } catch (error) {
-        alert(error.message || "PDF yüklenemedi.");
+        alert(friendlyClientError(error, "PDF okunamadı. Lütfen tekrar dene."));
         clearSelectedFile();
       }
 
@@ -6161,7 +6161,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
     chat.updatedAt = Date.now();
     renderAll();
   } catch (error) {
-    alert(error.message || "Görsel üretilemedi.");
+    alert(friendlyClientError(error, "Görsel üretilemedi. Lütfen tekrar dene."));
   } finally {
     hideTyping();
     sending = false;
@@ -6246,6 +6246,47 @@ async function forceLogout() {
 }
 
 
+function friendlyClientError(error, fallback = "İşlem tamamlanamadı. Lütfen tekrar dene.") {
+  const raw = String(error?.message || error || "").trim();
+  if (!raw) return fallback;
+  if (/413|gövdesi çok büyük|çok büyük/i.test(raw)) return "Dosya/görsel gönderim için fazla büyük. Zatoi küçültüp tekrar denemeyi başaramadı; daha küçük bir dosyayla tekrar dene.";
+  if (/429|çok fazla|çok hızlı|limit|quota/i.test(raw)) return "Kısa sürede çok fazla işlem yapıldı. Biraz bekleyip tekrar dene.";
+  if (/401|AUTH_REQUIRED|oturum/i.test(raw)) return "Oturum süren dolmuş. Tekrar giriş yap.";
+  if (/network|fetch|bağlantı|internet/i.test(raw)) return "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.";
+  if (/3030|tensor|model input/i.test(raw)) return "Referans görsel modele uygun biçimde işlenemedi. Zatoi normal üretimle tekrar deneyebilir.";
+  if (/5018|model.*eriş/i.test(raw)) return "Bu görsel modeli şu anda kullanılamıyor. Zatoi alternatif modelle devam etmeyi deneyecek.";
+  return raw.length > 220 ? fallback : raw;
+}
+
+async function requestIntentRouter(text, chat, hasImages, hasDocument) {
+  if (!authToken) return null;
+  const recent = findLatestGeneratedMessage(chat);
+  const shouldAsk = !!recent || hasImages || hasDocument || /(çiz|oluştur|üret|tasarla|görselleştir|resmet|olmamış|olmamis|beğenmedim|begenmedim|düzelt|değiştir|degistir|yeniden|tekrar)/i.test(String(text || ""));
+  if (!shouldAsk) return null;
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
+      body: JSON.stringify({
+        type: "intent_router",
+        text: String(text || "").slice(0, 2000),
+        context: {
+          recentImagePrompt: recent?.imagePrompt || "",
+          hasImages: !!hasImages,
+          hasDocument: !!hasDocument
+        }
+      })
+    });
+    if (response.status === 401) { await forceLogout(); return null; }
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data?.intent) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 /* ==========================================
    MESAJ GÖNDER
 ========================================== */
@@ -6319,57 +6360,52 @@ async function sendMessage() {
   }
 
 
-  // Açık ve yeni bir görsel komutu her zaman yeni konu sayılır.
-  // Önceki görsel bağlamı yalnızca "olmamış", "daha karanlık yap" gibi
-  // öznesiz devam/düzeltme cümlelerinde kullanılmalıdır.
+  // Merkezi niyet motoru: özellikle görsel üretim/devam mesajlarında sadece kelime
+  // aramak yerine son görsel bağlamını da dikkate alır. Worker yanıt veremezse
+  // aşağıdaki yerel kurallar güvenli fallback olarak çalışır.
+  const routedIntent = await requestIntentRouter(text, chat, imagesForAI.length > 0, hasDocumentContext);
   const explicitNewImagePrompt = imagePromptFromText(text);
-  const isExplicitNewImageRequest = explicitNewImagePrompt !== null &&
-    explicitNewImagePrompt !== "__PREVIOUS_IMAGE_REQUEST__";
+  const localExplicitNew = explicitNewImagePrompt !== null && explicitNewImagePrompt !== "__PREVIOUS_IMAGE_REQUEST__";
+  const wantsNewImage = routedIntent?.intent === "new_image" || localExplicitNew;
+  const wantsImageRevision = routedIntent?.intent === "edit_previous_image" ||
+    (!imagesForAI.length && !wantsNewImage && isImageRevisionRequest(text, chat));
 
-  if (!imagesForAI.length && !isExplicitNewImageRequest && isImageRevisionRequest(text, chat)) {
+  if (!imagesForAI.length && wantsImageRevision) {
     const previousGeneration = findLatestGeneratedMessage(chat);
     if (previousGeneration) {
       setInput("");
-
       const feedback = String(text || "").trim();
       const genericFailure = /^(?:bu\s+)?(?:hiç\s+)?(?:olmamış|olmamis|olmadı|olmadi|beğenmedim|begenmedim|kötü\s+olmuş|kotu\s+olmus|iyi\s+olmamış|iyi\s+olmamis|bu\s+değil|bu\s+degil|böyle\s+değil|boyle\s+degil|yanlış|yanlis)[.!…]*$/i.test(feedback);
-
+      const routedRevision = String(routedIntent?.imagePrompt || "").trim();
       const revisionPrompt = genericFailure
-        ? `${previousGeneration.imagePrompt}. Kullanıcı önceki görsel sonucunu beğenmedi ve "${feedback}" dedi. Önceki hatalı sonucu kopyalama. Konuyu yeniden değerlendir, ana özneyi daha doğru temsil et, anatomi ve yüz/kimlik tutarlılığını iyileştir, daha başarılı iki yeni alternatif üret.`
-        : `${previousGeneration.imagePrompt}. Kullanıcının önceki görsel için devam/düzenleme isteği: "${feedback}". Bu isteği doğrudan uygula; önceki sahnenin ana fikrini koru fakat kullanıcının belirttiği değişikliği belirgin biçimde gerçekleştir.`;
+        ? `${previousGeneration.imagePrompt}. Kullanıcı önceki sonucu beğenmedi. Aynı ana konuyu koru fakat önceki hatayı tekrarlama; özneyi daha doğru, temiz ve tutarlı üret.`
+        : `${previousGeneration.imagePrompt}. Kullanıcının düzenleme isteği: "${routedRevision || feedback}". Ana konuyu koru ve yalnızca istenen değişikliği belirgin biçimde uygula.`;
 
-      // Kullanıcı seçeneklerden birini seçtiyse, belirgin bir düzenleme isteğinde o görseli
-      // referans olarak kullan. "Olmamış / beğenmedim" gibi genel reddetmelerde kötü sonucu
-      // kopyalamamak için orijinal referansa dön.
       let revisionReference = previousGeneration.sourceReferenceImage || "";
       let revisionPreview = previousGeneration.sourceReferencePreview || "";
       let revisionName = previousGeneration.sourceReferenceName || "";
-
       if (!genericFailure && Number.isInteger(previousGeneration.chosenImage)) {
         const chosen = previousGeneration.generatedImages?.[previousGeneration.chosenImage];
-        if (chosen) {
+        if (chosen && chosen !== "__ZATOI_EXPIRED_IMAGE__") {
           revisionReference = chosen;
           revisionPreview = chosen;
           revisionName = `Önceki görsel seçenek ${previousGeneration.chosenImage + 1}`;
         }
       }
-
-      await generateImage(
-        revisionPrompt,
-        revisionReference,
-        revisionPreview,
-        revisionName
-      );
+      await generateImage(revisionPrompt, revisionReference, revisionPreview, revisionName);
       return;
     }
   }
 
-  const requestedImagePrompt = explicitNewImagePrompt;
-  if (requestedImagePrompt !== null) {
+  if (wantsNewImage || explicitNewImagePrompt === "__PREVIOUS_IMAGE_REQUEST__") {
     setInput("");
-    const resolvedPrompt = requestedImagePrompt === "__PREVIOUS_IMAGE_REQUEST__"
-      ? findPreviousImagePrompt(chat)
-      : requestedImagePrompt;
+    let resolvedPrompt = String(routedIntent?.imagePrompt || "").trim();
+    if (!resolvedPrompt) {
+      resolvedPrompt = explicitNewImagePrompt === "__PREVIOUS_IMAGE_REQUEST__"
+        ? findPreviousImagePrompt(chat)
+        : (explicitNewImagePrompt || text);
+    }
+    // Yeni görsel isteğinde eski görsel konusu/referansı kesinlikle taşınmaz.
     await generateImage(
       resolvedPrompt,
       imagesForAI[0]?.data || "",
