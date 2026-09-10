@@ -4176,12 +4176,23 @@ function renderMessages() {
           choose.className = "choice-button";
           choose.textContent = message.chosenImage === index ? "✓ Seçildi" : `Seçenek ${index + 1}'i seç`;
           choose.onclick = () => chooseGeneratedImage(message, index);
+
+          const regenerate = document.createElement("button");
+          regenerate.className = "choice-button";
+          regenerate.style.marginTop = "6px";
+          regenerate.title = `Seçenek ${index + 1}'i yerinde yeniden oluştur`;
+          regenerate.setAttribute("aria-label", `Seçenek ${index + 1}'i yerinde yeniden oluştur`);
+          const isRegenerating = message.regeneratingIndex === index;
+          regenerate.disabled = sending || isRegenerating;
+          regenerate.textContent = isRegenerating ? "↻ Oluşturuluyor..." : "↻ Yeniden Oluştur";
+          regenerate.onclick = () => regenerateGeneratedImage(message, index);
+
           const download = document.createElement("a");
           download.href = imageSrc;
           download.download = `zatoi-gorsel-${index + 1}-${Date.now()}.jpg`;
           download.textContent = "⬇ İndir";
           download.style.cssText = "display:block;text-align:center;margin-top:6px;color:#93c5fd;font-size:12px;text-decoration:none";
-          choice.append(generated, metaText, choose, download);
+          choice.append(generated, metaText, choose, regenerate, download);
           pair.appendChild(choice);
         });
         bubble.insertBefore(pair, content);
@@ -5326,6 +5337,58 @@ function chooseGeneratedImage(message, index) {
   });
 }
 
+async function regenerateGeneratedImage(message, index) {
+  if (sending) return;
+  if (!message || !Array.isArray(message.generatedImages)) return;
+  if (index < 0 || index >= message.generatedImages.length) return;
+  if (!navigator.onLine) return alert("İnternet bağlantısı yok.");
+
+  const chat = getActiveChat();
+  if (!chat || !chat.messages.includes(message)) return;
+
+  const description = String(message.imagePrompt || "").trim();
+  if (!description) return alert("Bu görselin oluşturma açıklaması bulunamadı.");
+
+  const variant = index === 0 ? "A" : "B";
+  const referenceImage = String(message.sourceReferenceImage || "");
+  const generationId = String(message.generationId || crypto.randomUUID());
+  message.generationId = generationId;
+  message.regeneratingIndex = index;
+  sending = true;
+  renderMessages();
+
+  try {
+    const replacement = await requestGeneratedImage(
+      description,
+      variant,
+      referenceImage,
+      generationId
+    );
+
+    message.generatedImages[index] = replacement.dataUrl;
+
+    if (!Array.isArray(message.generationMeta)) {
+      message.generationMeta = [];
+    }
+
+    message.generationMeta[index] = {
+      model: replacement.model,
+      referenceMode: replacement.referenceMode
+    };
+
+    message.time = Date.now();
+    chat.updatedAt = Date.now();
+    saveChats();
+    queueCloudSave(chat);
+  } catch (error) {
+    alert(error.message || "Görsel yeniden oluşturulamadı.");
+  } finally {
+    delete message.regeneratingIndex;
+    sending = false;
+    renderAll();
+  }
+}
+
 async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "") {
   const response = await fetch(WORKER_URL, {
     method: "POST",
@@ -5395,6 +5458,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
         { model: imageB.model, referenceMode: imageB.referenceMode }
       ],
       preferenceChoiceId: crypto.randomUUID(),
+      generationId,
       imagePrompt: description,
       sourceReferenceImage: referenceImage,
       sourceReferencePreview: referencePreview,
