@@ -428,6 +428,22 @@
       flex-shrink: 0;
     }
 
+    .mobile-history-quick-btn {
+      display: none;
+      min-width: 42px;
+      height: 40px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid #263442;
+      background: #17212b;
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
     .mobile-menu-overlay {
       position: fixed;
       inset: 0;
@@ -1126,7 +1142,14 @@
       }
 
       .chat-title {
-        max-width: calc(100vw - 76px);
+        flex: 1;
+        max-width: none;
+        text-align: center;
+        padding: 0 6px;
+      }
+
+      .mobile-history-quick-btn {
+        display: inline-flex;
       }
 
       .top-actions {
@@ -1375,7 +1398,7 @@
     body.light-theme .history-delete { background:#fff1f2; color:#be123c; border:1px solid #fecdd3; }
     body.light-theme .history-item { border-color:#e2e8f0; }
     body.light-theme .account-name, body.light-theme .new-chat-btn, body.light-theme .mobile-history-btn, body.light-theme .settings-btn,
-    body.light-theme .mobile-menu-btn, body.light-theme .voice-btn, body.light-theme .action-btn:not(.send-btn) { background:#eef2f6; color:#17202a; border-color:#d3dce5; }
+    body.light-theme .mobile-menu-btn, body.light-theme .mobile-history-quick-btn, body.light-theme .voice-btn, body.light-theme .action-btn:not(.send-btn) { background:#eef2f6; color:#17202a; border-color:#d3dce5; }
     body.light-theme .mobile-menu-panel { background:#fff; color:#17202a; border-color:#d9e1e8; }
     body.light-theme .mobile-menu-header { border-color:#d9e1e8; }
     body.light-theme .mobile-menu-close, body.light-theme .mobile-menu-account, body.light-theme .mobile-menu-action { background:#eef2f6; color:#17202a; border-color:#d3dce5; }
@@ -1735,6 +1758,16 @@
 
     <div class="chat-top">
 
+      <button
+        id="mobileHistoryQuickButton"
+        class="mobile-history-quick-btn"
+        type="button"
+        aria-label="Sohbet geçmişini aç"
+        title="Geçmiş"
+      >
+        📚
+      </button>
+
       <div
         id="chatTitle"
         class="chat-title"
@@ -1757,7 +1790,7 @@
             class="logout-btn"
             aria-label="Hesaptan çıkış yap"
           >
-            Çıkış
+            Oturumu Kapat
           </button>
 
         </div>
@@ -2055,7 +2088,7 @@
         <div class="settings-section-title">Hesap</div>
         <div class="setting-row">
           <div class="setting-info"><div class="setting-label">Kullanıcı</div><div id="settingsUsername" class="setting-desc settings-username">—</div></div>
-          <button id="settingsLogoutButton" class="settings-logout">Çıkış Yap</button>
+          <button id="settingsLogoutButton" class="settings-logout">Oturumu Kapat</button>
         </div>
         <div class="account-tools">
           <button id="exportChatButton" class="account-tool">Aktif sohbeti dışa aktar</button>
@@ -2066,7 +2099,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.3 • Mobil Hamburger Menü</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.4 • Hızlı Geçmiş Menüsü</span></div>
       </div>
     </div>
   </section>
@@ -2118,9 +2151,8 @@
     </div>
     <div id="mobileMenuUsername" class="mobile-menu-account">Hesap</div>
     <button id="mobileMenuNewChat" class="mobile-menu-action" type="button"><span class="menu-icon">＋</span><span>Yeni Sohbet</span></button>
-    <button id="mobileMenuHistory" class="mobile-menu-action" type="button"><span class="menu-icon">📚</span><span>Geçmiş</span></button>
     <button id="mobileMenuSettings" class="mobile-menu-action" type="button"><span class="menu-icon">⚙️</span><span>Ayarlar</span></button>
-    <button id="mobileMenuLogout" class="mobile-menu-action logout" type="button"><span class="menu-icon">↪</span><span>Çıkış</span></button>
+    <button id="mobileMenuLogout" class="mobile-menu-action logout" type="button"><span class="menu-icon">↪</span><span>Oturumu Kapat</span></button>
   </aside>
 </div>
 
@@ -6836,7 +6868,6 @@ const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileMenuCloseButton = document.getElementById("mobileMenuCloseButton");
 const mobileMenuUsername = document.getElementById("mobileMenuUsername");
 const mobileMenuNewChat = document.getElementById("mobileMenuNewChat");
-const mobileMenuHistory = document.getElementById("mobileMenuHistory");
 const mobileMenuSettings = document.getElementById("mobileMenuSettings");
 const mobileMenuLogout = document.getElementById("mobileMenuLogout");
 
@@ -6856,6 +6887,11 @@ function closeMobileMenu() {
   mobileMenuButton?.setAttribute("aria-expanded", "false");
 }
 
+const mobileHistoryQuickButton = document.getElementById("mobileHistoryQuickButton");
+mobileHistoryQuickButton?.addEventListener("click", () => {
+  document.getElementById("mobileHistoryButton")?.click();
+});
+
 mobileMenuButton?.addEventListener("click", openMobileMenu);
 mobileMenuCloseButton?.addEventListener("click", closeMobileMenu);
 mobileMenuOverlay?.addEventListener("click", event => {
@@ -6869,11 +6905,6 @@ document.addEventListener("keydown", event => {
 mobileMenuNewChat?.addEventListener("click", () => {
   closeMobileMenu();
   document.getElementById("newChatButton")?.click();
-});
-
-mobileMenuHistory?.addEventListener("click", () => {
-  closeMobileMenu();
-  document.getElementById("mobileHistoryButton")?.click();
 });
 
 mobileMenuSettings?.addEventListener("click", () => {
