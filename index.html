@@ -1890,7 +1890,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.0 • Mobil Yan Yana Görseller</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.1 • Mobil Geri Kaydırma Koruması</span></div>
       </div>
     </div>
   </section>
@@ -6866,6 +6866,126 @@ function updateNetworkState() {
 window.addEventListener("online", updateNetworkState);
 window.addEventListener("offline", updateNetworkState);
 updateNetworkState();
+
+/* ==========================================
+   V12.1 MOBİL GERİ KAYDIRMA KORUMASI
+========================================== */
+
+let zatoiLastBackAttempt = 0;
+let zatoiBackGuardReady = false;
+let zatoiBackToastTimer = null;
+
+function isZatoiStandaloneMode() {
+  return !!(
+    window.matchMedia?.("(display-mode: standalone)")?.matches ||
+    window.matchMedia?.("(display-mode: fullscreen)")?.matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function showBackExitHint() {
+  let toast = document.getElementById("zatoiBackExitToast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "zatoiBackExitToast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    Object.assign(toast.style, {
+      position: "fixed",
+      left: "50%",
+      bottom: "calc(92px + env(safe-area-inset-bottom, 0px))",
+      transform: "translate(-50%, 14px)",
+      zIndex: "10050",
+      maxWidth: "calc(100vw - 32px)",
+      padding: "10px 14px",
+      borderRadius: "12px",
+      background: "rgba(15, 23, 42, .96)",
+      color: "#fff",
+      fontSize: "13px",
+      fontWeight: "700",
+      textAlign: "center",
+      boxShadow: "0 8px 28px rgba(0,0,0,.35)",
+      opacity: "0",
+      pointerEvents: "none",
+      transition: "opacity .18s ease, transform .18s ease"
+    });
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = "Uygulamadan çıkmak için tekrar geri kaydır.";
+  toast.style.opacity = "1";
+  toast.style.transform = "translate(-50%, 0)";
+
+  clearTimeout(zatoiBackToastTimer);
+  zatoiBackToastTimer = setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translate(-50%, 14px)";
+  }, 1800);
+}
+
+function closeTopLayerForBack() {
+  const imageViewer = document.getElementById("imageViewer");
+  if (imageViewer && !imageViewer.classList.contains("hidden")) {
+    if (typeof closeImageViewer === "function") closeImageViewer();
+    return true;
+  }
+
+  const privacy = document.getElementById("privacyOverlay");
+  if (privacy?.classList.contains("show")) {
+    if (typeof closePrivacy === "function") closePrivacy();
+    return true;
+  }
+
+  const settings = document.getElementById("settingsOverlay");
+  if (settings?.classList.contains("show")) {
+    if (typeof closeSettings === "function") closeSettings();
+    return true;
+  }
+
+  const mobileHistory = document.getElementById("mobileHistoryOverlay");
+  if (mobileHistory?.classList.contains("show")) {
+    if (typeof closeMobileHistory === "function") closeMobileHistory();
+    return true;
+  }
+
+  return false;
+}
+
+function installMobileBackGuard() {
+  if (zatoiBackGuardReady || !isMobile() || !isZatoiStandaloneMode()) return;
+
+  zatoiBackGuardReady = true;
+
+  try {
+    history.replaceState({ ...(history.state || {}), zatoiBase: true }, "", location.href);
+    history.pushState({ zatoiBackGuard: true }, "", location.href);
+  } catch (error) {
+    console.warn("Geri kaydırma koruması başlatılamadı:", error);
+    return;
+  }
+
+  window.addEventListener("popstate", () => {
+    if (closeTopLayerForBack()) {
+      history.pushState({ zatoiBackGuard: true }, "", location.href);
+      return;
+    }
+
+    const now = Date.now();
+
+    if (now - zatoiLastBackAttempt < 2000) {
+      zatoiLastBackAttempt = 0;
+      setTimeout(() => history.back(), 0);
+      return;
+    }
+
+    zatoiLastBackAttempt = now;
+    history.pushState({ zatoiBackGuard: true }, "", location.href);
+    showBackExitHint();
+  });
+}
+
+window.addEventListener("load", installMobileBackGuard, { once: true });
 
 /* ==========================================
    RESIZE
