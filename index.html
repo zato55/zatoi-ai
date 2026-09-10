@@ -4935,6 +4935,11 @@ document
 
 function imagePromptFromText(text) {
   const value = String(text || "").trim();
+  if (/^(?:evet[,\s]+)?(?:ben\s+)?(?:bir\s+)?(?:görsel|resim|fotoğraf|foto)\s+(?:oluşturmak|üretmek|çizmek|yapmak)\s+istiyorum[.!]?$/i.test(value) ||
+      /^(?:evet[,\s]+)?(?:sen\s+)?(?:bu\s+)?(?:görseli|resmi|fotoğrafı|fotoyu)\s+(?:oluştur|üret|çiz|yap)(?:abilirsin)?[.!]?$/i.test(value) ||
+      /^(?:evet[,\s]+)?(?:sen\s+)?(?:oluştur|üret|çiz|yap)(?:abilirsin)?[.!]?$/i.test(value)) {
+    return "__PREVIOUS_IMAGE_REQUEST__";
+  }
   const direct = /^(?:bana\s+)?(?:bir\s+)?(?:görsel|resim|fotoğraf|foto)\s*(?:oluştur|üret|çiz|yap)\s*[:,-]?\s*/i;
   if (direct.test(value)) return value.replace(direct, "").trim();
 
@@ -5285,6 +5290,26 @@ async function sendMessage() {
 
         }
       );
+
+    if (response.ok && String(response.headers.get("content-type") || "").startsWith("image/")) {
+      const imageBlob = await response.blob();
+      const imageData = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("Üretilen görsel okunamadı."));
+        reader.readAsDataURL(imageBlob);
+      });
+      chat.messages.push({
+        role: "assistant",
+        content: "Görselin hazır. Kalıcı saklamak için indirebilirsin.",
+        generatedImage: imageData,
+        imagePrompt: text,
+        time: Date.now()
+      });
+      chat.updatedAt = Date.now();
+      hideTyping(); sending = false; renderAll();
+      return;
+    }
 
 
     let data = {};
