@@ -2175,7 +2175,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.5 • Ekleme Araçları Menüsü</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.9 • Akıllı Taranmış PDF Okuma</span></div>
       </div>
     </div>
   </section>
@@ -5342,14 +5342,15 @@ async function uploadPdf(file) {
 
   let response = await uploadPdfRequest(file);
 
-  // Normal PDF metni çıkarılamazsa sayfaları görsele çevirip
+  // Normal PDF'den hiç metin çıkmazsa veya yalnızca Contents/başlık gibi
+  // yetersiz metin çıkarsa sayfaları görsele çevirip
   // aynı PDF uç noktasına tekrar gönder. Böylece taranmış PDF'ler
   // de Workers AI görsel okuma hattından geçer.
   if (response.status === 422) {
     let firstError = null;
     try { firstError = await response.clone().json(); } catch {}
     const message = String(firstError?.error || firstError?.details || "");
-    if (/metin çıkarılamadı|dönüştürülürken/i.test(message)) {
+    if (/metin çıkarılamadı|yeterli metin|görsel okuma gerekli|dönüştürülürken/i.test(message)) {
       const scannedPages = await renderScannedPdfPages(file, 30);
       if (scannedPages.pages.length) {
         response = await uploadPdfRequest(file, scannedPages);
