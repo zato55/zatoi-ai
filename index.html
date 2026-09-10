@@ -2187,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.0 • Akıllı Taranmış PDF Okuma</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.1 • Akıllı Taranmış PDF Okuma</span></div>
       </div>
     </div>
   </section>
@@ -5715,11 +5715,47 @@ function findPreviousImagePrompt(chat) {
   return "";
 }
 
-function isImageRevisionRequest(text) {
-  const value = String(text || "").toLocaleLowerCase("tr-TR");
-  const mentionsProblem = /(yüz|surat|benze|kimlik|göz|burun|ağız|saç|kafa|portre|görsel|resim)/i.test(value);
-  const asksCorrection = /(düzelt|daha doğru|yeniden|tekrar|iyileştir|olmamış|olmamis|olmadı|olmadi|yanlış|yanlis|benzemiyor|benzememiş|benzememis)/i.test(value);
-  return mentionsProblem && asksCorrection;
+function isImageRevisionRequest(text, chat = getActiveChat()) {
+  const value = String(text || "")
+    .trim()
+    .toLocaleLowerCase("tr-TR");
+
+  if (!value) return false;
+
+  // Görselle ilgili açık düzeltme ifadeleri her zaman güçlü sinyaldir.
+  const explicitVisualEdit = /(görsel|resim|fotoğraf|foto|portre|yüz|surat|göz|burun|ağız|saç|kafa|arka\s*plan|renk|ışık|poz|kıyafet|stil|tarz|kompozisyon)/i.test(value) &&
+    /(düzelt|değiştir|iyileştir|yeniden|tekrar|daha\s+iyi|daha\s+doğru|benzet|gerçekçi|yap|olsun|olmasın|kaldır|ekle|büyüt|küçült)/i.test(value);
+  if (explicitVisualEdit) return true;
+
+  // Son oluşturulan görsel hâlâ sohbetin yakın bağlamındaysa kısa geri bildirimleri
+  // görsel devam isteği olarak anla. Böylece yalnızca "olmamış" / "beğenmedim"
+  // demek yeterli olur.
+  const messages = Array.isArray(chat?.messages) ? chat.messages : [];
+  let latestGeneratedIndex = -1;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    if (message?.role === "assistant" && Array.isArray(message.generatedImages) && message.generatedImages.length && message.imagePrompt) {
+      latestGeneratedIndex = i;
+      break;
+    }
+  }
+
+  if (latestGeneratedIndex < 0) return false;
+
+  // Çok eski bir görsele yanlışlıkla bağlanmaması için yalnızca yakın devamı kabul et.
+  const messagesAfterGeneration = messages.length - 1 - latestGeneratedIndex;
+  if (messagesAfterGeneration > 5) return false;
+
+  const shortNegativeFeedback = /^(?:bu\s+)?(?:hiç\s+)?(?:olmamış|olmamis|olmadı|olmadi|olmamış\s+ya|beğenmedim|begenmedim|kötü\s+olmuş|kotu\s+olmus|iyi\s+olmamış|iyi\s+olmamis|bu\s+değil|bu\s+degil|böyle\s+değil|boyle\s+degil|yanlış|yanlis|olmadı\s+bu|olmamış\s+bu)[.!…]*$/i;
+  if (shortNegativeFeedback.test(value)) return true;
+
+  const correctionFeedback = /(olmamış|olmamis|olmadı|olmadi|beğenmedim|begenmedim|benzemiyor|benzememiş|benzememis|yanlış|yanlis|kötü\s+olmuş|kotu\s+olmus|düzelt|yeniden\s+dene|tekrar\s+dene|bir\s+daha\s+dene|daha\s+iyi\s+yap)/i;
+  if (correctionFeedback.test(value)) return true;
+
+  // Görselden hemen sonra "daha karanlık olsun", "kırmızı yap", "şapkayı kaldır"
+  // gibi özneyi tekrar etmeyen doğal düzenleme cümlelerini de yakala.
+  const naturalEditFollowup = /(?:daha\s+.+\s+olsun|biraz\s+.+\s+olsun|.+\s+olmasın|.+\s+yap|.+\s+değiştir|.+\s+degistir|.+\s+kaldır|.+\s+kaldir|.+\s+ekle|.+\s+düzelt|.+\s+duzelt)$/i;
+  return naturalEditFollowup.test(value);
 }
 
 function findLatestGeneratedMessage(chat) {
@@ -6121,20 +6157,39 @@ async function sendMessage() {
   }
 
 
-  if (!imagesForAI.length && isImageRevisionRequest(text)) {
+  if (!imagesForAI.length && isImageRevisionRequest(text, chat)) {
     const previousGeneration = findLatestGeneratedMessage(chat);
     if (previousGeneration) {
-      if (!Number.isInteger(previousGeneration.chosenImage)) {
-        alert("Önce düzeltilmesini istediğin iki görselden birini seç.");
-        return;
-      }
       setInput("");
-      const revisionPrompt = `${previousGeneration.imagePrompt}. Önceki sonuç için düzeltme isteği: ${text}. Ana kişinin yüz kimliğini güvenilir referansa göre yeniden araştır ve yüzü daha doğru, tanınabilir ve gerçekçi biçimde oluştur. Yanlış üretilmiş önceki yüzü kopyalama.`;
+
+      const feedback = String(text || "").trim();
+      const genericFailure = /^(?:bu\s+)?(?:hiç\s+)?(?:olmamış|olmamis|olmadı|olmadi|beğenmedim|begenmedim|kötü\s+olmuş|kotu\s+olmus|iyi\s+olmamış|iyi\s+olmamis|bu\s+değil|bu\s+degil|böyle\s+değil|boyle\s+degil|yanlış|yanlis)[.!…]*$/i.test(feedback);
+
+      const revisionPrompt = genericFailure
+        ? `${previousGeneration.imagePrompt}. Kullanıcı önceki görsel sonucunu beğenmedi ve "${feedback}" dedi. Önceki hatalı sonucu kopyalama. Konuyu yeniden değerlendir, ana özneyi daha doğru temsil et, anatomi ve yüz/kimlik tutarlılığını iyileştir, daha başarılı iki yeni alternatif üret.`
+        : `${previousGeneration.imagePrompt}. Kullanıcının önceki görsel için devam/düzenleme isteği: "${feedback}". Bu isteği doğrudan uygula; önceki sahnenin ana fikrini koru fakat kullanıcının belirttiği değişikliği belirgin biçimde gerçekleştir.`;
+
+      // Kullanıcı seçeneklerden birini seçtiyse, belirgin bir düzenleme isteğinde o görseli
+      // referans olarak kullan. "Olmamış / beğenmedim" gibi genel reddetmelerde kötü sonucu
+      // kopyalamamak için orijinal referansa dön.
+      let revisionReference = previousGeneration.sourceReferenceImage || "";
+      let revisionPreview = previousGeneration.sourceReferencePreview || "";
+      let revisionName = previousGeneration.sourceReferenceName || "";
+
+      if (!genericFailure && Number.isInteger(previousGeneration.chosenImage)) {
+        const chosen = previousGeneration.generatedImages?.[previousGeneration.chosenImage];
+        if (chosen) {
+          revisionReference = chosen;
+          revisionPreview = chosen;
+          revisionName = `Önceki görsel seçenek ${previousGeneration.chosenImage + 1}`;
+        }
+      }
+
       await generateImage(
         revisionPrompt,
-        previousGeneration.sourceReferenceImage || "",
-        previousGeneration.sourceReferencePreview || "",
-        previousGeneration.sourceReferenceName || ""
+        revisionReference,
+        revisionPreview,
+        revisionName
       );
       return;
     }
