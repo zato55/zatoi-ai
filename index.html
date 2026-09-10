@@ -5094,7 +5094,7 @@ function chooseGeneratedImage(message, index) {
   });
 }
 
-async function requestGeneratedImage(description, variant) {
+async function requestGeneratedImage(description, variant, referenceImage = "") {
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
@@ -5102,7 +5102,8 @@ async function requestGeneratedImage(description, variant) {
       type: "image_generate",
       prompt: description,
       variant,
-      preference: getImagePreferenceText()
+      preference: getImagePreferenceText(),
+      referenceImage
     })
   });
   if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
@@ -5124,7 +5125,7 @@ async function requestGeneratedImage(description, variant) {
   });
 }
 
-async function generateImage(promptText = "") {
+async function generateImage(promptText = "", referenceImage = "", referencePreview = "", referenceName = "") {
   if (sending) return;
   let description = String(promptText || "").trim();
   if (!description) description = window.prompt("Nasıl bir görsel oluşturulsun?");
@@ -5134,15 +5135,21 @@ async function generateImage(promptText = "") {
   if (!chat) return;
 
   sending = true;
-  chat.messages.push({ role: "user", content: `Görsel oluştur: ${description}`, time: Date.now() });
+  chat.messages.push({
+    role: "user",
+    content: `Görsel oluştur: ${description}`,
+    imageNames: referenceName ? [referenceName] : [],
+    imagePreviews: referencePreview ? [referencePreview] : [],
+    time: Date.now()
+  });
   updateTitle(chat, description); chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat);
   setInput(""); renderAll(); showTyping();
   try {
-    const imageA = await requestGeneratedImage(description, "A");
-    const imageB = await requestGeneratedImage(description, "B");
+    const imageA = await requestGeneratedImage(description, "A", referenceImage);
+    const imageB = await requestGeneratedImage(description, "B", referenceImage);
     chat.messages.push({
       role: "assistant",
-      content: "İki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
+      content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
       generatedImages: [imageA, imageB],
       preferenceChoiceId: crypto.randomUUID(),
       imagePrompt: description,
@@ -5300,13 +5307,18 @@ async function sendMessage() {
     return;
   }
 
-  const requestedImagePrompt = !imagesForAI.length ? imagePromptFromText(text) : null;
+  const requestedImagePrompt = imagePromptFromText(text);
   if (requestedImagePrompt !== null) {
     setInput("");
     const resolvedPrompt = requestedImagePrompt === "__PREVIOUS_IMAGE_REQUEST__"
       ? findPreviousImagePrompt(chat)
       : requestedImagePrompt;
-    await generateImage(resolvedPrompt);
+    await generateImage(
+      resolvedPrompt,
+      imagesForAI[0]?.data || "",
+      imagesForAI[0]?.preview || "",
+      imagesForAI[0]?.name || ""
+    );
     return;
   }
 
