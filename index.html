@@ -4739,7 +4739,7 @@ function readImageAsDataURL(file) {
   });
 }
 
-async function compressImageFile(file, maxDimension = 2048, quality = 0.82) {
+async function compressImageFile(file, maxDimension = 1280, quality = 0.78) {
   if (file.size > 50 * 1024 * 1024) throw new Error("Görsel 50 MB'dan büyük olamaz.");
   const original = await readImageAsDataURL(file);
   const image = new Image();
@@ -4748,15 +4748,23 @@ async function compressImageFile(file, maxDimension = 2048, quality = 0.82) {
     image.onerror = () => reject(new Error("Görsel açılamadı."));
     image.src = original;
   });
-  const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+  let scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
   const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-  canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-  const context = canvas.getContext("2d");
-  context.drawImage(image, 0, 0, canvas.width, canvas.height);
-  let result = canvas.toDataURL("image/jpeg", quality);
-  if (result.length > 5.2 * 1024 * 1024) result = canvas.toDataURL("image/jpeg", 0.65);
-  if (result.length > 5.2 * 1024 * 1024) throw new Error("Görsel sıkıştırıldıktan sonra hâlâ çok büyük.");
+  const targetDataUrlLength = 2 * 1024 * 1024;
+  let result = "";
+  for (let resizeAttempt = 0; resizeAttempt < 3; resizeAttempt++) {
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    for (const attemptQuality of [quality, 0.68, 0.58, 0.48]) {
+      result = canvas.toDataURL("image/jpeg", attemptQuality);
+      if (result.length <= targetDataUrlLength) return result;
+    }
+    scale *= 0.75;
+  }
+  if (result.length > targetDataUrlLength) throw new Error("Görsel gönderim için yeterince küçültülemedi.");
   return result;
 }
 
@@ -5118,7 +5126,7 @@ function chooseGeneratedImage(message, index) {
   });
 }
 
-async function requestGeneratedImage(description, variant, referenceImage = "") {
+async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "") {
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
@@ -5127,7 +5135,8 @@ async function requestGeneratedImage(description, variant, referenceImage = "") 
       prompt: description,
       variant,
       preference: getImagePreferenceText(),
-      referenceImage
+      referenceImage,
+      generationId
     })
   });
   if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
@@ -5174,8 +5183,9 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
   updateTitle(chat, description); chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat);
   setInput(""); renderAll(); showTyping();
   try {
-    const imageA = await requestGeneratedImage(description, "A", referenceImage);
-    const imageB = await requestGeneratedImage(description, "B", referenceImage);
+    const generationId = crypto.randomUUID();
+    const imageA = await requestGeneratedImage(description, "A", referenceImage, generationId);
+    const imageB = await requestGeneratedImage(description, "B", referenceImage, generationId);
     chat.messages.push({
       role: "assistant",
       content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
