@@ -1,4 +1,4 @@
-const CACHE_NAME = "zatoi-ai-v11";
+const CACHE_NAME = "zatoi-ai-v12";
 const APP_FILES = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
@@ -17,7 +17,10 @@ self.addEventListener("fetch", event => {
   if (url.origin !== self.location.origin) return;
   event.respondWith(
     fetch(event.request).then(response => {
-      if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(event.request, response.clone()));
+      if (response.ok) {
+        const copy = response.clone();
+        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)));
+      }
       return response;
     }).catch(async () => (await caches.match(event.request)) || (await caches.match("./index.html")))
   );
