@@ -1353,7 +1353,14 @@
     .generated-choice .generated-image { width:100%; margin:0 0 7px; }
     .choice-button { width:100%; padding:8px; border-radius:9px; background:#253444; color:#fff; }
     .generated-choice.selected .choice-button { background:#2563eb; }
-    @media (max-width:520px) { .generated-pair { grid-template-columns:1fr; } }
+    @media (max-width:520px) {
+      .generated-pair { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px; }
+      .generated-choice { padding:5px; min-width:0; }
+      .generated-choice .generated-image { aspect-ratio:1 / 1; object-fit:cover; border-radius:10px; }
+      .generated-choice .choice-button { padding:7px 4px; font-size:11px; line-height:1.2; }
+      .generated-choice .generated-image + div { font-size:9px !important; line-height:1.25; }
+      .generated-choice a[download] { font-size:11px !important; }
+    }
     .account-tool.danger { background:#3a171c; border-color:#7f1d1d; color:#fecaca; }
     .network-banner { display:none; position:fixed; z-index:3000; top:0; left:50%; transform:translateX(-50%);
       padding:8px 15px; background:#7f1d1d; color:white; border-radius:0 0 10px 10px; font-size:13px; }
@@ -1883,7 +1890,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.9 • Yeniden Oluştur Sağlamlaştırma</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.0 • Mobil Yan Yana Görseller</span></div>
       </div>
     </div>
   </section>
