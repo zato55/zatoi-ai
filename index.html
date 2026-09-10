@@ -1384,6 +1384,49 @@
       .image-viewer img { max-width: 98vw; max-height: 84vh; }
     }
 
+  
+
+    /* =================================
+       V11.2 GIZLILIK + DRAG DROP
+    ================================= */
+    .privacy-link-btn {
+      background: transparent; color: #8fb8ff; border: 0; padding: 6px 4px;
+      font-size: 12px; text-decoration: underline; text-underline-offset: 2px;
+    }
+    .privacy-overlay {
+      position: fixed; inset: 0; z-index: 5200; display: none; align-items: center; justify-content: center;
+      padding: 18px; background: rgba(0,0,0,.72); backdrop-filter: blur(5px);
+    }
+    .privacy-overlay.show { display: flex; }
+    .privacy-panel {
+      width: min(620px, 100%); max-height: min(820px, calc(100vh - 36px)); overflow-y: auto;
+      background: #10171f; color: #e5edf5; border: 1px solid #2a3947; border-radius: 18px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.5);
+    }
+    .privacy-header {
+      position: sticky; top: 0; z-index: 2; display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 18px; background:#10171f; border-bottom:1px solid #25323e; border-radius:18px 18px 0 0;
+    }
+    .privacy-title { font-size: 18px; font-weight: 800; }
+    .privacy-close { width:36px; height:36px; border-radius:10px; background:#1b2732; color:#fff; font-size:22px; }
+    .privacy-content { padding: 18px; font-size: 13px; line-height: 1.65; color:#cbd5e1; }
+    .privacy-content h3 { margin: 16px 0 5px; color:#fff; font-size:14px; }
+    .privacy-content h3:first-child { margin-top: 0; }
+    .privacy-content p { margin: 0 0 8px; }
+    .drop-overlay {
+      position: fixed; inset: 0; z-index: 5100; display:none; align-items:center; justify-content:center;
+      pointer-events:none; background:rgba(37,99,235,.12); border:3px dashed rgba(96,165,250,.75);
+    }
+    .drop-overlay.show { display:flex; }
+    .drop-overlay-card {
+      padding:18px 24px; border-radius:14px; background:rgba(13,18,24,.96); color:#e8f2ff;
+      border:1px solid #3b82f6; font-size:15px; font-weight:700; box-shadow:0 18px 55px rgba(0,0,0,.4);
+    }
+    body.light-theme .privacy-panel, body.light-theme .privacy-header { background:#fff; color:#0f172a; }
+    body.light-theme .privacy-content { color:#334155; }
+    body.light-theme .privacy-content h3 { color:#0f172a; }
+    body.light-theme .drop-overlay-card { background:rgba(255,255,255,.97); color:#0f172a; }
+
   </style>
 
 </head>
@@ -1480,6 +1523,7 @@
     <div class="auth-tools">
       <button id="forgotPasswordButton" type="button">Kurtarma koduyla şifremi yenile</button>
       <button id="installAppButton" type="button" hidden>Uygulamayı yükle</button>
+      <button id="authPrivacyButton" class="privacy-link-btn" type="button">Gizlilik Politikası</button>
     </div>
 
     <div id="authHelp" class="auth-info">
@@ -1562,6 +1606,7 @@
           id="mobileHistoryButton"
           class="mobile-history-btn"
           aria-label="Sohbet geçmişini aç"
+          title="Sohbet geçmişi"
         >
           📚 Geçmiş
         </button>
@@ -1571,6 +1616,7 @@
           id="newChatButton"
           class="new-chat-btn"
           aria-label="Yeni sohbet başlat"
+          title="Yeni sohbet"
         >
           ➕ Yeni Sohbet
         </button>
@@ -1631,6 +1677,7 @@
           id="micButton"
           class="voice-btn"
           aria-label="Sesli mesaj başlat"
+          title="Sesli mesaj"
         >
           🎤
         </button>
@@ -1640,6 +1687,7 @@
           id="voiceToggle"
           class="voice-btn"
           aria-label="Sesli cevapları aç veya kapat"
+          title="Sesli cevapları aç/kapat"
         >
           🔊
         </button>
@@ -1649,6 +1697,7 @@
           id="sendButton"
           class="action-btn send-btn"
           aria-label="Mesajı gönder"
+          title="Mesajı gönder"
         >
           Gönder
         </button>
@@ -1723,6 +1772,7 @@
           id="mobilePdfButton"
           class="voice-btn pdf-btn"
           aria-label="PDF veya görsel yükle"
+          title="PDF veya görsel ekle"
         >
           📎
         </button>
@@ -1734,6 +1784,7 @@
           id="mobileMicButton"
           class="voice-btn"
           aria-label="Sesli mesaj başlat"
+          title="Sesli mesaj"
         >
           🎤
         </button>
@@ -1743,6 +1794,7 @@
           id="mobileVoiceToggle"
           class="voice-btn"
           aria-label="Sesli cevapları aç veya kapat"
+          title="Sesli cevapları aç/kapat"
         >
           🔊
         </button>
@@ -1752,6 +1804,7 @@
           id="mobileSendButton"
           class="action-btn send-btn"
           aria-label="Mesajı gönder"
+          title="Mesajı gönder"
         >
           ➤
         </button>
@@ -1823,16 +1876,45 @@
         </div>
         <div class="account-tools">
           <button id="exportChatButton" class="account-tool">Aktif sohbeti dışa aktar</button>
+          <button id="privacyPolicyButton" class="account-tool">Gizlilik Politikası</button>
           <button id="clearDataButton" class="account-tool">Sohbetleri ve hafızayı temizle</button>
           <button id="deleteAccountButton" class="account-tool danger">Hesabı kalıcı sil</button>
         </div>
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.1 • Hesap İzolasyonu</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.2 • Hesap İzolasyonu ve UX</span></div>
       </div>
     </div>
   </section>
+</div>
+
+
+<div id="privacyOverlay" class="privacy-overlay" aria-hidden="true">
+  <section class="privacy-panel" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+    <div class="privacy-header">
+      <div id="privacyTitle" class="privacy-title">Gizlilik Politikası</div>
+      <button id="privacyCloseButton" class="privacy-close" type="button" aria-label="Gizlilik politikasını kapat" title="Kapat">×</button>
+    </div>
+    <div class="privacy-content">
+      <h3>Hangi veriler işlenir?</h3>
+      <p>Zatoi AI; kullanıcı adı, oturum bilgileri, sohbet geçmişi, kişisel hafıza tercihleri ve kullandığın özelliklere göre yüklediğin PDF/görselleri işleyebilir. Şifreler düz metin olarak saklanmaz; sunucu tarafında türetilmiş parola özeti kullanılır.</p>
+      <h3>Sohbetler ve cihaz verileri</h3>
+      <p>Sohbet geçmişi hesabınla bulutta eşitlenebilir. Aynı cihazdaki yerel sohbet önbelleği hesap kimliğine göre ayrı tutulur. Tema ve yazı boyutu gibi arayüz tercihleri cihazda saklanabilir.</p>
+      <h3>PDF, görsel ve yapay zekâ işlemleri</h3>
+      <p>Bir PDF veya görsel gönderdiğinde içerik, istediğin yanıtı üretmek veya görseli analiz etmek için Zatoi Worker ve kullanılan yapay zekâ hizmetlerine aktarılabilir. Görsel üretiminde, isteğe göre görsel referans araştırması yapılabilir.</p>
+      <h3>Web araştırması</h3>
+      <p>Güncel internet bilgisi gereken isteklerde arama sorgusu üçüncü taraf arama hizmetine gönderilebilir. Arama yalnızca gerekli olduğunda kullanılır.</p>
+      <h3>Kontrol sende</h3>
+      <p>Ayarlar bölümünden sohbet verilerini ve hafızayı temizleyebilir veya hesabını kalıcı olarak silebilirsin. Kurtarma kodunu güvenli bir yerde saklaman gerekir; kod hesabını kurtarmak için kullanılır.</p>
+      <h3>Güvenlik notu</h3>
+      <p>İnternete gönderilen hiçbir sistem için mutlak güvenlik garantisi verilemez. Bu nedenle gereksiz hassas bilgi, parola veya ödeme bilgisi yüklememen önerilir.</p>
+    </div>
+  </section>
+</div>
+
+<div id="dropOverlay" class="drop-overlay" aria-hidden="true">
+  <div class="drop-overlay-card">📎 PDF veya görselleri buraya bırak</div>
 </div>
 
 
@@ -1933,6 +2015,26 @@ const AUTH_TOKEN_KEY =
 const AUTH_USER_KEY =
   "zatoi_auth_user_v1";
 
+function storedUserId() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(AUTH_USER_KEY) || "null");
+    return String(raw?.userId || "").trim();
+  } catch {
+    return "";
+  }
+}
+
+function accountStorageKey(baseKey) {
+  const userId = String(currentUser?.userId || storedUserId() || "").trim();
+  return userId ? `${baseKey}__${userId}` : `${baseKey}__anonymous`;
+}
+
+function chatsKey() { return accountStorageKey(CHATS_KEY); }
+function activeChatKey() { return accountStorageKey(ACTIVE_CHAT_KEY); }
+function memoryKey() { return accountStorageKey(GLOBAL_MEMORY_KEY); }
+function imagePreferenceKey() { return accountStorageKey(IMAGE_PREFERENCE_KEY); }
+function pendingImageChoicesKey() { return accountStorageKey(PENDING_IMAGE_CHOICES_KEY); }
+
 
 /* ==========================================
    AUTH DURUMU
@@ -1946,39 +2048,11 @@ let authToken =
 
 let currentUser = null;
 
-// V11.1 - HESAP BAZLI YEREL VERİ AYRIMI
-// Aynı cihazda farklı hesapların sohbet/hafıza verileri birbirine karışmasın.
-function scopedStorageKey(baseKey) {
-  let userId =
-    currentUser?.userId ||
-    currentUser?.username ||
-    "";
-
-  if (!userId) {
-    try {
-      const storedUser = JSON.parse(
-        localStorage.getItem(AUTH_USER_KEY) || "null"
-      );
-
-      userId =
-        storedUser?.userId ||
-        storedUser?.username ||
-        "";
-    } catch {}
-  }
-
-  const suffix = userId
-    ? encodeURIComponent(String(userId))
-    : "guest";
-
-  return `${baseKey}__user_${suffix}`;
-}
-
 let imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
 let pendingImageChoices = [];
 try {
-  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(scopedStorageKey(IMAGE_PREFERENCE_KEY)) || "{}") };
-  const pending = JSON.parse(localStorage.getItem(scopedStorageKey(PENDING_IMAGE_CHOICES_KEY)) || "[]");
+  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(imagePreferenceKey()) || "{}") };
+  const pending = JSON.parse(localStorage.getItem(pendingImageChoicesKey()) || "[]");
   pendingImageChoices = Array.isArray(pending) ? pending : [];
 } catch {}
 
@@ -2317,78 +2391,17 @@ async function authRequest(
    AUTH BAŞARILI
 ========================================== */
 
-function reloadScopedAccountState() {
-  // Hesap değiştiğinde önceki hesabın RAM'de kalan verilerini temizle.
-  chats = [];
-  activeChatId = null;
-
-  globalMemory = {
-    name: "",
-    facts: [],
-    preferences: []
-  };
-
-  imagePreference = {
-    realistic: 0,
-    cinematic: 0,
-    choices: 0
-  };
-
-  pendingImageChoices = [];
-
-  try {
-    imagePreference = {
-      ...imagePreference,
-      ...JSON.parse(
-        localStorage.getItem(
-          scopedStorageKey(IMAGE_PREFERENCE_KEY)
-        ) || "{}"
-      )
-    };
-
-    const pending = JSON.parse(
-      localStorage.getItem(
-        scopedStorageKey(PENDING_IMAGE_CHOICES_KEY)
-      ) || "[]"
-    );
-
-    pendingImageChoices = Array.isArray(pending)
-      ? pending
-      : [];
-  } catch {}
-
-  loadMemory();
-  loadChats();
-}
-
 function saveAuth(
   token,
   user,
   memory
 ) {
 
-  const previousUserId =
-    currentUser?.userId ||
-    currentUser?.username ||
-    "";
-
   authToken =
     token || "";
 
   currentUser =
     user || null;
-
-  const nextUserId =
-    currentUser?.userId ||
-    currentUser?.username ||
-    "";
-
-  if (
-    nextUserId &&
-    String(previousUserId) !== String(nextUserId)
-  ) {
-    reloadScopedAccountState();
-  }
 
 
   if (authToken) {
@@ -2676,6 +2689,7 @@ async function registerAccount() {
       data.user,
       data.memory
     );
+    loadAccountLocalState();
 
     if (data.recoveryCode) {
       alert(`KURTARMA KODUN:\n\n${data.recoveryCode}\n\nBu kod yalnızca şimdi gösterilir. Ekran görüntüsü al veya güvenli bir yere kaydet.`);
@@ -2793,6 +2807,7 @@ async function loginAccount() {
       data.user,
       data.memory
     );
+    loadAccountLocalState();
 
     if (data.recoveryCode) {
       alert(`HESAP KURTARMA KODUN:\n\n${data.recoveryCode}\n\nBu kod yalnızca şimdi gösterilir. Güvenli bir yere kaydet.`);
@@ -3001,6 +3016,7 @@ async function checkAuth() {
       data.user,
       data.memory
     );
+    loadAccountLocalState();
 
 
     await syncImagePreference();
@@ -3064,7 +3080,7 @@ function loadMemory() {
 
     const saved =
       localStorage.getItem(
-        scopedStorageKey(GLOBAL_MEMORY_KEY)
+        memoryKey()
       );
 
 
@@ -3113,7 +3129,7 @@ function saveMemory() {
 
   localStorage.setItem(
 
-    scopedStorageKey(GLOBAL_MEMORY_KEY),
+    memoryKey(),
 
     JSON.stringify(
       globalMemory
@@ -3166,7 +3182,7 @@ function saveChats() {
 
   localStorage.setItem(
 
-    scopedStorageKey(CHATS_KEY),
+    chatsKey(),
 
     JSON.stringify(
       chats,
@@ -3178,7 +3194,7 @@ function saveChats() {
 
   localStorage.setItem(
 
-    scopedStorageKey(ACTIVE_CHAT_KEY),
+    activeChatKey(),
 
     activeChatId || ""
 
@@ -3193,7 +3209,7 @@ function loadChats() {
 
     const saved =
       localStorage.getItem(
-        scopedStorageKey(CHATS_KEY)
+        chatsKey()
       );
 
 
@@ -3256,7 +3272,7 @@ function loadChats() {
 
   const savedActive =
     localStorage.getItem(
-      scopedStorageKey(ACTIVE_CHAT_KEY)
+      activeChatKey()
     );
 
 
@@ -3295,6 +3311,24 @@ function loadChats() {
 
 }
 
+
+function loadAccountLocalState() {
+  chats = [];
+  activeChatId = null;
+  imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+  pendingImageChoices = [];
+
+  try {
+    imagePreference = {
+      ...imagePreference,
+      ...JSON.parse(localStorage.getItem(imagePreferenceKey()) || "{}")
+    };
+    const pending = JSON.parse(localStorage.getItem(pendingImageChoicesKey()) || "[]");
+    pendingImageChoices = Array.isArray(pending) ? pending : [];
+  } catch {}
+
+  loadChats();
+}
 
 loadChats();
 
@@ -4240,6 +4274,27 @@ function renderMessages() {
           saveChats(); queueCloudSave(chat); setInput(userText); sendMessage();
         };
         tools.appendChild(retryButton);
+
+        const shareButton = document.createElement("button");
+        shareButton.className = "message-tool";
+        shareButton.textContent = "↗";
+        shareButton.title = "Yanıtı paylaş";
+        shareButton.setAttribute("aria-label", "Yanıtı paylaş");
+        shareButton.onclick = async () => {
+          const text = String(message.content || "").trim();
+          if (!text) return;
+          try {
+            if (navigator.share) {
+              await navigator.share({ title: "Zatoi AI yanıtı", text });
+            } else {
+              await navigator.clipboard.writeText(text);
+              alert("Paylaşım desteklenmediği için yanıt panoya kopyalandı.");
+            }
+          } catch (error) {
+            if (error?.name !== "AbortError") alert("Yanıt paylaşılamadı.");
+          }
+        };
+        tools.appendChild(shareButton);
       }
       bubble.appendChild(tools);
 
@@ -4960,10 +5015,8 @@ async function uploadPdf(file) {
 }
 
 
-pdfInput.addEventListener(
-  "change",
-  async event => {
-    const files = Array.from(event.target.files || []);
+async function processSelectedFiles(fileList) {
+    const files = Array.from(fileList || []);
     if (!files.length) return;
 
     const pdfFiles = files.filter(file => {
@@ -5057,8 +5110,50 @@ pdfInput.addEventListener(
       alert(error.message || "Görsel okunamadı.");
       pdfInput.value = "";
     }
+}
+
+pdfInput.addEventListener("change", event => processSelectedFiles(event.target.files));
+
+/* Masaüstü sürükle-bırak */
+const dropOverlay = document.getElementById("dropOverlay");
+let dragDepth = 0;
+
+function hasDraggedFiles(event) {
+  return Array.from(event.dataTransfer?.types || []).includes("Files");
+}
+
+window.addEventListener("dragenter", event => {
+  if (isMobile() || !hasDraggedFiles(event) || app.classList.contains("hidden")) return;
+  event.preventDefault();
+  dragDepth += 1;
+  dropOverlay.classList.add("show");
+  dropOverlay.setAttribute("aria-hidden", "false");
+});
+
+window.addEventListener("dragover", event => {
+  if (isMobile() || !hasDraggedFiles(event) || app.classList.contains("hidden")) return;
+  event.preventDefault();
+  if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+});
+
+window.addEventListener("dragleave", event => {
+  if (isMobile()) return;
+  dragDepth = Math.max(0, dragDepth - 1);
+  if (!dragDepth) {
+    dropOverlay.classList.remove("show");
+    dropOverlay.setAttribute("aria-hidden", "true");
   }
-);
+});
+
+window.addEventListener("drop", async event => {
+  if (isMobile() || app.classList.contains("hidden")) return;
+  event.preventDefault();
+  dragDepth = 0;
+  dropOverlay.classList.remove("show");
+  dropOverlay.setAttribute("aria-hidden", "true");
+  const files = event.dataTransfer?.files;
+  if (files?.length) await processSelectedFiles(files);
+});
 
 /* ==========================================
    PDF BUTONLARI
@@ -5164,11 +5259,11 @@ function storeImagePreference(preference) {
     cinematic: Math.max(0, Number(preference?.cinematic) || 0),
     choices: Math.max(0, Number(preference?.choices) || 0)
   };
-  localStorage.setItem(scopedStorageKey(IMAGE_PREFERENCE_KEY), JSON.stringify(imagePreference));
+  localStorage.setItem(imagePreferenceKey(), JSON.stringify(imagePreference));
 }
 
 function savePendingImageChoices() {
-  localStorage.setItem(scopedStorageKey(PENDING_IMAGE_CHOICES_KEY), JSON.stringify(pendingImageChoices));
+  localStorage.setItem(pendingImageChoicesKey(), JSON.stringify(pendingImageChoices));
 }
 
 async function syncImagePreference() {
@@ -5201,7 +5296,7 @@ function chooseGeneratedImage(message, index) {
   if (index === 0) imagePreference.realistic += 1;
   if (index === 1) imagePreference.cinematic += 1;
   message.chosenImage = index;
-  localStorage.setItem(scopedStorageKey(IMAGE_PREFERENCE_KEY), JSON.stringify(imagePreference));
+  localStorage.setItem(imagePreferenceKey(), JSON.stringify(imagePreference));
   const choiceId = message.preferenceChoiceId || (message.preferenceChoiceId = crypto.randomUUID());
   const userId = currentUser?.userId || "";
   pendingImageChoices = pendingImageChoices.filter(item => !(item.userId === userId && item.choiceId === choiceId));
@@ -6486,6 +6581,36 @@ document
 
 
 /* ==========================================
+   V11.2 GIZLILIK
+========================================== */
+const privacyOverlay = document.getElementById("privacyOverlay");
+const privacyCloseButton = document.getElementById("privacyCloseButton");
+const authPrivacyButton = document.getElementById("authPrivacyButton");
+const privacyPolicyButton = document.getElementById("privacyPolicyButton");
+let privacyReturnFocus = null;
+
+function openPrivacy(event) {
+  privacyReturnFocus = event?.currentTarget || document.activeElement;
+  privacyOverlay.classList.add("show");
+  privacyOverlay.setAttribute("aria-hidden", "false");
+  privacyCloseButton.focus();
+}
+
+function closePrivacy() {
+  privacyOverlay.classList.remove("show");
+  privacyOverlay.setAttribute("aria-hidden", "true");
+  privacyReturnFocus?.focus?.();
+}
+
+authPrivacyButton?.addEventListener("click", openPrivacy);
+privacyPolicyButton?.addEventListener("click", openPrivacy);
+privacyCloseButton?.addEventListener("click", closePrivacy);
+privacyOverlay?.addEventListener("click", event => { if (event.target === privacyOverlay) closePrivacy(); });
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && privacyOverlay?.classList.contains("show")) closePrivacy();
+});
+
+/* ==========================================
    V10.6 AYARLAR
 ========================================== */
 const settingsOverlay = document.getElementById("settingsOverlay");
@@ -6581,7 +6706,7 @@ clearDataButton.onclick = async () => {
     globalMemory = { name: "", facts: [], preferences: [] };
     imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
     pendingImageChoices = pendingImageChoices.filter(item => item.userId !== currentUser?.userId);
-    localStorage.setItem(scopedStorageKey(IMAGE_PREFERENCE_KEY), JSON.stringify(imagePreference));
+    localStorage.setItem(imagePreferenceKey(), JSON.stringify(imagePreference));
     savePendingImageChoices();
     saveChats(); saveMemory(); renderAll(); closeSettings();
     alert("Sohbetler ve hafıza temizlendi.");
@@ -6593,9 +6718,9 @@ deleteAccountButton.onclick = async () => {
   if (!password || !confirm("Hesap ve tüm bulut verileri kalıcı olarak silinecek. Bu işlem geri alınamaz.")) return;
   try {
     await authRequest("delete_account", "", password);
-    localStorage.removeItem(scopedStorageKey(CHATS_KEY)); localStorage.removeItem(scopedStorageKey(ACTIVE_CHAT_KEY));
-    localStorage.removeItem(scopedStorageKey(GLOBAL_MEMORY_KEY)); localStorage.removeItem(AUTH_TOKEN_KEY); localStorage.removeItem(AUTH_USER_KEY);
-    localStorage.removeItem(scopedStorageKey(IMAGE_PREFERENCE_KEY)); localStorage.removeItem(scopedStorageKey(PENDING_IMAGE_CHOICES_KEY));
+    localStorage.removeItem(chatsKey()); localStorage.removeItem(activeChatKey());
+    localStorage.removeItem(memoryKey()); localStorage.removeItem(AUTH_TOKEN_KEY); localStorage.removeItem(AUTH_USER_KEY);
+    localStorage.removeItem(imagePreferenceKey()); localStorage.removeItem(pendingImageChoicesKey());
     authToken = ""; currentUser = null; chats = []; showAuthScreen();
     alert("Hesabın silindi.");
   } catch (error) { alert(error.message || "Hesap silinemedi."); }
