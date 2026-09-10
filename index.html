@@ -2187,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.3 • Son 5 Görsel Kalıcı Hafıza</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.4 • Son 5 Görsel Kalıcı Hafıza</span></div>
       </div>
     </div>
   </section>
@@ -5708,6 +5708,14 @@ function imagePromptFromText(text) {
   const ending = value.match(/^(?:(?:bana|benim\s+için)\s+)?(.+?)\s+(?:çiz|çizer\s+misin|çizebilir\s+misin|resmet|oluştur|oluşturur\s+musun|oluşturabilir\s+misin|üret|üretir\s+misin|tasarla|tasarlar\s+mısın|görselleştir)$/i);
   if (ending?.[1]) prompt = ending[1].trim();
 
+  // "araba çiz yarış arabası olsun" gibi doğal komutlarda ortadaki
+  // üretim fiilini prompttan çıkar. Böylece model "araba çiz" ifadesini
+  // konu sanmaz; yeni isteği "araba, yarış arabası olsun" olarak alır.
+  prompt = prompt
+    .replace(/\s+(?:çiz|resmet|oluştur|üret|tasarla|görselleştir)\s+(?=.+)/i, ", ")
+    .replace(/\s+/g, " ")
+    .trim();
+
   // Görsel kelimesi var ama komut temizleme sonrası boşsa önceki isteğe dön.
   if (!prompt || /^(?:bir\s+)?(?:görsel|resim|fotoğraf|foto)$/i.test(prompt)) {
     return "__PREVIOUS_IMAGE_REQUEST__";
@@ -6265,7 +6273,14 @@ async function sendMessage() {
   }
 
 
-  if (!imagesForAI.length && isImageRevisionRequest(text, chat)) {
+  // Açık ve yeni bir görsel komutu her zaman yeni konu sayılır.
+  // Önceki görsel bağlamı yalnızca "olmamış", "daha karanlık yap" gibi
+  // öznesiz devam/düzeltme cümlelerinde kullanılmalıdır.
+  const explicitNewImagePrompt = imagePromptFromText(text);
+  const isExplicitNewImageRequest = explicitNewImagePrompt !== null &&
+    explicitNewImagePrompt !== "__PREVIOUS_IMAGE_REQUEST__";
+
+  if (!imagesForAI.length && !isExplicitNewImageRequest && isImageRevisionRequest(text, chat)) {
     const previousGeneration = findLatestGeneratedMessage(chat);
     if (previousGeneration) {
       setInput("");
@@ -6303,7 +6318,7 @@ async function sendMessage() {
     }
   }
 
-  const requestedImagePrompt = imagePromptFromText(text);
+  const requestedImagePrompt = explicitNewImagePrompt;
   if (requestedImagePrompt !== null) {
     setInput("");
     const resolvedPrompt = requestedImagePrompt === "__PREVIOUS_IMAGE_REQUEST__"
