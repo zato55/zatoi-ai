@@ -1883,7 +1883,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.3 • PDF Bağlam Düzeltmesi</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V11.9 • Yeniden Oluştur Sağlamlaştırma</span></div>
       </div>
     </div>
   </section>
@@ -4183,9 +4183,14 @@ function renderMessages() {
           regenerate.title = `Seçenek ${index + 1}'i yerinde yeniden oluştur`;
           regenerate.setAttribute("aria-label", `Seçenek ${index + 1}'i yerinde yeniden oluştur`);
           const isRegenerating = message.regeneratingIndex === index;
-          regenerate.disabled = sending || isRegenerating;
+          regenerate.disabled = isRegenerating;
           regenerate.textContent = isRegenerating ? "↻ Yeniden oluşturuluyor..." : "↻ Yeniden Oluştur";
-          regenerate.onclick = () => regenerateGeneratedImage(message, index);
+          regenerate.onclick = async () => {
+            if (regenerate.disabled) return;
+            regenerate.disabled = true;
+            regenerate.textContent = "↻ Yeniden oluşturuluyor...";
+            await regenerateGeneratedImage(message, index);
+          };
 
           const download = document.createElement("a");
           download.href = imageSrc;
@@ -5338,23 +5343,38 @@ function chooseGeneratedImage(message, index) {
 }
 
 async function regenerateGeneratedImage(message, index) {
-  if (sending) return;
   if (!message || !Array.isArray(message.generatedImages)) return;
   if (index < 0 || index >= message.generatedImages.length) return;
-  if (!navigator.onLine) return alert("İnternet bağlantısı yok.");
+  if (message.regeneratingIndex !== undefined && message.regeneratingIndex !== null) return;
+  if (!navigator.onLine) {
+    alert("İnternet bağlantısı yok.");
+    renderAll();
+    return;
+  }
 
   const chat = getActiveChat();
-  if (!chat || !chat.messages.includes(message)) return;
+  if (!chat) return;
 
-  const description = String(message.imagePrompt || "").trim();
-  if (!description) return alert("Bu görselin oluşturma açıklaması bulunamadı.");
+  // Bulut senkronu mesaj nesnesini değiştirmiş olsa bile doğru görsel mesajını bul.
+  const targetMessage = chat.messages.find(item =>
+    item === message ||
+    (message.preferenceChoiceId && item.preferenceChoiceId === message.preferenceChoiceId) ||
+    (message.generationId && item.generationId === message.generationId && item.imagePrompt === message.imagePrompt)
+  );
+  if (!targetMessage || !Array.isArray(targetMessage.generatedImages)) return;
+
+  const description = String(targetMessage.imagePrompt || "").trim();
+  if (!description) {
+    alert("Bu görselin oluşturma açıklaması bulunamadı.");
+    renderAll();
+    return;
+  }
 
   const variant = index === 0 ? "A" : "B";
-  const referenceImage = String(message.sourceReferenceImage || "");
-  const generationId = String(message.generationId || crypto.randomUUID());
-  message.generationId = generationId;
-  message.regeneratingIndex = index;
-  sending = true;
+  const referenceImage = String(targetMessage.sourceReferenceImage || "");
+  const generationId = String(targetMessage.generationId || crypto.randomUUID());
+  targetMessage.generationId = generationId;
+  targetMessage.regeneratingIndex = index;
   renderMessages();
 
   try {
@@ -5365,26 +5385,30 @@ async function regenerateGeneratedImage(message, index) {
       generationId
     );
 
-    message.generatedImages[index] = replacement.dataUrl;
+    targetMessage.generatedImages[index] = replacement.dataUrl;
 
-    if (!Array.isArray(message.generationMeta)) {
-      message.generationMeta = [];
+    if (!Array.isArray(targetMessage.generationMeta)) {
+      targetMessage.generationMeta = [];
     }
 
-    message.generationMeta[index] = {
+    targetMessage.generationMeta[index] = {
       model: replacement.model,
       referenceMode: replacement.referenceMode
     };
 
-    message.time = Date.now();
+    // Yeniden oluşturulan görsel artık yeni bir seçenek olduğu için eski seçimi kaldır.
+    if (targetMessage.chosenImage === index) {
+      delete targetMessage.chosenImage;
+    }
+
+    targetMessage.time = Date.now();
     chat.updatedAt = Date.now();
     saveChats();
     queueCloudSave(chat);
   } catch (error) {
     alert(error.message || "Görsel yeniden oluşturulamadı.");
   } finally {
-    delete message.regeneratingIndex;
-    sending = false;
+    delete targetMessage.regeneratingIndex;
     renderAll();
   }
 }
