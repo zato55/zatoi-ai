@@ -4184,7 +4184,7 @@ function renderMessages() {
           regenerate.setAttribute("aria-label", `Seçenek ${index + 1}'i yerinde yeniden oluştur`);
           const isRegenerating = message.regeneratingIndex === index;
           regenerate.disabled = sending || isRegenerating;
-          regenerate.textContent = isRegenerating ? "↻ Oluşturuluyor..." : "↻ Yeniden Oluştur";
+          regenerate.textContent = isRegenerating ? "↻ Yeniden oluşturuluyor..." : "↻ Yeniden Oluştur";
           regenerate.onclick = () => regenerateGeneratedImage(message, index);
 
           const download = document.createElement("a");
@@ -5470,7 +5470,9 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
   } catch (error) {
     alert(error.message || "Görsel üretilemedi.");
   } finally {
-    hideTyping(); sending = false;
+    hideTyping();
+    sending = false;
+    renderAll();
   }
 }
 
