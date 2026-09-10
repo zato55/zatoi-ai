@@ -616,6 +616,7 @@
 
     .input-box {
       width: 100%;
+      position: relative;
 
       display: flex;
       align-items: flex-end;
@@ -686,6 +687,67 @@
 
     .voice-btn.active {
       background: #b91c1c;
+    }
+
+
+    /* =================================
+       EKLE / ARAÇLAR MENÜSÜ
+    ================================= */
+    .tools-menu {
+      position: absolute;
+      left: 8px;
+      bottom: calc(100% + 10px);
+      z-index: 80;
+      width: min(300px, calc(100vw - 28px));
+      padding: 10px;
+      border: 1px solid #334352;
+      border-radius: 18px;
+      background: #17212b;
+      box-shadow: 0 18px 45px rgba(0,0,0,.38);
+      display: none;
+      gap: 6px;
+    }
+
+    .tools-menu.show {
+      display: grid;
+    }
+
+    .tools-menu-item {
+      width: 100%;
+      min-height: 52px;
+      border: 0;
+      border-radius: 13px;
+      background: transparent;
+      color: #f4f7fa;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 8px 10px;
+      text-align: left;
+      font: inherit;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .tools-menu-item:hover,
+    .tools-menu-item:focus-visible {
+      background: #22313e;
+      outline: none;
+    }
+
+    .tools-menu-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #2b3946;
+      font-size: 19px;
+    }
+
+    .tools-menu-label {
+      font-weight: 650;
     }
 
     /* =================================
@@ -1386,6 +1448,10 @@
     body.light-theme .chat-top, body.light-theme .desktop-input-area, body.light-theme .mobile-input-area { background:#fff; border-color:#d9e1e8; }
     body.light-theme .messages { background:#f3f6f9; }
     body.light-theme .input-box { background:#fff; border-color:#cbd5df; }
+    body.light-theme .tools-menu { background:#fff; border-color:#ccd6df; box-shadow:0 18px 45px rgba(30,41,59,.18); }
+    body.light-theme .tools-menu-item { color:#17202a; }
+    body.light-theme .tools-menu-item:hover, body.light-theme .tools-menu-item:focus-visible { background:#eef3f7; }
+    body.light-theme .tools-menu-icon { background:#e7edf2; }
     body.light-theme textarea { color:#17202a; }
     body.light-theme .message.assistant { background:#fff; color:#17202a; border-color:#d9e1e8; }
     body.light-theme .message.user { color:#fff; }
@@ -1877,16 +1943,22 @@
         ></textarea>
 
 
+        <div id="desktopToolsMenu" class="tools-menu" aria-hidden="true">
+          <button id="desktopCameraButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">📷</span><span class="tools-menu-label">Kamera</span></button>
+          <button id="desktopGalleryButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">🖼️</span><span class="tools-menu-label">Fotoğraflar</span></button>
+          <button id="desktopFilesButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">📄</span><span class="tools-menu-label">Dosyalar</span></button>
+          <button id="desktopImageGenerateButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">🎨</span><span class="tools-menu-label">Görsel Oluştur</span></button>
+        </div>
+
         <button
           id="desktopPdfButton"
           class="voice-btn pdf-btn"
-          aria-label="PDF, kamera veya galeriden görsel ekle"
-          title="PDF veya görsel ekle"
+          aria-label="Ekleme seçeneklerini aç"
+          aria-expanded="false"
+          title="Ekle"
         >
-          📎
+          ＋
         </button>
-
-        <button id="desktopImageGenerateButton" class="voice-btn" aria-label="Yapay zekâyla görsel oluştur" title="Görsel oluştur">🎨</button>
 
 
         <button
@@ -1984,16 +2056,22 @@
         ></textarea>
 
 
+        <div id="mobileToolsMenu" class="tools-menu" aria-hidden="true">
+          <button id="mobileCameraButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">📷</span><span class="tools-menu-label">Kamera</span></button>
+          <button id="mobileGalleryButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">🖼️</span><span class="tools-menu-label">Fotoğraflar</span></button>
+          <button id="mobileFilesButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">📄</span><span class="tools-menu-label">Dosyalar</span></button>
+          <button id="mobileImageGenerateButton" class="tools-menu-item" type="button"><span class="tools-menu-icon">🎨</span><span class="tools-menu-label">Görsel Oluştur</span></button>
+        </div>
+
         <button
           id="mobilePdfButton"
           class="voice-btn pdf-btn"
-          aria-label="PDF veya görsel yükle"
-          title="PDF veya görsel ekle"
+          aria-label="Ekleme seçeneklerini aç"
+          aria-expanded="false"
+          title="Ekle"
         >
-          📎
+          ＋
         </button>
-
-        <button id="mobileImageGenerateButton" class="voice-btn" aria-label="Yapay zekâyla görsel oluştur" title="Görsel oluştur">🎨</button>
 
 
         <button
@@ -2099,7 +2177,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.4 • Hızlı Geçmiş Menüsü</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V12.5 • Ekleme Araçları Menüsü</span></div>
       </div>
     </div>
   </section>
@@ -2138,8 +2216,23 @@
   id="pdfInput"
   class="file-input"
   type="file"
-  accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+  accept="application/pdf,.pdf"
+>
+
+<input
+  id="galleryInput"
+  class="file-input"
+  type="file"
+  accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
   multiple
+>
+
+<input
+  id="cameraInput"
+  class="file-input"
+  type="file"
+  accept="image/*"
+  capture="environment"
 >
 
 
@@ -2416,6 +2509,13 @@ const pdfInput =
   document.getElementById(
     "pdfInput"
   );
+
+const galleryInput = document.getElementById("galleryInput");
+const cameraInput = document.getElementById("cameraInput");
+const desktopToolsMenu = document.getElementById("desktopToolsMenu");
+const mobileToolsMenu = document.getElementById("mobileToolsMenu");
+const desktopPdfButton = document.getElementById("desktopPdfButton");
+const mobilePdfButton = document.getElementById("mobilePdfButton");
 
 
 let chats = [];
@@ -5374,6 +5474,8 @@ async function processSelectedFiles(fileList) {
 }
 
 pdfInput.addEventListener("change", event => processSelectedFiles(event.target.files));
+galleryInput.addEventListener("change", event => processSelectedFiles(event.target.files));
+cameraInput.addEventListener("change", event => processSelectedFiles(event.target.files));
 
 /* Masaüstü sürükle-bırak */
 const dropOverlay = document.getElementById("dropOverlay");
@@ -5420,22 +5522,63 @@ window.addEventListener("drop", async event => {
    PDF BUTONLARI
 ========================================== */
 
-document
-  .getElementById(
-    "desktopPdfButton"
-  )
-  .onclick =
-    () =>
-      pdfInput.click();
+function closeToolsMenus() {
+  desktopToolsMenu?.classList.remove("show");
+  mobileToolsMenu?.classList.remove("show");
+  desktopToolsMenu?.setAttribute("aria-hidden", "true");
+  mobileToolsMenu?.setAttribute("aria-hidden", "true");
+  desktopPdfButton?.setAttribute("aria-expanded", "false");
+  mobilePdfButton?.setAttribute("aria-expanded", "false");
+}
 
+function toggleToolsMenu(menu, button) {
+  const willOpen = !menu?.classList.contains("show");
+  closeToolsMenus();
+  if (!willOpen || !menu) return;
+  menu.classList.add("show");
+  menu.setAttribute("aria-hidden", "false");
+  button?.setAttribute("aria-expanded", "true");
+}
 
-document
-  .getElementById(
-    "mobilePdfButton"
-  )
-  .onclick =
-    () =>
-      pdfInput.click();
+desktopPdfButton.onclick = event => {
+  event.stopPropagation();
+  toggleToolsMenu(desktopToolsMenu, desktopPdfButton);
+};
+
+mobilePdfButton.onclick = event => {
+  event.stopPropagation();
+  toggleToolsMenu(mobileToolsMenu, mobilePdfButton);
+};
+
+function openCameraPicker() {
+  closeToolsMenus();
+  cameraInput.value = "";
+  cameraInput.click();
+}
+
+function openGalleryPicker() {
+  closeToolsMenus();
+  galleryInput.value = "";
+  galleryInput.click();
+}
+
+function openPdfPicker() {
+  closeToolsMenus();
+  pdfInput.value = "";
+  pdfInput.click();
+}
+
+document.getElementById("desktopCameraButton").onclick = openCameraPicker;
+document.getElementById("mobileCameraButton").onclick = openCameraPicker;
+document.getElementById("desktopGalleryButton").onclick = openGalleryPicker;
+document.getElementById("mobileGalleryButton").onclick = openGalleryPicker;
+document.getElementById("desktopFilesButton").onclick = openPdfPicker;
+document.getElementById("mobileFilesButton").onclick = openPdfPicker;
+
+document.addEventListener("click", event => {
+  if (event.target.closest(".tools-menu") || event.target.closest("#desktopPdfButton") || event.target.closest("#mobilePdfButton")) return;
+  closeToolsMenus();
+});
 
 function imagePromptFromText(text) {
   const value = String(text || "").trim();
@@ -5729,8 +5872,8 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
   }
 }
 
-document.getElementById("desktopImageGenerateButton").onclick = () => generateImage();
-document.getElementById("mobileImageGenerateButton").onclick = () => generateImage();
+document.getElementById("desktopImageGenerateButton").onclick = () => { closeToolsMenus(); generateImage(); };
+document.getElementById("mobileImageGenerateButton").onclick = () => { closeToolsMenus(); generateImage(); };
 
 
 document
