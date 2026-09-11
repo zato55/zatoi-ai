@@ -2320,6 +2320,9 @@
 const WORKER_URL =
   "https://zatoi-ai.fbboytr.workers.dev/";
 
+const ZATOI_CLIENT_VERSION = "v14.5-limit-unlock";
+console.info("Zatoi arayüz sürümü:", ZATOI_CLIENT_VERSION);
+
 
 const CHATS_KEY =
   "zatoi_chats_v6";
@@ -6013,8 +6016,8 @@ function friendlyUserError(error, context = "general") {
     return "Yanıt beklenenden uzun sürdü. Lütfen tekrar dene.";
   }
 
-  if (lower.includes("4006") || lower.includes("daily free allocation") || lower.includes("10,000 neurons") || lower.includes("10000 neurons") || lower.includes("workers paid plan")) {
-    return "Bugünkü ücretsiz AI kullanım sınırına ulaşıldı. Daha sonra tekrar deneyebilirsin.";
+  if (lower.includes("ai_daily_limit") || lower.includes("ücretsiz ai kullanım sınırı") || lower.includes("4006") || lower.includes("daily free allocation") || lower.includes("10,000 neurons") || lower.includes("10000 neurons") || lower.includes("workers paid plan")) {
+    return "Bugünkü ücretsiz AI kullanım sınırı doldu. Hak yenilendiğinde tekrar deneyebilirsin.";
   }
 
   if (lower.includes("413") || lower.includes("request body too large") || lower.includes("istek gövdesi çok büyük") || lower.includes("payload too large")) {
@@ -6048,13 +6051,15 @@ function sanitizeAssistantTextForUser(value, context = "general") {
   // Altyapı sağlayıcılarının ham hata metinleri kullanıcıya asla gösterilmez.
   if (
     lower.includes("4006") ||
+    lower.includes("ai_daily_limit") ||
+    lower.includes("ücretsiz ai kullanım sınırı") ||
     lower.includes("daily free allocation") ||
     lower.includes("10,000 neurons") ||
     lower.includes("10000 neurons") ||
     lower.includes("workers paid plan") ||
     (lower.includes("cloudflare") && lower.includes("neuron"))
   ) {
-    return "Bugünkü ücretsiz AI kullanım sınırına ulaşıldı. Daha sonra tekrar deneyebilirsin.";
+    return "Bugünkü ücretsiz AI kullanım sınırı doldu. Hak yenilendiğinde tekrar deneyebilirsin.";
   }
 
   if (
@@ -6619,11 +6624,10 @@ async function sendMessage() {
   showTyping();
 
 
+  let documentForAI = null;
+
+
   try {
-
-    let documentForAI =
-      null;
-
 
     if (
       chat.document &&
@@ -6905,6 +6909,24 @@ async function sendMessage() {
       error
     );
 
+    // Kullanıcı yeni mesaj yazabilsin diye ağ kontrolünü beklemeden kilidi aç.
+    sending = false;
+    hideTyping();
+
+    // Tarayıcı bazı Worker hata cevaplarını yalnızca "Failed to fetch"
+    // olarak gösterebilir. Durum uç noktası limit bilgisini doğrular.
+    if (/failed to fetch|network|connection/i.test(String(error?.message || error || ""))) {
+      try {
+        const statusResponse = await fetchWithTimeout(
+          WORKER_URL,
+          { cache: "no-store" },
+          5000
+        );
+        const statusData = await statusResponse.json();
+        if (statusData?.aiDailyLimitReached) error = new Error("AI_DAILY_LIMIT");
+      } catch {}
+    }
+
 
     hideTyping();
 
@@ -6937,12 +6959,13 @@ async function sendMessage() {
 
     renderAll();
 
+  } finally {
+    // Ağ, kota, depolama veya arayüz hatası ne olursa olsun gönderim kilidini aç.
+    // Böylece tek bir başarısız istek Gönder butonunu kalıcı olarak kilitlemez.
+    hideTyping();
+    sending = false;
+    focusInput();
   }
-
-
-  sending = false;
-
-  focusInput();
 
 }
 
