@@ -2544,6 +2544,7 @@ let authMode = "login";
 
 let cloudSyncTimer = null;
 let cloudSyncInFlight = false;
+let cloudSyncRunId = 0;
 
 
 /* ==========================================
@@ -3291,6 +3292,7 @@ async function logoutAccount() {
   authToken = "";
 
   currentUser = null;
+  resetAccountRuntimeState();
 
 
   localStorage.removeItem(
@@ -3377,6 +3379,7 @@ async function checkAuth() {
     authToken = "";
 
     currentUser = null;
+    resetAccountRuntimeState();
 
 
     localStorage.removeItem(
@@ -3414,6 +3417,9 @@ let globalMemory = {
 
 
 function loadMemory() {
+
+  // Hesap değiştiğinde önceki kullanıcının RAM'deki hafızasını taşıma.
+  globalMemory = { name: "", facts: [], preferences: [] };
 
   try {
 
@@ -3656,6 +3662,7 @@ function loadAccountLocalState() {
   activeChatId = null;
   imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
   pendingImageChoices = [];
+  globalMemory = { name: "", facts: [], preferences: [] };
 
   try {
     imagePreference = {
@@ -3666,7 +3673,18 @@ function loadAccountLocalState() {
     pendingImageChoices = Array.isArray(pending) ? pending : [];
   } catch {}
 
+  loadMemory();
   loadChats();
+}
+
+function resetAccountRuntimeState() {
+  cloudSyncRunId += 1;
+  cloudSyncInFlight = false;
+  chats = [];
+  activeChatId = null;
+  globalMemory = { name: "", facts: [], preferences: [] };
+  imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+  pendingImageChoices = [];
 }
 
 loadChats();
@@ -3828,6 +3846,9 @@ async function syncChatsWithCloud(silent = false) {
   }
 
   cloudSyncInFlight = true;
+  const syncRunId = ++cloudSyncRunId;
+  const syncToken = authToken;
+  const syncUserId = String(currentUser?.userId || "");
 
   if (!silent) {
     showSyncStatus(
@@ -3838,6 +3859,11 @@ async function syncChatsWithCloud(silent = false) {
   try {
 
     const data = await cloudChatRequest("list");
+
+    // İstek sürerken hesap değiştiyse eski hesabın sonucunu kesinlikle uygulama.
+    if (syncRunId !== cloudSyncRunId || authToken !== syncToken || String(currentUser?.userId || "") !== syncUserId) {
+      return;
+    }
 
     const remoteChats = Array.isArray(data.chats)
       ? data.chats
@@ -3930,7 +3956,7 @@ async function syncChatsWithCloud(silent = false) {
 
   } finally {
 
-    cloudSyncInFlight = false;
+    if (syncRunId === cloudSyncRunId) cloudSyncInFlight = false;
 
     if (!silent) {
       hideSyncStatus();
@@ -6013,7 +6039,7 @@ async function regenerateGeneratedImage(message, index) {
   }
 }
 
-async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "") {
+async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "", sourceReferenceImageId = "") {
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
@@ -6023,6 +6049,7 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
       variant,
       preference: getImagePreferenceText(),
       referenceImage,
+      sourceReferenceImageId,
       generationId
     })
   });
@@ -6047,7 +6074,8 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
     dataUrl,
     imageId: response.headers.get("X-Zatoi-Image-Id") || "",
     model: response.headers.get("X-Zatoi-Image-Model") || "",
-    referenceMode: response.headers.get("X-Zatoi-Reference-Mode") || "none"
+    referenceMode: response.headers.get("X-Zatoi-Reference-Mode") || "none",
+    sourceReferenceImageId: response.headers.get("X-Zatoi-Source-Reference-Id") || ""
   };
 }
 
@@ -6168,7 +6196,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
   try {
     const generationId = crypto.randomUUID();
     const imageA = await requestGeneratedImage(description, "A", safeReferenceImage, generationId);
-    const imageB = await requestGeneratedImage(description, "B", safeReferenceImage, generationId);
+    const imageB = await requestGeneratedImage(description, "B", safeReferenceImage, generationId, imageA.sourceReferenceImageId);
     chat.messages.push({
       role: "assistant",
       content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
@@ -6182,6 +6210,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
       generationId,
       imagePrompt: description,
       sourceReferenceImage: safeReferenceImage,
+      sourceReferenceImageId: imageA.sourceReferenceImageId || imageB.sourceReferenceImageId || "",
       sourceReferencePreview: referencePreview,
       sourceReferenceName: referenceName,
       time: Date.now()
@@ -6412,6 +6441,10 @@ async function sendMessage() {
       let revisionReference = previousGeneration.sourceReferenceImage || "";
       let revisionPreview = previousGeneration.sourceReferencePreview || "";
       let revisionName = previousGeneration.sourceReferenceName || "";
+      if (!revisionReference && previousGeneration.sourceReferenceImageId) {
+        revisionReference = await fetchStoredGeneratedImage(previousGeneration.sourceReferenceImageId);
+        if (revisionReference && !revisionPreview) revisionPreview = revisionReference;
+      }
       if (!genericFailure && Number.isInteger(previousGeneration.chosenImage)) {
         const chosen = previousGeneration.generatedImages?.[previousGeneration.chosenImage];
         if (chosen && chosen !== "__ZATOI_EXPIRED_IMAGE__") {
