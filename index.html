@@ -2187,7 +2187,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V13.10 • PDF Batch Vision + Akıllı Router + Son 6 Görsel</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14 • Sağlamlık + Zeka • Akıllı Router + PDF Vision + Hata Kurtarma + Son 6 Görsel</span></div>
       </div>
     </div>
   </section>
@@ -2347,6 +2347,8 @@ const AUTH_TOKEN_KEY =
 const AUTH_USER_KEY =
   "zatoi_auth_user_v1";
 
+let currentUser = null;
+
 function storedUserId() {
   try {
     const raw = JSON.parse(localStorage.getItem(AUTH_USER_KEY) || "null");
@@ -2378,17 +2380,7 @@ let authToken =
   ) || "";
 
 
-let currentUser = null;
-
 let imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
-let pendingImageChoices = [];
-try {
-  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(imagePreferenceKey()) || "{}") };
-  const pending = JSON.parse(localStorage.getItem(pendingImageChoicesKey()) || "[]");
-  pendingImageChoices = Array.isArray(pending) ? pending : [];
-} catch {}
-
-
 try {
 
   currentUser =
@@ -2403,6 +2395,13 @@ try {
   currentUser = null;
 
 }
+
+let pendingImageChoices = [];
+try {
+  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(imagePreferenceKey()) || "{}") };
+  const pending = JSON.parse(localStorage.getItem(pendingImageChoicesKey()) || "[]");
+  pendingImageChoices = Array.isArray(pending) ? pending : [];
+} catch {}
 
 
 /* ==========================================
@@ -2544,7 +2543,6 @@ let authMode = "login";
 
 let cloudSyncTimer = null;
 let cloudSyncInFlight = false;
-let cloudSyncRunId = 0;
 
 
 /* ==========================================
@@ -3292,7 +3290,6 @@ async function logoutAccount() {
   authToken = "";
 
   currentUser = null;
-  resetAccountRuntimeState();
 
 
   localStorage.removeItem(
@@ -3302,6 +3299,12 @@ async function logoutAccount() {
   localStorage.removeItem(
     AUTH_USER_KEY
   );
+
+  chats = [];
+  activeChatId = null;
+  globalMemory = { name: "", facts: [], preferences: [] };
+  imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+  pendingImageChoices = [];
 
 
   showAuthScreen();
@@ -3379,7 +3382,6 @@ async function checkAuth() {
     authToken = "";
 
     currentUser = null;
-    resetAccountRuntimeState();
 
 
     localStorage.removeItem(
@@ -3417,9 +3419,6 @@ let globalMemory = {
 
 
 function loadMemory() {
-
-  // Hesap değiştiğinde önceki kullanıcının RAM'deki hafızasını taşıma.
-  globalMemory = { name: "", facts: [], preferences: [] };
 
   try {
 
@@ -3660,9 +3659,9 @@ function loadChats() {
 function loadAccountLocalState() {
   chats = [];
   activeChatId = null;
+  globalMemory = { name: "", facts: [], preferences: [] };
   imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
   pendingImageChoices = [];
-  globalMemory = { name: "", facts: [], preferences: [] };
 
   try {
     imagePreference = {
@@ -3675,16 +3674,6 @@ function loadAccountLocalState() {
 
   loadMemory();
   loadChats();
-}
-
-function resetAccountRuntimeState() {
-  cloudSyncRunId += 1;
-  cloudSyncInFlight = false;
-  chats = [];
-  activeChatId = null;
-  globalMemory = { name: "", facts: [], preferences: [] };
-  imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
-  pendingImageChoices = [];
 }
 
 loadChats();
@@ -3846,9 +3835,8 @@ async function syncChatsWithCloud(silent = false) {
   }
 
   cloudSyncInFlight = true;
-  const syncRunId = ++cloudSyncRunId;
-  const syncToken = authToken;
   const syncUserId = String(currentUser?.userId || "");
+  const syncToken = authToken;
 
   if (!silent) {
     showSyncStatus(
@@ -3860,8 +3848,7 @@ async function syncChatsWithCloud(silent = false) {
 
     const data = await cloudChatRequest("list");
 
-    // İstek sürerken hesap değiştiyse eski hesabın sonucunu kesinlikle uygulama.
-    if (syncRunId !== cloudSyncRunId || authToken !== syncToken || String(currentUser?.userId || "") !== syncUserId) {
+    if (!syncUserId || String(currentUser?.userId || "") !== syncUserId || authToken !== syncToken) {
       return;
     }
 
@@ -3941,6 +3928,7 @@ async function syncChatsWithCloud(silent = false) {
 
     // Eski tarayıcı sohbetlerini ilk senkron sırasında buluta taşı.
     for (const chat of uploadAfterMerge) {
+      if (String(currentUser?.userId || "") !== syncUserId || authToken !== syncToken) break;
       try {
         await saveChatToCloud(chat);
       } catch (error) {
@@ -3956,7 +3944,7 @@ async function syncChatsWithCloud(silent = false) {
 
   } finally {
 
-    if (syncRunId === cloudSyncRunId) cloudSyncInFlight = false;
+    cloudSyncInFlight = false;
 
     if (!silent) {
       hideSyncStatus();
@@ -4477,7 +4465,9 @@ function renderMessages() {
 
 
       content.textContent =
-        message.content;
+        message.role === "assistant"
+          ? sanitizeAssistantTextForUser(message.content)
+          : message.content;
 
 
       const messagePreviews = Array.isArray(message.imagePreviews)
@@ -5371,7 +5361,7 @@ async function ensurePdfJs() {
   return window.pdfjsLib;
 }
 
-async function renderScannedPdfPages(file, maxPages = 30, onProgress = null) {
+async function renderScannedPdfPages(file, maxPages = 30) {
   const pdfjsLib = await ensurePdfJs();
   const bytes = new Uint8Array(await file.arrayBuffer());
   const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
@@ -5382,7 +5372,7 @@ async function renderScannedPdfPages(file, maxPages = 30, onProgress = null) {
     const page = await pdf.getPage(pageNumber);
     const baseViewport = page.getViewport({ scale: 1 });
     const maxSide = Math.max(baseViewport.width, baseViewport.height);
-    const scale = Math.min(1.45, 1100 / Math.max(1, maxSide));
+    const scale = Math.min(1.6, 1280 / Math.max(1, maxSide));
     const viewport = page.getViewport({ scale });
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(viewport.width));
@@ -5391,18 +5381,26 @@ async function renderScannedPdfPages(file, maxPages = 30, onProgress = null) {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     await page.render({ canvasContext: ctx, viewport }).promise;
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.68));
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.72));
     if (blob) pages.push({ pageNumber, blob });
     page.cleanup();
-    if (typeof onProgress === "function") onProgress(pageNumber, count, "render");
   }
 
   return { pages, totalPages: pdf.numPages, limited: pdf.numPages > count };
 }
 
-async function uploadPdfRequest(file) {
+async function uploadPdfRequest(file, scannedPages = null) {
   const formData = new FormData();
   formData.append("file", file);
+
+  if (scannedPages?.pages?.length) {
+    for (const item of scannedPages.pages) {
+      formData.append("scanPage", item.blob, `page-${item.pageNumber}.jpg`);
+      formData.append("scanPageNumber", String(item.pageNumber));
+    }
+    formData.append("scanTotalPages", String(scannedPages.totalPages || scannedPages.pages.length));
+    formData.append("scanLimited", scannedPages.limited ? "1" : "0");
+  }
 
   return fetch(WORKER_URL, {
     method: "POST",
@@ -5411,123 +5409,95 @@ async function uploadPdfRequest(file) {
   });
 }
 
-async function uploadPdfScanBatch(items, totalPages) {
-  const formData = new FormData();
-  formData.append("scanOnly", "1");
-  formData.append("scanTotalPages", String(totalPages || items.length));
-
-  for (const item of items) {
-    formData.append("scanPage", item.blob, `page-${item.pageNumber}.jpg`);
-    formData.append("scanPageNumber", String(item.pageNumber));
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 90000);
-
-  try {
-    return await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${authToken}` },
-      body: formData,
-      signal: controller.signal
-    });
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-async function uploadPdf(file, onProgress = null) {
+async function uploadPdf(file) {
 
   if (!authToken) {
-    throw new Error("Oturum açman gerekiyor.");
+
+    throw new Error(
+      "Oturum açman gerekiyor."
+    );
+
   }
+
 
   let response = await uploadPdfRequest(file);
 
-  if (response.status === 401) {
-    await forceLogout();
-    throw new Error("Oturum süren dolmuş. Tekrar giriş yap.");
-  }
-
+  // Normal PDF'den hiç metin çıkmazsa veya yalnızca Contents/başlık gibi
+  // yetersiz metin çıkarsa sayfaları görsele çevirip
+  // aynı PDF uç noktasına tekrar gönder. Böylece taranmış PDF'ler
+  // de Workers AI görsel okuma hattından geçer.
   if (response.status === 422) {
     let firstError = null;
     try { firstError = await response.clone().json(); } catch {}
     const message = String(firstError?.error || firstError?.details || "");
-    const needsVision = !!firstError?.needsVisionScan || /metin çıkarılamadı|yeterli metin|görsel okuma gerekli|dönüştürülürken/i.test(message);
-
-    if (needsVision) {
-      if (typeof onProgress === "function") onProgress(0, 30, "start");
-      const scannedPages = await renderScannedPdfPages(file, 30, onProgress);
-
-      if (!scannedPages.pages.length) {
-        throw new Error("PDF sayfaları görsel olarak hazırlanamadı.");
+    if (/metin çıkarılamadı|yeterli metin|görsel okuma gerekli|dönüştürülürken/i.test(message)) {
+      const scannedPages = await renderScannedPdfPages(file, 30);
+      if (scannedPages.pages.length) {
+        response = await uploadPdfRequest(file, scannedPages);
       }
-
-      const batchSize = 4;
-      const pageTexts = [];
-
-      for (let start = 0; start < scannedPages.pages.length; start += batchSize) {
-        const batch = scannedPages.pages.slice(start, start + batchSize);
-        if (typeof onProgress === "function") {
-          onProgress(Math.min(start + batch.length, scannedPages.pages.length), scannedPages.pages.length, "scan");
-        }
-
-        const batchResponse = await uploadPdfScanBatch(batch, scannedPages.totalPages);
-
-        if (batchResponse.status === 401) {
-          await forceLogout();
-          throw new Error("Oturum süren dolmuş. Tekrar giriş yap.");
-        }
-
-        let batchData = null;
-        try { batchData = await batchResponse.json(); } catch {}
-
-        if (!batchResponse.ok || !batchData?.success || !batchData?.text) {
-          throw new Error(
-            batchData?.details ||
-            batchData?.error ||
-            `PDF'nin ${batch[0]?.pageNumber || "?"}. sayfasından başlayan bölümü okunamadı.`
-          );
-        }
-
-        pageTexts.push(batchData.text);
-      }
-
-      const combinedText = pageTexts.join("\n\n").trim();
-      if (!combinedText) throw new Error("PDF sayfalarından içerik okunamadı.");
-
-      if (typeof onProgress === "function") {
-        onProgress(scannedPages.pages.length, scannedPages.pages.length, "done");
-      }
-
-      return {
-        success: true,
-        type: "pdf",
-        name: file.name || "Yüklenen PDF",
-        text: combinedText,
-        meta: {
-          chars: combinedText.length,
-          scanned: true,
-          pagesRead: scannedPages.pages.length,
-          totalPages: scannedPages.totalPages,
-          limited: scannedPages.limited
-        }
-      };
     }
   }
 
-  const data = await response.json();
+
+  if (
+    response.status ===
+    401
+  ) {
+
+    await forceLogout();
+
+    throw new Error(
+      "Oturum süren dolmuş. Tekrar giriş yap."
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
 
   if (!response.ok) {
-    throw new Error(data.details || data.error || "PDF yüklenemedi.");
+
+    throw new Error(
+
+      data.details ||
+      data.error ||
+      "PDF yüklenemedi."
+
+    );
+
   }
 
-  if (!data.success || !data.text) {
-    throw new Error(data.error || "PDF'den metin çıkarılamadı.");
+
+  if (
+    !data.success ||
+    !data.text
+  ) {
+
+    throw new Error(
+
+      data.error ||
+      "PDF'den metin çıkarılamadı."
+
+    );
+
   }
 
-  return data;
+
+  return {
+
+    name:
+      data.name ||
+      file.name,
+
+    text:
+      data.text
+
+  };
+
 }
+
 
 async function processSelectedFiles(fileList) {
     const files = Array.from(fileList || []);
@@ -5583,15 +5553,7 @@ async function processSelectedFiles(fileList) {
       const targetChatId = getActiveChat()?.id || "";
 
       try {
-        documentData = await uploadPdf(file, (current, total, phase) => {
-          let status = "PDF yükleniyor...";
-          if (phase === "start") status = "PDF taranmış görünüyor, sayfalar hazırlanıyor...";
-          if (phase === "render") status = `PDF sayfaları hazırlanıyor... ${current}/${total}`;
-          if (phase === "scan") status = `PDF okunuyor... ${current}/${total}`;
-          if (phase === "done") status = "PDF hazır.";
-          desktopName.textContent = status;
-          mobileName.textContent = status;
-        });
+        documentData = await uploadPdf(file);
         selectedPdf = file;
 
         // PDF metnini yalnızca geçici seçimde tutma; aktif sohbetin
@@ -6032,14 +5994,99 @@ async function regenerateGeneratedImage(message, index) {
     saveChats();
     queueCloudSave(chat);
   } catch (error) {
-    alert(error.message || "Görsel yeniden oluşturulamadı.");
+    alert(friendlyUserError(error, "image_generate"));
   } finally {
     delete targetMessage.regeneratingIndex;
     renderAll();
   }
 }
 
-async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "", sourceReferenceImageId = "") {
+function friendlyUserError(error, context = "general") {
+  const raw = String(error?.message || error || "").trim();
+  const lower = raw.toLocaleLowerCase("tr-TR");
+
+  if (lower.includes("auth_required") || lower.includes("oturum süren dolmuş") || lower.includes("unauthorized")) {
+    return "Oturum süren dolmuş. Lütfen tekrar giriş yap.";
+  }
+
+  if (lower.includes("zatoi_request_timeout") || lower.includes("aborted") || lower.includes("timeout")) {
+    return "Yanıt beklenenden uzun sürdü. Lütfen tekrar dene.";
+  }
+
+  if (lower.includes("4006") || lower.includes("daily free allocation") || lower.includes("10,000 neurons") || lower.includes("10000 neurons") || lower.includes("workers paid plan")) {
+    return "Bugünkü ücretsiz AI kullanım sınırına ulaşıldı. Daha sonra tekrar deneyebilirsin.";
+  }
+
+  if (lower.includes("413") || lower.includes("request body too large") || lower.includes("istek gövdesi çok büyük") || lower.includes("payload too large")) {
+    return context === "image"
+      ? "Görsel işlenemeyecek kadar büyük. Zatoi görseli küçültmeyi denedi ancak gönderemedi. Daha küçük bir görselle tekrar deneyebilirsin."
+      : "Gönderilen içerik çok büyük. Daha küçük bir dosya veya daha kısa içerikle tekrar deneyebilirsin.";
+  }
+
+  if (lower.includes("429") || lower.includes("rate limit") || lower.includes("too many requests")) {
+    return "Şu anda çok fazla istek var. Biraz sonra tekrar deneyebilirsin.";
+  }
+
+  if (lower.includes("network") || lower.includes("failed to fetch") || lower.includes("fetch failed") || lower.includes("connection") || lower.includes("internet")) {
+    return "Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar deneyebilirsin.";
+  }
+
+  if (context === "pdf") return "Bu belge şu anda okunamadı. Tekrar deneyebilirsin.";
+  if (context === "image") return "Görsel şu anda işlenemedi. Tekrar deneyebilirsin.";
+  if (context === "image_generate") return "Görsel şu anda oluşturulamadı. Tekrar deneyebilirsin.";
+  if (context === "web") return "İnternet araştırması şu anda tamamlanamadı. Tekrar deneyebilirsin.";
+
+  return "Bir sorun oluştu. Lütfen tekrar dene.";
+}
+
+function sanitizeAssistantTextForUser(value, context = "general") {
+  const text = String(value || "").trim();
+  if (!text) return text;
+
+  const lower = text.toLocaleLowerCase("tr-TR");
+
+  // Altyapı sağlayıcılarının ham hata metinleri kullanıcıya asla gösterilmez.
+  if (
+    lower.includes("4006") ||
+    lower.includes("daily free allocation") ||
+    lower.includes("10,000 neurons") ||
+    lower.includes("10000 neurons") ||
+    lower.includes("workers paid plan") ||
+    (lower.includes("cloudflare") && lower.includes("neuron"))
+  ) {
+    return "Bugünkü ücretsiz AI kullanım sınırına ulaşıldı. Daha sonra tekrar deneyebilirsin.";
+  }
+
+  if (
+    /(?:^|\\n)\\s*(?:⚠️\\s*)?(?:hata oluştu:?\\s*)?(?:http\\s*)?5\\d\\d\\b/i.test(text) ||
+    /internal server error|worker exception|stack trace|traceback/i.test(text)
+  ) {
+    return friendlyUserError(text, context);
+  }
+
+  if (/\\b(?:3030|5018)\\b|tensor|model input|request body too large|payload too large/i.test(text)) {
+    return friendlyUserError(text, context);
+  }
+
+  // JSON/API hata gövdeleri, model/binding ayrıntıları ve benzeri teknik cevaplar.
+  if (
+    /^\\s*\\{[\\s\\S]*(?:"error"|"details"|"code")[\\s\\S]*\\}\\s*$/i.test(text) ||
+    /(?:binding|d1|kv namespace|tavily_api_key|authorization bearer|cf-ray|workers ai error)/i.test(text)
+  ) {
+    return friendlyUserError(text, context);
+  }
+
+  return text;
+}
+
+function userSafeError(error, context = "general") {
+  const friendly = friendlyUserError(error, context);
+  const safe = new Error(friendly);
+  safe.userSafe = true;
+  return safe;
+}
+
+async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "") {
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
@@ -6049,7 +6096,6 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
       variant,
       preference: getImagePreferenceText(),
       referenceImage,
-      sourceReferenceImageId,
       generationId
     })
   });
@@ -6060,7 +6106,8 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
       const errorData = await response.json();
       message = errorData.details || errorData.error || message;
     } catch {}
-    throw new Error(message);
+    console.error("Image generation error:", response.status, message);
+    throw userSafeError(message, "image_generate");
   }
   const imageBlob = await response.blob();
   if (!imageBlob.type.startsWith("image/")) throw new Error("Worker geçerli bir görsel döndürmedi.");
@@ -6073,9 +6120,9 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
   return {
     dataUrl,
     imageId: response.headers.get("X-Zatoi-Image-Id") || "",
+    referenceImageId: response.headers.get("X-Zatoi-Reference-Image-Id") || "",
     model: response.headers.get("X-Zatoi-Image-Model") || "",
-    referenceMode: response.headers.get("X-Zatoi-Reference-Mode") || "none",
-    sourceReferenceImageId: response.headers.get("X-Zatoi-Source-Reference-Id") || ""
+    referenceMode: response.headers.get("X-Zatoi-Reference-Mode") || "none"
   };
 }
 
@@ -6111,6 +6158,27 @@ async function fetchStoredGeneratedImage(imageId) {
   } catch {
     return "";
   }
+}
+
+async function fetchStoredReferenceImage(referenceImageId) {
+  const id = String(referenceImageId || "").trim();
+  if (!id || !authToken) return "";
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
+      body: JSON.stringify({ type: "reference_get", referenceImageId: id })
+    });
+    if (!response.ok) return "";
+    const blob = await response.blob();
+    if (!blob.type.startsWith("image/")) return "";
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch { return ""; }
 }
 
 const hydratingStoredImages = new Set();
@@ -6196,7 +6264,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
   try {
     const generationId = crypto.randomUUID();
     const imageA = await requestGeneratedImage(description, "A", safeReferenceImage, generationId);
-    const imageB = await requestGeneratedImage(description, "B", safeReferenceImage, generationId, imageA.sourceReferenceImageId);
+    const imageB = await requestGeneratedImage(description, "B", safeReferenceImage, generationId);
     chat.messages.push({
       role: "assistant",
       content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
@@ -6210,7 +6278,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
       generationId,
       imagePrompt: description,
       sourceReferenceImage: safeReferenceImage,
-      sourceReferenceImageId: imageA.sourceReferenceImageId || imageB.sourceReferenceImageId || "",
+      sourceReferenceImageId: imageA.referenceImageId || imageB.referenceImageId || "",
       sourceReferencePreview: referencePreview,
       sourceReferenceName: referenceName,
       time: Date.now()
@@ -6286,6 +6354,12 @@ async function forceLogout() {
 
   currentUser = null;
 
+  chats = [];
+  activeChatId = null;
+  globalMemory = { name: "", facts: [], preferences: [] };
+  imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+  pendingImageChoices = [];
+
 
   localStorage.removeItem(
     AUTH_TOKEN_KEY
@@ -6306,13 +6380,35 @@ async function forceLogout() {
 function friendlyClientError(error, fallback = "İşlem tamamlanamadı. Lütfen tekrar dene.") {
   const raw = String(error?.message || error || "").trim();
   if (!raw) return fallback;
-  if (/413|gövdesi çok büyük|çok büyük/i.test(raw)) return "Dosya/görsel gönderim için fazla büyük. Zatoi küçültüp tekrar denemeyi başaramadı; daha küçük bir dosyayla tekrar dene.";
-  if (/429|çok fazla|çok hızlı|limit|quota/i.test(raw)) return "Kısa sürede çok fazla işlem yapıldı. Biraz bekleyip tekrar dene.";
-  if (/401|AUTH_REQUIRED|oturum/i.test(raw)) return "Oturum süren dolmuş. Tekrar giriş yap.";
-  if (/network|fetch|bağlantı|internet/i.test(raw)) return "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.";
-  if (/3030|tensor|model input/i.test(raw)) return "Referans görsel modele uygun biçimde işlenemedi. Zatoi normal üretimle tekrar deneyebilir.";
-  if (/5018|model.*eriş/i.test(raw)) return "Bu görsel modeli şu anda kullanılamıyor. Zatoi alternatif modelle devam etmeyi deneyecek.";
-  return raw.length > 220 ? fallback : raw;
+
+  const safe = friendlyUserError(raw, "general");
+  if (safe && safe !== "Bir sorun oluştu. Lütfen tekrar dene.") return safe;
+
+  // Kullanıcının kendi anlayabileceği, teknik olmayan kısa mesajlar korunabilir.
+  if (!/(?:http\\s*\\d+|\\b\\d{4}\\b|cloudflare|worker|exception|stack|tensor|model|binding|d1|kv|api[_ -]?key|json|fetch|quota|neuron)/i.test(raw) && raw.length <= 180) {
+    return raw;
+  }
+
+  return fallback;
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 45000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("ZATOI_REQUEST_TIMEOUT");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 async function requestIntentRouter(text, chat, hasImages, hasDocument) {
@@ -6322,7 +6418,7 @@ async function requestIntentRouter(text, chat, hasImages, hasDocument) {
   if (!shouldAsk) return null;
 
   try {
-    const response = await fetch(WORKER_URL, {
+    const response = await fetchWithTimeout(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
       body: JSON.stringify({
@@ -6334,7 +6430,7 @@ async function requestIntentRouter(text, chat, hasImages, hasDocument) {
           hasDocument: !!hasDocument
         }
       })
-    });
+    }, 10000);
     if (response.status === 401) { await forceLogout(); return null; }
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data?.intent) return null;
@@ -6442,7 +6538,7 @@ async function sendMessage() {
       let revisionPreview = previousGeneration.sourceReferencePreview || "";
       let revisionName = previousGeneration.sourceReferenceName || "";
       if (!revisionReference && previousGeneration.sourceReferenceImageId) {
-        revisionReference = await fetchStoredGeneratedImage(previousGeneration.sourceReferenceImageId);
+        revisionReference = await fetchStoredReferenceImage(previousGeneration.sourceReferenceImageId);
         if (revisionReference && !revisionPreview) revisionPreview = revisionReference;
       }
       if (!genericFailure && Number.isInteger(previousGeneration.chosenImage)) {
@@ -6551,7 +6647,7 @@ async function sendMessage() {
 
 
     const response =
-      await fetch(
+      await fetchWithTimeout(
         WORKER_URL,
         {
 
@@ -6596,7 +6692,8 @@ async function sendMessage() {
 
             })
 
-        }
+        },
+        documentForAI ? 90000 : 45000
       );
 
     if (response.ok && String(response.headers.get("content-type") || "").startsWith("image/")) {
@@ -6670,8 +6767,15 @@ async function sendMessage() {
         rawResponse ||
         "Sunucu hatası.";
 
-      throw new Error(
-        `HTTP ${response.status} ${response.statusText || ""}\n${serverMessage}`.trim()
+      console.error("Worker response error:", {
+        status: response.status,
+        statusText: response.statusText || "",
+        serverMessage
+      });
+
+      throw userSafeError(
+        `${response.status} ${serverMessage}`,
+        documentForAI ? "pdf" : "general"
       );
 
     }
@@ -6728,8 +6832,8 @@ async function sendMessage() {
         rawResponse ||
         "Worker 200 döndürdü ama 'reply' alanı gelmedi.";
 
-      reply =
-        `⚠️ Zatoi cevap üretemedi.\n\n${debugInfo}`;
+      console.error("Zatoi missing reply:", debugInfo);
+      reply = "Bir sorun oluştu. Lütfen tekrar dene.";
 
     }
 
@@ -6741,9 +6845,12 @@ async function sendMessage() {
 
 
     const cleanReply =
-      stripWorkerSourceList(
-        reply,
-        sources
+      sanitizeAssistantTextForUser(
+        stripWorkerSourceList(
+          reply,
+          sources
+        ),
+        documentForAI ? "pdf" : "general"
       );
 
 
@@ -6753,7 +6860,7 @@ async function sendMessage() {
         "assistant",
 
       content:
-        cleanReply || reply,
+        cleanReply || "Bir sorun oluştu. Lütfen tekrar dene.",
 
       sources,
 
@@ -6802,21 +6909,10 @@ async function sendMessage() {
     hideTyping();
 
 
-    const rawErrorText = error && error.message
-      ? error.message
-      : String(error || "Bilinmeyen hata");
-
-    const normalizedErrorText = rawErrorText.toLocaleLowerCase("tr-TR");
-    const errorText =
-      normalizedErrorText.includes("ai_daily_limit") ||
-      normalizedErrorText.includes("ücretsiz ai kullanım sınırı") ||
-      normalizedErrorText.includes("4006") ||
-      normalizedErrorText.includes("daily free allocation") ||
-      normalizedErrorText.includes("10,000 neurons") ||
-      normalizedErrorText.includes("10000 neurons") ||
-      normalizedErrorText.includes("workers paid plan")
-        ? "Bugünkü ücretsiz AI kullanım sınırı doldu. Hak yenilendiğinde tekrar deneyebilirsin."
-        : rawErrorText;
+    const errorText = friendlyUserError(
+      error,
+      documentForAI ? "pdf" : "general"
+    );
 
     chat.messages.push({
 
@@ -6824,7 +6920,7 @@ async function sendMessage() {
         "assistant",
 
       content:
-        `⚠️ Hata oluştu:\n\n${errorText}`,
+        errorText,
 
       time:
         Date.now()
