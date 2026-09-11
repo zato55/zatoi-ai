@@ -4451,7 +4451,9 @@ function renderMessages() {
 
 
       content.textContent =
-        message.content;
+        message.role === "assistant"
+          ? sanitizeAssistantTextForUser(message.content)
+          : message.content;
 
 
       const messagePreviews = Array.isArray(message.imagePreviews)
@@ -6019,6 +6021,46 @@ function friendlyUserError(error, context = "general") {
   return "Bir sorun oluştu. Lütfen tekrar dene.";
 }
 
+function sanitizeAssistantTextForUser(value, context = "general") {
+  const text = String(value || "").trim();
+  if (!text) return text;
+
+  const lower = text.toLocaleLowerCase("tr-TR");
+
+  // Altyapı sağlayıcılarının ham hata metinleri kullanıcıya asla gösterilmez.
+  if (
+    lower.includes("4006") ||
+    lower.includes("daily free allocation") ||
+    lower.includes("10,000 neurons") ||
+    lower.includes("10000 neurons") ||
+    lower.includes("workers paid plan") ||
+    (lower.includes("cloudflare") && lower.includes("neuron"))
+  ) {
+    return "Bugünkü ücretsiz AI kullanım sınırına ulaşıldı. Daha sonra tekrar deneyebilirsin.";
+  }
+
+  if (
+    /(?:^|\\n)\\s*(?:⚠️\\s*)?(?:hata oluştu:?\\s*)?(?:http\\s*)?5\\d\\d\\b/i.test(text) ||
+    /internal server error|worker exception|stack trace|traceback/i.test(text)
+  ) {
+    return friendlyUserError(text, context);
+  }
+
+  if (/\\b(?:3030|5018)\\b|tensor|model input|request body too large|payload too large/i.test(text)) {
+    return friendlyUserError(text, context);
+  }
+
+  // JSON/API hata gövdeleri, model/binding ayrıntıları ve benzeri teknik cevaplar.
+  if (
+    /^\\s*\\{[\\s\\S]*(?:"error"|"details"|"code")[\\s\\S]*\\}\\s*$/i.test(text) ||
+    /(?:binding|d1|kv namespace|tavily_api_key|authorization bearer|cf-ray|workers ai error)/i.test(text)
+  ) {
+    return friendlyUserError(text, context);
+  }
+
+  return text;
+}
+
 function userSafeError(error, context = "general") {
   const friendly = friendlyUserError(error, context);
   const safe = new Error(friendly);
@@ -6291,13 +6333,16 @@ async function forceLogout() {
 function friendlyClientError(error, fallback = "İşlem tamamlanamadı. Lütfen tekrar dene.") {
   const raw = String(error?.message || error || "").trim();
   if (!raw) return fallback;
-  if (/413|gövdesi çok büyük|çok büyük/i.test(raw)) return "Dosya/görsel gönderim için fazla büyük. Zatoi küçültüp tekrar denemeyi başaramadı; daha küçük bir dosyayla tekrar dene.";
-  if (/429|çok fazla|çok hızlı|limit|quota/i.test(raw)) return "Kısa sürede çok fazla işlem yapıldı. Biraz bekleyip tekrar dene.";
-  if (/401|AUTH_REQUIRED|oturum/i.test(raw)) return "Oturum süren dolmuş. Tekrar giriş yap.";
-  if (/network|fetch|bağlantı|internet/i.test(raw)) return "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.";
-  if (/3030|tensor|model input/i.test(raw)) return "Referans görsel modele uygun biçimde işlenemedi. Zatoi normal üretimle tekrar deneyebilir.";
-  if (/5018|model.*eriş/i.test(raw)) return "Bu görsel modeli şu anda kullanılamıyor. Zatoi alternatif modelle devam etmeyi deneyecek.";
-  return raw.length > 220 ? fallback : raw;
+
+  const safe = friendlyUserError(raw, "general");
+  if (safe && safe !== "Bir sorun oluştu. Lütfen tekrar dene.") return safe;
+
+  // Kullanıcının kendi anlayabileceği, teknik olmayan kısa mesajlar korunabilir.
+  if (!/(?:http\\s*\\d+|\\b\\d{4}\\b|cloudflare|worker|exception|stack|tensor|model|binding|d1|kv|api[_ -]?key|json|fetch|quota|neuron)/i.test(raw) && raw.length <= 180) {
+    return raw;
+  }
+
+  return fallback;
 }
 
 async function requestIntentRouter(text, chat, hasImages, hasDocument) {
@@ -6729,9 +6774,12 @@ async function sendMessage() {
 
 
     const cleanReply =
-      stripWorkerSourceList(
-        reply,
-        sources
+      sanitizeAssistantTextForUser(
+        stripWorkerSourceList(
+          reply,
+          sources
+        ),
+        documentForAI ? "pdf" : "general"
       );
 
 
@@ -6741,7 +6789,7 @@ async function sendMessage() {
         "assistant",
 
       content:
-        cleanReply || reply,
+        cleanReply || "Bir sorun oluştu. Lütfen tekrar dene.",
 
       sources,
 
