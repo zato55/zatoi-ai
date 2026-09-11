@@ -6170,6 +6170,7 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
 async function fetchStoredGeneratedImage(imageId) {
   const id = String(imageId || "").trim();
   if (!id || !authToken) return "";
+  if (unavailableStoredImageIds.has(id)) return "";
 
   try {
     const response = await fetchWithTimeout(WORKER_URL, {
@@ -6186,9 +6187,19 @@ async function fetchStoredGeneratedImage(imageId) {
       return "";
     }
 
+    // 204: Görsel artık saklama havuzunda değil. Bunu hata olarak değil,
+    // normal bir "eski görsel süresi dolmuş" durumu olarak ele al.
+    if (response.status === 204) {
+      unavailableStoredImageIds.add(id);
+      return "";
+    }
+
     if (!response.ok) return "";
     const blob = await response.blob();
-    if (!blob.type.startsWith("image/")) return "";
+    if (!blob.type.startsWith("image/")) {
+      unavailableStoredImageIds.add(id);
+      return "";
+    }
 
     return await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -6204,15 +6215,23 @@ async function fetchStoredGeneratedImage(imageId) {
 async function fetchStoredReferenceImage(referenceImageId) {
   const id = String(referenceImageId || "").trim();
   if (!id || !authToken) return "";
+  if (unavailableStoredImageIds.has(id)) return "";
   try {
     const response = await fetchWithTimeout(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
       body: JSON.stringify({ type: "image_get", imageId: id })
     }, 20000);
+    if (response.status === 204) {
+      unavailableStoredImageIds.add(id);
+      return "";
+    }
     if (!response.ok) return "";
     const blob = await response.blob();
-    if (!blob.type.startsWith("image/")) return "";
+    if (!blob.type.startsWith("image/")) {
+      unavailableStoredImageIds.add(id);
+      return "";
+    }
     return await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(String(reader.result || ""));
@@ -6223,6 +6242,9 @@ async function fetchStoredReferenceImage(referenceImageId) {
 }
 
 const hydratingStoredImages = new Set();
+// KV'de artık bulunmadığı kesinleşen eski görselleri aynı oturumda tekrar isteme.
+// Böylece eski sohbet geçmişi açıldığında aynı IMAGE_NOT_FOUND isteği ağ sekmesini doldurmaz.
+const unavailableStoredImageIds = new Set();
 
 async function hydratePersistedImagesForChats(targetChats = chats) {
   if (!authToken || !Array.isArray(targetChats)) return;
@@ -6242,6 +6264,13 @@ async function hydratePersistedImagesForChats(targetChats = chats) {
 
       message.generatedImageIds.forEach((imageId, index) => {
         if (!imageId || message.generatedImages[index]) return;
+
+        if (unavailableStoredImageIds.has(String(imageId))) {
+          message.generatedImages[index] = "__ZATOI_EXPIRED_IMAGE__";
+          changed = true;
+          return;
+        }
+
         const key = `${chat.id}:${message.generationId || message.preferenceChoiceId || message.time || "msg"}:${index}:${imageId}`;
         if (hydratingStoredImages.has(key)) return;
         hydratingStoredImages.add(key);
@@ -6253,7 +6282,9 @@ async function hydratePersistedImagesForChats(targetChats = chats) {
               message.generatedImages[index] = dataUrl;
               changed = true;
             } else {
-              // Son 6 sınırı nedeniyle silinmiş eski görsel için kırık img yerine boş işaret bırak.
+              // Son 6 sınırı nedeniyle silinmiş eski görsel için kırık img yerine
+              // süre-doldu işareti bırak ve bu oturumda aynı ID'yi tekrar isteme.
+              unavailableStoredImageIds.add(String(imageId));
               message.generatedImages[index] = "__ZATOI_EXPIRED_IMAGE__";
               changed = true;
             }
