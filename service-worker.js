@@ -1,4 +1,4 @@
-const CACHE_NAME = "zatoi-ai-v14-3";
+const CACHE_NAME = "zatoi-ai-v14-6";
 
 const APP_FILES = [
   "./",
@@ -13,7 +13,7 @@ self.addEventListener("install", event => {
     caches.open(CACHE_NAME).then(cache =>
       Promise.all(
         APP_FILES.map(file =>
-          cache.add(file).catch(error => {
+          cache.add(new Request(file, { cache: "reload" })).catch(error => {
             console.warn("Önbelleğe eklenemedi:", file, error);
           })
         )
@@ -55,7 +55,15 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     (async () => {
       try {
-        const response = await fetch(request);
+        // Ana uygulama ve navigasyonlarda tarayıcının eski HTTP önbelleğine takılma.
+        const networkRequest =
+          request.mode === "navigate" ||
+          requestUrl.pathname.endsWith("/index.html") ||
+          requestUrl.pathname.endsWith("/manifest.json")
+            ? new Request(request, { cache: "no-store" })
+            : request;
+
+        const response = await fetch(networkRequest);
 
         if (response && response.ok) {
           const responseCopy = response.clone();
@@ -78,7 +86,9 @@ self.addEventListener("fetch", event => {
         }
 
         if (request.mode === "navigate") {
-          const homePage = await caches.match("./");
+          const homePage =
+            (await caches.match("./index.html")) ||
+            (await caches.match("./"));
 
           if (homePage) {
             return homePage;
