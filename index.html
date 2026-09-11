@@ -3524,6 +3524,8 @@ function createChat() {
 
 function saveChats() {
 
+  try {
+
   localStorage.setItem(
 
     chatsKey(),
@@ -3543,6 +3545,13 @@ function saveChats() {
     activeChatId || ""
 
   );
+
+  return true;
+
+  } catch (error) {
+    console.warn("Zatoi yerel sohbet kaydı yapılamadı:", error);
+    return false;
+  }
 
 }
 
@@ -6013,8 +6022,8 @@ function friendlyUserError(error, context = "general") {
     return "Yanıt beklenenden uzun sürdü. Lütfen tekrar dene.";
   }
 
-  if (lower.includes("4006") || lower.includes("daily free allocation") || lower.includes("10,000 neurons") || lower.includes("10000 neurons") || lower.includes("workers paid plan")) {
-    return "Bugünkü ücretsiz AI kullanım sınırına ulaşıldı. Daha sonra tekrar deneyebilirsin.";
+  if (lower.includes("ai_daily_limit") || lower.includes("bugünkü ücretsiz ai kullanım sınırı") || lower.includes("4006") || lower.includes("daily free allocation") || lower.includes("10,000 neurons") || lower.includes("10000 neurons") || lower.includes("workers paid plan")) {
+    return "🌙 Zatoi biraz dinleniyor\n\nBugünkü ücretsiz kullanım hakkımız doldu. Haklar yenilendiğinde kaldığımız yerden devam edebiliriz.";
   }
 
   if (lower.includes("413") || lower.includes("request body too large") || lower.includes("istek gövdesi çok büyük") || lower.includes("payload too large")) {
@@ -6024,7 +6033,7 @@ function friendlyUserError(error, context = "general") {
   }
 
   if (lower.includes("429") || lower.includes("rate limit") || lower.includes("too many requests")) {
-    return "Şu anda çok fazla istek var. Biraz sonra tekrar deneyebilirsin.";
+    return "⏳ Zatoi biraz yoğun\n\nKısa bir süre sonra yeniden deneyebilirsin.";
   }
 
   if (lower.includes("network") || lower.includes("failed to fetch") || lower.includes("fetch failed") || lower.includes("connection") || lower.includes("internet")) {
@@ -6036,7 +6045,7 @@ function friendlyUserError(error, context = "general") {
   if (context === "image_generate") return "Görsel şu anda oluşturulamadı. Tekrar deneyebilirsin.";
   if (context === "web") return "İnternet araştırması şu anda tamamlanamadı. Tekrar deneyebilirsin.";
 
-  return "Bir sorun oluştu. Lütfen tekrar dene.";
+  return "✨ Zatoi şu an cevap veremedi\n\nKısa bir süre sonra yeniden dener misin?";
 }
 
 function sanitizeAssistantTextForUser(value, context = "general") {
@@ -6054,7 +6063,7 @@ function sanitizeAssistantTextForUser(value, context = "general") {
     lower.includes("workers paid plan") ||
     (lower.includes("cloudflare") && lower.includes("neuron"))
   ) {
-    return "Bugünkü ücretsiz AI kullanım sınırına ulaşıldı. Daha sonra tekrar deneyebilirsin.";
+    return "🌙 Zatoi biraz dinleniyor\n\nBugünkü ücretsiz kullanım hakkımız doldu. Haklar yenilendiğinde kaldığımız yerden devam edebiliriz.";
   }
 
   if (
@@ -6596,33 +6605,29 @@ async function sendMessage() {
   });
 
 
-  updateTitle(
-    chat,
-    text
-  );
+  try {
+    updateTitle(chat, text);
+    chat.updatedAt = Date.now();
+    saveChats();
+    queueCloudSave(chat);
+  } catch (preflightError) {
+    console.warn("Zatoi gönderim öncesi kayıt uyarısı:", preflightError);
+  }
 
+  try {
+    setInput("");
+    renderAll();
+    showTyping();
+  } catch (uiError) {
+    console.warn("Zatoi gönderim öncesi arayüz uyarısı:", uiError);
+  }
 
-  chat.updatedAt =
-    Date.now();
-
-
-  saveChats();
-
-  queueCloudSave(chat);
-
-
-  setInput("");
-
-
-  renderAll();
-
-  showTyping();
+  // catch bloğunun da PDF/normal mesaj ayrımını güvenle kullanabilmesi için
+  // değişken try kapsamının dışında tanımlanır.
+  let documentForAI = null;
 
 
   try {
-
-    let documentForAI =
-      null;
 
 
     if (
@@ -6909,10 +6914,9 @@ async function sendMessage() {
     hideTyping();
 
 
-    const errorText = friendlyUserError(
-      error,
-      documentForAI ? "pdf" : "general"
-    );
+    const errorText = error?.userSafe
+      ? String(error.message || "")
+      : friendlyUserError(error, documentForAI ? "pdf" : "general");
 
     chat.messages.push({
 
@@ -6931,18 +6935,20 @@ async function sendMessage() {
     chat.updatedAt =
       Date.now();
 
-    saveChats();
-
-    queueCloudSave(chat);
-
     renderAll();
 
+    try {
+      saveChats();
+      queueCloudSave(chat);
+    } catch (saveError) {
+      console.warn("Zatoi hata bildirimi kaydedilemedi:", saveError);
+    }
+
+  } finally {
+    hideTyping();
+    sending = false;
+    focusInput();
   }
-
-
-  sending = false;
-
-  focusInput();
 
 }
 
