@@ -2320,7 +2320,7 @@
 const WORKER_URL =
   "https://zatoi-ai.fbboytr.workers.dev/";
 
-const ZATOI_CLIENT_VERSION = "v14.5-limit-unlock";
+const ZATOI_CLIENT_VERSION = "v14.6-limit-message";
 console.info("Zatoi arayüz sürümü:", ZATOI_CLIENT_VERSION);
 
 
@@ -6018,6 +6018,10 @@ function friendlyUserError(error, context = "general") {
 
   if (lower.includes("ai_daily_limit") || lower.includes("ücretsiz ai kullanım sınırı") || lower.includes("4006") || lower.includes("daily free allocation") || lower.includes("10,000 neurons") || lower.includes("10000 neurons") || lower.includes("workers paid plan")) {
     return "Bugünkü ücretsiz AI kullanım sınırı doldu. Hak yenilendiğinde tekrar deneyebilirsin.";
+  }
+
+  if (lower.includes("ai_service_unavailable") || lower.includes("günlük ücretsiz kullanım sınırı dolmuş olabilir")) {
+    return "AI şu anda yanıt veremiyor. Cloudflare günlük ücretsiz kullanım sınırı dolmuş olabilir; hak yenilendiğinde tekrar deneyebilirsin.";
   }
 
   if (lower.includes("413") || lower.includes("request body too large") || lower.includes("istek gövdesi çok büyük") || lower.includes("payload too large")) {
