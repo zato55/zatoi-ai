@@ -5807,39 +5807,71 @@ function isImageRevisionRequest(text, chat = getActiveChat()) {
 
   if (!value) return false;
 
-  // Görselle ilgili açık düzeltme ifadeleri her zaman güçlü sinyaldir.
-  const explicitVisualEdit = /(görsel|resim|fotoğraf|foto|portre|yüz|surat|göz|burun|ağız|saç|kafa|arka\s*plan|renk|ışık|poz|kıyafet|stil|tarz|kompozisyon)/i.test(value) &&
-    /(düzelt|değiştir|iyileştir|yeniden|tekrar|daha\s+iyi|daha\s+doğru|benzet|gerçekçi|yap|olsun|olmasın|kaldır|ekle|büyüt|küçült)/i.test(value);
-  if (explicitVisualEdit) return true;
-
-  // Son oluşturulan görsel hâlâ sohbetin yakın bağlamındaysa kısa geri bildirimleri
-  // görsel devam isteği olarak anla. Böylece yalnızca "olmamış" / "beğenmedim"
-  // demek yeterli olur.
   const messages = Array.isArray(chat?.messages) ? chat.messages : [];
   let latestGeneratedIndex = -1;
+
   for (let i = messages.length - 1; i >= 0; i--) {
     const message = messages[i];
-    if (message?.role === "assistant" && Array.isArray(message.generatedImages) && message.generatedImages.length && message.imagePrompt) {
+
+    if (
+      message?.role === "assistant" &&
+      Array.isArray(message.generatedImages) &&
+      message.generatedImages.length &&
+      message.imagePrompt
+    ) {
       latestGeneratedIndex = i;
       break;
     }
   }
 
+  // Düzenleme bağlamı ancak gerçekten daha önce üretilmiş bir görsel varsa açılır.
   if (latestGeneratedIndex < 0) return false;
 
-  // Çok eski bir görsele yanlışlıkla bağlanmaması için yalnızca yakın devamı kabul et.
-  const messagesAfterGeneration = messages.length - 1 - latestGeneratedIndex;
+  // Çok eski bir görsele sıradan sohbeti yanlışlıkla bağlamamak için yalnızca
+  // yakın devam mesajlarını görsel düzenleme adayı say.
+  const messagesAfterGeneration =
+    messages.length - 1 - latestGeneratedIndex;
+
   if (messagesAfterGeneration > 5) return false;
 
-  const shortNegativeFeedback = /^(?:bu\s+)?(?:hiç\s+)?(?:olmamış|olmamis|olmadı|olmadi|olmamış\s+ya|beğenmedim|begenmedim|kötü\s+olmuş|kotu\s+olmus|iyi\s+olmamış|iyi\s+olmamis|bu\s+değil|bu\s+degil|böyle\s+değil|boyle\s+degil|yanlış|yanlis|olmadı\s+bu|olmamış\s+bu)[.!…]*$/i;
-  if (shortNegativeFeedback.test(value)) return true;
+  // Görsel özellikleri Türkçede ek aldığında kök değişebilir:
+  // "renk" -> "rengi", "ışık" -> "ışığı", "saç" -> "saçı".
+  // Bu yüzden yalnızca çıplak kökleri değil doğal çekimlerini de tanı.
+  const visualAttribute =
+    /(görsel|resim|fotoğraf|foto|portre|yüz|surat|göz|gözü|burun|burnu|ağız|ağzı|saç|saçı|kafa|arka\s*plan|arkaplan|renk|rengi|renkleri|ışık|ışığı|aydınlık|karanlık|poz|pozu|kıyafet|kıyafeti|stil|stili|tarz|tarzı|kompozisyon|zemin|fon|gökyüzü|ten|teni|boyut|boyutu)/i;
 
-  const correctionFeedback = /(olmamış|olmamis|olmadı|olmadi|beğenmedim|begenmedim|benzemiyor|benzememiş|benzememis|yanlış|yanlis|kötü\s+olmuş|kotu\s+olmus|düzelt|yeniden\s+dene|tekrar\s+dene|bir\s+daha\s+dene|daha\s+iyi\s+yap)/i;
-  if (correctionFeedback.test(value)) return true;
+  const editVerb =
+    /(düzelt|duzelt|değiştir|degistir|iyileştir|iyilestir|yeniden|tekrar|daha\s+iyi|daha\s+doğru|benzet|gerçekçi|gercekci|yap|olsun|olmasın|olmasin|kaldır|kaldir|ekle|büyüt|buyut|küçült|kucult|artır|arttir|azalt)/i;
 
-  // Görselden hemen sonra "daha karanlık olsun", "kırmızı yap", "şapkayı kaldır"
-  // gibi özneyi tekrar etmeyen doğal düzenleme cümlelerini de yakala.
-  const naturalEditFollowup = /(?:daha\s+.+\s+olsun|biraz\s+.+\s+olsun|.+\s+olmasın|.+\s+yap|.+\s+değiştir|.+\s+degistir|.+\s+kaldır|.+\s+kaldir|.+\s+ekle|.+\s+düzelt|.+\s+duzelt)$/i;
+  if (visualAttribute.test(value) && editVerb.test(value)) {
+    return true;
+  }
+
+  // "olmamış", "beğenmedim", "bu değil" gibi kısa geri bildirimler.
+  const shortNegativeFeedback =
+    /^(?:bu\s+)?(?:hiç\s+)?(?:olmamış|olmamis|olmadı|olmadi|olmamış\s+ya|beğenmedim|begenmedim|kötü\s+olmuş|kotu\s+olmus|iyi\s+olmamış|iyi\s+olmamis|bu\s+değil|bu\s+degil|böyle\s+değil|boyle\s+degil|yanlış|yanlis|olmadı\s+bu|olmamış\s+bu)[.!…]*$/i;
+
+  if (shortNegativeFeedback.test(value)) {
+    return true;
+  }
+
+  const correctionFeedback =
+    /(olmamış|olmamis|olmadı|olmadi|beğenmedim|begenmedim|benzemiyor|benzememiş|benzememis|yanlış|yanlis|kötü\s+olmuş|kotu\s+olmus|düzelt|duzelt|yeniden\s+dene|tekrar\s+dene|bir\s+daha\s+dene|daha\s+iyi\s+yap)/i;
+
+  if (correctionFeedback.test(value)) {
+    return true;
+  }
+
+  // Son görselin hemen ardından gelen doğal devam komutları:
+  // "rengi mavi olsun"
+  // "gözleri yeşil olsun"
+  // "arka plan gece olsun"
+  // "daha karanlık yap"
+  // "şapkayı kaldır"
+  // "biraz büyüt"
+  const naturalEditFollowup =
+    /^(?=.{1,220}$)(?:(?:rengi|renkleri|ışığı|saçı|gözleri|gözü|yüzü|arka\s*planı|arkaplanı|kıyafeti|stili|tarzı|pozu|boyutu|fonu|zemini)\s+.+\s+(?:olsun|olmasın|olmasin)|(?:daha|biraz)\s+.+(?:\s+olsun|\s+yap|\s+artır|\s+arttir|\s+azalt)?|.+\s+(?:olsun|olmasın|olmasin|yap|değiştir|degistir|kaldır|kaldir|ekle|düzelt|duzelt|büyüt|buyut|küçült|kucult))[\s.!…]*$/i;
+
   return naturalEditFollowup.test(value);
 }
 
