@@ -2,6 +2,7 @@
   "name": "Zatoi AI",
   "short_name": "Zatoi",
   "description": "Sohbet, web araştırması, PDF ve görsel analizi sunan yapay zeka asistanı.",
+  "lang": "tr",
   "id": "./",
   "start_url": "./",
   "scope": "./",
@@ -9,10 +10,31 @@
   "background_color": "#0b0f14",
   "theme_color": "#111827",
   "icons": [
-    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "Yeni sohbet", "short_name": "Yeni sohbet", "url": "./?new=1", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] }
+    {
+      "name": "Yeni sohbet",
+      "short_name": "Yeni sohbet",
+      "url": "./?new=1",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }
