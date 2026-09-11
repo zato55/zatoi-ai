@@ -2347,6 +2347,8 @@ const AUTH_TOKEN_KEY =
 const AUTH_USER_KEY =
   "zatoi_auth_user_v1";
 
+let currentUser = null;
+
 function storedUserId() {
   try {
     const raw = JSON.parse(localStorage.getItem(AUTH_USER_KEY) || "null");
@@ -2378,17 +2380,7 @@ let authToken =
   ) || "";
 
 
-let currentUser = null;
-
 let imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
-let pendingImageChoices = [];
-try {
-  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(imagePreferenceKey()) || "{}") };
-  const pending = JSON.parse(localStorage.getItem(pendingImageChoicesKey()) || "[]");
-  pendingImageChoices = Array.isArray(pending) ? pending : [];
-} catch {}
-
-
 try {
 
   currentUser =
@@ -2403,6 +2395,13 @@ try {
   currentUser = null;
 
 }
+
+let pendingImageChoices = [];
+try {
+  imagePreference = { ...imagePreference, ...JSON.parse(localStorage.getItem(imagePreferenceKey()) || "{}") };
+  const pending = JSON.parse(localStorage.getItem(pendingImageChoicesKey()) || "[]");
+  pendingImageChoices = Array.isArray(pending) ? pending : [];
+} catch {}
 
 
 /* ==========================================
@@ -3301,6 +3300,12 @@ async function logoutAccount() {
     AUTH_USER_KEY
   );
 
+  chats = [];
+  activeChatId = null;
+  globalMemory = { name: "", facts: [], preferences: [] };
+  imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+  pendingImageChoices = [];
+
 
   showAuthScreen();
 
@@ -3654,6 +3659,7 @@ function loadChats() {
 function loadAccountLocalState() {
   chats = [];
   activeChatId = null;
+  globalMemory = { name: "", facts: [], preferences: [] };
   imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
   pendingImageChoices = [];
 
@@ -3666,6 +3672,7 @@ function loadAccountLocalState() {
     pendingImageChoices = Array.isArray(pending) ? pending : [];
   } catch {}
 
+  loadMemory();
   loadChats();
 }
 
@@ -3828,6 +3835,8 @@ async function syncChatsWithCloud(silent = false) {
   }
 
   cloudSyncInFlight = true;
+  const syncUserId = String(currentUser?.userId || "");
+  const syncToken = authToken;
 
   if (!silent) {
     showSyncStatus(
@@ -3838,6 +3847,10 @@ async function syncChatsWithCloud(silent = false) {
   try {
 
     const data = await cloudChatRequest("list");
+
+    if (!syncUserId || String(currentUser?.userId || "") !== syncUserId || authToken !== syncToken) {
+      return;
+    }
 
     const remoteChats = Array.isArray(data.chats)
       ? data.chats
@@ -3915,6 +3928,7 @@ async function syncChatsWithCloud(silent = false) {
 
     // Eski tarayıcı sohbetlerini ilk senkron sırasında buluta taşı.
     for (const chat of uploadAfterMerge) {
+      if (String(currentUser?.userId || "") !== syncUserId || authToken !== syncToken) break;
       try {
         await saveChatToCloud(chat);
       } catch (error) {
@@ -6106,6 +6120,7 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
   return {
     dataUrl,
     imageId: response.headers.get("X-Zatoi-Image-Id") || "",
+    referenceImageId: response.headers.get("X-Zatoi-Reference-Image-Id") || "",
     model: response.headers.get("X-Zatoi-Image-Model") || "",
     referenceMode: response.headers.get("X-Zatoi-Reference-Mode") || "none"
   };
@@ -6143,6 +6158,27 @@ async function fetchStoredGeneratedImage(imageId) {
   } catch {
     return "";
   }
+}
+
+async function fetchStoredReferenceImage(referenceImageId) {
+  const id = String(referenceImageId || "").trim();
+  if (!id || !authToken) return "";
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
+      body: JSON.stringify({ type: "reference_get", referenceImageId: id })
+    });
+    if (!response.ok) return "";
+    const blob = await response.blob();
+    if (!blob.type.startsWith("image/")) return "";
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch { return ""; }
 }
 
 const hydratingStoredImages = new Set();
@@ -6242,6 +6278,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
       generationId,
       imagePrompt: description,
       sourceReferenceImage: safeReferenceImage,
+      sourceReferenceImageId: imageA.referenceImageId || imageB.referenceImageId || "",
       sourceReferencePreview: referencePreview,
       sourceReferenceName: referenceName,
       time: Date.now()
@@ -6316,6 +6353,12 @@ async function forceLogout() {
   authToken = "";
 
   currentUser = null;
+
+  chats = [];
+  activeChatId = null;
+  globalMemory = { name: "", facts: [], preferences: [] };
+  imagePreference = { realistic: 0, cinematic: 0, choices: 0 };
+  pendingImageChoices = [];
 
 
   localStorage.removeItem(
@@ -6494,6 +6537,10 @@ async function sendMessage() {
       let revisionReference = previousGeneration.sourceReferenceImage || "";
       let revisionPreview = previousGeneration.sourceReferencePreview || "";
       let revisionName = previousGeneration.sourceReferenceName || "";
+      if (!revisionReference && previousGeneration.sourceReferenceImageId) {
+        revisionReference = await fetchStoredReferenceImage(previousGeneration.sourceReferenceImageId);
+        if (revisionReference && !revisionPreview) revisionPreview = revisionReference;
+      }
       if (!genericFailure && Number.isInteger(previousGeneration.chosenImage)) {
         const chosen = previousGeneration.generatedImages?.[previousGeneration.chosenImage];
         if (chosen && chosen !== "__ZATOI_EXPIRED_IMAGE__") {
