@@ -3041,6 +3041,7 @@ async function registerAccount() {
 
     await syncImagePreference();
     await syncChatsWithCloud();
+    await openFreshChatForSession();
 
     showApp();
 
@@ -3158,6 +3159,7 @@ async function loginAccount() {
 
     await syncImagePreference();
     await syncChatsWithCloud();
+    await openFreshChatForSession();
 
     showApp();
 
@@ -3365,6 +3367,7 @@ async function checkAuth() {
 
     await syncImagePreference();
     await syncChatsWithCloud();
+    await openFreshChatForSession();
 
     showApp();
 
@@ -3522,37 +3525,80 @@ function createChat() {
 }
 
 
-function saveChats() {
 
-  try {
+function stripHeavyLocalMessageData(message) {
+  if (!message || typeof message !== "object") return message;
 
-  localStorage.setItem(
+  const clean = { ...message };
 
-    chatsKey(),
-
-    JSON.stringify(
-      chats,
-      (key, value) => (key === "generatedImage" || key === "generatedImages" || key === "sourceReferenceImage" || key === "sourceReferencePreview") ? undefined : value
-    )
-
-  );
-
-
-  localStorage.setItem(
-
-    activeChatKey(),
-
-    activeChatId || ""
-
-  );
-
-  return true;
-
-  } catch (error) {
-    console.warn("Zatoi yerel sohbet kaydı yapılamadı:", error);
-    return false;
+  // Üretilen görsellerin ham data URL/base64 kopyalarını localStorage'a yazma.
+  // Kalıcı yükleme generatedImageIds üzerinden KV'den yapılır.
+  if (clean.role === "assistant" && Array.isArray(clean.generatedImageIds)) {
+    clean.generatedImages = clean.generatedImageIds.map(() => "");
   }
 
+  // Referans görsel ham verisini de localStorage'a yazma.
+  if (clean.sourceReferenceImageId) {
+    delete clean.sourceReferenceImage;
+  }
+
+  // Kullanıcı mesajındaki yüklenmiş görseller sadece istek sırasında gerekir.
+  // Sohbet geçmişinde büyük data URL taşımalarına izin verme.
+  if (Array.isArray(clean.images)) {
+    clean.images = clean.images.map(image => ({
+      name: String(image?.name || "").slice(0, 200),
+      type: String(image?.type || "").slice(0, 100)
+    }));
+  }
+
+  return clean;
+}
+
+function chatsForLocalStorage(sourceChats) {
+  return (Array.isArray(sourceChats) ? sourceChats : []).map(chat => ({
+    ...chat,
+    messages: (Array.isArray(chat?.messages) ? chat.messages : [])
+      .slice(-100)
+      .map(stripHeavyLocalMessageData)
+  }));
+}
+
+function compactChatRequestMessages(messages, maxMessages = 16) {
+  return (Array.isArray(messages) ? messages : [])
+    .slice(-maxMessages)
+    .map(message => ({
+      role: message?.role === "assistant" ? "assistant" : "user",
+      content: String(message?.content || "").slice(0, 6000)
+    }))
+    .filter(message => message.content.trim());
+}
+
+function saveChats() {
+  try {
+    localStorage.setItem(
+      accountStorageKey(CHATS_KEY),
+      JSON.stringify(chatsForLocalStorage(chats))
+    );
+  } catch (error) {
+    console.warn("Zatoi yerel sohbet kaydı küçültülüyor:", error);
+
+    try {
+      const compact = chatsForLocalStorage(chats)
+        .slice(-20)
+        .map(chat => ({
+          ...chat,
+          messages: (chat.messages || []).slice(-50)
+        }));
+
+      localStorage.setItem(
+        accountStorageKey(CHATS_KEY),
+        JSON.stringify(compact)
+      );
+    } catch (finalError) {
+      // Yerel depolama dolu olsa bile uygulama ve bulut sohbet akışı çalışmaya devam etsin.
+      console.warn("Zatoi yerel sohbet kaydı atlandı:", finalError);
+    }
+  }
 }
 
 
@@ -4058,6 +4104,37 @@ function createNewChat() {
 
 }
 
+
+async function openFreshChatForSession() {
+  // Her hesap/uygulama açılışında kullanıcıyı yeni ve boş bir sohbete getir.
+  // Eski sohbetler silinmez; Geçmiş bölümünde kalır.
+  // Mevcut boş sohbet varsa onu kullanarak gereksiz boş sohbet birikmesini önle.
+  let chat = Array.isArray(chats)
+    ? chats.find(item => isEmptyPlaceholderChat(item))
+    : null;
+
+  if (!chat) {
+    chat = createChat();
+    chats.unshift(chat);
+    queueCloudSave(chat);
+  } else {
+    // Yeni oturumda boş sohbeti en üste taşı.
+    chats = [
+      chat,
+      ...chats.filter(item => item.id !== chat.id)
+    ];
+  }
+
+  activeChatId = chat.id;
+  documentData = null;
+  selectedPdf = null;
+  selectedImages = [];
+
+  saveChats();
+  clearSelectedFile();
+  setInput("");
+  renderAll();
+}
 
 function selectChat(id) {
 
@@ -6349,6 +6426,7 @@ async function generateImage(promptText = "", referenceImage = "", referencePrev
       preferenceChoiceId: crypto.randomUUID(),
       generationId,
       imagePrompt: description,
+      baseImagePrompt: String(description || "").replace(/(?:Kullanıcının düzenleme isteği:|Kullanıcının güncel düzenleme isteği:)[\s\S]*$/i, "").trim(),
       sourceReferenceImage: safeReferenceImage,
       sourceReferenceImageId: imageA.referenceImageId || imageB.referenceImageId || "",
       sourceReferencePreview: referencePreview,
