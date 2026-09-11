@@ -4533,7 +4533,7 @@ function renderMessages() {
           generated.className = "generated-image";
           if (imageExpired) {
             generated.style.cssText = "aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;background:#0b1118;color:#94a3b8;font-size:12px;border:1px dashed #34424f";
-            generated.textContent = "Bu eski görsel son 6 görsel hafızası dışında kaldı.";
+            generated.textContent = "Bu eski görsel saklanan son 6 görselin dışında kaldı.";
           } else {
             generated.src = imageSrc;
             generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
@@ -5411,11 +5411,11 @@ async function uploadPdfRequest(file, scannedPages = null) {
     formData.append("scanLimited", scannedPages.limited ? "1" : "0");
   }
 
-  return fetch(WORKER_URL, {
+  return fetchWithTimeout(WORKER_URL, {
     method: "POST",
     headers: { "Authorization": `Bearer ${authToken}` },
     body: formData
-  });
+  }, 120000);
 }
 
 async function uploadPdf(file) {
@@ -5865,11 +5865,11 @@ function getImagePreferenceText() {
 
 async function imagePreferenceRequest(action, payload = {}) {
   if (!authToken) throw new Error("AUTH_REQUIRED");
-  const response = await fetch(WORKER_URL, {
+  const response = await fetchWithTimeout(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
     body: JSON.stringify({ type: "image_preference", action, ...payload })
-  });
+  }, 20000);
   let data = {};
   try { data = await response.json(); } catch {}
   if (response.status === 401) throw new Error("AUTH_REQUIRED");
@@ -6067,19 +6067,19 @@ function sanitizeAssistantTextForUser(value, context = "general") {
   }
 
   if (
-    /(?:^|\\n)\\s*(?:⚠️\\s*)?(?:hata oluştu:?\\s*)?(?:http\\s*)?5\\d\\d\\b/i.test(text) ||
+    /(?:^|\n)\s*(?:⚠️\s*)?(?:hata oluştu:?\s*)?(?:http\s*)?5\d\d\b/i.test(text) ||
     /internal server error|worker exception|stack trace|traceback/i.test(text)
   ) {
     return friendlyUserError(text, context);
   }
 
-  if (/\\b(?:3030|5018)\\b|tensor|model input|request body too large|payload too large/i.test(text)) {
+  if (/\b(?:3030|5018)\b|tensor|model input|request body too large|payload too large/i.test(text)) {
     return friendlyUserError(text, context);
   }
 
   // JSON/API hata gövdeleri, model/binding ayrıntıları ve benzeri teknik cevaplar.
   if (
-    /^\\s*\\{[\\s\\S]*(?:"error"|"details"|"code")[\\s\\S]*\\}\\s*$/i.test(text) ||
+    /^\s*\{[\s\S]*(?:"error"|"details"|"code")[\s\S]*\}\s*$/i.test(text) ||
     /(?:binding|d1|kv namespace|tavily_api_key|authorization bearer|cf-ray|workers ai error)/i.test(text)
   ) {
     return friendlyUserError(text, context);
@@ -6096,7 +6096,7 @@ function userSafeError(error, context = "general") {
 }
 
 async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "") {
-  const response = await fetch(WORKER_URL, {
+  const response = await fetchWithTimeout(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
     body: JSON.stringify({
@@ -6107,13 +6107,13 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
       referenceImage,
       generationId
     })
-  });
+  }, 90000);
   if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
   if (!response.ok) {
     let message = "Görsel üretilemedi.";
     try {
       const errorData = await response.json();
-      message = errorData.details || errorData.error || message;
+      message = errorData.error || message;
     } catch {}
     console.error("Image generation error:", response.status, message);
     throw userSafeError(message, "image_generate");
@@ -6140,14 +6140,14 @@ async function fetchStoredGeneratedImage(imageId) {
   if (!id || !authToken) return "";
 
   try {
-    const response = await fetch(WORKER_URL, {
+    const response = await fetchWithTimeout(WORKER_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${authToken}`
       },
       body: JSON.stringify({ type: "image_get", imageId: id })
-    });
+    }, 20000);
 
     if (response.status === 401) {
       await forceLogout();
@@ -6173,11 +6173,11 @@ async function fetchStoredReferenceImage(referenceImageId) {
   const id = String(referenceImageId || "").trim();
   if (!id || !authToken) return "";
   try {
-    const response = await fetch(WORKER_URL, {
+    const response = await fetchWithTimeout(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
-      body: JSON.stringify({ type: "reference_get", referenceImageId: id })
-    });
+      body: JSON.stringify({ type: "image_get", imageId: id })
+    }, 20000);
     if (!response.ok) return "";
     const blob = await response.blob();
     if (!blob.type.startsWith("image/")) return "";
@@ -6394,7 +6394,7 @@ function friendlyClientError(error, fallback = "İşlem tamamlanamadı. Lütfen 
   if (safe && safe !== "Bir sorun oluştu. Lütfen tekrar dene.") return safe;
 
   // Kullanıcının kendi anlayabileceği, teknik olmayan kısa mesajlar korunabilir.
-  if (!/(?:http\\s*\\d+|\\b\\d{4}\\b|cloudflare|worker|exception|stack|tensor|model|binding|d1|kv|api[_ -]?key|json|fetch|quota|neuron)/i.test(raw) && raw.length <= 180) {
+  if (!/(?:http\s*\d+|\b\d{4}\b|cloudflare|worker|exception|stack|tensor|model|binding|d1|kv|api[_ -]?key|json|fetch|quota|neuron)/i.test(raw) && raw.length <= 180) {
     return raw;
   }
 
@@ -6522,15 +6522,54 @@ async function sendMessage() {
   }
 
 
-  // Merkezi niyet motoru: özellikle görsel üretim/devam mesajlarında sadece kelime
-  // aramak yerine son görsel bağlamını da dikkate alır. Worker yanıt veremezse
-  // aşağıdaki yerel kurallar güvenli fallback olarak çalışır.
-  const routedIntent = await requestIntentRouter(text, chat, imagesForAI.length > 0, hasDocumentContext);
+  // V14.6: Yerel ve kesin kuralları önce uygula.
+  // Böylece normal sohbetler, PDF soruları ve açık görsel komutları gereksiz
+  // bir niyet-modeli çağrısını beklemez. Router yalnızca yüklenmiş görselin
+  // analiz mi yoksa düzenleme/üretim mi istediğinin belirsiz olduğu durumda devreye girer.
   const explicitNewImagePrompt = imagePromptFromText(text);
-  const localExplicitNew = explicitNewImagePrompt !== null && explicitNewImagePrompt !== "__PREVIOUS_IMAGE_REQUEST__";
-  const wantsNewImage = routedIntent?.intent === "new_image" || localExplicitNew;
-  const wantsImageRevision = routedIntent?.intent === "edit_previous_image" ||
-    (!imagesForAI.length && !wantsNewImage && isImageRevisionRequest(text, chat));
+  const localExplicitNew =
+    explicitNewImagePrompt !== null &&
+    explicitNewImagePrompt !== "__PREVIOUS_IMAGE_REQUEST__";
+
+  const localImageRevision =
+    !imagesForAI.length &&
+    !localExplicitNew &&
+    isImageRevisionRequest(text, chat);
+
+  let routedIntent = null;
+
+  if (imagesForAI.length && !localExplicitNew) {
+    routedIntent = await requestIntentRouter(
+      text,
+      chat,
+      true,
+      hasDocumentContext
+    );
+  }
+
+  const wantsNewImage =
+    localExplicitNew ||
+    routedIntent?.intent === "new_image";
+
+  const wantsImageRevision =
+    localImageRevision ||
+    routedIntent?.intent === "edit_previous_image";
+
+  if (imagesForAI.length && wantsImageRevision) {
+    setInput("");
+
+    const editPrompt =
+      String(routedIntent?.imagePrompt || text || "").trim() ||
+      "Yüklenen görseli kullanıcının isteğine göre düzenle.";
+
+    await generateImage(
+      editPrompt,
+      imagesForAI[0]?.data || "",
+      imagesForAI[0]?.preview || "",
+      imagesForAI[0]?.name || ""
+    );
+    return;
+  }
 
   if (!imagesForAI.length && wantsImageRevision) {
     const previousGeneration = findLatestGeneratedMessage(chat);
@@ -6897,7 +6936,7 @@ async function sendMessage() {
     ) {
 
       speakText(
-        reply
+        cleanReply
       );
 
     }
