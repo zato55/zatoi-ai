@@ -6769,10 +6769,21 @@ async function sendMessage() {
     hideTyping();
 
 
+    const rawErrorText = error && error.message
+      ? error.message
+      : String(error || "Bilinmeyen hata");
+
+    const normalizedErrorText = rawErrorText.toLocaleLowerCase("tr-TR");
     const errorText =
-      error && error.message
-        ? error.message
-        : String(error || "Bilinmeyen hata");
+      normalizedErrorText.includes("ai_daily_limit") ||
+      normalizedErrorText.includes("ücretsiz ai kullanım sınırı") ||
+      normalizedErrorText.includes("4006") ||
+      normalizedErrorText.includes("daily free allocation") ||
+      normalizedErrorText.includes("10,000 neurons") ||
+      normalizedErrorText.includes("10000 neurons") ||
+      normalizedErrorText.includes("workers paid plan")
+        ? "Bugünkü ücretsiz AI kullanım sınırı doldu. Hak yenilendiğinde tekrar deneyebilirsin."
+        : rawErrorText;
 
     chat.messages.push({
 
