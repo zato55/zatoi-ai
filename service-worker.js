@@ -1,4 +1,4 @@
-const CACHE_NAME = "zatoi-ai-v14-12";
+const CACHE_NAME = "zatoi-ai-v14-13";
 
 const APP_FILES = [
   "./",
