@@ -1,12 +1,15 @@
-// ZATOI AI SERVICE WORKER V14.20 - ADMIN PANEL
-const CACHE_NAME = "zatoi-ai-v14-20";
+// ZATOI AI SERVICE WORKER V14.21 - SEO + ADMIN PANEL
+const CACHE_NAME = "zatoi-ai-v14-21";
 
 const APP_FILES = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./robots.txt",
+  "./sitemap.xml",
+  "./llms.txt"
 ];
 
 self.addEventListener("install", event => {
