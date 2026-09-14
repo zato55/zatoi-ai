@@ -4630,7 +4630,7 @@ function renderMessages() {
           metaText.style.cssText = "margin:0 0 7px;text-align:center;color:#94a3b8;font-size:11px;word-break:break-word";
           const referenceLabel = meta.referenceMode === "user"
             ? "yüklenen referans"
-            : (meta.referenceMode === "automatic" ? "internet referansı" : "referans yok");
+            : (meta.referenceMode === "automatic" ? "internet referansı" : (meta.referenceMode === "vision_fallback" ? "görsel betimlemesinden yeniden üretildi" : (meta.referenceMode === "text_fallback" ? "metinden yeniden üretildi" : "referans yok")));
           metaText.textContent = meta.model ? `${meta.model} • ${referenceLabel}` : `Model bilgisi yok • ${referenceLabel}`;
           const choose = document.createElement("button");
           choose.className = "choice-button";
@@ -6089,18 +6089,21 @@ async function regenerateGeneratedImage(message, index) {
   }
 
   const variant = index === 0 ? "A" : "B";
-  const referenceImage = String(targetMessage.sourceReferenceImage || "");
+  let referenceImage = String(targetMessage.sourceReferenceImage || "");
   const generationId = String(targetMessage.generationId || crypto.randomUUID());
   targetMessage.generationId = generationId;
   targetMessage.regeneratingIndex = index;
   renderMessages();
 
   try {
+    if (!referenceImage && targetMessage.sourceReferenceImageId) referenceImage = await fetchStoredReferenceImage(targetMessage.sourceReferenceImageId);
+    if (targetMessage.isImageEdit && !referenceImage) throw userSafeError("IMAGE_EDIT_REFERENCE_MISSING");
     const replacement = await requestGeneratedImage(
       description,
       variant,
       referenceImage,
-      generationId
+      generationId,
+      !!targetMessage.isImageEdit
     );
 
     targetMessage.generatedImages[index] = replacement.dataUrl;
@@ -6139,6 +6142,8 @@ async function regenerateGeneratedImage(message, index) {
 function friendlyUserError(error, context = "general") {
   const raw = String(error?.message || error || "").trim();
   const lower = raw.toLowerCase();
+  if (lower.includes("image_edit_reference_missing")) return "Düzenlenecek görsel yüklenemedi. Görseli yeniden yükleyip tekrar dene.";
+  if (lower.includes("image_edit_unavailable")) return "Seçtiğin görsel şu anda düzenlenemedi. Orijinal görsel korundu; tekrar deneyebilirsin.";
 
   if (lower.includes("auth_required") || lower.includes("oturum süren dolmuş") || lower.includes("unauthorized")) {
     return "Oturum süren dolmuş. Lütfen tekrar giriş yap.";
@@ -6187,7 +6192,7 @@ function userSafeError(error, context = "general") {
   return safe;
 }
 
-async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "") {
+async function requestGeneratedImage(description, variant, referenceImage = "", generationId = "", isEdit = false) {
   const response = await fetchWithTimeout(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
@@ -6197,7 +6202,8 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
       variant,
       preference: getImagePreferenceText(),
       referenceImage,
-      generationId
+      generationId,
+      isEdit
     })
   }, 90000);
   if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
@@ -6205,7 +6211,7 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
     let message = "Görsel üretilemedi.";
     try {
       const errorData = await response.json();
-      message = errorData.error || message;
+      message = `${errorData.code || ""} ${errorData.error || message}`;
     } catch {}
     console.error("Image generation error:", response.status, message);
     throw userSafeError(`${response.status} ${message}`, "image_generate");
@@ -6357,7 +6363,22 @@ async function hydratePersistedImagesForChats(targetChats = chats) {
 }
 
 
-async function generateImageCore(promptText = "", referenceImage = "", referencePreview = "", referenceName = "") {
+function cleanBaseImagePrompt(value) {
+  return String(value || "").split(/Kullanıcının (?:güncel )?düzenleme isteği:|Kullanıcı önceki sonucu beğenmedi\./i)[0]
+    .replace(/^(?:Görsel oluştur:\s*)/i, "").replace(/[.\s]+$/, "").slice(0, 600);
+}
+
+async function resolveRevisionReference(message) {
+  const index = Number.isInteger(message.chosenImage) ? message.chosenImage : 0;
+  let data = message.generatedImages?.[index] || "";
+  if (!data || data === "__ZATOI_EXPIRED_IMAGE__") {
+    const id = message.generatedImageIds?.[index];
+    data = id ? await fetchStoredGeneratedImage(id) : "";
+  }
+  return /^data:image\//i.test(data) ? { data, index } : null;
+}
+
+async function generateImageCore(promptText = "", referenceImage = "", referencePreview = "", referenceName = "", options = {}) {
   let description = String(promptText || "").trim();
   if (!description) description = window.prompt("Nasıl bir görsel oluşturulsun?");
   if (!description) return;
@@ -6371,20 +6392,20 @@ async function generateImageCore(promptText = "", referenceImage = "", reference
     let safeReferenceImage = referenceImage;
     if (referenceImage) safeReferenceImage = await prepareReferenceImageForGeneration(referenceImage);
     if (ownerToken !== authToken || !chats.includes(chat)) return;
-    chat.messages.push({ role: "user", content: `Görsel oluştur: ${description}`,
+    chat.messages.push({ role: "user", content: options.displayText || `Görsel oluştur: ${description}`,
       imageNames: referenceName ? [referenceName] : [],
       imagePreviews: referencePreview ? [referencePreview] : [], time: Date.now() });
     updateTitle(chat, description); chat.updatedAt = Date.now();
     saveChats(); queueCloudSave(chat); setInput(""); renderAll(); showTyping();
     const generationId = crypto.randomUUID();
     for (const variant of ["A", "B"]) {
-      const image = await requestGeneratedImage(description, variant, safeReferenceImage, generationId);
+      const image = await requestGeneratedImage(description, variant, safeReferenceImage, generationId, !!options.isEdit);
       if (ownerToken !== authToken || !chats.includes(chat)) return;
       if (!resultMessage) {
         resultMessage = { role: "assistant", content: "İlk görsel hazır. İkinci seçenek hazırlanıyor…",
           generatedImages: [], generatedImageIds: [], generationMeta: [],
           preferenceChoiceId: crypto.randomUUID(), generationId, imagePrompt: description,
-          baseImagePrompt: description.replace(/(?:Kullanıcının düzenleme isteği:|Kullanıcının güncel düzenleme isteği:)[\s\S]*$/i, "").trim(),
+          baseImagePrompt: options.basePrompt || cleanBaseImagePrompt(description), isImageEdit: !!options.isEdit,
           sourceReferenceImage: safeReferenceImage, sourceReferenceImageId: "",
           sourceReferencePreview: referencePreview, sourceReferenceName: referenceName, time: Date.now() };
         chat.messages.push(resultMessage);
@@ -6689,7 +6710,8 @@ async function sendMessageCore() {
       editPrompt,
       imagesForAI[0]?.data || "",
       imagesForAI[0]?.preview || "",
-      imagesForAI[0]?.name || ""
+      imagesForAI[0]?.name || "",
+      { displayText: text, basePrompt: editPrompt, isEdit: true }
     );
     return;
   }
@@ -6699,28 +6721,15 @@ async function sendMessageCore() {
     if (previousGeneration) {
       setInput("");
       const feedback = String(text || "").trim();
-      const genericFailure = /^(?:bu\s+)?(?:hiç\s+)?(?:olmamış|olmamis|olmadı|olmadi|beğenmedim|begenmedim|kötü\s+olmuş|kotu\s+olmus|iyi\s+olmamış|iyi\s+olmamis|bu\s+değil|bu\s+degil|böyle\s+değil|boyle\s+degil|yanlış|yanlis)[.!…]*$/i.test(feedback);
-      const routedRevision = String(routedIntent?.imagePrompt || "").trim();
-      const revisionPrompt = genericFailure
-        ? `${previousGeneration.imagePrompt}. Kullanıcı önceki sonucu beğenmedi. Aynı ana konuyu koru fakat önceki hatayı tekrarlama; özneyi daha doğru, temiz ve tutarlı üret.`
-        : `${previousGeneration.imagePrompt}. Kullanıcının düzenleme isteği: "${routedRevision || feedback}". Ana konuyu koru ve yalnızca istenen değişikliği belirgin biçimde uygula.`;
-
-      let revisionReference = previousGeneration.sourceReferenceImage || "";
-      let revisionPreview = previousGeneration.sourceReferencePreview || "";
-      let revisionName = previousGeneration.sourceReferenceName || "";
-      if (!revisionReference && previousGeneration.sourceReferenceImageId) {
-        revisionReference = await fetchStoredReferenceImage(previousGeneration.sourceReferenceImageId);
-        if (revisionReference && !revisionPreview) revisionPreview = revisionReference;
+      const reference = await resolveRevisionReference(previousGeneration);
+      if (!reference) {
+        throw userSafeError("IMAGE_EDIT_REFERENCE_MISSING");
       }
-      if (!genericFailure && Number.isInteger(previousGeneration.chosenImage)) {
-        const chosen = previousGeneration.generatedImages?.[previousGeneration.chosenImage];
-        if (chosen && chosen !== "__ZATOI_EXPIRED_IMAGE__") {
-          revisionReference = chosen;
-          revisionPreview = chosen;
-          revisionName = `Önceki görsel seçenek ${previousGeneration.chosenImage + 1}`;
-        }
-      }
-      await generateImageCore(revisionPrompt, revisionReference, revisionPreview, revisionName);
+      const basePrompt = cleanBaseImagePrompt(previousGeneration.baseImagePrompt || previousGeneration.imagePrompt);
+      const revisionPrompt = `CURRENT EDIT: ${feedback}. Preserve everything else in the supplied image. Original subject: ${basePrompt}`;
+      await generateImageCore(revisionPrompt, reference.data, reference.data,
+        `Önceki görsel seçenek ${reference.index + 1}`,
+        { displayText: feedback, basePrompt, isEdit: true });
       return;
     }
   }
