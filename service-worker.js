@@ -1,5 +1,5 @@
-// ZATOI AI SERVICE WORKER V14.19.1 - FREE ONLY
-const CACHE_NAME = "zatoi-ai-v14-19-1";
+// ZATOI AI SERVICE WORKER V14.20 - ADMIN PANEL
+const CACHE_NAME = "zatoi-ai-v14-20";
 
 const APP_FILES = [
   "./",
