@@ -4628,9 +4628,22 @@ function renderMessages() {
           const meta = message.generationMeta?.[index] || {};
           const metaText = document.createElement("div");
           metaText.style.cssText = "margin:0 0 7px;text-align:center;color:#94a3b8;font-size:11px;word-break:break-word";
-          const referenceLabel = meta.referenceMode === "user"
-            ? "yüklenen referans"
-            : (meta.referenceMode === "automatic" ? "internet referansı" : (meta.referenceMode === "vision_fallback" ? "görsel betimlemesinden yeniden üretildi" : (meta.referenceMode === "text_fallback" ? "metinden yeniden üretildi" : "referans yok")));
+          const referenceLabel =
+            meta.referenceMode === "flux_edit"
+              ? "FLUX ile gerçek görsel düzenleme"
+              : meta.referenceMode === "user"
+                ? "yüklenen referans"
+                : meta.referenceMode === "automatic"
+                  ? "internet referansı"
+                  : meta.referenceMode === "edit_vision_fallback"
+                    ? "düzenleme fallback: görsel analizinden yeniden üretildi"
+                    : meta.referenceMode === "edit_text_fallback"
+                      ? "düzenleme fallback: metinden yeniden üretildi"
+                      : meta.referenceMode === "vision_fallback"
+                        ? "görsel betimlemesinden yeniden üretildi"
+                        : meta.referenceMode === "text_fallback"
+                          ? "metinden yeniden üretildi"
+                          : "referans yok";
           metaText.textContent = meta.model ? `${meta.model} • ${referenceLabel}` : `Model bilgisi yok • ${referenceLabel}`;
           const choose = document.createElement("button");
           choose.className = "choice-button";
@@ -5404,7 +5417,7 @@ async function compressImageFile(file, maxDimension = 1280, quality = 0.78) {
 }
 
 
-async function prepareReferenceImageForGeneration(dataUrl, maxDimension = 768) {
+async function prepareReferenceImageForGeneration(dataUrl, maxDimension = 480) {
   const source = String(dataUrl || "");
   if (!source.startsWith("data:image/")) return source;
 
@@ -6682,11 +6695,11 @@ async function sendMessageCore() {
 
   let routedIntent = null;
 
-  if (imagesForAI.length && !localExplicitNew) {
+  if (!localExplicitNew && (imagesForAI.length || findLatestGeneratedMessage(chat))) {
     routedIntent = await requestIntentRouter(
       text,
       chat,
-      true,
+      imagesForAI.length > 0 || !!findLatestGeneratedMessage(chat),
       hasDocumentContext
     );
   }
