@@ -1,4 +1,5 @@
-const CACHE_NAME = "zatoi-ai-v14-14";
+// ZATOI AI SERVICE WORKER V14.19.1 - FREE ONLY
+const CACHE_NAME = "zatoi-ai-v14-19-1";
 
 const APP_FILES = [
   "./",
@@ -11,97 +12,84 @@ const APP_FILES = [
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
-      Promise.all(
+      Promise.allSettled(
         APP_FILES.map(file =>
-          cache.add(new Request(file, { cache: "reload" })).catch(error => {
-            console.warn("Önbelleğe eklenemedi:", file, error);
-          })
+          cache.add(new Request(file, { cache: "reload" }))
         )
       )
     )
   );
-
   self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys()
-      .then(keys =>
+    Promise.all([
+      caches.keys().then(keys =>
         Promise.all(
           keys
-            .filter(key => key.startsWith("zatoi-ai-") && key !== CACHE_NAME)
+            .filter(key => key !== CACHE_NAME)
             .map(key => caches.delete(key))
         )
-      )
-      .then(() => self.clients.claim())
+      ),
+      self.clients.claim()
+    ])
   );
 });
 
 self.addEventListener("fetch", event => {
   const request = event.request;
 
-  if (request.method !== "GET") {
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // SPA navigasyonları: ağ öncelikli, tamamen çevrimdışıyken index.html.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(new Request(request, { cache: "no-store" }))
+        .then(response => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            event.waitUntil(
+              caches.open(CACHE_NAME).then(cache =>
+                cache.put("./index.html", copy)
+              )
+            );
+          }
+          return response;
+        })
+        .catch(async () =>
+          (await caches.match("./index.html")) ||
+          (await caches.match("./")) ||
+          new Response("Zatoi AI çevrimdışı.", {
+            status: 503,
+            headers: { "Content-Type": "text/plain; charset=utf-8" }
+          })
+        )
+    );
     return;
   }
 
-  const requestUrl = new URL(request.url);
-
-  // Worker API gibi başka alan adlarına yapılan istekleri önbelleğe alma.
-  if (requestUrl.origin !== self.location.origin) {
-    return;
-  }
-
+  // Uygulama dosyaları: network-first, hata olursa cache.
   event.respondWith(
-    (async () => {
-      try {
-        // Ana uygulama ve navigasyonlarda tarayıcının eski HTTP önbelleğine takılma.
-        const networkRequest =
-          request.mode === "navigate" ||
-          requestUrl.pathname.endsWith("/index.html") ||
-          requestUrl.pathname.endsWith("/manifest.json")
-            ? new Request(request, { cache: "no-store" })
-            : request;
-
-        const response = await fetch(networkRequest);
-
+    fetch(request, { cache: "no-cache" })
+      .then(response => {
         if (response && response.ok) {
-          const responseCopy = response.clone();
-
+          const copy = response.clone();
           event.waitUntil(
-            caches.open(CACHE_NAME)
-              .then(cache => cache.put(request, responseCopy))
-              .catch(error => {
-                console.warn("Önbellek güncellenemedi:", error);
-              })
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy))
           );
         }
-
         return response;
-      } catch {
-        const cachedResponse = await caches.match(request);
-
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        if (request.mode === "navigate") {
-          const homePage =
-            (await caches.match("./index.html")) ||
-            (await caches.match("./"));
-
-          if (homePage) {
-            return homePage;
-          }
-        }
-
-        return new Response("İnternet bağlantısı yok.", {
+      })
+      .catch(async () =>
+        (await caches.match(request)) ||
+        new Response("İnternet bağlantısı yok.", {
           status: 503,
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8"
-          }
-        });
-      }
-    })()
+          headers: { "Content-Type": "text/plain; charset=utf-8" }
+        })
+      )
   );
 });
