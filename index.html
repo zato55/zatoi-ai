@@ -3473,17 +3473,8 @@ function loadMemory() {
 
 
 function saveMemory() {
-
-  localStorage.setItem(
-
-    memoryKey(),
-
-    JSON.stringify(
-      globalMemory
-    )
-
-  );
-
+  try { localStorage.setItem(memoryKey(), JSON.stringify(globalMemory)); }
+  catch (error) { console.warn("Hafıza bu cihazda kaydedilemedi:", error); }
 }
 
 
@@ -3534,7 +3525,8 @@ function stripHeavyLocalMessageData(message) {
   // Üretilen görsellerin ham data URL/base64 kopyalarını localStorage'a yazma.
   // Kalıcı yükleme generatedImageIds üzerinden KV'den yapılır.
   if (clean.role === "assistant" && Array.isArray(clean.generatedImageIds)) {
-    clean.generatedImages = clean.generatedImageIds.map(() => "");
+    clean.generatedImages = (clean.generatedImages || []).map((image, index) =>
+      clean.generatedImageIds[index] ? "" : image);
   }
 
   // Referans görsel ham verisini de localStorage'a yazma.
@@ -3584,7 +3576,8 @@ function saveChats() {
 
     try {
       const compact = chatsForLocalStorage(chats)
-        .slice(-20)
+        .sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt))
+        .slice(0, 20)
         .map(chat => ({
           ...chat,
           messages: (chat.messages || []).slice(-50)
@@ -3827,7 +3820,11 @@ async function saveChatToCloud(chat) {
     id: chat.id,
     title: chat.title || "Yeni Sohbet",
     messages: Array.isArray(chat.messages)
-      ? chat.messages.slice(-100)
+      ? chat.messages.slice(-100).map(message => {
+          const clean = { ...message };
+          for (const key of ["generatedImages", "generatedImage", "sourceReferenceImage", "sourceReferencePreview", "imagePreviews", "imagePreview", "images"]) delete clean[key];
+          return clean;
+        })
       : [],
     createdAt: Number(chat.createdAt) || Date.now(),
     updatedAt: Number(chat.updatedAt) || Date.now(),
@@ -4610,7 +4607,19 @@ function renderMessages() {
           generated.className = "generated-image";
           if (imageExpired) {
             generated.style.cssText = "aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;background:#0b1118;color:#94a3b8;font-size:12px;border:1px dashed #34424f";
-            generated.textContent = "Bu eski görsel saklanan son 6 görselin dışında kaldı.";
+            generated.textContent = imageSrc === "__ZATOI_EXPIRED_IMAGE__"
+              ? "Bu görsel artık saklama alanında bulunmuyor."
+              : "Görsel yüklenemedi. Yeniden yüklemeyi deneyebilirsin.";
+            if (!imageSrc) {
+              const retry = document.createElement("button");
+              retry.className = "choice-button"; retry.textContent = "Yeniden yükle";
+              retry.onclick = async () => {
+                retry.disabled = true;
+                try { await hydratePersistedImagesForChats([chat]); }
+                finally { retry.disabled = false; }
+              };
+              choice.appendChild(retry);
+            }
           } else {
             generated.src = imageSrc;
             generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
@@ -4649,7 +4658,7 @@ function renderMessages() {
           const download = document.createElement("a");
           download.href = imageExpired ? "#" : imageSrc;
           download.download = imageExpired ? "" : `zatoi-gorsel-${index + 1}-${Date.now()}.png`;
-          download.textContent = imageExpired ? "Hafızadan temizlendi" : "⬇ İndir";
+          download.textContent = imageExpired ? (imageSrc ? "Görsel mevcut değil" : "Yükleme bekleniyor") : "⬇ İndir";
           download.style.cssText = "display:block;text-align:center;margin-top:6px;color:#93c5fd;font-size:12px;text-decoration:none";
           if (imageExpired) {
             download.style.pointerEvents = "none";
@@ -5185,22 +5194,30 @@ function renderHistoryList(
    V10.9 ÇOKLU GÖRSEL
 ========================================== */
 
+let imageViewerPreviousFocus = null;
+
 function openImageViewer(src, altText = "Görsel") {
   if (!src) return;
 
   const viewer = document.getElementById("imageViewer");
   const viewerImage = document.getElementById("imageViewerImage");
 
+  imageViewerPreviousFocus = document.activeElement;
+  viewer.inert = false;
   viewerImage.src = src;
   viewerImage.alt = altText;
   viewer.classList.add("show");
   viewer.setAttribute("aria-hidden", "false");
+  document.getElementById("imageViewerClose")?.focus();
 }
 
 function closeImageViewer() {
   const viewer = document.getElementById("imageViewer");
   const viewerImage = document.getElementById("imageViewerImage");
 
+  if (viewer.contains(document.activeElement)) document.activeElement.blur();
+  if (imageViewerPreviousFocus?.isConnected && !viewer.contains(imageViewerPreviousFocus)) imageViewerPreviousFocus.focus();
+  viewer.inert = true;
   viewer.classList.remove("show");
   viewer.setAttribute("aria-hidden", "true");
   viewerImage.removeAttribute("src");
@@ -6121,7 +6138,7 @@ async function regenerateGeneratedImage(message, index) {
 
 function friendlyUserError(error, context = "general") {
   const raw = String(error?.message || error || "").trim();
-  const lower = raw.toLocaleLowerCase("tr-TR");
+  const lower = raw.toLowerCase();
 
   if (lower.includes("auth_required") || lower.includes("oturum süren dolmuş") || lower.includes("unauthorized")) {
     return "Oturum süren dolmuş. Lütfen tekrar giriş yap.";
@@ -6158,43 +6175,9 @@ function friendlyUserError(error, context = "general") {
 }
 
 function sanitizeAssistantTextForUser(value, context = "general") {
-  const text = String(value || "").trim();
-  if (!text) return text;
-
-  const lower = text.toLocaleLowerCase("tr-TR");
-
-  // Altyapı sağlayıcılarının ham hata metinleri kullanıcıya asla gösterilmez.
-  if (
-    lower.includes("4006") ||
-    lower.includes("daily free allocation") ||
-    lower.includes("10,000 neurons") ||
-    lower.includes("10000 neurons") ||
-    lower.includes("workers paid plan") ||
-    (lower.includes("cloudflare") && lower.includes("neuron"))
-  ) {
-    return "🌙 Zatoi biraz dinleniyor\n\nBugünkü ücretsiz kullanım hakkımız doldu. Haklar yenilendiğinde kaldığımız yerden devam edebiliriz.";
-  }
-
-  if (
-    /(?:^|\n)\s*(?:⚠️\s*)?(?:hata oluştu:?\s*)?(?:http\s*)?5\d\d\b/i.test(text) ||
-    /internal server error|worker exception|stack trace|traceback/i.test(text)
-  ) {
-    return friendlyUserError(text, context);
-  }
-
-  if (/\b(?:3030|5018)\b|tensor|model input|request body too large|payload too large/i.test(text)) {
-    return friendlyUserError(text, context);
-  }
-
-  // JSON/API hata gövdeleri, model/binding ayrıntıları ve benzeri teknik cevaplar.
-  if (
-    /^\s*\{[\s\S]*(?:"error"|"details"|"code")[\s\S]*\}\s*$/i.test(text) ||
-    /(?:binding|d1|kv namespace|tavily_api_key|authorization bearer|cf-ray|workers ai error)/i.test(text)
-  ) {
-    return friendlyUserError(text, context);
-  }
-
-  return text;
+  // Successful model text is content, not an error envelope. HTTP errors are
+  // handled before this function; technical terms must remain readable.
+  return String(value || "").trim();
 }
 
 function userSafeError(error, context = "general") {
@@ -6225,7 +6208,7 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
       message = errorData.error || message;
     } catch {}
     console.error("Image generation error:", response.status, message);
-    throw userSafeError(message, "image_generate");
+    throw userSafeError(`${response.status} ${message}`, "image_generate");
   }
   const imageBlob = await response.blob();
   if (!imageBlob.type.startsWith("image/")) throw new Error("Worker geçerli bir görsel döndürmedi.");
@@ -6273,10 +6256,7 @@ async function fetchStoredGeneratedImage(imageId) {
 
     if (!response.ok) return "";
     const blob = await response.blob();
-    if (!blob.type.startsWith("image/")) {
-      unavailableStoredImageIds.add(id);
-      return "";
-    }
+    if (!blob.type.startsWith("image/")) return "";
 
     return await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -6305,10 +6285,7 @@ async function fetchStoredReferenceImage(referenceImageId) {
     }
     if (!response.ok) return "";
     const blob = await response.blob();
-    if (!blob.type.startsWith("image/")) {
-      unavailableStoredImageIds.add(id);
-      return "";
-    }
+    if (!blob.type.startsWith("image/")) return "";
     return await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(String(reader.result || ""));
@@ -6358,11 +6335,11 @@ async function hydratePersistedImagesForChats(targetChats = chats) {
             if (dataUrl) {
               message.generatedImages[index] = dataUrl;
               changed = true;
-            } else {
-              // Son 6 sınırı nedeniyle silinmiş eski görsel için kırık img yerine
-              // süre-doldu işareti bırak ve bu oturumda aynı ID'yi tekrar isteme.
-              unavailableStoredImageIds.add(String(imageId));
+            } else if (unavailableStoredImageIds.has(String(imageId))) {
               message.generatedImages[index] = "__ZATOI_EXPIRED_IMAGE__";
+              changed = true;
+            } else {
+              // Network failures remain retryable and do not imply deletion.
               changed = true;
             }
           } finally {
@@ -6380,67 +6357,52 @@ async function hydratePersistedImagesForChats(targetChats = chats) {
 }
 
 
-async function generateImage(promptText = "", referenceImage = "", referencePreview = "", referenceName = "") {
-  if (sending) return;
+async function generateImageCore(promptText = "", referenceImage = "", referencePreview = "", referenceName = "") {
   let description = String(promptText || "").trim();
   if (!description) description = window.prompt("Nasıl bir görsel oluşturulsun?");
   if (!description) return;
   if (!navigator.onLine) return alert("İnternet bağlantısı yok.");
+  if (!authToken) return showAuthScreen();
   const chat = getActiveChat();
   if (!chat) return;
-
-  // Referans görseli yalnızca üretim isteği için güvenli boyuta indir.
-  // Sohbette gösterilen önizleme ve KV'ye kaydedilen üretilmiş görsellerin kalitesi etkilenmez.
-  let safeReferenceImage = referenceImage;
-  if (referenceImage) {
-    try {
-      safeReferenceImage = await prepareReferenceImageForGeneration(referenceImage);
-    } catch {
-      safeReferenceImage = referenceImage;
-    }
-  }
-
-  sending = true;
-  chat.messages.push({
-    role: "user",
-    content: `Görsel oluştur: ${description}`,
-    imageNames: referenceName ? [referenceName] : [],
-    imagePreviews: referencePreview ? [referencePreview] : [],
-    time: Date.now()
-  });
-  updateTitle(chat, description); chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat);
-  setInput(""); renderAll(); showTyping();
+  const ownerToken = authToken;
+  let resultMessage = null;
   try {
+    let safeReferenceImage = referenceImage;
+    if (referenceImage) safeReferenceImage = await prepareReferenceImageForGeneration(referenceImage);
+    if (ownerToken !== authToken || !chats.includes(chat)) return;
+    chat.messages.push({ role: "user", content: `Görsel oluştur: ${description}`,
+      imageNames: referenceName ? [referenceName] : [],
+      imagePreviews: referencePreview ? [referencePreview] : [], time: Date.now() });
+    updateTitle(chat, description); chat.updatedAt = Date.now();
+    saveChats(); queueCloudSave(chat); setInput(""); renderAll(); showTyping();
     const generationId = crypto.randomUUID();
-    const imageA = await requestGeneratedImage(description, "A", safeReferenceImage, generationId);
-    const imageB = await requestGeneratedImage(description, "B", safeReferenceImage, generationId);
-    chat.messages.push({
-      role: "assistant",
-      content: "Konuyu araştırarak ve uygun referans varsa onu kullanarak iki seçenek hazırladım. Beğendiğini seç; sonraki görselleri tercihine göre iyileştireceğim.",
-      generatedImages: [imageA.dataUrl, imageB.dataUrl],
-      generatedImageIds: [imageA.imageId, imageB.imageId],
-      generationMeta: [
-        { model: imageA.model, referenceMode: imageA.referenceMode },
-        { model: imageB.model, referenceMode: imageB.referenceMode }
-      ],
-      preferenceChoiceId: crypto.randomUUID(),
-      generationId,
-      imagePrompt: description,
-      baseImagePrompt: String(description || "").replace(/(?:Kullanıcının düzenleme isteği:|Kullanıcının güncel düzenleme isteği:)[\s\S]*$/i, "").trim(),
-      sourceReferenceImage: safeReferenceImage,
-      sourceReferenceImageId: imageA.referenceImageId || imageB.referenceImageId || "",
-      sourceReferencePreview: referencePreview,
-      sourceReferenceName: referenceName,
-      time: Date.now()
-    });
-    chat.updatedAt = Date.now();
-    renderAll();
+    for (const variant of ["A", "B"]) {
+      const image = await requestGeneratedImage(description, variant, safeReferenceImage, generationId);
+      if (ownerToken !== authToken || !chats.includes(chat)) return;
+      if (!resultMessage) {
+        resultMessage = { role: "assistant", content: "İlk görsel hazır. İkinci seçenek hazırlanıyor…",
+          generatedImages: [], generatedImageIds: [], generationMeta: [],
+          preferenceChoiceId: crypto.randomUUID(), generationId, imagePrompt: description,
+          baseImagePrompt: description.replace(/(?:Kullanıcının düzenleme isteği:|Kullanıcının güncel düzenleme isteği:)[\s\S]*$/i, "").trim(),
+          sourceReferenceImage: safeReferenceImage, sourceReferenceImageId: "",
+          sourceReferencePreview: referencePreview, sourceReferenceName: referenceName, time: Date.now() };
+        chat.messages.push(resultMessage);
+      }
+      resultMessage.generatedImages.push(image.dataUrl);
+      resultMessage.generatedImageIds.push(image.imageId);
+      resultMessage.generationMeta.push({ model: image.model, referenceMode: image.referenceMode });
+      resultMessage.sourceReferenceImageId ||= image.referenceImageId || "";
+      if (variant === "B") resultMessage.content = "İki seçenek hazır. Beğendiğini seçebilirsin.";
+      chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat); renderAll();
+      if (variant === "A") showTyping();
+    }
   } catch (error) {
-    alert(friendlyClientError(error, "Görsel üretilemedi. Lütfen tekrar dene."));
-  } finally {
-    hideTyping();
-    sending = false;
-    renderAll();
+    if (ownerToken !== authToken || !chats.includes(chat)) return;
+    const message = friendlyClientError(error);
+    if (resultMessage) resultMessage.content = `İlk görsel hazır ve korundu. İkinci seçenek tamamlanamadı.\n\n${message}`;
+    else chat.messages.push({ role: "assistant", content: message, time: Date.now() });
+    chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat); renderAll();
   }
 }
 
@@ -6528,18 +6490,9 @@ async function forceLogout() {
 
 
 function friendlyClientError(error, fallback = "İşlem tamamlanamadı. Lütfen tekrar dene.") {
-  const raw = String(error?.message || error || "").trim();
-  if (!raw) return fallback;
-
-  const safe = friendlyUserError(raw, "general");
-  if (safe && safe !== "Bir sorun oluştu. Lütfen tekrar dene.") return safe;
-
-  // Kullanıcının kendi anlayabileceği, teknik olmayan kısa mesajlar korunabilir.
-  if (!/(?:http\s*\d+|\b\d{4}\b|cloudflare|worker|exception|stack|tensor|model|binding|d1|kv|api[_ -]?key|json|fetch|quota|neuron)/i.test(raw) && raw.length <= 180) {
-    return raw;
-  }
-
-  return fallback;
+  if (error?.userSafe) return String(error.message || fallback);
+  if (!String(error?.message || error || "").trim()) return fallback;
+  return friendlyUserError(error);
 }
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = 45000) {
@@ -6594,11 +6547,40 @@ async function requestIntentRouter(text, chat, hasImages, hasDocument) {
    MESAJ GÖNDER
 ========================================== */
 
-async function sendMessage() {
-
-  if (sending) {
-    return;
+async function withSendingLock(task) {
+  if (sending) return;
+  sending = true;
+  try { return await task(); }
+  finally {
+    sending = false;
+    try { hideTyping(); } catch (error) { console.warn(error); }
+    for (const id of ["sendButton", "mobileSendButton"]) {
+      const button = document.getElementById(id);
+      if (button) button.disabled = false;
+    }
+    try { focusInput(); } catch {}
   }
+}
+
+async function sendMessage() {
+  return withSendingLock(async () => {
+    const chat = getActiveChat();
+    try { return await sendMessageCore(); }
+    catch (error) {
+      if (chat && chats.includes(chat)) {
+        chat.messages.push({ role: "assistant", content: friendlyClientError(error), time: Date.now() });
+        chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat); renderAll();
+      }
+    }
+  });
+}
+
+async function generateImage(...args) {
+  return withSendingLock(() => generateImageCore(...args));
+}
+
+async function sendMessageCore() {
+
 
   if (!navigator.onLine) {
     alert("İnternet bağlantısı yok. Mesajın gönderilmedi.");
@@ -6703,7 +6685,7 @@ async function sendMessage() {
       String(routedIntent?.imagePrompt || text || "").trim() ||
       "Yüklenen görseli kullanıcının isteğine göre düzenle.";
 
-    await generateImage(
+    await generateImageCore(
       editPrompt,
       imagesForAI[0]?.data || "",
       imagesForAI[0]?.preview || "",
@@ -6738,7 +6720,7 @@ async function sendMessage() {
           revisionName = `Önceki görsel seçenek ${previousGeneration.chosenImage + 1}`;
         }
       }
-      await generateImage(revisionPrompt, revisionReference, revisionPreview, revisionName);
+      await generateImageCore(revisionPrompt, revisionReference, revisionPreview, revisionName);
       return;
     }
   }
@@ -6752,7 +6734,7 @@ async function sendMessage() {
         : (explicitNewImagePrompt || text);
     }
     // Yeni görsel isteğinde eski görsel konusu/referansı kesinlikle taşınmaz.
-    await generateImage(
+    await generateImageCore(
       resolvedPrompt,
       imagesForAI[0]?.data || "",
       imagesForAI[0]?.preview || "",
@@ -6897,7 +6879,7 @@ async function sendMessage() {
         time: Date.now()
       });
       chat.updatedAt = Date.now();
-      hideTyping(); sending = false; renderAll();
+      hideTyping(); renderAll();
       return;
     }
 
@@ -6931,7 +6913,7 @@ async function sendMessage() {
 
       hideTyping();
 
-      sending = false;
+  
 
       await forceLogout();
 
@@ -6974,10 +6956,7 @@ async function sendMessage() {
 
       globalMemory = {
 
-        name:
-          data.memory.name ||
-          globalMemory.name ||
-          "",
+        name: typeof data.memory.name === "string" ? data.memory.name : globalMemory.name,
 
         facts:
           Array.isArray(
@@ -7126,7 +7105,7 @@ async function sendMessage() {
 
   } finally {
     hideTyping();
-    sending = false;
+
     focusInput();
   }
 
@@ -8154,13 +8133,9 @@ window.addEventListener(
 ========================================== */
 
 function renderAll() {
-
-  updateChatTitle();
-
-  renderMessages();
-
-  renderHistory();
-
+  for (const render of [renderMessages, updateChatTitle, renderHistory]) {
+    try { render(); } catch (error) { console.warn("Arayüz bölümü güncellenemedi:", error); }
+  }
 }
 
 
