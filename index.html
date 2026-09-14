@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.18 - 4 MODEL COMPARISON -->
+<!-- ZATOI AI INDEX V14.18.1 - 4 MODEL + REFERENCE PREVIEW -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -4598,6 +4598,29 @@ function renderMessages() {
       );
 
       if (message.role === "assistant" && Array.isArray(message.generatedImages) && message.generatedImages.length) {
+        if (message.automaticReferencePreview && /^data:image\//i.test(message.automaticReferencePreview)) {
+          const referenceBox = document.createElement("div");
+          referenceBox.style.cssText = "margin:8px 0 10px;padding:8px;border:1px solid var(--border);border-radius:10px";
+
+          const referenceTitle = document.createElement("div");
+          referenceTitle.textContent = "🔎 Modellerin kullandığı internet referansı";
+          referenceTitle.style.cssText = "font-weight:700;margin-bottom:7px";
+
+          const referenceImg = document.createElement("img");
+          referenceImg.src = message.automaticReferencePreview;
+          referenceImg.alt = "Zatoi'nin FLUX modellerine gönderdiği internet referansı";
+          referenceImg.title = "Büyütmek için dokun";
+          referenceImg.style.cssText = "display:block;width:180px;max-width:100%;height:auto;border-radius:8px;object-fit:contain;cursor:pointer";
+          referenceImg.onclick = () => openImageViewer(referenceImg.src, referenceImg.alt);
+
+          const referenceNote = document.createElement("div");
+          referenceNote.textContent = "Bu görsel, Zatoi'nin kişiyi tanımak için modele gerçekten gönderdiği referanstır.";
+          referenceNote.style.cssText = "font-size:12px;opacity:.75;margin-top:6px";
+
+          referenceBox.append(referenceTitle, referenceImg, referenceNote);
+          bubble.appendChild(referenceBox);
+        }
+
         const pair = document.createElement("div");
         pair.className = "generated-pair";
         message.generatedImages.forEach((imageSrc, index) => {
@@ -6475,6 +6498,7 @@ async function generateImageCore(promptText = "", referenceImage = "", reference
           sourceReferenceImageId: "",
           sourceReferencePreview: referencePreview,
           sourceReferenceName: referenceName,
+          automaticReferencePreview: "",
           time: Date.now()
         };
         chat.messages.push(resultMessage);
@@ -6490,6 +6514,14 @@ async function generateImageCore(promptText = "", referenceImage = "", reference
         error: modelError
       });
       resultMessage.sourceReferenceImageId ||= image?.referenceImageId || "";
+      if (!resultMessage.automaticReferencePreview &&
+          image?.referenceMode === "automatic" &&
+          image?.referenceImageId) {
+        try {
+          resultMessage.automaticReferencePreview =
+            await fetchStoredGeneratedImage(image.referenceImageId);
+        } catch {}
+      }
 
       const completed = planIndex + 1;
       if (options.isEdit) {
