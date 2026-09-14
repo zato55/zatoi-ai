@@ -1,4 +1,4 @@
-const CACHE_NAME = "zatoi-ai-v14-11";
+const CACHE_NAME = "zatoi-ai-v14-12";
 
 const APP_FILES = [
   "./",
@@ -30,7 +30,7 @@ self.addEventListener("activate", event => {
       .then(keys =>
         Promise.all(
           keys
-            .filter(key => key !== CACHE_NAME)
+            .filter(key => key.startsWith("zatoi-ai-") && key !== CACHE_NAME)
             .map(key => caches.delete(key))
         )
       )
