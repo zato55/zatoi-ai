@@ -3560,7 +3560,7 @@ function compactChatRequestMessages(messages, maxMessages = 16) {
     .slice(-maxMessages)
     .map(message => ({
       role: message?.role === "assistant" ? "assistant" : "user",
-      content: String(message?.content || "").slice(0, 6000)
+      content: String(message?.content || "").slice(0, 12000)
     }))
     .filter(message => message.content.trim());
 }
@@ -6852,9 +6852,7 @@ async function sendMessageCore() {
                 globalMemory,
 
               messages:
-                chat.messages.slice(
-                  -20
-                ),
+                compactChatRequestMessages(chat.messages, 20),
 
               document:
                 documentForAI,
