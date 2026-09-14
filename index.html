@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.18.1 - 4 MODEL + REFERENCE PREVIEW -->
+<!-- ZATOI AI INDEX V14.18.2 - SAFE REFERENCE PREVIEW -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -1702,6 +1702,33 @@
 
   </style>
 
+
+<style>
+.automatic-reference-box{
+  margin:8px 0 10px;
+  padding:8px;
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+.automatic-reference-title{
+  font-weight:700;
+  margin-bottom:7px;
+}
+.automatic-reference-image{
+  display:block;
+  width:180px;
+  max-width:100%;
+  height:auto;
+  border-radius:8px;
+  object-fit:contain;
+  cursor:pointer;
+}
+.automatic-reference-note{
+  font-size:12px;
+  opacity:.75;
+  margin-top:6px;
+}
+</style>
 </head>
 
 <body>
@@ -4600,25 +4627,25 @@ function renderMessages() {
       if (message.role === "assistant" && Array.isArray(message.generatedImages) && message.generatedImages.length) {
         if (message.automaticReferencePreview && /^data:image\//i.test(message.automaticReferencePreview)) {
           const referenceBox = document.createElement("div");
-          referenceBox.style.cssText = "margin:8px 0 10px;padding:8px;border:1px solid var(--border);border-radius:10px";
+          referenceBox.className = "automatic-reference-box";
 
           const referenceTitle = document.createElement("div");
+          referenceTitle.className = "automatic-reference-title";
           referenceTitle.textContent = "🔎 Modellerin kullandığı internet referansı";
-          referenceTitle.style.cssText = "font-weight:700;margin-bottom:7px";
 
           const referenceImg = document.createElement("img");
+          referenceImg.className = "automatic-reference-image";
           referenceImg.src = message.automaticReferencePreview;
           referenceImg.alt = "Zatoi'nin FLUX modellerine gönderdiği internet referansı";
-          referenceImg.title = "Büyütmek için dokun";
-          referenceImg.style.cssText = "display:block;width:180px;max-width:100%;height:auto;border-radius:8px;object-fit:contain;cursor:pointer";
+          referenceImg.title = "Büyütmek için tıkla";
           referenceImg.onclick = () => openImageViewer(referenceImg.src, referenceImg.alt);
 
           const referenceNote = document.createElement("div");
-          referenceNote.textContent = "Bu görsel, Zatoi'nin kişiyi tanımak için modele gerçekten gönderdiği referanstır.";
-          referenceNote.style.cssText = "font-size:12px;opacity:.75;margin-top:6px";
+          referenceNote.className = "automatic-reference-note";
+          referenceNote.textContent = "Bu görsel, modele kimlik referansı olarak gerçekten gönderildi.";
 
           referenceBox.append(referenceTitle, referenceImg, referenceNote);
-          bubble.appendChild(referenceBox);
+          bubble.insertBefore(referenceBox, content);
         }
 
         const pair = document.createElement("div");
@@ -4676,6 +4703,10 @@ function renderMessages() {
             ? `${modelTitle} • başarısız`
             : `${modelTitle}${meta.model && meta.label ? ` (${meta.model})` : ""} • ${referenceLabel}`;
           if (meta.error) metaText.title = meta.error;
+          if (meta.error && imageExpired) {
+            choice.classList.add("generation-failed");
+          }
+
           const choose = document.createElement("button");
           choose.className = "choice-button";
           choose.textContent = message.chosenImage === index ? "✓ Seçildi" : `Seçenek ${index + 1}'i seç`;
@@ -4708,7 +4739,11 @@ function renderMessages() {
             download.style.pointerEvents = "none";
             download.style.opacity = "0.6";
           }
-          choice.append(generated, metaText, choose, regenerate, download);
+          if (meta.error && imageExpired) {
+            choice.append(generated, metaText);
+          } else {
+            choice.append(generated, metaText, choose, regenerate, download);
+          }
           pair.appendChild(choice);
         });
         bubble.insertBefore(pair, content);
@@ -6514,12 +6549,13 @@ async function generateImageCore(promptText = "", referenceImage = "", reference
         error: modelError
       });
       resultMessage.sourceReferenceImageId ||= image?.referenceImageId || "";
+
       if (!resultMessage.automaticReferencePreview &&
           image?.referenceMode === "automatic" &&
           image?.referenceImageId) {
         try {
           resultMessage.automaticReferencePreview =
-            await fetchStoredGeneratedImage(image.referenceImageId);
+            await fetchStoredReferenceImage(image.referenceImageId);
         } catch {}
       }
 
