@@ -1700,7 +1700,110 @@
     body.light-theme .privacy-content h3 { color:#0f172a; }
     body.light-theme .drop-overlay-card { background:rgba(255,255,255,.97); color:#0f172a; }
 
-  </style>
+  
+    /* =================================
+       V14.20 YÖNETİCİ PANELİ
+    ================================= */
+    .admin-btn {
+      display:none;
+      width:38px; height:38px; border-radius:11px;
+      background:#2a1f10; color:#fbbf24; border:1px solid #5b421b;
+      font-size:18px;
+    }
+    .admin-btn.show { display:grid; place-items:center; }
+    .admin-overlay {
+      display:none; position:fixed; inset:0; z-index:7000;
+      align-items:center; justify-content:center; padding:18px;
+      background:rgba(3,7,12,.76); backdrop-filter:blur(5px);
+    }
+    .admin-overlay.show { display:flex; }
+    .admin-panel {
+      width:min(1040px, 96vw); max-height:92vh; overflow:hidden;
+      border:1px solid #2f4050; border-radius:18px; background:#0c131a;
+      color:#eef5fb; box-shadow:0 28px 90px rgba(0,0,0,.5);
+      display:flex; flex-direction:column;
+    }
+    .admin-header {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:14px 16px; border-bottom:1px solid #263542; background:#111a22;
+    }
+    .admin-title { font-size:18px; font-weight:850; }
+    .admin-subtitle { color:#8fa4b7; font-size:12px; margin-top:2px; }
+    .admin-close {
+      width:36px; height:36px; border-radius:10px; background:#1c2833;
+      color:#fff; border:1px solid #344554; font-size:22px;
+    }
+    .admin-content { padding:14px; overflow:auto; }
+    .admin-toolbar {
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;
+    }
+    .admin-action {
+      padding:8px 11px; border-radius:9px; background:#1b2a38; color:#dcecff;
+      border:1px solid #32485b; font-weight:700; font-size:12px;
+    }
+    .admin-action.primary { background:#1d4ed8; border-color:#2563eb; color:#fff; }
+    .admin-action.danger { background:#3a171c; border-color:#7f1d1d; color:#fecaca; }
+    .admin-action.warning { background:#3a2b10; border-color:#72531b; color:#fde68a; }
+    .admin-status {
+      margin-left:auto; font-size:12px; color:#9fb1c1;
+    }
+    .admin-stats {
+      display:grid; grid-template-columns:repeat(6,minmax(110px,1fr));
+      gap:8px; margin-bottom:14px;
+    }
+    .admin-stat {
+      padding:12px; border:1px solid #263846; border-radius:12px; background:#111b24;
+    }
+    .admin-stat-value { font-size:22px; font-weight:900; color:#dbeafe; }
+    .admin-stat-label { margin-top:3px; color:#8fa4b7; font-size:11px; }
+    .admin-section {
+      margin-top:12px; border:1px solid #263846; border-radius:14px;
+      overflow:hidden; background:#0f171f;
+    }
+    .admin-section-head {
+      display:flex; justify-content:space-between; align-items:center; gap:8px;
+      padding:11px 12px; border-bottom:1px solid #263846; font-weight:800;
+    }
+    .admin-table-wrap { overflow:auto; max-height:330px; }
+    .admin-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .admin-table th, .admin-table td {
+      padding:9px 10px; text-align:left; border-bottom:1px solid #1f2d38; vertical-align:middle;
+      white-space:nowrap;
+    }
+    .admin-table th { position:sticky; top:0; background:#14202a; color:#93c5fd; z-index:1; }
+    .admin-role {
+      display:inline-flex; padding:3px 7px; border-radius:999px;
+      background:#182b3c; border:1px solid #2c4b65; color:#bfdbfe; font-weight:750;
+    }
+    .admin-role.admin { background:#3a2b10; border-color:#72531b; color:#fde68a; }
+    .admin-user-actions { display:flex; gap:5px; }
+    .admin-mini {
+      padding:5px 7px; border-radius:7px; background:#1b2935; color:#dce6ef;
+      border:1px solid #31414f; font-size:11px;
+    }
+    .admin-mini.danger { background:#35161a; color:#fecaca; border-color:#6f252c; }
+    .admin-empty { padding:18px; text-align:center; color:#91a4b5; }
+    .admin-error-message {
+      max-width:360px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    body.light-theme .admin-panel, body.light-theme .admin-header {
+      background:#fff; color:#17202a; border-color:#d9e1e8;
+    }
+    body.light-theme .admin-content { background:#f6f8fa; }
+    body.light-theme .admin-stat, body.light-theme .admin-section {
+      background:#fff; border-color:#d9e1e8;
+    }
+    body.light-theme .admin-table th { background:#eef3f7; color:#1d4ed8; }
+    body.light-theme .admin-table td { border-color:#e5eaf0; }
+    @media (max-width:800px) {
+      .admin-overlay { padding:0; align-items:flex-end; }
+      .admin-panel { width:100%; max-height:94vh; border-radius:18px 18px 0 0; }
+      .admin-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .admin-status { width:100%; margin-left:0; }
+      .admin-table th, .admin-table td { padding:8px 7px; }
+    }
+
+</style>
 
 
 <style>
@@ -1909,6 +2012,17 @@
           title="Ayarlar"
         >
           ⚙️
+        </button>
+
+
+        <button
+          id="adminButton"
+          class="admin-btn"
+          aria-label="Yönetici panelini aç"
+          title="Yönetici Paneli"
+          hidden
+        >
+          🛡️
         </button>
 
 
@@ -2215,12 +2329,78 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14 • Sağlamlık + Zeka • Akıllı Router + PDF Vision + Hata Kurtarma + Son 6 Görsel</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14.20 • Yönetici Paneli + Ücretsiz KV + Güvenli Oturum + Akıllı Router</span></div>
       </div>
     </div>
   </section>
 </div>
 
+
+
+<div id="adminOverlay" class="admin-overlay" aria-hidden="true">
+  <section class="admin-panel" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="admin-header">
+      <div>
+        <div id="adminTitle" class="admin-title">🛡️ Zatoi Yönetici Paneli</div>
+        <div class="admin-subtitle">Kullanıcılar, oturumlar, bakım modu ve sistem durumu</div>
+      </div>
+      <button id="adminCloseButton" class="admin-close" type="button" aria-label="Yönetici panelini kapat">×</button>
+    </div>
+
+    <div class="admin-content">
+      <div class="admin-toolbar">
+        <button id="adminRefreshButton" class="admin-action primary" type="button">↻ Yenile</button>
+        <button id="adminMaintenanceButton" class="admin-action warning" type="button">Bakım Modu</button>
+        <button id="adminErrorsButton" class="admin-action" type="button">Hata Kayıtları</button>
+        <span id="adminStatus" class="admin-status">Hazır</span>
+      </div>
+
+      <div class="admin-stats">
+        <div class="admin-stat"><div id="adminStatUsers" class="admin-stat-value">—</div><div class="admin-stat-label">Kullanıcı</div></div>
+        <div class="admin-stat"><div id="adminStatAdmins" class="admin-stat-value">—</div><div class="admin-stat-label">Yönetici</div></div>
+        <div class="admin-stat"><div id="adminStatSessions" class="admin-stat-value">—</div><div class="admin-stat-label">Aktif Oturum</div></div>
+        <div class="admin-stat"><div id="adminStatChats" class="admin-stat-value">—</div><div class="admin-stat-label">Bulut Sohbeti</div></div>
+        <div class="admin-stat"><div id="adminStatImages" class="admin-stat-value">—</div><div class="admin-stat-label">Saklanan Görsel</div></div>
+        <div class="admin-stat"><div id="adminStatErrors" class="admin-stat-value">—</div><div class="admin-stat-label">24s Hata</div></div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-head">
+          <span>Kullanıcı Yönetimi</span>
+          <span id="adminMaintenanceState" class="admin-role">Bakım: —</span>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Kullanıcı</th>
+                <th>Rol</th>
+                <th>Oturum</th>
+                <th>Sohbet</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersBody">
+              <tr><td colspan="5" class="admin-empty">Panel açıldığında kullanıcılar yüklenir.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="adminErrorsSection" class="admin-section" hidden>
+        <div class="admin-section-head"><span>Son Hata Kayıtları</span></div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Zaman</th><th>Alan</th><th>Kod</th><th>Mesaj</th></tr>
+            </thead>
+            <tbody id="adminErrorsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
 
 <div id="privacyOverlay" class="privacy-overlay" aria-hidden="true">
   <section class="privacy-panel" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
@@ -2283,6 +2463,7 @@
     <div id="mobileMenuUsername" class="mobile-menu-account">Hesap</div>
     <button id="mobileMenuNewChat" class="mobile-menu-action" type="button"><span class="menu-icon">＋</span><span>Yeni Sohbet</span></button>
     <button id="mobileMenuSettings" class="mobile-menu-action" type="button"><span class="menu-icon">⚙️</span><span>Ayarlar</span></button>
+    <button id="mobileMenuAdmin" class="mobile-menu-action" type="button" hidden><span class="menu-icon">🛡️</span><span>Yönetici Paneli</span></button>
     <button id="mobileMenuLogout" class="mobile-menu-action logout" type="button"><span class="menu-icon">↪</span><span>Oturumu Kapat</span></button>
   </aside>
 </div>
@@ -2847,6 +3028,19 @@ function saveAuth(
     accountUsername.textContent =
       "";
 
+  }
+
+  const isAdmin = currentUser?.role === "admin";
+  const adminButtonNode = document.getElementById("adminButton");
+  const mobileAdminNode = document.getElementById("mobileMenuAdmin");
+
+  if (adminButtonNode) {
+    adminButtonNode.hidden = !isAdmin;
+    adminButtonNode.classList.toggle("show", isAdmin);
+  }
+
+  if (mobileAdminNode) {
+    mobileAdminNode.hidden = !isAdmin;
   }
 
 }
@@ -7867,6 +8061,7 @@ const mobileMenuCloseButton = document.getElementById("mobileMenuCloseButton");
 const mobileMenuUsername = document.getElementById("mobileMenuUsername");
 const mobileMenuNewChat = document.getElementById("mobileMenuNewChat");
 const mobileMenuSettings = document.getElementById("mobileMenuSettings");
+const mobileMenuAdmin = document.getElementById("mobileMenuAdmin");
 const mobileMenuLogout = document.getElementById("mobileMenuLogout");
 
 function openMobileMenu() {
@@ -7908,6 +8103,11 @@ mobileMenuNewChat?.addEventListener("click", () => {
 mobileMenuSettings?.addEventListener("click", () => {
   closeMobileMenu();
   document.getElementById("settingsButton")?.click();
+});
+
+mobileMenuAdmin?.addEventListener("click", () => {
+  closeMobileMenu();
+  openAdminPanel();
 });
 
 mobileMenuLogout?.addEventListener("click", () => {
@@ -8008,6 +8208,253 @@ privacyCloseButton?.addEventListener("click", closePrivacy);
 privacyOverlay?.addEventListener("click", event => { if (event.target === privacyOverlay) closePrivacy(); });
 document.addEventListener("keydown", event => {
   if (event.key === "Escape" && privacyOverlay?.classList.contains("show")) closePrivacy();
+});
+
+/* ==========================================
+   V14.20 YÖNETİCİ PANELİ
+========================================== */
+const adminOverlay = document.getElementById("adminOverlay");
+const adminButton = document.getElementById("adminButton");
+const adminCloseButton = document.getElementById("adminCloseButton");
+const adminRefreshButton = document.getElementById("adminRefreshButton");
+const adminMaintenanceButton = document.getElementById("adminMaintenanceButton");
+const adminErrorsButton = document.getElementById("adminErrorsButton");
+const adminStatus = document.getElementById("adminStatus");
+const adminUsersBody = document.getElementById("adminUsersBody");
+const adminErrorsBody = document.getElementById("adminErrorsBody");
+const adminErrorsSection = document.getElementById("adminErrorsSection");
+const adminMaintenanceState = document.getElementById("adminMaintenanceState");
+const adminStatUsers = document.getElementById("adminStatUsers");
+const adminStatAdmins = document.getElementById("adminStatAdmins");
+const adminStatSessions = document.getElementById("adminStatSessions");
+const adminStatChats = document.getElementById("adminStatChats");
+const adminStatImages = document.getElementById("adminStatImages");
+const adminStatErrors = document.getElementById("adminStatErrors");
+
+let adminMaintenanceEnabled = false;
+
+function escapeAdminHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function adminRequest(action, extra = {}) {
+  if (!authToken || currentUser?.role !== "admin") {
+    throw new Error("Yönetici oturumu gerekli.");
+  }
+
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${authToken}`
+    },
+    body: JSON.stringify({
+      type: "admin",
+      action,
+      ...extra
+    })
+  });
+
+  let data = {};
+  try { data = await response.json(); } catch {}
+
+  if (!response.ok) {
+    throw new Error(data.error || data.details || "Yönetici işlemi başarısız.");
+  }
+
+  return data;
+}
+
+function setAdminStatus(text) {
+  if (adminStatus) adminStatus.textContent = text;
+}
+
+function renderAdminStats(stats = {}) {
+  adminStatUsers.textContent = stats.users ?? 0;
+  adminStatAdmins.textContent = stats.admins ?? 0;
+  adminStatSessions.textContent = stats.activeSessions ?? 0;
+  adminStatChats.textContent = stats.chats ?? 0;
+  adminStatImages.textContent = stats.storedImages ?? 0;
+  adminStatErrors.textContent = stats.errors24h ?? 0;
+
+  adminMaintenanceEnabled = stats.maintenanceMode === true;
+  adminMaintenanceState.textContent =
+    `Bakım: ${adminMaintenanceEnabled ? "AÇIK" : "Kapalı"}`;
+  adminMaintenanceState.classList.toggle("admin", adminMaintenanceEnabled);
+
+  adminMaintenanceButton.textContent =
+    adminMaintenanceEnabled
+      ? "✓ Bakım Modunu Kapat"
+      : "⚠ Bakım Modunu Aç";
+}
+
+function renderAdminUsers(users = []) {
+  if (!users.length) {
+    adminUsersBody.innerHTML =
+      `<tr><td colspan="5" class="admin-empty">Kullanıcı bulunamadı.</td></tr>`;
+    return;
+  }
+
+  adminUsersBody.innerHTML = users.map(user => {
+    const role = user.role === "admin" ? "admin" : "user";
+    const self = user.isSelf === true;
+
+    return `
+      <tr>
+        <td>
+          <strong>${escapeAdminHtml(user.username)}</strong>
+          ${self ? `<span class="admin-role">Sen</span>` : ""}
+        </td>
+        <td><span class="admin-role ${role === "admin" ? "admin" : ""}">${role}</span></td>
+        <td>${Number(user.activeSessions || 0)}</td>
+        <td>${Number(user.chatCount || 0)}</td>
+        <td>
+          <div class="admin-user-actions">
+            ${self ? "" : `
+              <button class="admin-mini" data-admin-action="role" data-user-id="${escapeAdminHtml(user.userId)}" data-role="${role === "admin" ? "user" : "admin"}">
+                ${role === "admin" ? "Yetkiyi Kaldır" : "Admin Yap"}
+              </button>
+              <button class="admin-mini" data-admin-action="logout" data-user-id="${escapeAdminHtml(user.userId)}">Oturumları Kapat</button>
+              <button class="admin-mini danger" data-admin-action="delete" data-user-id="${escapeAdminHtml(user.userId)}" data-username="${escapeAdminHtml(user.username)}">Sil</button>
+            `}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderAdminErrors(errors = []) {
+  if (!errors.length) {
+    adminErrorsBody.innerHTML =
+      `<tr><td colspan="4" class="admin-empty">Kayıtlı hata yok.</td></tr>`;
+    return;
+  }
+
+  adminErrorsBody.innerHTML = errors.map(item => `
+    <tr>
+      <td>${escapeAdminHtml(new Date(item.created_at).toLocaleString("tr-TR"))}</td>
+      <td>${escapeAdminHtml(item.area)}</td>
+      <td>${escapeAdminHtml(item.code)}</td>
+      <td class="admin-error-message" title="${escapeAdminHtml(item.message)}">${escapeAdminHtml(item.message)}</td>
+    </tr>
+  `).join("");
+}
+
+async function refreshAdminPanel() {
+  if (currentUser?.role !== "admin") return;
+
+  setAdminStatus("Yükleniyor...");
+
+  try {
+    const [statsData, usersData] = await Promise.all([
+      adminRequest("stats"),
+      adminRequest("users")
+    ]);
+
+    renderAdminStats(statsData.stats || {});
+    renderAdminUsers(usersData.users || []);
+    setAdminStatus("Güncel");
+  } catch (error) {
+    setAdminStatus(error.message || "Yüklenemedi");
+  }
+}
+
+async function openAdminPanel() {
+  if (currentUser?.role !== "admin") return;
+
+  adminOverlay.classList.add("show");
+  adminOverlay.setAttribute("aria-hidden", "false");
+  adminCloseButton?.focus();
+  await refreshAdminPanel();
+}
+
+function closeAdminPanel() {
+  adminOverlay.classList.remove("show");
+  adminOverlay.setAttribute("aria-hidden", "true");
+  adminButton?.focus();
+}
+
+adminButton?.addEventListener("click", openAdminPanel);
+adminCloseButton?.addEventListener("click", closeAdminPanel);
+adminOverlay?.addEventListener("click", event => {
+  if (event.target === adminOverlay) closeAdminPanel();
+});
+
+adminRefreshButton?.addEventListener("click", refreshAdminPanel);
+
+adminMaintenanceButton?.addEventListener("click", async () => {
+  const nextState = !adminMaintenanceEnabled;
+  const message = nextState
+    ? "Bakım modu açıldığında normal kullanıcıların AI istekleri geçici olarak durdurulur. Açılsın mı?"
+    : "Bakım modu kapatılsın mı?";
+
+  if (!confirm(message)) return;
+
+  try {
+    setAdminStatus("Kaydediliyor...");
+    const data = await adminRequest("maintenance_set", { enabled: nextState });
+    adminMaintenanceEnabled = data.maintenanceMode === true;
+    await refreshAdminPanel();
+  } catch (error) {
+    alert(error.message || "Bakım modu değiştirilemedi.");
+    setAdminStatus("Hata");
+  }
+});
+
+adminErrorsButton?.addEventListener("click", async () => {
+  try {
+    setAdminStatus("Hatalar yükleniyor...");
+    const data = await adminRequest("errors");
+    renderAdminErrors(data.errors || []);
+    adminErrorsSection.hidden = false;
+    adminErrorsSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    setAdminStatus("Hata kayıtları güncel");
+  } catch (error) {
+    alert(error.message || "Hata kayıtları alınamadı.");
+  }
+});
+
+adminUsersBody?.addEventListener("click", async event => {
+  const button = event.target.closest("button[data-admin-action]");
+  if (!button) return;
+
+  const action = button.dataset.adminAction;
+  const userId = button.dataset.userId;
+
+  try {
+    if (action === "role") {
+      const role = button.dataset.role;
+      if (!confirm(`Bu kullanıcının rolü "${role}" olarak değiştirilsin mi?`)) return;
+      await adminRequest("set_role", { userId, role });
+    }
+
+    if (action === "logout") {
+      if (!confirm("Bu kullanıcının tüm oturumları kapatılsın mı?")) return;
+      await adminRequest("logout_user", { userId });
+    }
+
+    if (action === "delete") {
+      const username = button.dataset.username || "kullanıcı";
+      if (!confirm(`${username} hesabı ve bağlı verileri kalıcı silinsin mi?`)) return;
+      await adminRequest("delete_user", { userId });
+    }
+
+    await refreshAdminPanel();
+  } catch (error) {
+    alert(error.message || "İşlem başarısız.");
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && adminOverlay?.classList.contains("show")) {
+    closeAdminPanel();
+  }
 });
 
 /* ==========================================
