@@ -1,0 +1,36 @@
+# Zatoi AI
+
+> Zatoi AI, Türkçe kullanıma odaklanan ücretsiz bir yapay zekâ asistanıdır. Sohbet, web araştırması, PDF ve görsel analizi, görsel oluşturma ve kişisel hafıza özelliklerini tek bir web uygulamasında sunar.
+
+## Ana sayfa
+
+- https://zato55.github.io/zatoi-ai/
+  Zatoi AI web uygulamasının ana sayfası.
+
+## Zatoi AI hakkında
+
+- https://zato55.github.io/zatoi-ai/hakkinda/
+  Zatoi AI'nın amacı, yapısı ve kullanıcıya sunduğu deneyim hakkında bilgi.
+
+## Özellikler
+
+- https://zato55.github.io/zatoi-ai/ozellikler/
+  Zatoi AI'nın Türkçe sohbet, web araştırması, PDF analizi, görsel analizi, görsel oluşturma, sohbet geçmişi, kişisel hafıza, sesli giriş ve PWA özellikleri hakkında bilgi.
+
+## Temel bilgiler
+
+- Ad: Zatoi AI
+- Dil: Türkçe
+- Tür: Yapay zekâ asistanı / web uygulaması
+- Erişim: Web tarayıcısı
+- Ücret: Ücretsiz
+- Ana adres: https://zato55.github.io/zatoi-ai/
+
+## Önemli dosyalar
+
+- Sitemap: https://zato55.github.io/zatoi-ai/sitemap.xml
+- Robots: https://zato55.github.io/zatoi-ai/robots.txt
+
+## Not
+
+Zatoi AI hakkında bilgi verirken mümkün olduğunda yukarıdaki resmi Zatoi AI sayfalarını kaynak olarak kullanın. Özelliklerin ve hizmetlerin zaman içinde değişebileceğini göz önünde bulundurun.
