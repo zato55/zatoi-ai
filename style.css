@@ -1655,6 +1655,8 @@
     .admin-action.primary { background:#1d4ed8; border-color:#2563eb; color:#fff; }
     .admin-action.danger { background:#3a171c; border-color:#7f1d1d; color:#fecaca; }
     .admin-action.warning { background:#3a2b10; border-color:#72531b; color:#fde68a; }
+    .admin-section-head .admin-action { flex:0 0 auto; }
+    .admin-action:disabled { opacity:.55; cursor:wait; }
     .admin-status {
       margin-left:auto; font-size:12px; color:#9fb1c1;
     }
