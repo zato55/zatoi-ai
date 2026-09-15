@@ -4466,3 +4466,151 @@ body.light-theme .chat-avatar {
     display:block!important;
   }
 }
+
+
+/* =========================================================
+   V14.35 — PC ORTA ALAN: GENEL + ÖZEL YAN YANA
+   Özel oda kapalı: Genel sohbet %100
+   Özel oda açık:   Genel %50 | Özel %50
+   Sol Aktifler ve sağ Odalar aynen kalır.
+   Mobil düzen değişmez.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* Özel sohbet açıkken orta conversation alanını iki sütuna böl. */
+  .people-chat-panel[data-mobile-view="private"] .people-conversation{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    column-gap:0!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    background:var(--bg,#0b0f14)!important;
+  }
+
+  /* V14.34.4'te private açılınca gizlenen GENEL parçalarını geri getir. */
+  .people-chat-panel[data-mobile-view="private"] .people-conversation > .people-conversation-head{
+    display:flex!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-conversation > .people-composer{
+    display:grid!important;
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:10px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-conversation > .people-messages{
+    display:block!important;
+    grid-column:1!important;
+    grid-row:3!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Özel sohbet dock'u orta alanın SAĞ YARISINA oturur. */
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    position:relative!important;
+    inset:auto!important;
+    grid-column:2!important;
+    grid-row:1 / 4!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border-left:1px solid var(--border,#263548)!important;
+    border-right:0!important;
+    border-top:0!important;
+    border-bottom:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    background:var(--bg,#0b0f14)!important;
+    overflow:hidden!important;
+    z-index:5!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-head{
+    display:flex!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-composer{
+    display:grid!important;
+    grid-column:1!important;
+    grid-row:2!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:10px!important;
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    padding:10px 12px!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
+    display:block!important;
+    grid-column:1!important;
+    grid-row:3!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  /* İki yarıda da başlık/metin taşmasını önle. */
+  .people-chat-panel[data-mobile-view="private"] .people-conversation-head,
+  .people-chat-panel[data-mobile-view="private"] .people-private-head{
+    overflow:hidden!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-conversation-head strong,
+  .people-chat-panel[data-mobile-view="private"] .people-conversation-head small,
+  .people-chat-panel[data-mobile-view="private"] .people-private-head strong,
+  .people-chat-panel[data-mobile-view="private"] .people-private-head small{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  /* Mesaj balonları yarım alanda gereksiz genişlemesin. */
+  .people-chat-panel[data-mobile-view="private"] .people-message-bubble,
+  .people-chat-panel[data-mobile-view="private"] .people-private-message{
+    max-width:82%!important;
+  }
+}
+
+/* Daha dar masaüstünde iki orta yarının kullanılabilir kalması için
+   yan sütunları V14.34.4'teki gibi küçült. */
+@media (min-width:721px) and (max-width:1100px){
+  .people-chat-panel[data-mobile-view="private"] .people-message-bubble,
+  .people-chat-panel[data-mobile-view="private"] .people-private-message{
+    max-width:90%!important;
+  }
+}
