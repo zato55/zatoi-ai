@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.28.4">
+  <link rel="stylesheet" href="./style.css?v=14.29">
 </head>
 
 <body>
@@ -256,6 +256,11 @@
         class="chat-title"
       >
         Yeni Sohbet
+      </div>
+
+      <div class="zatoi-mode-switch" role="tablist" aria-label="Zatoi modu">
+        <button id="zatoiAiModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">🤖 Zatoi AI</button>
+        <button id="zatoiChatModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">💬 Sohbet</button>
       </div>
 
 
@@ -538,6 +543,37 @@
 
   </section>
 
+
+  <section id="peopleChatPanel" class="people-chat-panel" aria-hidden="true">
+    <aside class="people-chat-list">
+      <div class="people-chat-heading">
+        <div><strong>Sohbet</strong><span>İnsanlarla konuş</span></div>
+        <button type="button" class="people-new-chat" title="Yeni sohbet">＋</button>
+      </div>
+      <label class="people-search"><span>⌕</span><input type="search" placeholder="Kullanıcı ara..." aria-label="Kullanıcı ara"></label>
+      <div class="people-chat-placeholder">
+        <div class="people-empty-icon">💬</div>
+        <strong>Henüz sohbet yok</strong>
+        <p>İkinci aşamada kullanıcı arama ve gerçek mesajlaşmayı buraya bağlayacağız.</p>
+      </div>
+    </aside>
+    <main class="people-conversation">
+      <div class="people-conversation-head">
+        <div class="people-avatar">Z</div>
+        <div><strong>Zatoi Sohbet</strong><span>Gerçek kullanıcı mesajlaşması</span></div>
+      </div>
+      <div class="people-conversation-empty">
+        <div class="people-empty-orb">💬</div>
+        <h2>Sohbet bölümüne hoş geldin</h2>
+        <p>Burada Zatoi kullanıcıları birbirleriyle konuşabilecek. AI kotası bu mesajlarda kullanılmayacak.</p>
+        <span class="people-stage-badge">V14.29 • Arayüz altyapısı hazır</span>
+      </div>
+      <div class="people-composer disabled" aria-disabled="true">
+        <input type="text" placeholder="Bir sohbet seçince mesaj yazabileceksin..." disabled>
+        <button type="button" disabled>➤</button>
+      </div>
+    </main>
+  </section>
 
   <aside class="side-panel">
 
@@ -7283,6 +7319,30 @@ window.addEventListener(
 
 
 /* ==========================================
+   V14.29 — ZATOI AI / İNSAN SOHBETİ MODU
+========================================== */
+const zatoiAiModeButton = document.getElementById("zatoiAiModeButton");
+const zatoiChatModeButton = document.getElementById("zatoiChatModeButton");
+const peopleChatPanel = document.getElementById("peopleChatPanel");
+
+function setZatoiMode(mode) {
+  const chatMode = mode === "chat";
+  document.getElementById("app")?.classList.toggle("people-chat-mode", chatMode);
+  zatoiAiModeButton?.classList.toggle("active", !chatMode);
+  zatoiChatModeButton?.classList.toggle("active", chatMode);
+  zatoiAiModeButton?.setAttribute("aria-selected", String(!chatMode));
+  zatoiChatModeButton?.setAttribute("aria-selected", String(chatMode));
+  peopleChatPanel?.setAttribute("aria-hidden", String(!chatMode));
+  try { sessionStorage.setItem("zatoi_active_mode_v1", chatMode ? "chat" : "ai"); } catch {}
+}
+
+zatoiAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
+zatoiChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
+
+try { setZatoiMode(sessionStorage.getItem("zatoi_active_mode_v1") === "chat" ? "chat" : "ai"); }
+catch { setZatoiMode("ai"); }
+
+/* ==========================================
    BAŞLANGIÇ
 ========================================== */
 
@@ -7311,7 +7371,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.28.4",
+        "./service-worker.js?v=14.29",
         { updateViaCache: "none" }
       );
 
@@ -7355,7 +7415,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.28.4";
+  window.__ZATOI_BUILD__ = "14.29";
 </script>
 </body>
 </html>
