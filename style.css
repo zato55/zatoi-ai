@@ -2756,3 +2756,56 @@ body.light-theme .chat-avatar {
     max-width:100% !important;
   }
 }
+
+
+/* ==========================================
+   V14.28.2 GÖRSEL BALONU KESİN KOMPAKT BOYUT
+========================================== */
+.message-row.assistant.has-generated-image {
+  width: auto !important;
+  max-width: 100% !important;
+  grid-template-columns: 52px minmax(0, 370px) !important;
+  grid-template-areas: "avatar bubble" !important;
+  justify-content: start !important;
+}
+
+.message-row.assistant.has-generated-image > .message.has-generated-image {
+  box-sizing: border-box !important;
+  width: 370px !important;
+  min-width: 0 !important;
+  max-width: 370px !important;
+  justify-self: start !important;
+  overflow: hidden !important;
+}
+
+.message-row.assistant.has-generated-image .generated-pair,
+.message-row.assistant.has-generated-image .generated-choice {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.message-row.assistant.has-generated-image .generated-image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+.message-row.assistant.has-generated-image .message-actions {
+  max-width: 100% !important;
+}
+
+@media (max-width: 720px) {
+  .message-row.assistant.has-generated-image {
+    width: 100% !important;
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+  }
+
+  .message-row.assistant.has-generated-image > .message.has-generated-image {
+    width: min(370px, calc(100vw - 76px)) !important;
+    max-width: calc(100vw - 76px) !important;
+  }
+}
