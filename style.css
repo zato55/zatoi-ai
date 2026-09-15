@@ -4716,3 +4716,92 @@ body.light-theme .chat-avatar {
     overflow-x:hidden!important;
   }
 }
+
+
+/* =========================================================
+   V14.36 — ADMIN SOHBET MODERASYONU
+   ========================================================= */
+.people-admin-chat-tools{
+  display:flex;
+  gap:6px;
+  margin-left:auto;
+}
+.people-admin-chat-tools[hidden]{display:none!important}
+.people-admin-chat-tools button,
+.people-message-admin-actions button{
+  border:1px solid var(--border,#263548);
+  background:rgba(15,22,32,.88);
+  color:var(--text,#eef5ff);
+  border-radius:9px;
+  cursor:pointer;
+}
+.people-admin-chat-tools button{
+  min-height:32px;
+  padding:0 10px;
+  font-size:11px;
+  font-weight:700;
+}
+.people-message-meta-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:0 0 5px;
+}
+.people-admin-badge,
+.people-announcement-badge,
+.people-pinned-badge{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  padding:2px 6px;
+  border-radius:999px;
+  font-size:8px;
+  line-height:1.2;
+  font-weight:900;
+  letter-spacing:.06em;
+}
+.people-admin-badge{
+  background:rgba(37,99,235,.20);
+  border:1px solid rgba(96,165,250,.34);
+}
+.people-announcement-badge{
+  background:rgba(245,158,11,.16);
+  border:1px solid rgba(245,158,11,.34);
+}
+.people-pinned-badge{
+  background:rgba(168,85,247,.15);
+  border:1px solid rgba(192,132,252,.32);
+}
+.people-message-foot{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  margin-top:4px;
+}
+.people-message-foot time{
+  margin-top:0!important;
+}
+.people-message-admin-actions{
+  display:inline-flex;
+  gap:3px;
+}
+.people-message-admin-actions button{
+  width:24px;
+  height:22px;
+  padding:0;
+  font-size:11px;
+}
+.people-public-profile-moderate{
+  border-color:rgba(245,158,11,.38)!important;
+}
+@media (max-width:720px){
+  .people-admin-chat-tools{
+    gap:4px;
+  }
+  .people-admin-chat-tools button{
+    min-height:29px;
+    padding:0 7px;
+    font-size:9px;
+  }
+}
