@@ -3721,3 +3721,151 @@ body.light-theme .chat-avatar {
     display:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.34 — MESAJ GÖNDEREN KİMLİĞİ + TIKLANABİLİR PROFİL
+   ========================================================= */
+.people-message-sender{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  max-width:100%;
+  margin:0 0 6px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  cursor:pointer;
+  text-align:left;
+}
+.people-message-sender:hover span:nth-child(2){text-decoration:underline}
+.people-message-sender-avatar{
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 24px;
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#1478ff,#5a38ff);
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+}
+.people-message-sender>span:nth-child(2){
+  min-width:0;
+  max-width:140px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:11px;
+  font-weight:800;
+}
+.people-message-sender small{
+  min-width:0;
+  max-width:120px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:9px;
+  opacity:.7;
+}
+.people-message-text{overflow-wrap:anywhere}
+
+/* Kullanıcının kendi mesajında da isim görünür; kim konuşuyor net olur. */
+.people-message-row.mine .people-message-sender{justify-content:flex-end}
+.people-message-row.mine .people-message-sender-avatar{order:3}
+.people-message-row.mine .people-message-sender small{opacity:.82}
+
+/* Güvenli, sadece kullanıcının herkese açık profil alanlarını gösteren kart. */
+.people-public-profile-modal{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+.people-public-profile-modal[hidden]{display:none!important}
+.people-public-profile-backdrop{
+  position:absolute;
+  inset:0;
+  border:0;
+  background:rgba(2,8,16,.72);
+  backdrop-filter:blur(5px);
+}
+.people-public-profile-card{
+  position:relative;
+  z-index:1;
+  width:min(390px,calc(100vw - 28px));
+  padding:26px 22px 20px;
+  border:1px solid rgba(62,132,230,.28);
+  border-radius:20px;
+  background:linear-gradient(180deg,#111b29,#0c141f);
+  box-shadow:0 24px 70px rgba(0,0,0,.42);
+  color:var(--text,#eef5ff);
+  text-align:center;
+}
+.people-public-profile-close{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:34px;
+  height:34px;
+  border:1px solid var(--border,#263548);
+  border-radius:10px;
+  background:rgba(255,255,255,.035);
+  color:inherit;
+  font-size:20px;
+  cursor:pointer;
+}
+.people-public-profile-avatar{
+  display:grid;
+  place-items:center;
+  width:72px;
+  height:72px;
+  margin:4px auto 12px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#1478ff,#5a38ff);
+  font-size:25px;
+  font-weight:800;
+}
+.people-public-profile-card>strong{
+  display:block;
+  font-size:20px;
+}
+.people-public-profile-card>span{
+  display:block;
+  margin-top:3px;
+  color:var(--muted,#91a0b2);
+  font-size:12px;
+}
+.people-public-profile-card>p{
+  margin:17px 0;
+  padding:13px;
+  border-radius:12px;
+  background:rgba(255,255,255,.035);
+  color:#c6d1df;
+  font-size:13px;
+  line-height:1.5;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.people-public-profile-actions button{
+  min-height:42px;
+  padding:0 18px;
+  border:0;
+  border-radius:12px;
+  background:#1478ff;
+  color:#fff;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+
+@media(max-width:720px){
+  .people-message-sender>span:nth-child(2){max-width:110px}
+  .people-message-sender small{max-width:90px}
+  .people-public-profile-card{padding:24px 17px 17px}
+}
