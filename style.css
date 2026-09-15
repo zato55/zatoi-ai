@@ -4157,3 +4157,221 @@ body.light-theme .chat-avatar {
     right:220px!important;
   }
 }
+
+
+/* =========================================================
+   V14.34.3 — PC 3 SÜTUN KESİN DÜZELTME
+   SOL: Aktifler sürekli görünür
+   ORTA: Genel veya seçilen özel sohbet
+   SAĞ: Özel Odalar sürekli görünür
+   Mobil kurallarına dokunmaz.
+   ========================================================= */
+@media (min-width:721px){
+
+  .app.people-chat-mode > .people-chat-panel{
+    position:relative!important;
+    display:grid!important;
+    grid-template-columns:280px minmax(0,1fr) 280px!important;
+    grid-template-rows:auto minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+
+  .people-mode-top{
+    display:flex!important;
+    grid-column:1/-1!important;
+    grid-row:1!important;
+  }
+
+  /* PC'de mobil sekmeler yok. */
+  .people-mobile-nav{
+    display:none!important;
+  }
+
+  /* HANGİ data-mobile-view seçili olursa olsun sol panel görünür. */
+  .people-chat-panel[data-mobile-view] .people-active-panel,
+  .people-chat-panel .people-active-panel{
+    position:relative!important;
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    height:100%!important;
+    min-height:0!important;
+    padding:12px!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+    border-left:0!important;
+    border-right:1px solid var(--border,#263548)!important;
+    background:var(--panel,#0f1620)!important;
+    z-index:2!important;
+  }
+
+  /* HANGİ data-mobile-view seçili olursa olsun sağ panel görünür. */
+  .people-chat-panel[data-mobile-view] .people-rooms-panel,
+  .people-chat-panel .people-rooms-panel{
+    position:relative!important;
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    flex-direction:column!important;
+    grid-column:3!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    height:100%!important;
+    min-height:0!important;
+    padding:12px!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+    border-left:1px solid var(--border,#263548)!important;
+    border-right:0!important;
+    background:var(--panel,#0f1620)!important;
+    z-index:2!important;
+  }
+
+  .people-active-panel > .people-panel-heading,
+  .people-active-panel > .people-search-wrap,
+  .people-active-panel > .people-list,
+  .people-rooms-panel > .people-panel-heading,
+  .people-rooms-panel > .people-room-list{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-active-panel > .people-panel-heading,
+  .people-rooms-panel > .people-panel-heading{
+    display:flex!important;
+  }
+
+  .people-rooms-panel > .people-room-list{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    padding:6px 0 12px!important;
+  }
+
+  /* Orta alan her durumda orta sütunda. */
+  .people-chat-panel .people-conversation,
+  .people-chat-panel[data-mobile-view="general"] .people-conversation{
+    position:relative!important;
+    display:grid!important;
+    visibility:visible!important;
+    opacity:1!important;
+    grid-column:2!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    border:0!important;
+    background:var(--bg,#0b0f14)!important;
+    z-index:1!important;
+  }
+
+  /* Aktifler/Odalar görünüm state'leri PC'de orta alanı gizlemesin. */
+  .people-chat-panel[data-mobile-view="active"] .people-conversation,
+  .people-chat-panel[data-mobile-view="rooms"] .people-conversation{
+    display:grid!important;
+    grid-column:2!important;
+    grid-row:2!important;
+  }
+
+  /* Kompakt sol kullanıcı kartları. */
+  .people-active-panel .people-user-card{
+    width:100%!important;
+    min-height:58px!important;
+    margin:0 0 6px!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Kompakt sağ oda kartları. */
+  .people-rooms-panel .people-room-card{
+    display:grid!important;
+    width:100%!important;
+    height:58px!important;
+    min-height:58px!important;
+    margin:0 0 6px!important;
+    padding:7px 8px!important;
+    grid-template-columns:38px minmax(0,1fr) auto!important;
+    gap:8px!important;
+    align-items:center!important;
+    border-radius:11px!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-rooms-panel .people-room-avatar{
+    width:38px!important;
+    height:38px!important;
+  }
+
+  /* Özel sohbet seçildiğinde sağ oda listesi aynen kalır.
+     Private dock yalnızca ORTA sütunun üstüne gelir. */
+  .people-chat-panel[data-mobile-view="private"] .people-rooms-panel > .people-panel-heading{
+    display:flex!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-rooms-panel > .people-room-list{
+    display:block!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    position:absolute!important;
+    left:280px!important;
+    right:280px!important;
+    top:0!important;
+    bottom:0!important;
+    z-index:20!important;
+    display:grid!important;
+    width:auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    background:var(--bg,#0b0f14)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-head{
+    grid-row:1!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-composer{
+    grid-row:2!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
+    grid-row:3!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+  }
+}
+
+@media (min-width:721px) and (max-width:1100px){
+  .app.people-chat-mode > .people-chat-panel{
+    grid-template-columns:220px minmax(0,1fr) 220px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    left:220px!important;
+    right:220px!important;
+  }
+}
