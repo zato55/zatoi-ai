@@ -2343,7 +2343,110 @@ tyle>
   opacity:.75;
   margin-top:6px;
 }
-</style>
+</s
+
+/* =========================================================
+   ZATOI AI — OKUNABILIRLIK / TEXT CONTRAST FIX
+   ========================================================= */
+body:not(.light-theme),
+body:not(.light-theme) .app,
+body:not(.light-theme) .chat-column,
+body:not(.light-theme) .chat-top,
+body:not(.light-theme) .side-panel,
+body:not(.light-theme) .side-header {
+  color: #f7fbff !important;
+}
+
+body:not(.light-theme) .chat-title,
+body:not(.light-theme) .side-header,
+body:not(.light-theme) .settings-title,
+body:not(.light-theme) .setting-label,
+body:not(.light-theme) .welcome h1,
+body:not(.light-theme) h1,
+body:not(.light-theme) h2,
+body:not(.light-theme) h3,
+body:not(.light-theme) strong {
+  color: #f7fbff !important;
+  -webkit-text-fill-color: #f7fbff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+
+body:not(.light-theme) .account-name,
+body:not(.light-theme) .new-chat-btn,
+body:not(.light-theme) .settings-btn,
+body:not(.light-theme) .mobile-history-btn,
+body:not(.light-theme) .mobile-menu-btn,
+body:not(.light-theme) .mobile-history-quick-btn,
+body:not(.light-theme) .action-btn,
+body:not(.light-theme) .voice-btn,
+body:not(.light-theme) .send-btn,
+body:not(.light-theme) button {
+  color: #f4f8ff !important;
+  -webkit-text-fill-color: #f4f8ff !important;
+}
+
+body:not(.light-theme) .logout-btn,
+body:not(.light-theme) .settings-logout,
+body:not(.light-theme) .mobile-menu-action.logout {
+  color: #ff9fae !important;
+  -webkit-text-fill-color: #ff9fae !important;
+}
+
+body:not(.light-theme) .history-open {
+  color: #edf6ff !important;
+  -webkit-text-fill-color: #edf6ff !important;
+}
+
+body:not(.light-theme) textarea,
+body:not(.light-theme) input,
+body:not(.light-theme) select {
+  color: #f7fbff !important;
+  -webkit-text-fill-color: #f7fbff !important;
+}
+
+body:not(.light-theme) textarea::placeholder,
+body:not(.light-theme) input::placeholder {
+  color: #9bb0c8 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #9bb0c8 !important;
+}
+
+body:not(.light-theme) .welcome p,
+body:not(.light-theme) .setting-desc,
+body:not(.light-theme) .settings-about,
+body:not(.light-theme) .auth-subtitle,
+body:not(.light-theme) .auth-info,
+body:not(.light-theme) .history-empty {
+  color: #a9bdd3 !important;
+  -webkit-text-fill-color: #a9bdd3 !important;
+}
+
+/* açık tema metinleri de garanti altına al */
+body.light-theme,
+body.light-theme .chat-title,
+body.light-theme .side-header,
+body.light-theme .settings-title,
+body.light-theme .setting-label,
+body.light-theme .welcome h1 {
+  color: #17243a !important;
+  -webkit-text-fill-color: #17243a !important;
+}
+
+body.light-theme textarea,
+body.light-theme input,
+body.light-theme select {
+  color: #17243a !important;
+  -webkit-text-fill-color: #17243a !important;
+}
+
+body.light-theme textarea::placeholder,
+body.light-theme input::placeholder {
+  color: #718096 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #718096 !important;
+}
+
+tyle>
 </head>
 
 <body>
