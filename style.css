@@ -2721,3 +2721,38 @@ body.light-theme .chat-avatar {
     object-position: 48% 32%;
   }
 }
+
+
+/* V14.28.1 — yalnız görsel içeren Zatoi balonunu içeriğe göre küçült */
+.message-row.assistant.has-generated-image {
+  width: fit-content !important;
+  max-width: 100% !important;
+}
+.message-row.assistant.has-generated-image > .message.has-generated-image {
+  width: fit-content !important;
+  max-width: min(590px, calc(100vw - 210px)) !important;
+  min-width: 0 !important;
+  justify-self: start !important;
+}
+.message-row.assistant.has-generated-image .generated-pair,
+.message-row.assistant.has-generated-image .generated-choice {
+  width: min(540px, 100%) !important;
+  max-width: 540px !important;
+}
+.message-row.assistant.has-generated-image .generated-image {
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+@media (max-width:720px) {
+  .message-row.assistant.has-generated-image { width:100% !important; }
+  .message-row.assistant.has-generated-image > .message.has-generated-image {
+    width:fit-content !important;
+    max-width:calc(100vw - 76px) !important;
+  }
+  .message-row.assistant.has-generated-image .generated-pair,
+  .message-row.assistant.has-generated-image .generated-choice {
+    width:100% !important;
+    max-width:100% !important;
+  }
+}
