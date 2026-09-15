@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.34.3">
+  <link rel="stylesheet" href="./style.css?v=14.34.4">
 </head>
 
 <body>
@@ -7383,6 +7383,8 @@ window.addEventListener(
 const zatoiAiModeButton = document.getElementById("zatoiAiModeButton");
 const zatoiChatModeButton = document.getElementById("zatoiChatModeButton");
 const peopleChatPanel = document.getElementById("peopleChatPanel");
+const peopleConversationPanel = document.querySelector("#peopleChatPanel .people-conversation");
+const peopleRoomsPanel = document.querySelector("#peopleChatPanel .people-rooms-panel");
 const peopleActiveList = document.getElementById("peopleActiveList");
 const peopleRoomList = document.getElementById("peopleRoomList");
 const peopleUserSearch = document.getElementById("peopleUserSearch");
@@ -7714,6 +7716,18 @@ function setPeopleMobileView(view) {
   peopleMobileRoomsTab?.classList.toggle("active", view === "rooms" || view === "private");
 }
 
+
+function mountPeoplePrivateDock() {
+  if (!peoplePrivateDock) return;
+
+  const desktop = window.matchMedia("(min-width: 721px)").matches;
+  const target = desktop ? peopleConversationPanel : peopleRoomsPanel;
+
+  if (target && peoplePrivateDock.parentElement !== target) {
+    target.appendChild(peoplePrivateDock);
+  }
+}
+
 function syncPrivateIntoMobileConversation(openPrivate) {
   if (!peopleIsMobileChat()) return;
   setPeopleMobileView(openPrivate ? "private" : "general");
@@ -7758,6 +7772,7 @@ async function loadPeoplePrivateMessages({ silent = false } = {}) {
 
 async function selectPeopleRoom(roomId) {
   if (!roomId) return;
+  mountPeoplePrivateDock();
   peopleCurrentRoomId = roomId;
   const room = peopleRooms.find(item => item.roomId === roomId);
   peopleCurrentPartner = room?.partner || null;
@@ -7895,6 +7910,10 @@ peopleAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
 peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
+peoplePrivateSend?.addEventListener("click", (event) => {
+  event.preventDefault();
+  sendPeoplePrivateMessage(event);
+});
 peoplePublicProfileClose?.addEventListener("click", closePeoplePublicProfile);
 peoplePublicProfileBackdrop?.addEventListener("click", closePeoplePublicProfile);
 peoplePublicProfileChat?.addEventListener("click", async () => {
@@ -7919,6 +7938,7 @@ peopleMobileGeneralTab?.addEventListener("click", async () => {
 peopleMobileRoomsTab?.addEventListener("click", () => setPeopleMobileView("rooms"));
 
 window.addEventListener("resize", () => {
+  mountPeoplePrivateDock();
   if (peopleIsMobileChat() && peopleChatActive && !peopleChatPanel?.dataset.mobileView) {
     setPeopleMobileView("general");
   }
@@ -7982,7 +8002,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.34.3",
+        "./service-worker.js?v=14.34.4",
         { updateViaCache: "none" }
       );
 
@@ -8026,7 +8046,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.34.3";
+  window.__ZATOI_BUILD__ = "14.34.4";
 </script>
 </body>
 </html>
