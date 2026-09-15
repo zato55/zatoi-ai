@@ -3936,3 +3936,224 @@ body.light-theme .chat-avatar {
     min-height:48px!important;
   }
 }
+
+
+/* =========================================================
+   V14.34.2 — PC: AKTİFLER SOLDA, ÖZEL ODALAR SAĞDA
+   Tıklanınca detay SADECE ORTADA açılır.
+   MOBİL V14.34.1 DAVRANIŞI AYNI KALIR.
+   ========================================================= */
+@media (min-width:721px){
+
+  .app.people-chat-mode > .people-chat-panel{
+    display:grid!important;
+    grid-template-columns:minmax(220px,280px) minmax(0,1fr) minmax(220px,280px)!important;
+    grid-template-rows:auto minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+
+  /* Üst Zatoi AI / Sohbet geçişi tüm genişlikte kalır. */
+  .people-mode-top{
+    grid-column:1 / -1!important;
+    grid-row:1!important;
+  }
+
+  /* Mobil için oluşturulan Aktifler / Genel / Odalar sekme çubuğunu PC'de gizle. */
+  .people-mobile-nav{
+    display:none!important;
+  }
+
+  /* Sol sütun: aktif kullanıcılar HER ZAMAN görünür. */
+  .people-active-panel{
+    display:block!important;
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    border-right:1px solid var(--border,#263548)!important;
+    border-left:0!important;
+    padding:12px!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Sağ sütun: özel oda listesi HER ZAMAN görünür. */
+  .people-rooms-panel{
+    display:flex!important;
+    flex-direction:column!important;
+    grid-column:3!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    border-left:1px solid var(--border,#263548)!important;
+    border-right:0!important;
+    padding:12px!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Orta alan varsayılan olarak genel sohbet. */
+  .people-conversation{
+    display:grid!important;
+    grid-column:2!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    border:0!important;
+  }
+
+  /* Sol/sağ panel içerikleri artık dar sütunlarına göre tam genişlik kullanır. */
+  .people-active-panel > .people-panel-heading,
+  .people-active-panel > .people-search-wrap,
+  .people-active-panel > .people-list,
+  .people-rooms-panel > .people-panel-heading,
+  .people-rooms-panel > .people-room-list{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  /* Sağdaki özel odalar kompakt kalsın. */
+  .people-rooms-panel > .people-room-list{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    padding:6px 0 12px!important;
+  }
+
+  .people-rooms-panel .people-room-card{
+    width:100%!important;
+    min-height:58px!important;
+    height:58px!important;
+    margin:0 0 6px!important;
+    padding:7px 8px!important;
+    grid-template-columns:38px minmax(0,1fr) auto!important;
+    gap:8px!important;
+    border-radius:11px!important;
+  }
+
+  .people-rooms-panel .people-room-avatar{
+    width:38px!important;
+    height:38px!important;
+  }
+
+  /* Aktif kullanıcı kartları da sol sütunda kompakt. */
+  .people-active-panel .people-user-card{
+    width:100%!important;
+    min-height:58px!important;
+    margin-bottom:6px!important;
+  }
+
+  /* Aktifler'e tıklanınca sol panel kaybolmaz; liste DETAYI ortaya gelir. */
+  .people-chat-panel[data-mobile-view="active"] .people-active-panel{
+    display:block!important;
+  }
+  .people-chat-panel[data-mobile-view="active"] .people-rooms-panel{
+    display:flex!important;
+  }
+  .people-chat-panel[data-mobile-view="active"] .people-conversation{
+    display:block!important;
+    grid-column:2!important;
+  }
+
+  /* Odalar'a tıklanınca sağ panel kaybolmaz; oda listesi DETAYI ortaya gelir. */
+  .people-chat-panel[data-mobile-view="rooms"] .people-active-panel{
+    display:block!important;
+  }
+  .people-chat-panel[data-mobile-view="rooms"] .people-rooms-panel{
+    display:flex!important;
+    grid-column:3!important;
+    padding:12px!important;
+  }
+  .people-chat-panel[data-mobile-view="rooms"] .people-conversation{
+    display:block!important;
+    grid-column:2!important;
+  }
+
+  /* Özel sohbet seçilince SAĞ panelde dock açılmasın.
+     Sağda yalnızca oda listesi kalır. Özel konuşma orta alana taşınır. */
+  .people-chat-panel[data-mobile-view="private"] .people-active-panel{
+    display:block!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-rooms-panel{
+    display:flex!important;
+    grid-column:3!important;
+    grid-row:2!important;
+    padding:12px!important;
+    overflow:hidden!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-rooms-panel > .people-panel-heading,
+  .people-chat-panel[data-mobile-view="private"] .people-room-list{
+    display:flex!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-room-list{
+    display:block!important;
+  }
+
+  /* Private dock'u sağ sütundan alıp ORTA sütuna yerleştir. */
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    position:absolute!important;
+    left:280px!important;
+    right:280px!important;
+    top:0!important;
+    bottom:0!important;
+    width:auto!important;
+    height:auto!important;
+    max-height:none!important;
+    min-height:0!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    z-index:8!important;
+    display:grid!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    background:var(--bg,#0b0f14)!important;
+  }
+
+  /* Orta özel sohbette de mesaj kutusu üstte. */
+  .people-chat-panel[data-mobile-view="private"] .people-private-head{
+    grid-row:1!important;
+  }
+  .people-chat-panel[data-mobile-view="private"] .people-private-composer{
+    grid-row:2!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+  }
+  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
+    grid-row:3!important;
+  }
+
+  /* Panel relative olsun ki private dock orta sütuna güvenli otursun. */
+  .people-chat-panel{
+    position:relative!important;
+  }
+}
+
+/* Daha dar PC/tablet yatay ekranlarında yan sütunları biraz küçült. */
+@media (min-width:721px) and (max-width:1100px){
+  .app.people-chat-mode > .people-chat-panel{
+    grid-template-columns:220px minmax(0,1fr) 220px!important;
+  }
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    left:220px!important;
+    right:220px!important;
+  }
+}
