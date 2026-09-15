@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.35.2">
+  <link rel="stylesheet" href="./style.css?v=14.35.4">
 </head>
 
 <body>
@@ -7595,12 +7595,15 @@ function setPeopleComposerEnabled(enabled) {
 function renderPeopleMessages(messages) {
   if (!peopleMessages) return;
 
-  // V14.35.2: En yeni mesaj üstte; eski mesajlar aşağı doğru devam eder.
+  // V14.35.4:
+  // PC: en yeni mesaj üstte.
+  // Mobil: eski mesaj üstte, yeni mesaj aşağıda.
+  const peopleMobileFlow = window.matchMedia("(max-width: 720px)").matches;
   messages = Array.isArray(messages)
     ? [...messages].sort((a, b) => {
         const at = Date.parse(a?.createdAt || "") || 0;
         const bt = Date.parse(b?.createdAt || "") || 0;
-        return bt - at;
+        return peopleMobileFlow ? (at - bt) : (bt - at);
       })
     : [];
   if (!messages.length) {
@@ -7624,7 +7627,7 @@ function renderPeopleMessages(messages) {
       </div>
     `;
   }).join("");
-  peopleMessages.scrollTop = 0;
+  peopleMessages.scrollTop = window.matchMedia("(max-width: 720px)").matches ? peopleMessages.scrollHeight : 0;
   peopleMessages.querySelectorAll("[data-profile-user]").forEach(button => {
     button.addEventListener("click", () => openPeoplePublicProfile(button.dataset.profileUser));
   });
@@ -7743,12 +7746,15 @@ function syncPrivateIntoMobileConversation(openPrivate) {
 }
 
 function renderPeoplePrivateMessages(messages) {
-  // V14.35.2: En yeni özel mesaj üstte; eski mesajlar aşağı doğru devam eder.
+  // V14.35.4:
+  // PC: en yeni özel mesaj üstte.
+  // Mobil: eski özel mesaj üstte, yeni mesaj aşağıda.
+  const peoplePrivateMobileFlow = window.matchMedia("(max-width: 720px)").matches;
   messages = Array.isArray(messages)
     ? [...messages].sort((a, b) => {
         const at = Date.parse(a?.createdAt || "") || 0;
         const bt = Date.parse(b?.createdAt || "") || 0;
-        return bt - at;
+        return peoplePrivateMobileFlow ? (at - bt) : (bt - at);
       })
     : [];
   if (!peoplePrivateMessages) return;
@@ -7766,7 +7772,7 @@ function renderPeoplePrivateMessages(messages) {
         </div>
       </div>`;
   }).join("");
-  peoplePrivateMessages.scrollTop = 0;
+  peoplePrivateMessages.scrollTop = window.matchMedia("(max-width: 720px)").matches ? peoplePrivateMessages.scrollHeight : 0;
 }
 
 async function loadPeoplePrivateMessages({ silent = false } = {}) {
@@ -8039,7 +8045,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.35.2",
+        "./service-worker.js?v=14.35.4",
         { updateViaCache: "none" }
       );
 
@@ -8083,7 +8089,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.35.2";
+  window.__ZATOI_BUILD__ = "14.35.4";
 </script>
 </body>
 </html>
