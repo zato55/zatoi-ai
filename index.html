@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.33">
+  <link rel="stylesheet" href="./style.css?v=14.34">
 </head>
 
 <body>
@@ -544,7 +544,21 @@
   </section>
 
 
-  <section id="peopleChatPanel" class="people-chat-panel" aria-hidden="true">
+  <div id="peoplePublicProfileModal" class="people-public-profile-modal" hidden>
+  <button id="peoplePublicProfileBackdrop" class="people-public-profile-backdrop" type="button" aria-label="Profili kapat"></button>
+  <section class="people-public-profile-card" role="dialog" aria-modal="true" aria-labelledby="peoplePublicProfileName">
+    <button id="peoplePublicProfileClose" class="people-public-profile-close" type="button" aria-label="Profili kapat">×</button>
+    <div id="peoplePublicProfileAvatar" class="people-public-profile-avatar">✦</div>
+    <strong id="peoplePublicProfileName">Kullanıcı</strong>
+    <span id="peoplePublicProfileUsername">@kullanici</span>
+    <p id="peoplePublicProfileBio">Henüz profil açıklaması yok.</p>
+    <div class="people-public-profile-actions">
+      <button id="peoplePublicProfileChat" type="button">💬 Özel Sohbet</button>
+    </div>
+  </section>
+</div>
+
+<section id="peopleChatPanel" class="people-chat-panel" aria-hidden="true">
     <div id="peopleMobileNav" class="people-mobile-nav" aria-label="Mobil sohbet görünümü">
       <button id="peopleMobileActiveTab" type="button">🟢 Aktifler</button>
       <button id="peopleMobileGeneralTab" type="button" class="active">🌐 Genel</button>
@@ -7397,6 +7411,15 @@ const peoplePrivateClose = document.getElementById("peoplePrivateClose");
 const peopleMobileActiveTab = document.getElementById("peopleMobileActiveTab");
 const peopleMobileGeneralTab = document.getElementById("peopleMobileGeneralTab");
 const peopleMobileRoomsTab = document.getElementById("peopleMobileRoomsTab");
+const peoplePublicProfileModal = document.getElementById("peoplePublicProfileModal");
+const peoplePublicProfileBackdrop = document.getElementById("peoplePublicProfileBackdrop");
+const peoplePublicProfileClose = document.getElementById("peoplePublicProfileClose");
+const peoplePublicProfileAvatar = document.getElementById("peoplePublicProfileAvatar");
+const peoplePublicProfileName = document.getElementById("peoplePublicProfileName");
+const peoplePublicProfileUsername = document.getElementById("peoplePublicProfileUsername");
+const peoplePublicProfileBio = document.getElementById("peoplePublicProfileBio");
+const peoplePublicProfileChat = document.getElementById("peoplePublicProfileChat");
+let peoplePublicProfileUserId = "";
 
 let peopleChatActive = false;
 let peopleActiveUsers = [];
@@ -7579,13 +7602,21 @@ function renderPeopleMessages(messages) {
     return `
       <div class="people-message-row ${mine ? "mine" : "theirs"}">
         <div class="people-message-bubble">
-          <div>${peopleEscape(message.content)}</div>
+          <button class="people-message-sender" type="button" data-profile-user="${peopleEscape(message.senderId || "")}">
+            <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(message.sender))}</span>
+            <span>${peopleEscape(peopleDisplayName(message.sender))}</span>
+            <small>@${peopleEscape(message.sender?.username || "kullanici")}</small>
+          </button>
+          <div class="people-message-text">${peopleEscape(message.content)}</div>
           <time>${peopleEscape(peopleTime(message.createdAt))}</time>
         </div>
       </div>
     `;
   }).join("");
   peopleMessages.scrollTop = peopleMessages.scrollHeight;
+  peopleMessages.querySelectorAll("[data-profile-user]").forEach(button => {
+    button.addEventListener("click", () => openPeoplePublicProfile(button.dataset.profileUser));
+  });
 }
 
 async function loadPeopleMessages({ silent = false } = {}) {
@@ -7638,6 +7669,37 @@ async function loadPeopleGeneralMessages({ silent = false } = {}) {
   }
 }
 
+
+
+function closePeoplePublicProfile() {
+  if (peoplePublicProfileModal) peoplePublicProfileModal.hidden = true;
+  peoplePublicProfileUserId = "";
+}
+
+async function openPeoplePublicProfile(userId) {
+  userId = String(userId || "").trim();
+  if (!userId) return;
+  peoplePublicProfileUserId = userId;
+  if (peoplePublicProfileModal) peoplePublicProfileModal.hidden = false;
+  if (peoplePublicProfileName) peoplePublicProfileName.textContent = "Yükleniyor...";
+  if (peoplePublicProfileUsername) peoplePublicProfileUsername.textContent = "";
+  if (peoplePublicProfileBio) peoplePublicProfileBio.textContent = "Profil bilgileri alınıyor.";
+  try {
+    const data = await peopleApi("get_public_profile", { targetUserId: userId });
+    const profile = data.profile || {};
+    if (peoplePublicProfileAvatar) peoplePublicProfileAvatar.textContent = peopleAvatarText(profile);
+    if (peoplePublicProfileName) peoplePublicProfileName.textContent = peopleDisplayName(profile);
+    if (peoplePublicProfileUsername) peoplePublicProfileUsername.textContent = `@${profile.username || "kullanici"}`;
+    if (peoplePublicProfileBio) peoplePublicProfileBio.textContent = profile.bio || "Henüz profil açıklaması yok.";
+    if (peoplePublicProfileChat) {
+      const isSelf = String(profile.userId || "") === String(currentUser?.userId || "");
+      peoplePublicProfileChat.hidden = isSelf;
+    }
+  } catch (error) {
+    if (peoplePublicProfileName) peoplePublicProfileName.textContent = "Profil açılamadı";
+    if (peoplePublicProfileBio) peoplePublicProfileBio.textContent = error.message || "Profil bilgileri alınamadı.";
+  }
+}
 
 function peopleIsMobileChat() {
   // V14.33: Genel / Aktifler / Odalar tek alan düzeni artık masaüstünde de kullanılır.
@@ -7833,6 +7895,20 @@ peopleAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
 peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
+peoplePublicProfileClose?.addEventListener("click", closePeoplePublicProfile);
+peoplePublicProfileBackdrop?.addEventListener("click", closePeoplePublicProfile);
+peoplePublicProfileChat?.addEventListener("click", async () => {
+  const targetUserId = peoplePublicProfileUserId;
+  if (!targetUserId) return;
+  try {
+    const data = await peopleApi("open_room", { targetUserId });
+    closePeoplePublicProfile();
+    await refreshPeopleRooms();
+    if (data.roomId) await selectPeopleRoom(data.roomId);
+  } catch (error) {
+    alert(error.message);
+  }
+});
 peopleMobileActiveTab?.addEventListener("click", () => setPeopleMobileView("active"));
 peopleMobileGeneralTab?.addEventListener("click", async () => {
   if (peoplePrivateDock) peoplePrivateDock.hidden = true;
@@ -7906,7 +7982,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.33",
+        "./service-worker.js?v=14.34",
         { updateViaCache: "none" }
       );
 
@@ -7950,7 +8026,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.33";
+  window.__ZATOI_BUILD__ = "14.34";
 </script>
 </body>
 </html>
