@@ -266,6 +266,9 @@
           <span
             id="accountUsername"
             class="account-name"
+            role="button"
+            tabindex="0"
+            title="Profilimi aç"
           ></span>
 
           <button
@@ -6864,7 +6867,17 @@ profileBio.addEventListener("input", refreshProfilePreview);
 profileCloseButton.onclick = closeProfile;
 profileOverlay.addEventListener("click", event => { if (event.target === profileOverlay) closeProfile(); });
 openProfileButton.onclick = () => { closeSettings(); openProfile(); };
-document.getElementById("accountName")?.addEventListener("click", openProfile);
+document.getElementById("accountUsername")?.addEventListener("click", openProfile);
+document.getElementById("accountUsername")?.addEventListener("keydown", event => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    openProfile();
+  }
+});
+document.querySelector(".account-area")?.addEventListener("click", event => {
+  if (event.target.closest("#logoutButton, #settingsButton, #adminButton, button:not(#accountUsername)")) return;
+  openProfile();
+});
 document.getElementById("mobileMenuAccount")?.addEventListener("click", () => {
   document.getElementById("mobileMenuOverlay")?.classList.remove("show");
   openProfile();
