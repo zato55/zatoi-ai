@@ -4805,3 +4805,166 @@ body.light-theme .chat-avatar {
     font-size:9px;
   }
 }
+
+
+/* =========================================================
+   V14.37 — PC SOHBET ARAYÜZÜ
+   Yan paneller, yönet menüsü, sabit mesaj şeridi,
+   okunmamış oda vurgusu ve boş alan Zatoi dokusu.
+   Mobil düzen korunur.
+   ========================================================= */
+@media (min-width:721px){
+  .people-chat-panel{
+    grid-template-columns:260px minmax(0,1fr) 260px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"]{
+    grid-template-columns:260px minmax(0,1fr) 260px!important;
+  }
+
+  .people-conversation{
+    position:relative!important;
+    isolation:isolate;
+  }
+
+  .people-conversation::before{
+    content:"Z";
+    position:absolute;
+    left:50%;
+    top:58%;
+    transform:translate(-50%,-50%);
+    z-index:0;
+    font-size:clamp(120px,15vw,250px);
+    line-height:1;
+    font-weight:900;
+    letter-spacing:-.08em;
+    color:rgba(100,160,230,.025);
+    pointer-events:none;
+    user-select:none;
+  }
+
+  .people-conversation > *{
+    position:relative;
+    z-index:1;
+  }
+
+  .people-active-panel,
+  .people-rooms-panel{
+    background:rgba(13,22,33,.97)!important;
+  }
+
+  .people-room-card.has-unread{
+    border-color:rgba(59,130,246,.48)!important;
+    background:linear-gradient(90deg,rgba(37,99,235,.13),rgba(20,29,41,.96))!important;
+    box-shadow:inset 3px 0 0 rgba(59,130,246,.85),0 0 18px rgba(37,99,235,.06)!important;
+  }
+
+  .people-room-unread{
+    min-width:20px!important;
+    height:20px!important;
+    padding:0 6px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-radius:999px!important;
+    background:#1677ff!important;
+    color:white!important;
+    font-size:10px!important;
+    font-weight:900!important;
+    box-shadow:0 0 0 3px rgba(22,119,255,.12)!important;
+  }
+}
+
+.people-admin-chat-tools{
+  position:relative;
+  margin-left:auto;
+}
+.people-admin-manage-toggle{
+  min-height:34px!important;
+  padding:0 11px!important;
+}
+.people-admin-manage-menu{
+  position:absolute;
+  top:calc(100% + 7px);
+  right:0;
+  z-index:80;
+  width:220px;
+  padding:6px;
+  border:1px solid var(--border,#263548);
+  border-radius:12px;
+  background:#101925;
+  box-shadow:0 16px 38px rgba(0,0,0,.34);
+}
+.people-admin-manage-menu[hidden]{display:none!important}
+.people-admin-manage-menu button{
+  width:100%;
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:0 10px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--text,#eef5ff);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.people-admin-manage-menu button:hover{
+  background:rgba(255,255,255,.065);
+}
+
+.people-pinned-bar{
+  width:100%;
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:7px 14px;
+  border:0;
+  border-bottom:1px solid rgba(168,85,247,.25);
+  background:linear-gradient(90deg,rgba(99,60,145,.16),rgba(20,27,39,.94));
+  color:var(--text,#eef5ff);
+  text-align:left;
+  cursor:pointer;
+}
+.people-pinned-bar[hidden]{display:none!important}
+.people-pinned-bar-icon{font-size:16px}
+.people-pinned-bar-copy{
+  min-width:0;
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  gap:1px;
+}
+.people-pinned-bar-copy strong{
+  font-size:10px;
+  color:#c9a8f4;
+}
+.people-pinned-bar-copy small{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--muted,#9eb0c5);
+  font-size:11px;
+}
+.people-pinned-bar-go{
+  font-size:22px;
+  color:#b990e9;
+}
+.people-message-highlight .people-message-bubble{
+  animation:zatoiPinnedPulse 1.35s ease;
+}
+@keyframes zatoiPinnedPulse{
+  0%,100%{box-shadow:inherit}
+  35%{box-shadow:0 0 0 3px rgba(168,85,247,.34),0 0 25px rgba(168,85,247,.22)}
+}
+
+@media (max-width:720px){
+  .people-pinned-bar{
+    min-height:40px;
+    padding:6px 10px;
+  }
+  .people-pinned-bar-copy small{font-size:10px}
+}
