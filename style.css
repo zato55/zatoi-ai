@@ -4701,3 +4701,18 @@ body.light-theme .chat-avatar {
     box-shadow:0 0 0 3px rgba(157, 112, 214, .10)!important;
   }
 }
+
+
+/* =========================================================
+   V14.35.4 — RESPONSIVE SOHBET AKIŞI
+   PC:     yeni mesajlar üstte, eskiler aşağıda
+   Mobil:  eski mesajlar üstte, yeni mesajlar aşağıda
+   ========================================================= */
+@media (max-width:720px){
+  .people-messages,
+  .people-private-messages{
+    flex-direction:column!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+}
