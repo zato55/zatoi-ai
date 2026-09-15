@@ -2665,3 +2665,23 @@ body.light-theme .chat-avatar {
     max-width: calc(100vw - 76px) !important;
   }
 }
+
+
+/* ==========================================
+   V14.27.1 AVATAR GÖRÜNÜRLÜK + CACHE FIX
+========================================== */
+.message-row .message-identity {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+.message-row .chat-avatar {
+  display: grid !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.message-row.user .message-identity { order: 2; }
+.message-row.user > .message { order: 1; }
+.message-row.assistant .message-identity { order: 1; }
+.message-row.assistant > .message { order: 2; }
