@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.35.4">
+  <link rel="stylesheet" href="./style.css?v=14.36">
 </head>
 
 <body>
@@ -554,6 +554,7 @@
     <p id="peoplePublicProfileBio">Henüz profil açıklaması yok.</p>
     <div class="people-public-profile-actions">
       <button id="peoplePublicProfileChat" type="button">💬 Özel Sohbet</button>
+      <button id="peoplePublicProfileModerate" class="people-public-profile-moderate" type="button" hidden>🛡️ Moderasyon</button>
     </div>
   </section>
 </div>
@@ -587,6 +588,10 @@
       <div id="peopleConversationHead" class="people-conversation-head">
         <div id="peopleConversationAvatar" class="people-avatar">🌐</div>
         <div><strong id="peopleConversationName">Genel Sohbet</strong><span id="peopleConversationStatus">Tüm aktif Zatoi kullanıcıları</span></div>
+        <div id="peopleAdminChatTools" class="people-admin-chat-tools" hidden>
+          <button id="peopleAdminAnnouncement" type="button" title="Admin duyurusu gönder">📢 Duyuru</button>
+          <button id="peopleAdminClearGeneral" type="button" title="Genel sohbeti temizle">🧹 Temizle</button>
+        </div>
         <button id="peopleGeneralButton" class="people-general-btn" type="button" title="Genel sohbete dön">🌐 Genel</button>
       </div>
 
@@ -7398,6 +7403,9 @@ const peopleComposer = document.getElementById("peopleComposer");
 const peopleMessageInput = document.getElementById("peopleMessageInput");
 const peopleSendButton = document.getElementById("peopleSendButton");
 const peopleGeneralButton = document.getElementById("peopleGeneralButton");
+const peopleAdminChatTools = document.getElementById("peopleAdminChatTools");
+const peopleAdminAnnouncement = document.getElementById("peopleAdminAnnouncement");
+const peopleAdminClearGeneral = document.getElementById("peopleAdminClearGeneral");
 const peopleAiModeButton = document.getElementById("peopleAiModeButton");
 const peopleChatModeButton = document.getElementById("peopleChatModeButton");
 const peoplePrivateDock = document.getElementById("peoplePrivateDock");
@@ -7421,6 +7429,7 @@ const peoplePublicProfileName = document.getElementById("peoplePublicProfileName
 const peoplePublicProfileUsername = document.getElementById("peoplePublicProfileUsername");
 const peoplePublicProfileBio = document.getElementById("peoplePublicProfileBio");
 const peoplePublicProfileChat = document.getElementById("peoplePublicProfileChat");
+const peoplePublicProfileModerate = document.getElementById("peoplePublicProfileModerate");
 let peoplePublicProfileUserId = "";
 
 let peopleChatActive = false;
@@ -7592,6 +7601,83 @@ function setPeopleComposerEnabled(enabled) {
   if (peopleSendButton) peopleSendButton.disabled = !enabled;
 }
 
+function peopleIsAdmin() {
+  return currentUser?.role === "admin";
+}
+
+function syncPeopleAdminTools() {
+  if (peopleAdminChatTools) peopleAdminChatTools.hidden = !peopleIsAdmin();
+}
+
+async function peopleAdminDeleteMessage(messageId) {
+  if (!peopleIsAdmin() || !messageId) return;
+  if (!confirm("Bu mesaj Genel Sohbet'ten silinsin mi?")) return;
+  try {
+    await peopleApi("admin_delete_general_message", { messageId });
+    peopleLastMessageSignature = "";
+    await loadPeopleGeneralMessages();
+  } catch (error) { alert(error.message); }
+}
+
+async function peopleAdminPinMessage(messageId, pinned) {
+  if (!peopleIsAdmin() || !messageId) return;
+  try {
+    await peopleApi("admin_pin_general_message", { messageId, pinned: !pinned });
+    peopleLastMessageSignature = "";
+    await loadPeopleGeneralMessages();
+  } catch (error) { alert(error.message); }
+}
+
+async function peopleAdminClearChat() {
+  if (!peopleIsAdmin()) return;
+  if (!confirm("Genel Sohbet'teki TÜM mesajlar silinecek. Emin misin?")) return;
+  if (!confirm("Bu işlem geri alınamaz. Genel sohbeti gerçekten temizlemek istiyor musun?")) return;
+  try {
+    await peopleApi("admin_clear_general_messages");
+    peopleLastMessageSignature = "";
+    await loadPeopleGeneralMessages();
+  } catch (error) { alert(error.message); }
+}
+
+async function peopleAdminSendAnnouncement() {
+  if (!peopleIsAdmin()) return;
+  const content = prompt("Genel Sohbet için duyuru metni:");
+  if (!content?.trim()) return;
+  try {
+    await peopleApi("admin_send_announcement", { content: content.trim() });
+    peopleLastMessageSignature = "";
+    await loadPeopleGeneralMessages();
+  } catch (error) { alert(error.message); }
+}
+
+async function peopleAdminModerateUser(userId) {
+  if (!peopleIsAdmin() || !userId || String(userId) === String(currentUser?.userId)) return;
+  const choice = prompt(
+`Moderasyon işlemi:
+1 = 10 dk sustur
+2 = 1 saat sustur
+3 = 24 saat sustur
+4 = Susturmayı kaldır
+5 = Sohbet yasağı ver
+6 = Sohbet yasağını kaldır
+
+Numara yaz:`);
+  if (!choice) return;
+  try {
+    if (choice === "1") await peopleApi("admin_set_mute", { targetUserId:userId, minutes:10 });
+    else if (choice === "2") await peopleApi("admin_set_mute", { targetUserId:userId, minutes:60 });
+    else if (choice === "3") await peopleApi("admin_set_mute", { targetUserId:userId, minutes:1440 });
+    else if (choice === "4") await peopleApi("admin_set_mute", { targetUserId:userId, minutes:0 });
+    else if (choice === "5") {
+      if (!confirm("Bu kullanıcı insan sohbetinde mesaj gönderemesin mi?")) return;
+      await peopleApi("admin_set_chat_ban", { targetUserId:userId, banned:true });
+    }
+    else if (choice === "6") await peopleApi("admin_set_chat_ban", { targetUserId:userId, banned:false });
+    else return;
+    alert("Moderasyon işlemi uygulandı.");
+  } catch (error) { alert(error.message); }
+}
+
 function renderPeopleMessages(messages) {
   if (!peopleMessages) return;
 
@@ -7621,8 +7707,19 @@ function renderPeopleMessages(messages) {
             <span>${peopleEscape(peopleDisplayName(message.sender))}</span>
             <small>@${peopleEscape(message.sender?.username || "kullanici")}</small>
           </button>
+          <div class="people-message-meta-badges">
+            ${message.sender?.role === "admin" ? '<span class="people-admin-badge">ADMIN</span>' : ''}
+            ${message.kind === "announcement" ? '<span class="people-announcement-badge">📢 DUYURU</span>' : ''}
+            ${message.pinned ? '<span class="people-pinned-badge">📌 SABİT</span>' : ''}
+          </div>
           <div class="people-message-text">${peopleEscape(message.content)}</div>
-          <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+          <div class="people-message-foot">
+            <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+            ${peopleIsAdmin() ? `<span class="people-message-admin-actions">
+              <button type="button" data-admin-pin="${peopleEscape(message.messageId)}" data-pinned="${message.pinned ? "1" : "0"}" title="${message.pinned ? "Sabitlemeyi kaldır" : "Mesajı sabitle"}">📌</button>
+              <button type="button" data-admin-delete="${peopleEscape(message.messageId)}" title="Mesajı sil">🗑️</button>
+            </span>` : ""}
+          </div>
         </div>
       </div>
     `;
@@ -7630,6 +7727,15 @@ function renderPeopleMessages(messages) {
   peopleMessages.scrollTop = window.matchMedia("(max-width: 720px)").matches ? peopleMessages.scrollHeight : 0;
   peopleMessages.querySelectorAll("[data-profile-user]").forEach(button => {
     button.addEventListener("click", () => openPeoplePublicProfile(button.dataset.profileUser));
+  });
+  peopleMessages.querySelectorAll("[data-admin-delete]").forEach(button => {
+    button.addEventListener("click", () => peopleAdminDeleteMessage(button.dataset.adminDelete));
+  });
+  peopleMessages.querySelectorAll("[data-admin-pin]").forEach(button => {
+    button.addEventListener("click", () => peopleAdminPinMessage(
+      button.dataset.adminPin,
+      button.dataset.pinned === "1"
+    ));
   });
 }
 
@@ -7668,6 +7774,7 @@ async function selectPeopleGeneral() {
 
 async function loadPeopleGeneralMessages({ silent = false } = {}) {
   if (!peopleChatActive || peopleConversationMode !== "general") return;
+  syncPeopleAdminTools();
   try {
     const data = await peopleApi("get_general_messages");
     const messages = Array.isArray(data.messages) ? data.messages : [];
@@ -7708,6 +7815,10 @@ async function openPeoplePublicProfile(userId) {
     if (peoplePublicProfileChat) {
       const isSelf = String(profile.userId || "") === String(currentUser?.userId || "");
       peoplePublicProfileChat.hidden = isSelf;
+    }
+    if (peoplePublicProfileModerate) {
+      const isSelf = String(profile.userId || "") === String(currentUser?.userId || "");
+      peoplePublicProfileModerate.hidden = !peopleIsAdmin() || isSelf;
     }
   } catch (error) {
     if (peoplePublicProfileName) peoplePublicProfileName.textContent = "Profil açılamadı";
@@ -7952,6 +8063,9 @@ zatoiChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
+peopleAdminClearGeneral?.addEventListener("click", peopleAdminClearChat);
+peopleAdminAnnouncement?.addEventListener("click", peopleAdminSendAnnouncement);
+peoplePublicProfileModerate?.addEventListener("click", () => peopleAdminModerateUser(peoplePublicProfileUserId));
 peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
 peoplePrivateSend?.addEventListener("click", (event) => {
   event.preventDefault();
@@ -8045,7 +8159,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.35.4",
+        "./service-worker.js?v=14.36",
         { updateViaCache: "none" }
       );
 
@@ -8089,7 +8203,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.35.4";
+  window.__ZATOI_BUILD__ = "14.36";
 </script>
 </body>
 </html>
