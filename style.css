@@ -2918,7 +2918,7 @@ body.light-theme .chat-avatar {
 }
 
 /* =========================================================
-   V14.30 — ZATOI AI / GERÇEK KULLANICI SOHBETİ
+   V14.31 — GENEL + ÖZEL KULLANICI SOHBETİ
    ========================================================= */
 .zatoi-mode-switch{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--border,#263548);border-radius:14px;background:rgba(8,15,25,.72);margin-left:auto;margin-right:12px;flex:0 0 auto}
 .zatoi-mode-btn{border:0;background:transparent;color:var(--muted,#9aa9ba);font:inherit;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.2s ease;white-space:nowrap}
@@ -2928,7 +2928,7 @@ body.light-theme .chat-avatar {
 .people-chat-panel{display:none;min-width:0;min-height:0;height:100%;grid-column:1/-1;background:var(--bg,#0b0f14)}
 .app.people-chat-mode{grid-template-columns:1fr!important}
 .app.people-chat-mode>.chat-column,.app.people-chat-mode>.side-panel{display:none!important}
-.app.people-chat-mode>.people-chat-panel{display:grid;grid-template-columns:minmax(230px,290px) minmax(360px,1fr) minmax(240px,310px);overflow:hidden}
+.app.people-chat-mode>.people-chat-panel{display:grid;grid-template-columns:minmax(230px,290px) minmax(360px,1fr) minmax(240px,310px);grid-template-rows:auto minmax(0,1fr);overflow:hidden}
 
 .people-active-panel,.people-rooms-panel{min-width:0;background:var(--panel,#0f1620);padding:16px;overflow:auto}
 .people-active-panel{border-right:1px solid var(--border,#263548)}
@@ -2996,9 +2996,33 @@ body.light-theme .chat-avatar {
   .chat-top{flex-wrap:wrap}
   .zatoi-mode-switch{order:5;width:100%;margin:8px 0 0}
   .zatoi-mode-btn{flex:1;padding:8px}
-  .app.people-chat-mode>.people-chat-panel{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;overflow:auto}
+  .app.people-chat-mode>.people-chat-panel{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr) auto;overflow:auto}
   .people-active-panel{border-right:0;border-bottom:1px solid var(--border,#263548);max-height:240px}
   .people-conversation{min-height:62vh}
   .people-rooms-panel{border-left:0;border-top:1px solid var(--border,#263548);max-height:260px}
   .people-message-bubble{max-width:86%}
+}
+
+/* V14.31 — Sohbet modunda üst geçiş daima görünür */
+.people-mode-top{
+  grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
+  min-height:58px;padding:8px 16px;border-bottom:1px solid var(--border,#263548);
+  background:var(--panel,#0f1620);z-index:5
+}
+.people-mode-brand{display:grid;gap:1px}
+.people-mode-brand strong{color:var(--text,#eef5ff);font-size:15px}
+.people-mode-brand span{color:var(--muted,#91a0b2);font-size:10px}
+.people-mode-top .zatoi-mode-switch{margin:0}
+.people-general-btn{
+  margin-left:auto;border:1px solid rgba(42,135,255,.28);border-radius:10px;
+  background:rgba(20,104,255,.08);color:#8fc0ff;padding:7px 10px;font:inherit;font-size:11px;
+  cursor:pointer;white-space:nowrap
+}
+.people-general-btn:hover{background:rgba(20,104,255,.16)}
+
+@media(max-width:720px){
+  .people-mode-top{position:sticky;top:0;padding:7px 10px;min-height:52px}
+  .people-mode-brand{display:none}
+  .people-mode-top .zatoi-mode-switch{width:100%}
+  .people-general-btn{padding:6px 8px}
 }
