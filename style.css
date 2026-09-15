@@ -2685,3 +2685,39 @@ body.light-theme .chat-avatar {
 .message-row.user > .message { order: 1; }
 .message-row.assistant .message-identity { order: 1; }
 .message-row.assistant > .message { order: 2; }
+
+
+/* ==========================================
+   V14.28 ZATOI AI SİBER SAMURAY AVATARI
+========================================== */
+.chat-avatar.zatoi-chat-avatar {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 2px solid #168cff !important;
+  background: #050b14 !important;
+  box-shadow:
+    0 0 0 2px rgba(22,140,255,.12),
+    0 0 22px rgba(22,140,255,.32) !important;
+}
+
+.zatoi-chat-avatar-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 48% 34%;
+  border-radius: inherit;
+  transform: scale(1.08);
+}
+
+.message-row.assistant .message-identity:hover .zatoi-chat-avatar {
+  box-shadow:
+    0 0 0 2px rgba(22,140,255,.18),
+    0 0 28px rgba(22,140,255,.46) !important;
+}
+
+@media (max-width: 720px) {
+  .zatoi-chat-avatar-image {
+    object-position: 48% 32%;
+  }
+}
