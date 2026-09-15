@@ -6449,7 +6449,7 @@ function friendlyUserError(error, context = "general") {
     return "Yanıt beklenenden uzun sürdü. Lütfen tekrar dene.";
   }
 
-  if (lower.includes("ai_daily_limit") || lower.includes("bugünkü ücretsiz ai kullanım sınırı") || lower.includes("4006") || lower.includes("daily free allocation") || lower.includes("10,000 neurons") || lower.includes("10000 neurons") || lower.includes("workers paid plan")) {
+  if (lower.includes("ai_daily_limit") || lower.includes("bugünkü ücretsiz ai kullanım sınırı") || lower.includes("daily free allocation")) {
     return "🌙 Zatoi biraz dinleniyor\n\nBugünkü ücretsiz kullanım hakkımız doldu. Haklar yenilendiğinde kaldığımız yerden devam edebiliriz.";
   }
 
@@ -6481,6 +6481,41 @@ function sanitizeAssistantTextForUser(value, context = "general") {
   return String(value || "").trim();
 }
 
+function apiResponseError(response, data = {}, context = "general") {
+  const code = String(data?.code || "");
+  const status = Number(response?.status) || 0;
+  const seconds = Math.min(86400, Math.max(1, Math.ceil(Number(data?.retryAfter || response?.headers?.get?.("Retry-After")) || 60)));
+  let message = "";
+  if (code === "CHAT_RATE_LIMIT") {
+    message = `⏳ Mesaj hız sınırı\n\nDakikada 15 mesaj sınırına ulaşıldı. Yaklaşık ${seconds} saniye sonra tekrar deneyebilirsin. Bu, günlük kota uyarısı değil.`;
+  } else if (code === "AI_DAILY_LIMIT") {
+    message = "🌙 Günlük AI kullanım sınırı\n\nAI sağlayıcısı günlük ücretsiz kullanım sınırına ulaşıldığını bildirdi. Uygulamadaki görsel sayacı bu kotadan ayrıdır.";
+  } else if (code === "AI_CAPACITY") {
+    message = "⏳ Geçici kapasite sorunu\n\nAI sağlayıcısı şu anda isteği işleyemiyor. Biraz sonra tekrar deneyebilirsin.";
+  } else if (code === "RATE_LIMITED") {
+    message = `⏳ İstek sınırı\n\nBu işlem için istek sınırına ulaşıldı. Yaklaşık ${seconds} saniye sonra tekrar deneyebilirsin.`;
+  } else if (code === "AI_RUN_FAILED") {
+    message = "AI hizmeti isteği tamamlayamadı. Tekrar deneyebilirsin. Sorun sürerse hata kaydı incelenmeli.";
+  }
+  if (!message) {
+    // Compatibility with older Workers: only explicit daily-limit wording qualifies.
+    const raw = String(data?.error || data?.details || "");
+    if (/çok hızlı mesaj gönderiyorsun/i.test(raw)) {
+      message = `⏳ Mesaj hız sınırı\n\nYaklaşık ${seconds} saniye sonra tekrar deneyebilirsin.`;
+    } else if (status === 429 && !/AI_DAILY_LIMIT|daily free allocation|bugünkü ücretsiz AI kullanım sınırı/i.test(raw)) {
+      message = "⏳ İstek sınırlandı\n\nSunucu bu isteği sınırlandırdı; günlük kotanın bittiği doğrulanmadı. Biraz sonra tekrar deneyebilirsin.";
+    } else {
+      message = friendlyUserError(`${status} ${code} ${raw}`, context);
+    }
+  }
+  const error = new Error(message);
+  error.userSafe = true;
+  error.code = code;
+  error.status = status;
+  error.retryAfter = seconds;
+  return error;
+}
+
 function userSafeError(error, context = "general") {
   const friendly = friendlyUserError(error, context);
   const safe = new Error(friendly);
@@ -6506,12 +6541,13 @@ async function requestGeneratedImage(description, variant, referenceImage = "", 
   if (response.status === 401) { await forceLogout(); throw new Error("Oturum süren dolmuş."); }
   if (!response.ok) {
     let message = "Görsel üretilemedi.";
+    let errorData = {};
     try {
-      const errorData = await response.json();
+      errorData = await response.json();
       message = `${errorData.code || ""} ${errorData.error || message}`;
     } catch {}
     console.error("Image generation error:", response.status, message);
-    throw userSafeError(`${response.status} ${message}`, "image_generate");
+    throw apiResponseError(response, errorData, "image_generate");
   }
   const imageBlob = await response.blob();
   if (!imageBlob.type.startsWith("image/")) throw new Error("Worker geçerli bir görsel döndürmedi.");
@@ -7315,13 +7351,12 @@ async function sendMessageCore() {
       console.error("Worker response error:", {
         status: response.status,
         statusText: response.statusText || "",
-        serverMessage
+        serverMessage,
+        code: data.code || "",
+        retryAfter: data.retryAfter || null
       });
 
-      throw userSafeError(
-        `${response.status} ${serverMessage}`,
-        documentForAI ? "pdf" : "general"
-      );
+      throw apiResponseError(response, data, documentForAI ? "pdf" : "general");
 
     }
 
@@ -8792,7 +8827,7 @@ if ("serviceWorker" in navigator) {
         { updateViaCache: "none" }
       );
 
-      console.log("Zatoi PWA Service Worker aktif.");
+      console.log("Zatoi V14.23 — PWA Service Worker aktif.");
 
       // Uygulama her açıldığında GitHub/CDN önbelleğini kullanmadan yeni SW kontrolü yap.
       await registration.update();
