@@ -6353,6 +6353,11 @@ function chooseGeneratedImage(message, index) {
 }
 
 async function regenerateGeneratedImage(message, index) {
+  if (sending) { renderAll(); return; }
+  return withSendingLock(() => regenerateGeneratedImageCore(message, index));
+}
+
+async function regenerateGeneratedImageCore(message, index) {
   if (!message || !Array.isArray(message.generatedImages)) return;
   if (index < 0 || index >= message.generatedImages.length) return;
   if (message.regeneratingIndex !== undefined && message.regeneratingIndex !== null) return;
@@ -6383,7 +6388,7 @@ async function regenerateGeneratedImage(message, index) {
   const comparisonChoices = ["klein4", "klein9", "dev", "sdxl"];
   const isFourModelComparison = targetMessage.comparisonMode === "four-model";
   const variant = isFourModelComparison ? "A" : (index === 0 ? "A" : "B");
-  const modelChoice = isFourModelComparison ? (comparisonChoices[index] || "") : "";
+  const modelChoice = ""; // Yeniden üretim tek varsayılan model kullanır.
   let referenceImage = String(targetMessage.sourceReferenceImage || "");
   const generationId = String(targetMessage.generationId || crypto.randomUUID());
   targetMessage.generationId = generationId;
@@ -6720,116 +6725,28 @@ async function generateImageCore(promptText = "", referenceImage = "", reference
   const chat = getActiveChat();
   if (!chat) return;
   const ownerToken = authToken;
-  let resultMessage = null;
   try {
-    let safeReferenceImage = referenceImage;
-    if (referenceImage) safeReferenceImage = await prepareReferenceImageForGeneration(referenceImage);
+    const safeReferenceImage = referenceImage ? await prepareReferenceImageForGeneration(referenceImage) : "";
     if (ownerToken !== authToken || !chats.includes(chat)) return;
     chat.messages.push({ role: "user", content: options.displayText || `Görsel oluştur: ${description}`,
-      imageNames: referenceName ? [referenceName] : [],
-      imagePreviews: referencePreview ? [referencePreview] : [], time: Date.now() });
+      imageNames: referenceName ? [referenceName] : [], imagePreviews: referencePreview ? [referencePreview] : [], time: Date.now() });
     updateTitle(chat, description); chat.updatedAt = Date.now();
     saveChats(); queueCloudSave(chat); setInput(""); renderAll(); showTyping();
     const generationId = crypto.randomUUID();
-    const generationPlan = options.isEdit
-      ? [
-          { variant: "A", modelChoice: "", label: "Düzenleme A" },
-          { variant: "B", modelChoice: "", label: "Düzenleme B" }
-        ]
-      : [
-          { variant: "A", modelChoice: "klein4", label: "FLUX.2 Klein 4B" },
-          { variant: "A", modelChoice: "klein9", label: "FLUX.2 Klein 9B" },
-          { variant: "A", modelChoice: "dev", label: "FLUX.2 Dev" },
-          { variant: "A", modelChoice: "sdxl", label: "SDXL / DreamShaper" }
-        ];
-
-    for (let planIndex = 0; planIndex < generationPlan.length; planIndex++) {
-      const plan = generationPlan[planIndex];
-      let image = null;
-      let modelError = "";
-
-      try {
-        image = await requestGeneratedImage(
-          description,
-          plan.variant,
-          safeReferenceImage,
-          generationId,
-          !!options.isEdit,
-          plan.modelChoice
-        );
-      } catch (error) {
-        modelError = friendlyUserError(error, "image_generate");
-      }
-
-      if (ownerToken !== authToken || !chats.includes(chat)) return;
-
-      if (!resultMessage) {
-        resultMessage = {
-          role: "assistant",
-          content: options.isEdit
-            ? "İlk düzenleme hazırlanıyor…"
-            : "4 model karşılaştırması hazırlanıyor…",
-          generatedImages: [],
-          generatedImageIds: [],
-          generationMeta: [],
-          preferenceChoiceId: crypto.randomUUID(),
-          generationId,
-          imagePrompt: description,
-          baseImagePrompt: options.basePrompt || cleanBaseImagePrompt(description),
-          isImageEdit: !!options.isEdit,
-          comparisonMode: options.isEdit ? "" : "four-model",
-          sourceReferenceImage: safeReferenceImage,
-          sourceReferenceImageId: "",
-          sourceReferencePreview: referencePreview,
-          sourceReferenceName: referenceName,
-          automaticReferencePreview: "",
-          time: Date.now()
-        };
-        chat.messages.push(resultMessage);
-      }
-
-      resultMessage.generatedImages.push(image?.dataUrl || "");
-      resultMessage.generatedImageIds.push(image?.imageId || "");
-      resultMessage.generationMeta.push({
-        model: image?.model || plan.label,
-        referenceMode: image?.referenceMode || "none",
-        modelChoice: plan.modelChoice,
-        label: plan.label,
-        error: modelError
-      });
-      resultMessage.sourceReferenceImageId ||= image?.referenceImageId || "";
-
-      if (!resultMessage.automaticReferencePreview &&
-          image?.referenceMode === "automatic" &&
-          image?.referenceImageId) {
-        try {
-          resultMessage.automaticReferencePreview =
-            await fetchStoredReferenceImage(image.referenceImageId);
-        } catch {}
-      }
-
-      const completed = planIndex + 1;
-      if (options.isEdit) {
-        resultMessage.content = completed >= 2
-          ? "İki düzenleme seçeneği hazır. Beğendiğini seçebilirsin."
-          : "İlk düzenleme hazır. İkinci seçenek hazırlanıyor…";
-      } else {
-        resultMessage.content = completed >= 4
-          ? "4 model sonucu hazır. En iyi olanı seçebilirsin."
-          : `${completed}/4 model tamamlandı. Diğerleri hazırlanıyor…`;
-      }
-
-      chat.updatedAt = Date.now();
-      saveChats();
-      queueCloudSave(chat);
-      renderAll();
-      if (completed < generationPlan.length) showTyping();
-    }
+    const image = await requestGeneratedImage(description, "A", safeReferenceImage, generationId, !!options.isEdit, "");
+    if (ownerToken !== authToken || !chats.includes(chat)) return;
+    chat.messages.push({ role: "assistant", content: options.isEdit ? "Düzenlenen görsel hazır." : "Görsel hazır. İstersen değişiklik isteyebilirsin.",
+      generatedImages: [image.dataUrl], generatedImageIds: [image.imageId],
+      generationMeta: [{ model: image.model, referenceMode: image.referenceMode }],
+      preferenceChoiceId: crypto.randomUUID(), generationId, imagePrompt: description,
+      baseImagePrompt: options.basePrompt || cleanBaseImagePrompt(description), isImageEdit: !!options.isEdit,
+      chosenImage: 0, comparisonMode: "", sourceReferenceImage: safeReferenceImage,
+      sourceReferenceImageId: image.referenceImageId || "", sourceReferencePreview: referencePreview,
+      sourceReferenceName: referenceName, time: Date.now() });
+    chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat); renderAll();
   } catch (error) {
     if (ownerToken !== authToken || !chats.includes(chat)) return;
-    const message = friendlyClientError(error);
-    if (resultMessage) resultMessage.content = `İlk görsel hazır ve korundu. İkinci seçenek tamamlanamadı.\n\n${message}`;
-    else chat.messages.push({ role: "assistant", content: message, time: Date.now() });
+    chat.messages.push({ role: "assistant", content: friendlyClientError(error), time: Date.now() });
     chat.updatedAt = Date.now(); saveChats(); queueCloudSave(chat); renderAll();
   }
 }
@@ -6943,32 +6860,11 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 45000) {
 }
 
 async function requestIntentRouter(text, chat, hasImages, hasDocument) {
-  if (!authToken) return null;
-  const recent = findLatestGeneratedMessage(chat);
-  const shouldAsk = !!recent || hasImages || hasDocument || /(çiz|oluştur|üret|tasarla|görselleştir|resmet|olmamış|olmamis|beğenmedim|begenmedim|düzelt|değiştir|degistir|yeniden|tekrar)/i.test(String(text || ""));
-  if (!shouldAsk) return null;
-
-  try {
-    const response = await fetchWithTimeout(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${authToken}` },
-      body: JSON.stringify({
-        type: "intent_router",
-        text: String(text || "").slice(0, 2000),
-        context: {
-          recentImagePrompt: recent?.imagePrompt || "",
-          hasImages: !!hasImages,
-          hasDocument: !!hasDocument
-        }
-      })
-    }, 10000);
-    if (response.status === 401) { await forceLogout(); return null; }
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data?.intent) return null;
-    return data;
-  } catch {
-    return null;
-  }
+  const value = String(text || "").trim();
+  const editing = /(?:rengini|arka\s*planını|arkaplanını|yüzünü|kıyafetini|saçını|gözlerini).*(?:yap|değiştir|olsun)|(?:kaldır|ekle|düzenle|düzelt|sil|değiştir)(?:[.!?]|$)|(?:kırmızı|sarı|mavi|yeşil|beyaz|siyah)\s+(?:yap|olsun)/i.test(value);
+  if (hasImages && editing) return { intent: "edit_previous_image", imagePrompt: value, confidence: 1 };
+  if (hasImages) return { intent: "image_analysis", imagePrompt: "", confidence: 1 };
+  return { intent: hasDocument ? "pdf_question" : "chat", imagePrompt: "", confidence: 1 };
 }
 
 /* ==========================================
@@ -7035,6 +6931,7 @@ async function sendMessageCore() {
 
   const chat =
     getActiveChat();
+  const ownerToken = authToken;
 
 
   if (!chat) {
@@ -7277,6 +7174,8 @@ async function sendMessageCore() {
         documentForAI ? 90000 : 45000
       );
 
+    if (ownerToken !== authToken || !chats.includes(chat)) return;
+
     if (response.ok && String(response.headers.get("content-type") || "").startsWith("image/")) {
       const imageBlob = await response.blob();
       const imageData = await new Promise((resolve, reject) => {
@@ -7364,6 +7263,8 @@ async function sendMessageCore() {
     /* =============================
        HAFIZA
     ============================= */
+
+    if (ownerToken !== authToken || !chats.includes(chat)) return;
 
     if (data.memory) {
 
@@ -7476,6 +7377,7 @@ async function sendMessageCore() {
 
 
   } catch (error) {
+    if (ownerToken !== authToken || !chats.includes(chat)) return;
 
     console.log(
       "Chat error:",
@@ -8827,7 +8729,7 @@ if ("serviceWorker" in navigator) {
         { updateViaCache: "none" }
       );
 
-      console.log("Zatoi V14.23 — PWA Service Worker aktif.");
+      console.log("Zatoi V14.24 — PWA Service Worker aktif.");
 
       // Uygulama her açıldığında GitHub/CDN önbelleğini kullanmadan yeni SW kontrolü yap.
       await registration.update();
