@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.38.3">
+  <link rel="stylesheet" href="./style.css?v=14.38.4">
 </head>
 
 <body>
@@ -8091,7 +8091,9 @@ function leavePeopleChat() {
 
 function setZatoiMode(mode) {
   const chatMode = mode === "chat";
-  document.getElementById("app")?.classList.toggle("people-chat-mode", chatMode);
+  const appRoot = document.getElementById("app");
+  appRoot?.classList.toggle("people-chat-mode", chatMode);
+  appRoot?.classList.toggle("zatoi-ai-mode", !chatMode);
   zatoiAiModeButton?.classList.toggle("active", !chatMode);
   zatoiChatModeButton?.classList.toggle("active", chatMode);
   peopleAiModeButton?.classList.toggle("active", !chatMode);
@@ -8239,7 +8241,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.38.3",
+        "./service-worker.js?v=14.38.4",
         { updateViaCache: "none" }
       );
 
@@ -8283,7 +8285,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.38.3";
+  window.__ZATOI_BUILD__ = "14.38.4";
 </script>
 </body>
 </html>
