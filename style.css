@@ -4375,3 +4375,94 @@ body.light-theme .chat-avatar {
     right:220px!important;
   }
 }
+
+
+/* =========================================================
+   V14.34.4 — ÖZEL SOHBET PC ORTA ALAN + GÖNDER BUTONU FIX
+   Private dock artık PC'de DOM olarak orta konuşma paneline taşınır.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* Private dock artık center panelin çocuğu: absolute hack yok. */
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    position:relative!important;
+    inset:auto!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    z-index:5!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    display:grid!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    background:var(--bg,#0b0f14)!important;
+  }
+
+  /* Özel oda açıkken orta alandaki genel sohbet parçalarını gizle. */
+  .people-chat-panel[data-mobile-view="private"] .people-conversation > .people-conversation-head,
+  .people-chat-panel[data-mobile-view="private"] .people-conversation > .people-composer,
+  .people-chat-panel[data-mobile-view="private"] .people-conversation > .people-messages{
+    display:none!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-conversation{
+    display:block!important;
+    overflow:hidden!important;
+  }
+
+  /* Özel sohbet yazma alanı başlığın hemen altında. */
+  .people-chat-panel[data-mobile-view="private"] .people-private-head{
+    grid-row:1!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-composer{
+    grid-row:2!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:10px!important;
+    width:100%!important;
+    padding:10px 14px!important;
+    box-sizing:border-box!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+    background:var(--panel,#0f1620)!important;
+    pointer-events:auto!important;
+    z-index:10!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-input,
+  .people-chat-panel[data-mobile-view="private"] #peoplePrivateInput,
+  .people-chat-panel[data-mobile-view="private"] #peoplePrivateSend{
+    pointer-events:auto!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
+    grid-row:3!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+  }
+
+  /* Sağ taraf artık yalnızca kompakt oda listesi. */
+  .people-chat-panel[data-mobile-view="private"] .people-rooms-panel{
+    display:flex!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-rooms-panel > .people-panel-heading{
+    display:flex!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-rooms-panel > .people-room-list{
+    display:block!important;
+  }
+}
