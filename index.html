@@ -662,7 +662,10 @@
       </div>
 
       <div id="adminErrorsSection" class="admin-section" hidden>
-        <div class="admin-section-head"><span>Son Hata Kayıtları</span></div>
+        <div class="admin-section-head">
+          <span>Son Hata Kayıtları</span>
+          <button id="adminClearErrorsButton" class="admin-action danger" type="button">🗑️ Hata Kayıtlarını Temizle</button>
+        </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
@@ -6422,6 +6425,7 @@ const adminCloseButton = document.getElementById("adminCloseButton");
 const adminRefreshButton = document.getElementById("adminRefreshButton");
 const adminMaintenanceButton = document.getElementById("adminMaintenanceButton");
 const adminErrorsButton = document.getElementById("adminErrorsButton");
+const adminClearErrorsButton = document.getElementById("adminClearErrorsButton");
 const adminStatus = document.getElementById("adminStatus");
 const adminUsersBody = document.getElementById("adminUsersBody");
 const adminErrorsBody = document.getElementById("adminErrorsBody");
@@ -6620,6 +6624,24 @@ adminErrorsButton?.addEventListener("click", async () => {
     setAdminStatus("Hata kayıtları güncel");
   } catch (error) {
     alert(error.message || "Hata kayıtları alınamadı.");
+  }
+});
+
+adminClearErrorsButton?.addEventListener("click", async () => {
+  if (!confirm("Tüm hata kayıtları kalıcı olarak silinecek. Devam edilsin mi?")) return;
+
+  try {
+    adminClearErrorsButton.disabled = true;
+    setAdminStatus("Hata kayıtları temizleniyor...");
+    const data = await adminRequest("errors_clear");
+    renderAdminErrors([]);
+    await refreshAdminPanel();
+    setAdminStatus(`${Number(data.deleted || 0)} hata kaydı temizlendi`);
+  } catch (error) {
+    alert(error.message || "Hata kayıtları temizlenemedi.");
+    setAdminStatus("Hata");
+  } finally {
+    adminClearErrorsButton.disabled = false;
   }
 });
 
