@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.38">
+  <link rel="stylesheet" href="./style.css?v=14.38.1">
 </head>
 
 <body>
@@ -7509,7 +7509,7 @@ function renderPeopleActiveUsers() {
   }
 
   peopleActiveList.innerHTML = users.map(user => `
-    <button class="people-user-card ${user.role === "admin" ? "zatoi-owner-card" : ""}" type="button" data-user-id="${peopleEscape(user.userId)}">
+    <button class="people-user-card ${user.role === "admin" ? "zatoi-owner-card" : "zatoi-user-card"}" type="button" data-user-id="${peopleEscape(user.userId)}">
       <span class="people-user-avatar">${peopleEscape(peopleAvatarText(user))}<i></i></span>
       <span class="people-user-info">
         <strong>${peopleEscape(peopleDisplayName(user))}</strong>
@@ -7746,7 +7746,7 @@ function renderPeopleMessages(messages) {
   peopleMessages.innerHTML = messages.map(message => {
     const mine = String(message.senderId) === String(currentUser?.userId);
     return `
-      <div class="people-message-row ${mine ? "mine" : "theirs"} ${message.sender?.role === "admin" ? "zatoi-owner-message" : ""}" data-general-message-id="${peopleEscape(message.messageId || "")}">
+      <div class="people-message-row ${mine ? "mine" : "theirs"} ${message.sender?.role === "admin" ? "zatoi-owner-message" : "zatoi-user-message"}" data-general-message-id="${peopleEscape(message.messageId || "")}">
         <div class="people-message-bubble">
           <button class="people-message-sender" type="button" data-profile-user="${peopleEscape(message.senderId || "")}">
             <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(message.sender))}</span>
@@ -7863,6 +7863,7 @@ async function openPeoplePublicProfile(userId) {
       peoplePublicProfileChat.hidden = isSelf;
     }
     peoplePublicProfileModal?.classList.toggle("zatoi-owner-profile", profile.role === "admin");
+    peoplePublicProfileModal?.classList.toggle("zatoi-user-profile", profile.role !== "admin");
     if (peoplePublicProfileModerate) {
       const isSelf = String(profile.userId || "") === String(currentUser?.userId || "");
       peoplePublicProfileModerate.hidden = !peopleIsAdmin() || isSelf;
@@ -8238,7 +8239,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.38",
+        "./service-worker.js?v=14.38.1",
         { updateViaCache: "none" }
       );
 
@@ -8282,7 +8283,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.38";
+  window.__ZATOI_BUILD__ = "14.38.1";
 </script>
 </body>
 </html>
