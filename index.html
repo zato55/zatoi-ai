@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.37.1">
+  <link rel="stylesheet" href="./style.css?v=14.37.2">
 </head>
 
 <body>
@@ -7620,8 +7620,29 @@ function peopleIsAdmin() {
 
 function syncPeopleAdminTools() {
   const admin = peopleIsAdmin();
-  if (peopleAdminChatTools) peopleAdminChatTools.hidden = !admin;
-  if (!admin && peopleAdminManageMenu) peopleAdminManageMenu.hidden = true;
+  document.body.classList.toggle("zatoi-chat-admin", admin);
+
+  // V14.37.2: Moderasyon kontrolleri normal üyeye hiç görünmez.
+  if (peopleAdminChatTools) {
+    peopleAdminChatTools.hidden = !admin;
+    peopleAdminChatTools.setAttribute("aria-hidden", String(!admin));
+  }
+
+  if (!admin) {
+    if (peopleAdminManageMenu) peopleAdminManageMenu.hidden = true;
+    peopleAdminChatTools?.classList.remove("menu-open");
+    peopleAdminManageToggle?.setAttribute("aria-expanded", "false");
+  }
+
+  // Mesajların içindeki admin aksiyonları da rol değişiminde anında temizlenir.
+  document.querySelectorAll(".people-message-admin-actions").forEach(node => {
+    node.hidden = !admin;
+  });
+
+  // Profil moderasyon butonu sadece admin + başka kullanıcı koşulunda açılır.
+  if (!admin && peoplePublicProfileModerate) {
+    peoplePublicProfileModerate.hidden = true;
+  }
 }
 
 async function peopleAdminDeleteMessage(messageId) {
@@ -8090,6 +8111,7 @@ peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
 peopleAdminManageToggle?.addEventListener("click", (event) => {
   event.stopPropagation();
+  if (!peopleIsAdmin()) return;
   if (!peopleAdminManageMenu) return;
   const willOpen = peopleAdminManageMenu.hidden;
   peopleAdminManageMenu.hidden = !willOpen;
@@ -8215,7 +8237,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.37.1",
+        "./service-worker.js?v=14.37.2",
         { updateViaCache: "none" }
       );
 
@@ -8259,7 +8281,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.37.1";
+  window.__ZATOI_BUILD__ = "14.37.2";
 </script>
 </body>
 </html>
