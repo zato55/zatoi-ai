@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.28.2">
+  <link rel="stylesheet" href="./style.css?v=14.28.3">
 </head>
 
 <body>
@@ -3331,7 +3331,7 @@ function renderMessages() {
           if (meta.error && imageExpired) {
             choice.append(generated, metaText);
           } else {
-            choice.append(generated, metaText, regenerate, download);
+            choice.append(generated, regenerate, download);
           }
           pair.appendChild(choice);
         });
@@ -3352,6 +3352,11 @@ function renderMessages() {
         download.textContent = "⬇ İndir";
         actions.appendChild(download);
         bubble.insertBefore(actions, content.nextSibling);
+      }
+
+
+      if (hasGeneratedImage) {
+        content.style.display = "none";
       }
 
 
@@ -3447,7 +3452,9 @@ function renderMessages() {
         };
         tools.appendChild(shareButton);
       }
-      bubble.appendChild(tools);
+      if (!hasGeneratedImage) {
+        bubble.appendChild(tools);
+      }
 
 
       row.appendChild(identity);
@@ -7304,7 +7311,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.28.2",
+        "./service-worker.js?v=14.28.3",
         { updateViaCache: "none" }
       );
 
@@ -7348,7 +7355,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.28.2";
+  window.__ZATOI_BUILD__ = "14.28.3";
 </script>
 </body>
 </html>
