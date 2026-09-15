@@ -4617,18 +4617,11 @@ body.light-theme .chat-avatar {
 
 
 /* =========================================================
-   V14.35.1 — MESAJ AKIŞI
-   Eski mesajlar yukarıda, yeniler aşağıda.
+   V14.35.2 — ODA TOGGLE + YENİ MESAJ ÜSTTE
+   En yeni mesaj yukarıda, eskiler aşağı doğru.
    ========================================================= */
 .people-messages,
 .people-private-messages{
   flex-direction:column!important;
-}
-
-@media (min-width:721px){
-  .people-chat-panel[data-mobile-view="private"] .people-messages,
-  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-  }
+  overflow-y:auto!important;
 }
