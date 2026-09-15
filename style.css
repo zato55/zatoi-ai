@@ -5445,3 +5445,58 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     animation:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.4 — AI / SOHBET CSS İZOLASYONU
+   İki modun görsel katmanları birbirine sızmaz.
+   ========================================================= */
+
+/* SOHBET kapalıyken People Chat tamamen devre dışı/görünmez. */
+.app.zatoi-ai-mode > .people-chat-panel,
+.app:not(.people-chat-mode) > .people-chat-panel{
+  display:none!important;
+}
+
+/* AI modunda yalnızca ana AI kolonları çalışır. */
+.app.zatoi-ai-mode > .chat-column{
+  display:flex!important;
+}
+.app.zatoi-ai-mode > .side-panel{
+  display:flex;
+}
+
+/* Chat'e ait overlay/katmanlar AI modunda asla görünmez. */
+.app.zatoi-ai-mode .people-pinned-bar,
+.app.zatoi-ai-mode .people-admin-chat-tools,
+.app.zatoi-ai-mode .people-admin-manage-menu,
+.app.zatoi-ai-mode .people-public-profile-moderate{
+  display:none!important;
+}
+
+/* Mobil AI: son sohbet CSS'lerinin input/toolbar geometrisini etkilemesini engelle. */
+@media (max-width:760px){
+  .app.zatoi-ai-mode{
+    overflow:hidden;
+  }
+
+  .app.zatoi-ai-mode > .chat-column{
+    min-width:0;
+    width:100%;
+  }
+
+  /* People Chat katmanlarının stacking context'i AI ekranına taşınmasın. */
+  .app.zatoi-ai-mode .people-conversation-body,
+  .app.zatoi-ai-mode .people-chat-messages-wrap,
+  .app.zatoi-ai-mode .people-messages,
+  .app.zatoi-ai-mode .people-message-list,
+  .app.zatoi-ai-mode .people-general-messages{
+    isolation:auto;
+    z-index:auto;
+  }
+}
+
+/* Sohbet görsel efektlerinin çalışacağı alanı kesinleştir. */
+.app.people-chat-mode .people-chat-panel{
+  isolation:isolate;
+}
