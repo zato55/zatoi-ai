@@ -5010,3 +5010,34 @@ body.light-theme .chat-avatar {
     z-index:2!important;
   }
 }
+
+
+/* =========================================================
+   V14.37.2 — MODERASYON UI SADECE ADMIN
+   Normal kullanıcılar hiçbir yönetim aksiyonunu görmez.
+   ADMIN / SABİT / DUYURU rozetleri bilgi amaçlı görünür kalır.
+   ========================================================= */
+
+/* Fail-closed: admin sınıfı yoksa moderasyon kontrollerini kapat. */
+body:not(.zatoi-chat-admin) .people-admin-chat-tools,
+body:not(.zatoi-chat-admin) .people-admin-manage-menu,
+body:not(.zatoi-chat-admin) .people-message-admin-actions,
+body:not(.zatoi-chat-admin) .people-public-profile-moderate{
+  display:none!important;
+}
+
+/* Admin oturumunda JS hidden durumuna saygı göster. */
+body.zatoi-chat-admin .people-admin-chat-tools[hidden],
+body.zatoi-chat-admin .people-admin-manage-menu[hidden],
+body.zatoi-chat-admin .people-message-admin-actions[hidden],
+body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
+  display:none!important;
+}
+
+/* Bunlar yönetim butonu değil; tüm üyeler mesaj durumunu görebilir. */
+.people-admin-badge,
+.people-announcement-badge,
+.people-pinned-badge,
+.people-pinned-bar{
+  visibility:visible;
+}
