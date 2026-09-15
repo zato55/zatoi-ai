@@ -2809,3 +2809,42 @@ body.light-theme .chat-avatar {
     max-width: calc(100vw - 76px) !important;
   }
 }
+
+
+/* ==========================================
+   V14.28.3 SADECE GÖRSEL KARTI
+   Görsel mesajlarında açıklama, model bilgisi ve normal mesaj araçları yok.
+========================================== */
+.message-row.assistant.has-generated-image {
+  grid-template-columns: 52px minmax(0, 330px) !important;
+}
+
+.message-row.assistant.has-generated-image > .message.has-generated-image {
+  width: 330px !important;
+  max-width: 330px !important;
+  padding: 8px !important;
+}
+
+.message-row.assistant.has-generated-image .generated-pair {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.message-row.assistant.has-generated-image .generated-choice {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.message-row.assistant.has-generated-image .generated-choice > .generated-image {
+  margin: 0 auto !important;
+}
+
+@media (max-width: 720px) {
+  .message-row.assistant.has-generated-image {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+  }
+  .message-row.assistant.has-generated-image > .message.has-generated-image {
+    width: min(330px, calc(100vw - 76px)) !important;
+    max-width: calc(100vw - 76px) !important;
+  }
+}
