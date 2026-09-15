@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.27.1">
+  <link rel="stylesheet" href="./style.css?v=14.28">
 </head>
 
 <body>
@@ -3126,7 +3126,12 @@ function renderMessages() {
         identityName.textContent = profile.displayName?.trim() || currentUser?.username || "Sen";
       } else {
         avatar.classList.add("zatoi-chat-avatar");
-        avatar.innerHTML = '<span class="zatoi-avatar-mark">Z</span>';
+        const zatoiAvatarImage = document.createElement("img");
+        zatoiAvatarImage.className = "zatoi-chat-avatar-image";
+        zatoiAvatarImage.src = "./zatoi-ai-samurai-avatar.png?v=14.28";
+        zatoiAvatarImage.alt = "Zatoi AI siber samuray avatarı";
+        zatoiAvatarImage.loading = "lazy";
+        avatar.appendChild(zatoiAvatarImage);
         identityName.textContent = "Zatoi AI";
 
         const aiBadge = document.createElement("span");
@@ -7289,7 +7294,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.27.1",
+        "./service-worker.js?v=14.28",
         { updateViaCache: "none" }
       );
 
@@ -7333,7 +7338,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.27.1";
+  window.__ZATOI_BUILD__ = "14.28";
 </script>
 </body>
 </html>
