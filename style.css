@@ -4614,3 +4614,21 @@ body.light-theme .chat-avatar {
     max-width:90%!important;
   }
 }
+
+
+/* =========================================================
+   V14.35.1 — MESAJ AKIŞI
+   Eski mesajlar yukarıda, yeniler aşağıda.
+   ========================================================= */
+.people-messages,
+.people-private-messages{
+  flex-direction:column!important;
+}
+
+@media (min-width:721px){
+  .people-chat-panel[data-mobile-view="private"] .people-messages,
+  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+}
