@@ -1,5 +1,5 @@
-// ZATOI AI SERVICE WORKER V14.23
-const CACHE_NAME = "zatoi-ai-v14-23";
+// ZATOI AI SERVICE WORKER V14.24
+const CACHE_NAME = "zatoi-ai-v14-24";
 const APP_FILES = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./robots.txt", "./sitemap.xml", "./llms.txt", "./hakkinda/", "./ozellikler/"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => Promise.allSettled(
