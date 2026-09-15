@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.35">
+  <link rel="stylesheet" href="./style.css?v=14.35.1">
 </head>
 
 <body>
@@ -7594,6 +7594,15 @@ function setPeopleComposerEnabled(enabled) {
 
 function renderPeopleMessages(messages) {
   if (!peopleMessages) return;
+
+  // V14.35.1: Eski mesajlar yukarıda, yeni mesajlar aşağıda.
+  messages = Array.isArray(messages)
+    ? [...messages].sort((a, b) => {
+        const at = Date.parse(a?.createdAt || "") || 0;
+        const bt = Date.parse(b?.createdAt || "") || 0;
+        return at - bt;
+      })
+    : [];
   if (!messages.length) {
     peopleMessages.innerHTML = `<div class="people-conversation-empty compact"><div class="people-empty-orb">🔒</div><h2>Özel oda hazır</h2><p>İlk mesajı gönderebilirsin.</p></div>`;
     return;
@@ -7734,6 +7743,14 @@ function syncPrivateIntoMobileConversation(openPrivate) {
 }
 
 function renderPeoplePrivateMessages(messages) {
+  // V14.35.1: Eski özel mesajlar yukarıda, yeni mesajlar aşağıda.
+  messages = Array.isArray(messages)
+    ? [...messages].sort((a, b) => {
+        const at = Date.parse(a?.createdAt || "") || 0;
+        const bt = Date.parse(b?.createdAt || "") || 0;
+        return at - bt;
+      })
+    : [];
   if (!peoplePrivateMessages) return;
   if (!messages.length) {
     peoplePrivateMessages.innerHTML = `<div class="people-private-empty">Henüz mesaj yok. İlk mesajı gönder.</div>`;
@@ -7772,6 +7789,22 @@ async function loadPeoplePrivateMessages({ silent = false } = {}) {
 
 async function selectPeopleRoom(roomId) {
   if (!roomId) return;
+
+  // V14.35.1: Açık olan özel odaya sağ listeden tekrar tıklanırsa kapat.
+  const clickedRoomId = String(roomId);
+  const currentRoomId = String(peopleSelectedRoomId || "");
+  const privateIsOpen =
+    peopleChatPanel?.dataset.mobileView === "private" &&
+    currentRoomId &&
+    currentRoomId === clickedRoomId;
+
+  if (privateIsOpen) {
+    peopleSelectedRoomId = "";
+    if (peoplePrivateDock) peoplePrivateDock.hidden = true;
+    setPeopleMobileView("general");
+    return;
+  }
+
   mountPeoplePrivateDock();
   peopleCurrentRoomId = roomId;
   const room = peopleRooms.find(item => item.roomId === roomId);
@@ -8002,7 +8035,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.35",
+        "./service-worker.js?v=14.35.1",
         { updateViaCache: "none" }
       );
 
@@ -8046,7 +8079,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.35";
+  window.__ZATOI_BUILD__ = "14.35.1";
 </script>
 </body>
 </html>
