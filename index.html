@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.29">
+  <link rel="stylesheet" href="./style.css?v=14.30">
 </head>
 
 <body>
@@ -545,34 +545,47 @@
 
 
   <section id="peopleChatPanel" class="people-chat-panel" aria-hidden="true">
-    <aside class="people-chat-list">
-      <div class="people-chat-heading">
-        <div><strong>Sohbet</strong><span>İnsanlarla konuş</span></div>
-        <button type="button" class="people-new-chat" title="Yeni sohbet">＋</button>
+    <aside class="people-active-panel">
+      <div class="people-panel-heading">
+        <div><strong>🟢 Aktif Kullanıcılar</strong><span>Şu anda sohbette olanlar</span></div>
+        <button id="peopleRefreshActive" type="button" class="people-icon-btn" title="Aktifleri yenile">↻</button>
       </div>
-      <label class="people-search"><span>⌕</span><input type="search" placeholder="Kullanıcı ara..." aria-label="Kullanıcı ara"></label>
-      <div class="people-chat-placeholder">
-        <div class="people-empty-icon">💬</div>
-        <strong>Henüz sohbet yok</strong>
-        <p>İkinci aşamada kullanıcı arama ve gerçek mesajlaşmayı buraya bağlayacağız.</p>
+      <label class="people-search"><span>⌕</span><input id="peopleUserSearch" type="search" placeholder="Aktif kullanıcı ara..." aria-label="Aktif kullanıcı ara"></label>
+      <div id="peopleActiveList" class="people-list">
+        <div class="people-loading">Aktif kullanıcılar yükleniyor...</div>
       </div>
     </aside>
+
     <main class="people-conversation">
-      <div class="people-conversation-head">
-        <div class="people-avatar">Z</div>
-        <div><strong>Zatoi Sohbet</strong><span>Gerçek kullanıcı mesajlaşması</span></div>
+      <div id="peopleConversationHead" class="people-conversation-head">
+        <div id="peopleConversationAvatar" class="people-avatar">💬</div>
+        <div><strong id="peopleConversationName">Bir sohbet seç</strong><span id="peopleConversationStatus">Aktiflerden veya özel odalardan seçim yap</span></div>
       </div>
-      <div class="people-conversation-empty">
-        <div class="people-empty-orb">💬</div>
-        <h2>Sohbet bölümüne hoş geldin</h2>
-        <p>Burada Zatoi kullanıcıları birbirleriyle konuşabilecek. AI kotası bu mesajlarda kullanılmayacak.</p>
-        <span class="people-stage-badge">V14.29 • Arayüz altyapısı hazır</span>
+
+      <div id="peopleMessages" class="people-messages">
+        <div class="people-conversation-empty">
+          <div class="people-empty-orb">💬</div>
+          <h2>Özel sohbetler</h2>
+          <p>Aktif bir kullanıcıya tıklayıp özel sohbet başlatabilirsin. Mesajlar Zatoi AI kotasını kullanmaz.</p>
+          <span class="people-stage-badge">V14.30 • Gerçek kullanıcı mesajlaşması</span>
+        </div>
       </div>
-      <div class="people-composer disabled" aria-disabled="true">
-        <input type="text" placeholder="Bir sohbet seçince mesaj yazabileceksin..." disabled>
-        <button type="button" disabled>➤</button>
-      </div>
+
+      <form id="peopleComposer" class="people-composer disabled" aria-disabled="true">
+        <input id="peopleMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="Bir özel oda seçince mesaj yazabilirsin..." disabled>
+        <button id="peopleSendButton" type="submit" disabled aria-label="Mesaj gönder">➤</button>
+      </form>
     </main>
+
+    <aside class="people-rooms-panel">
+      <div class="people-panel-heading">
+        <div><strong>🔒 Özel Odalar</strong><span>Başlattığın birebir sohbetler</span></div>
+        <button id="peopleRefreshRooms" type="button" class="people-icon-btn" title="Odaları yenile">↻</button>
+      </div>
+      <div id="peopleRoomList" class="people-list">
+        <div class="people-loading">Özel odalar yükleniyor...</div>
+      </div>
+    </aside>
   </section>
 
   <aside class="side-panel">
@@ -7319,11 +7332,290 @@ window.addEventListener(
 
 
 /* ==========================================
-   V14.29 — ZATOI AI / İNSAN SOHBETİ MODU
+   V14.30 — ZATOI AI / GERÇEK KULLANICI SOHBETİ
 ========================================== */
 const zatoiAiModeButton = document.getElementById("zatoiAiModeButton");
 const zatoiChatModeButton = document.getElementById("zatoiChatModeButton");
 const peopleChatPanel = document.getElementById("peopleChatPanel");
+const peopleActiveList = document.getElementById("peopleActiveList");
+const peopleRoomList = document.getElementById("peopleRoomList");
+const peopleUserSearch = document.getElementById("peopleUserSearch");
+const peopleRefreshActive = document.getElementById("peopleRefreshActive");
+const peopleRefreshRooms = document.getElementById("peopleRefreshRooms");
+const peopleMessages = document.getElementById("peopleMessages");
+const peopleConversationAvatar = document.getElementById("peopleConversationAvatar");
+const peopleConversationName = document.getElementById("peopleConversationName");
+const peopleConversationStatus = document.getElementById("peopleConversationStatus");
+const peopleComposer = document.getElementById("peopleComposer");
+const peopleMessageInput = document.getElementById("peopleMessageInput");
+const peopleSendButton = document.getElementById("peopleSendButton");
+
+let peopleChatActive = false;
+let peopleActiveUsers = [];
+let peopleRooms = [];
+let peopleCurrentRoomId = "";
+let peopleCurrentPartner = null;
+let peoplePollTimer = null;
+let peopleLastMessageSignature = "";
+
+function peopleEscape(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[char]);
+}
+
+function peopleAvatarText(user) {
+  const key = String(user?.avatarKey || "");
+  const symbols = { spark:"✦", orbit:"◉", bolt:"ϟ", pixel:"◆", nova:"✺", shield:"⬡" };
+  return symbols[key] || String(user?.displayName || user?.username || "?").trim().charAt(0).toLocaleUpperCase("tr-TR") || "?";
+}
+
+function peopleDisplayName(user) {
+  return String(user?.displayName || user?.username || "Zatoi kullanıcısı").trim();
+}
+
+function peopleTime(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+}
+
+async function peopleApi(action, payload = {}) {
+  if (!authToken) throw new Error("Sohbet için giriş yapmalısın.");
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${authToken}`
+    },
+    body: JSON.stringify({ type: "people_chat", action, ...payload })
+  });
+  let data = {};
+  try { data = await response.json(); } catch {}
+  if (!response.ok || data?.success === false) {
+    throw new Error(data?.error || `Sohbet isteği başarısız (${response.status}).`);
+  }
+  return data;
+}
+
+function renderPeopleActiveUsers() {
+  if (!peopleActiveList) return;
+  const query = String(peopleUserSearch?.value || "").trim().toLocaleLowerCase("tr-TR");
+  const users = peopleActiveUsers.filter(user => {
+    const haystack = `${user.displayName || ""} ${user.username || ""}`.toLocaleLowerCase("tr-TR");
+    return !query || haystack.includes(query);
+  });
+
+  if (!users.length) {
+    peopleActiveList.innerHTML = `<div class="people-empty-small">Şu anda başka aktif kullanıcı görünmüyor.</div>`;
+    return;
+  }
+
+  peopleActiveList.innerHTML = users.map(user => `
+    <button class="people-user-card" type="button" data-user-id="${peopleEscape(user.userId)}">
+      <span class="people-user-avatar">${peopleEscape(peopleAvatarText(user))}<i></i></span>
+      <span class="people-user-info">
+        <strong>${peopleEscape(peopleDisplayName(user))}</strong>
+        <small>@${peopleEscape(user.username || "kullanici")}</small>
+      </span>
+      <span class="people-start-chat">Sohbet</span>
+    </button>
+  `).join("");
+
+  peopleActiveList.querySelectorAll("[data-user-id]").forEach(button => {
+    button.addEventListener("click", () => openPeopleRoomWithUser(button.dataset.userId));
+  });
+}
+
+function renderPeopleRooms() {
+  if (!peopleRoomList) return;
+  if (!peopleRooms.length) {
+    peopleRoomList.innerHTML = `<div class="people-empty-small">Henüz özel odan yok.<br>Aktif bir kullanıcıyla sohbet başlat.</div>`;
+    return;
+  }
+
+  peopleRoomList.innerHTML = peopleRooms.map(room => {
+    const active = room.roomId === peopleCurrentRoomId ? " active" : "";
+    const preview = room.lastMessage ? peopleEscape(room.lastMessage) : "Yeni özel sohbet";
+    return `
+      <button class="people-room-card${active}" type="button" data-room-id="${peopleEscape(room.roomId)}">
+        <span class="people-room-avatar">${peopleEscape(peopleAvatarText(room.partner))}${room.partner?.isActive ? "<i></i>" : ""}</span>
+        <span class="people-room-info">
+          <strong>${peopleEscape(peopleDisplayName(room.partner))}</strong>
+          <small>${preview}</small>
+        </span>
+        <time>${peopleEscape(peopleTime(room.lastMessageAt))}</time>
+      </button>
+    `;
+  }).join("");
+
+  peopleRoomList.querySelectorAll("[data-room-id]").forEach(button => {
+    button.addEventListener("click", () => selectPeopleRoom(button.dataset.roomId));
+  });
+}
+
+async function refreshPeopleActive() {
+  if (!peopleChatActive || !authToken) return;
+  try {
+    const data = await peopleApi("list_active");
+    peopleActiveUsers = Array.isArray(data.users) ? data.users : [];
+    renderPeopleActiveUsers();
+  } catch (error) {
+    if (peopleActiveList) peopleActiveList.innerHTML = `<div class="people-empty-small error">${peopleEscape(error.message)}</div>`;
+  }
+}
+
+async function refreshPeopleRooms() {
+  if (!peopleChatActive || !authToken) return;
+  try {
+    const data = await peopleApi("list_rooms");
+    peopleRooms = Array.isArray(data.rooms) ? data.rooms : [];
+    renderPeopleRooms();
+    if (peopleCurrentRoomId) {
+      const room = peopleRooms.find(item => item.roomId === peopleCurrentRoomId);
+      if (room) peopleCurrentPartner = room.partner;
+    }
+  } catch (error) {
+    if (peopleRoomList) peopleRoomList.innerHTML = `<div class="people-empty-small error">${peopleEscape(error.message)}</div>`;
+  }
+}
+
+async function openPeopleRoomWithUser(userId) {
+  if (!userId) return;
+  try {
+    const data = await peopleApi("open_room", { targetUserId: userId });
+    await refreshPeopleRooms();
+    await selectPeopleRoom(data.roomId);
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+function setPeopleComposerEnabled(enabled) {
+  peopleComposer?.classList.toggle("disabled", !enabled);
+  peopleComposer?.setAttribute("aria-disabled", String(!enabled));
+  if (peopleMessageInput) {
+    peopleMessageInput.disabled = !enabled;
+    peopleMessageInput.placeholder = enabled ? "Mesaj yaz..." : "Bir özel oda seçince mesaj yazabilirsin...";
+  }
+  if (peopleSendButton) peopleSendButton.disabled = !enabled;
+}
+
+function renderPeopleMessages(messages) {
+  if (!peopleMessages) return;
+  if (!messages.length) {
+    peopleMessages.innerHTML = `<div class="people-conversation-empty compact"><div class="people-empty-orb">🔒</div><h2>Özel oda hazır</h2><p>İlk mesajı gönderebilirsin.</p></div>`;
+    return;
+  }
+
+  peopleMessages.innerHTML = messages.map(message => {
+    const mine = String(message.senderId) === String(currentUser?.userId);
+    return `
+      <div class="people-message-row ${mine ? "mine" : "theirs"}">
+        <div class="people-message-bubble">
+          <div>${peopleEscape(message.content)}</div>
+          <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+        </div>
+      </div>
+    `;
+  }).join("");
+  peopleMessages.scrollTop = peopleMessages.scrollHeight;
+}
+
+async function loadPeopleMessages({ silent = false } = {}) {
+  if (!peopleChatActive || !peopleCurrentRoomId) return;
+  try {
+    const data = await peopleApi("get_messages", { roomId: peopleCurrentRoomId });
+    const messages = Array.isArray(data.messages) ? data.messages : [];
+    const signature = messages.map(item => `${item.messageId}:${item.createdAt}`).join("|");
+    if (!silent || signature !== peopleLastMessageSignature) {
+      peopleLastMessageSignature = signature;
+      renderPeopleMessages(messages);
+    }
+  } catch (error) {
+    if (!silent && peopleMessages) {
+      peopleMessages.innerHTML = `<div class="people-empty-small error">${peopleEscape(error.message)}</div>`;
+    }
+  }
+}
+
+async function selectPeopleRoom(roomId) {
+  if (!roomId) return;
+  peopleCurrentRoomId = roomId;
+  const room = peopleRooms.find(item => item.roomId === roomId);
+  peopleCurrentPartner = room?.partner || peopleCurrentPartner;
+  peopleLastMessageSignature = "";
+
+  if (peopleConversationAvatar) peopleConversationAvatar.textContent = peopleAvatarText(peopleCurrentPartner);
+  if (peopleConversationName) peopleConversationName.textContent = peopleDisplayName(peopleCurrentPartner);
+  if (peopleConversationStatus) {
+    peopleConversationStatus.textContent = peopleCurrentPartner?.isActive
+      ? `🟢 Aktif • @${peopleCurrentPartner.username || "kullanici"}`
+      : `Özel sohbet • @${peopleCurrentPartner?.username || "kullanici"}`;
+  }
+  setPeopleComposerEnabled(true);
+  renderPeopleRooms();
+  await loadPeopleMessages();
+  peopleMessageInput?.focus();
+}
+
+async function sendPeopleMessage(event) {
+  event?.preventDefault();
+  const content = String(peopleMessageInput?.value || "").trim();
+  if (!peopleCurrentRoomId || !content) return;
+  if (content.length > 2000) return alert("Mesaj en fazla 2000 karakter olabilir.");
+
+  peopleMessageInput.disabled = true;
+  peopleSendButton.disabled = true;
+  try {
+    await peopleApi("send_message", { roomId: peopleCurrentRoomId, content });
+    peopleMessageInput.value = "";
+    await Promise.all([loadPeopleMessages(), refreshPeopleRooms()]);
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    setPeopleComposerEnabled(Boolean(peopleCurrentRoomId));
+    peopleMessageInput?.focus();
+  }
+}
+
+async function peopleHeartbeat() {
+  if (!peopleChatActive || !authToken) return;
+  try { await peopleApi("heartbeat"); } catch {}
+}
+
+function stopPeoplePolling() {
+  if (peoplePollTimer) clearInterval(peoplePollTimer);
+  peoplePollTimer = null;
+}
+
+function startPeoplePolling() {
+  stopPeoplePolling();
+  peoplePollTimer = setInterval(async () => {
+    if (!peopleChatActive || document.hidden) return;
+    await peopleHeartbeat();
+    await Promise.all([refreshPeopleActive(), refreshPeopleRooms()]);
+    if (peopleCurrentRoomId) await loadPeopleMessages({ silent: true });
+  }, 8000);
+}
+
+async function enterPeopleChat() {
+  peopleChatActive = true;
+  if (!authToken) {
+    if (peopleActiveList) peopleActiveList.innerHTML = `<div class="people-empty-small">Sohbet için hesabına giriş yap.</div>`;
+    if (peopleRoomList) peopleRoomList.innerHTML = `<div class="people-empty-small">Sohbet için hesabına giriş yap.</div>`;
+    return;
+  }
+  await peopleHeartbeat();
+  await Promise.all([refreshPeopleActive(), refreshPeopleRooms()]);
+  startPeoplePolling();
+}
+
+function leavePeopleChat() {
+  peopleChatActive = false;
+  stopPeoplePolling();
+}
 
 function setZatoiMode(mode) {
   const chatMode = mode === "chat";
@@ -7334,10 +7626,25 @@ function setZatoiMode(mode) {
   zatoiChatModeButton?.setAttribute("aria-selected", String(chatMode));
   peopleChatPanel?.setAttribute("aria-hidden", String(!chatMode));
   try { sessionStorage.setItem("zatoi_active_mode_v1", chatMode ? "chat" : "ai"); } catch {}
+  if (chatMode) enterPeopleChat();
+  else leavePeopleChat();
 }
 
 zatoiAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 zatoiChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
+peopleRefreshActive?.addEventListener("click", refreshPeopleActive);
+peopleRefreshRooms?.addEventListener("click", refreshPeopleRooms);
+peopleUserSearch?.addEventListener("input", renderPeopleActiveUsers);
+peopleComposer?.addEventListener("submit", sendPeopleMessage);
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && peopleChatActive) {
+    peopleHeartbeat();
+    refreshPeopleActive();
+    refreshPeopleRooms();
+    if (peopleCurrentRoomId) loadPeopleMessages({ silent: true });
+  }
+});
 
 try { setZatoiMode(sessionStorage.getItem("zatoi_active_mode_v1") === "chat" ? "chat" : "ai"); }
 catch { setZatoiMode("ai"); }
@@ -7371,7 +7678,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.29",
+        "./service-worker.js?v=14.30",
         { updateViaCache: "none" }
       );
 
@@ -7415,7 +7722,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.29";
+  window.__ZATOI_BUILD__ = "14.30";
 </script>
 </body>
 </html>
