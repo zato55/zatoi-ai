@@ -3869,3 +3869,70 @@ body.light-theme .chat-avatar {
   .people-message-sender small{max-width:90px}
   .people-public-profile-card{padding:24px 17px 17px}
 }
+
+
+/* =========================================================
+   V14.34.1 — PC SOHBET MESAJ KUTUSU ÜSTTE
+   SADECE >=721px. MOBİL DÜZEN DEĞİŞMEZ.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* Genel sohbet: Başlık -> Mesaj yazma -> Mesajlar */
+  .people-chat-panel[data-mobile-view="general"] .people-conversation{
+    display:grid!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-conversation-head{
+    grid-row:1!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-composer{
+    grid-row:2!important;
+    position:relative!important;
+    bottom:auto!important;
+    top:auto!important;
+    z-index:5!important;
+    padding:10px 14px!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+    background:var(--panel,#0f1620)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-messages{
+    grid-row:3!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-composer input{
+    min-height:48px!important;
+  }
+
+  /* Özel sohbet açıldığında da aynı kullanım: kişi -> mesaj kutusu -> mesajlar */
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-head{
+    grid-row:1!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-composer{
+    grid-row:2!important;
+    padding:10px 14px!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+    background:var(--panel,#0f1620)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
+    grid-row:3!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-composer input{
+    min-height:48px!important;
+  }
+}
