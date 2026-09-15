@@ -5041,3 +5041,120 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 .people-pinned-bar{
   visibility:visible;
 }
+
+
+/* =========================================================
+   V14.38 — ZATOI OWNER
+   Premium admin kimliği. Yalnızca admin/owner öğelerine uygulanır.
+   ========================================================= */
+
+@keyframes zatoiOwnerGlow{
+  0%,100%{filter:drop-shadow(0 0 4px rgba(77,163,255,.32))}
+  50%{filter:drop-shadow(0 0 11px rgba(167,104,255,.55))}
+}
+@keyframes zatoiOwnerShimmer{
+  0%{background-position:200% 50%}
+  100%{background-position:-200% 50%}
+}
+@keyframes zatoiOwnerRing{
+  to{transform:rotate(360deg)}
+}
+
+/* Genel sohbette OWNER mesajı */
+.people-message-row.zatoi-owner-message .people-message-bubble{
+  position:relative;
+  border:1px solid rgba(139,118,255,.52)!important;
+  background:
+    linear-gradient(135deg,rgba(30,87,145,.88),rgba(75,43,118,.88))!important;
+  box-shadow:
+    0 0 0 1px rgba(102,190,255,.07),
+    0 7px 24px rgba(68,73,190,.16),
+    0 0 22px rgba(137,91,230,.10)!important;
+  overflow:visible;
+}
+.people-message-row.zatoi-owner-message .people-message-bubble::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.13) 48%,transparent 70%);
+  background-size:220% 100%;
+  animation:zatoiOwnerShimmer 6s linear infinite;
+  opacity:.65;
+}
+
+/* Owner rozeti */
+.people-admin-badge.zatoi-owner-badge{
+  padding:3px 8px!important;
+  border:1px solid rgba(194,155,255,.58)!important;
+  background:linear-gradient(90deg,rgba(32,112,210,.34),rgba(135,71,205,.34),rgba(32,112,210,.34))!important;
+  background-size:200% 100%!important;
+  color:#f6f0ff!important;
+  box-shadow:0 0 12px rgba(142,91,226,.20)!important;
+  animation:zatoiOwnerShimmer 7s linear infinite;
+  letter-spacing:.075em!important;
+}
+
+/* Aktif kullanıcı kartında admin */
+.people-user-card.zatoi-owner-card{
+  position:relative;
+  border-color:rgba(137,109,238,.55)!important;
+  background:
+    linear-gradient(115deg,rgba(25,70,119,.28),rgba(76,42,112,.30)),
+    rgba(18,27,39,.96)!important;
+  box-shadow:
+    inset 3px 0 0 rgba(108,162,255,.72),
+    0 0 18px rgba(119,87,219,.09)!important;
+}
+.people-user-card.zatoi-owner-card::after{
+  content:"👑";
+  position:absolute;
+  top:7px;
+  right:8px;
+  font-size:11px;
+  animation:zatoiOwnerGlow 3.2s ease-in-out infinite;
+}
+
+/* Admin avatarlarında premium halka.
+   Kart yapısı bozulmadan mevcut avatarın etrafında glow. */
+.zatoi-owner-card .people-avatar,
+.zatoi-owner-message .people-avatar,
+.zatoi-owner-profile .people-avatar{
+  position:relative;
+  border:1px solid rgba(153,126,255,.75)!important;
+  box-shadow:
+    0 0 0 2px rgba(76,151,255,.12),
+    0 0 13px rgba(146,92,235,.30)!important;
+  animation:zatoiOwnerGlow 3.6s ease-in-out infinite;
+}
+
+/* Profil penceresinde OWNER kimliği */
+.zatoi-owner-profile .people-public-profile-card,
+.zatoi-owner-profile .people-profile-card{
+  border-color:rgba(139,111,239,.55)!important;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(117,80,193,.16),transparent 42%),
+    #101824!important;
+  box-shadow:0 20px 55px rgba(0,0,0,.42),0 0 32px rgba(113,80,206,.12)!important;
+}
+.zatoi-owner-profile .people-public-profile-name::after,
+.zatoi-owner-profile .people-profile-name::after{
+  content:"  👑 ZATOI OWNER";
+  color:#c6a7ff;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.06em;
+}
+
+/* Hareket azaltma tercihini koru */
+@media (prefers-reduced-motion:reduce){
+  .zatoi-owner-badge,
+  .zatoi-owner-card::after,
+  .zatoi-owner-card .people-avatar,
+  .zatoi-owner-message .people-avatar,
+  .zatoi-owner-profile .people-avatar,
+  .people-message-row.zatoi-owner-message .people-message-bubble::before{
+    animation:none!important;
+  }
+}
