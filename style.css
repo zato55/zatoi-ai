@@ -2848,3 +2848,71 @@ body.light-theme .chat-avatar {
     max-width: calc(100vw - 76px) !important;
   }
 }
+
+
+/* ==========================================
+   V14.28.4 GÖRSELDE DIŞ BALON YOK
+   Zatoi avatarının yanında yalnızca gerçek görsel kartı görünür.
+========================================== */
+.message-row.assistant.has-generated-image {
+  width: fit-content !important;
+  max-width: 100% !important;
+  grid-template-columns: 52px minmax(0, max-content) !important;
+  grid-template-areas: "avatar bubble" !important;
+  justify-content: start !important;
+  column-gap: 11px !important;
+}
+
+.message-row.assistant.has-generated-image > .message.has-generated-image {
+  width: fit-content !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.message-row.assistant.has-generated-image > .message.has-generated-image::before,
+.message-row.assistant.has-generated-image > .message.has-generated-image::after {
+  display: none !important;
+  content: none !important;
+}
+
+.message-row.assistant.has-generated-image .generated-pair {
+  display: block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.message-row.assistant.has-generated-image .generated-choice {
+  box-sizing: border-box !important;
+  width: 190px !important;
+  max-width: 190px !important;
+  margin: 0 !important;
+}
+
+.message-row.assistant.has-generated-image .generated-image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+@media (max-width: 720px) {
+  .message-row.assistant.has-generated-image {
+    width: 100% !important;
+    grid-template-columns: 40px minmax(0, max-content) !important;
+    column-gap: 8px !important;
+  }
+
+  .message-row.assistant.has-generated-image .generated-choice {
+    width: min(190px, calc(100vw - 70px)) !important;
+    max-width: calc(100vw - 70px) !important;
+  }
+}
