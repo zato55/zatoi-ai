@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.28">
+  <link rel="stylesheet" href="./style.css?v=14.28.1">
 </head>
 
 <body>
@@ -3154,6 +3154,16 @@ function renderMessages() {
       bubble.className =
         "message " +
         message.role;
+
+      const hasGeneratedImage =
+        message.role === "assistant" &&
+        Array.isArray(message.generatedImages) &&
+        message.generatedImages.length > 0;
+
+      if (hasGeneratedImage) {
+        row.classList.add("has-generated-image");
+        bubble.classList.add("has-generated-image");
+      }
 
 
       const content =
@@ -7294,7 +7304,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.28",
+        "./service-worker.js?v=14.28.1",
         { updateViaCache: "none" }
       );
 
@@ -7338,7 +7348,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.28";
+  window.__ZATOI_BUILD__ = "14.28.1";
 </script>
 </body>
 </html>
