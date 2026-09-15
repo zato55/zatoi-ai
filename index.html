@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.37">
+  <link rel="stylesheet" href="./style.css?v=14.37.1">
 </head>
 
 <body>
@@ -8093,11 +8093,13 @@ peopleAdminManageToggle?.addEventListener("click", (event) => {
   if (!peopleAdminManageMenu) return;
   const willOpen = peopleAdminManageMenu.hidden;
   peopleAdminManageMenu.hidden = !willOpen;
+  peopleAdminChatTools?.classList.toggle("menu-open", willOpen);
   peopleAdminManageToggle?.setAttribute("aria-expanded", String(willOpen));
 });
 document.addEventListener("click", (event) => {
   if (!peopleAdminChatTools?.contains(event.target) && peopleAdminManageMenu) {
     peopleAdminManageMenu.hidden = true;
+    peopleAdminChatTools?.classList.remove("menu-open");
     peopleAdminManageToggle?.setAttribute("aria-expanded", "false");
   }
 });
@@ -8109,8 +8111,16 @@ peoplePinnedBar?.addEventListener("click", () => {
   target?.classList.add("people-message-highlight");
   setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
 });
-peopleAdminClearGeneral?.addEventListener("click", peopleAdminClearChat);
-peopleAdminAnnouncement?.addEventListener("click", peopleAdminSendAnnouncement);
+peopleAdminClearGeneral?.addEventListener("click", async () => {
+  if (peopleAdminManageMenu) peopleAdminManageMenu.hidden = true;
+  peopleAdminChatTools?.classList.remove("menu-open");
+  await peopleAdminClearChat();
+});
+peopleAdminAnnouncement?.addEventListener("click", async () => {
+  if (peopleAdminManageMenu) peopleAdminManageMenu.hidden = true;
+  peopleAdminChatTools?.classList.remove("menu-open");
+  await peopleAdminSendAnnouncement();
+});
 peoplePublicProfileModerate?.addEventListener("click", () => peopleAdminModerateUser(peoplePublicProfileUserId));
 peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
 peoplePrivateSend?.addEventListener("click", (event) => {
@@ -8205,7 +8215,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.37",
+        "./service-worker.js?v=14.37.1",
         { updateViaCache: "none" }
       );
 
@@ -8249,7 +8259,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.37";
+  window.__ZATOI_BUILD__ = "14.37.1";
 </script>
 </body>
 </html>
