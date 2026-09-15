@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.24 - SEO + ADMIN + STRUCTURED LIMIT ERRORS -->
+<!-- ZATOI AI INDEX V14.26 - SEO + ADMIN + STRUCTURED LIMIT ERRORS -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -595,6 +595,7 @@
           <button id="settingsLogoutButton" class="settings-logout">Oturumu Kapat</button>
         </div>
         <div class="account-tools">
+          <button id="openProfileButton" class="account-tool">👤 Profilim</button>
           <button id="exportChatButton" class="account-tool">Aktif sohbeti dışa aktar</button>
           <button id="privacyPolicyButton" class="account-tool">Gizlilik Politikası</button>
           <button id="clearDataButton" class="account-tool">Sohbetleri ve hafızayı temizle</button>
@@ -603,13 +604,87 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14.24 • SEO + Yönetici Paneli + Ücretsiz KV + Akıllı Router</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14.26 • Profesyonel Profil + Yönetici Paneli + Akıllı Router</span></div>
       </div>
     </div>
   </section>
 </div>
 
 
+
+
+<div id="profileOverlay" class="profile-overlay" aria-hidden="true">
+  <section class="profile-panel" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+    <div class="profile-header">
+      <div>
+        <div id="profileTitle" class="profile-title">👤 Profilim</div>
+        <div class="profile-subtitle">Zatoi hesabını ve kişiselleştirme bilgilerini yönet.</div>
+      </div>
+      <button id="profileCloseButton" class="profile-close" type="button" aria-label="Profili kapat">×</button>
+    </div>
+
+    <div class="profile-content">
+      <div class="profile-hero">
+        <div id="profileAvatarPreview" class="profile-avatar profile-avatar-spark">✦</div>
+        <div class="profile-identity">
+          <div id="profileDisplayPreview" class="profile-display-name">Zatoi kullanıcısı</div>
+          <div id="profileUsernamePreview" class="profile-username">@kullanici</div>
+          <span id="profileRoleBadge" class="profile-role-badge">USER</span>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Profil bilgileri</div>
+        <label class="profile-field">
+          <span>Görünen ad</span>
+          <input id="profileDisplayName" maxlength="40" placeholder="Profilinde görünecek ad">
+        </label>
+        <label class="profile-field">
+          <span>Hakkımda</span>
+          <textarea id="profileBio" maxlength="180" rows="3" placeholder="Kendini kısaca anlat..."></textarea>
+          <small><span id="profileBioCount">0</span>/180</small>
+        </label>
+        <label class="profile-field">
+          <span>Zatoi sana nasıl hitap etsin?</span>
+          <input id="profilePreferredName" maxlength="40" placeholder="Örn. Mesut">
+        </label>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Avatar</div>
+        <div id="profileAvatarChoices" class="profile-avatar-choices" role="radiogroup" aria-label="Avatar seç">
+          <button type="button" data-avatar="spark" class="profile-avatar-choice">✦</button>
+          <button type="button" data-avatar="orbit" class="profile-avatar-choice">◉</button>
+          <button type="button" data-avatar="bolt" class="profile-avatar-choice">ϟ</button>
+          <button type="button" data-avatar="pixel" class="profile-avatar-choice">◆</button>
+          <button type="button" data-avatar="nova" class="profile-avatar-choice">✺</button>
+          <button type="button" data-avatar="shield" class="profile-avatar-choice">⬡</button>
+        </div>
+        <div class="profile-help">İlk sürümde hafif ve ücretsiz hazır avatarlar kullanıyoruz. Fotoğraf yüklemeyi depolama altyapısını şişirmeden sonraki aşamada ekleyebiliriz.</div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Hesap</div>
+        <div class="profile-meta-row"><span>Kullanıcı adı</span><strong id="profileMetaUsername">—</strong></div>
+        <div class="profile-meta-row"><span>Rol</span><strong id="profileMetaRole">—</strong></div>
+        <div class="profile-meta-row"><span>Profil oluşturma</span><strong id="profileMetaCreated">—</strong></div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Güvenlik</div>
+        <div class="profile-security-grid">
+          <button id="profileChangePasswordButton" class="profile-secondary-btn" type="button">🔑 Şifreyi Değiştir</button>
+          <button id="profileLogoutOthersButton" class="profile-secondary-btn" type="button">↪ Diğer Oturumları Kapat</button>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <span id="profileStatus" class="profile-status"></span>
+        <button id="profileSaveButton" class="profile-save-btn" type="button">Değişiklikleri Kaydet</button>
+      </div>
+    </div>
+  </section>
+</div>
 
 <div id="adminOverlay" class="admin-overlay" aria-hidden="true">
   <section class="admin-panel" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
@@ -6681,6 +6756,178 @@ document.addEventListener("keydown", event => {
     closeAdminPanel();
   }
 });
+
+
+/* ==========================================
+   V14.26 PROFİL SİSTEMİ
+========================================== */
+const profileOverlay = document.getElementById("profileOverlay");
+const profileCloseButton = document.getElementById("profileCloseButton");
+const profileSaveButton = document.getElementById("profileSaveButton");
+const profileDisplayName = document.getElementById("profileDisplayName");
+const profileBio = document.getElementById("profileBio");
+const profilePreferredName = document.getElementById("profilePreferredName");
+const profileBioCount = document.getElementById("profileBioCount");
+const profileAvatarPreview = document.getElementById("profileAvatarPreview");
+const profileDisplayPreview = document.getElementById("profileDisplayPreview");
+const profileUsernamePreview = document.getElementById("profileUsernamePreview");
+const profileRoleBadge = document.getElementById("profileRoleBadge");
+const profileMetaUsername = document.getElementById("profileMetaUsername");
+const profileMetaRole = document.getElementById("profileMetaRole");
+const profileMetaCreated = document.getElementById("profileMetaCreated");
+const profileStatus = document.getElementById("profileStatus");
+const profileChangePasswordButton = document.getElementById("profileChangePasswordButton");
+const profileLogoutOthersButton = document.getElementById("profileLogoutOthersButton");
+const openProfileButton = document.getElementById("openProfileButton");
+
+const PROFILE_AVATARS = {
+  spark: "✦", orbit: "◉", bolt: "ϟ", pixel: "◆", nova: "✺", shield: "⬡"
+};
+let selectedProfileAvatar = "spark";
+
+function profileData() {
+  return currentUser?.profile || {};
+}
+
+function formatProfileDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium" }).format(date);
+}
+
+function paintProfileAvatar(key) {
+  selectedProfileAvatar = PROFILE_AVATARS[key] ? key : "spark";
+  profileAvatarPreview.textContent = PROFILE_AVATARS[selectedProfileAvatar];
+  profileAvatarPreview.className = `profile-avatar profile-avatar-${selectedProfileAvatar}`;
+  document.querySelectorAll(".profile-avatar-choice").forEach(button => {
+    const active = button.dataset.avatar === selectedProfileAvatar;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-checked", String(active));
+  });
+}
+
+function refreshProfilePreview() {
+  const display = profileDisplayName.value.trim() || currentUser?.username || "Zatoi kullanıcısı";
+  profileDisplayPreview.textContent = display;
+  profileUsernamePreview.textContent = `@${currentUser?.username || "kullanici"}`;
+  profileRoleBadge.textContent = currentUser?.role === "admin" ? "ADMIN" : "USER";
+  profileRoleBadge.classList.toggle("admin", currentUser?.role === "admin");
+  profileBioCount.textContent = String(profileBio.value.length);
+}
+
+function fillProfileForm() {
+  const profile = profileData();
+  profileDisplayName.value = profile.displayName || "";
+  profileBio.value = profile.bio || "";
+  profilePreferredName.value = profile.preferredName || "";
+  profileMetaUsername.textContent = currentUser?.username || "—";
+  profileMetaRole.textContent = currentUser?.role === "admin" ? "Yönetici" : "Kullanıcı";
+  profileMetaCreated.textContent = formatProfileDate(profile.profileCreatedAt);
+  paintProfileAvatar(profile.avatarKey || "spark");
+  refreshProfilePreview();
+}
+
+async function refreshProfileFromServer() {
+  const data = await authRequest("me");
+  if (data?.user) {
+    currentUser = data.user;
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(currentUser));
+  }
+  return data;
+}
+
+async function openProfile() {
+  try {
+    await refreshProfileFromServer();
+  } catch (error) {
+    profileStatus.textContent = error.message || "Profil alınamadı.";
+  }
+  fillProfileForm();
+  profileStatus.textContent = "";
+  profileOverlay.classList.add("show");
+  profileOverlay.setAttribute("aria-hidden", "false");
+  profileCloseButton.focus();
+}
+
+function closeProfile() {
+  profileOverlay.classList.remove("show");
+  profileOverlay.setAttribute("aria-hidden", "true");
+}
+
+document.querySelectorAll(".profile-avatar-choice").forEach(button => {
+  button.onclick = () => paintProfileAvatar(button.dataset.avatar);
+});
+profileDisplayName.addEventListener("input", refreshProfilePreview);
+profileBio.addEventListener("input", refreshProfilePreview);
+
+profileCloseButton.onclick = closeProfile;
+profileOverlay.addEventListener("click", event => { if (event.target === profileOverlay) closeProfile(); });
+openProfileButton.onclick = () => { closeSettings(); openProfile(); };
+document.getElementById("accountName")?.addEventListener("click", openProfile);
+document.getElementById("mobileMenuAccount")?.addEventListener("click", () => {
+  document.getElementById("mobileMenuOverlay")?.classList.remove("show");
+  openProfile();
+});
+
+profileSaveButton.onclick = async () => {
+  profileSaveButton.disabled = true;
+  profileStatus.textContent = "Kaydediliyor...";
+  try {
+    const data = await authRequest("update_profile", "", "", {
+      displayName: profileDisplayName.value,
+      bio: profileBio.value,
+      preferredName: profilePreferredName.value,
+      avatarKey: selectedProfileAvatar
+    });
+    currentUser.profile = {
+      ...(currentUser.profile || {}),
+      displayName: data.profile?.display_name || "",
+      bio: data.profile?.bio || "",
+      preferredName: data.profile?.preferred_name || "",
+      avatarKey: data.profile?.avatar_key || "spark",
+      profileCreatedAt: data.profile?.created_at || "",
+      profileUpdatedAt: data.profile?.updated_at || ""
+    };
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(currentUser));
+    fillProfileForm();
+    profileStatus.textContent = "✓ Profil kaydedildi";
+  } catch (error) {
+    profileStatus.textContent = error.message || "Profil kaydedilemedi.";
+  } finally {
+    profileSaveButton.disabled = false;
+  }
+};
+
+profileChangePasswordButton.onclick = async () => {
+  const currentPassword = prompt("Mevcut şifreni yaz:");
+  if (!currentPassword) return;
+  const newPassword = prompt("Yeni şifreni yaz (en az 8 karakter):");
+  if (!newPassword) return;
+  const confirmPassword = prompt("Yeni şifreni tekrar yaz:");
+  if (newPassword !== confirmPassword) return alert("Yeni şifreler eşleşmiyor.");
+  try {
+    await authRequest("change_password", "", "", { currentPassword, newPassword });
+    alert("Şifren güncellendi.");
+  } catch (error) {
+    alert(error.message || "Şifre değiştirilemedi.");
+  }
+};
+
+profileLogoutOthersButton.onclick = async () => {
+  if (!confirm("Bu cihaz dışındaki tüm Zatoi oturumları kapatılsın mı?")) return;
+  try {
+    await authRequest("logout_others");
+    alert("Diğer oturumlar kapatıldı.");
+  } catch (error) {
+    alert(error.message || "Oturumlar kapatılamadı.");
+  }
+};
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && profileOverlay?.classList.contains("show")) closeProfile();
+});
+
 
 /* ==========================================
    V10.6 AYARLAR
