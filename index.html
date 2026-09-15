@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.30">
+  <link rel="stylesheet" href="./style.css?v=14.31">
 </head>
 
 <body>
@@ -545,6 +545,13 @@
 
 
   <section id="peopleChatPanel" class="people-chat-panel" aria-hidden="true">
+    <div class="people-mode-top">
+      <div class="people-mode-brand"><strong>Zatoi</strong><span>AI ve insan sohbeti</span></div>
+      <div class="zatoi-mode-switch people-mode-switch" role="tablist" aria-label="Zatoi modu">
+        <button id="peopleAiModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">🤖 Zatoi AI</button>
+        <button id="peopleChatModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">💬 Sohbet</button>
+      </div>
+    </div>
     <aside class="people-active-panel">
       <div class="people-panel-heading">
         <div><strong>🟢 Aktif Kullanıcılar</strong><span>Şu anda sohbette olanlar</span></div>
@@ -558,22 +565,23 @@
 
     <main class="people-conversation">
       <div id="peopleConversationHead" class="people-conversation-head">
-        <div id="peopleConversationAvatar" class="people-avatar">💬</div>
-        <div><strong id="peopleConversationName">Bir sohbet seç</strong><span id="peopleConversationStatus">Aktiflerden veya özel odalardan seçim yap</span></div>
+        <div id="peopleConversationAvatar" class="people-avatar">🌐</div>
+        <div><strong id="peopleConversationName">Genel Sohbet</strong><span id="peopleConversationStatus">Tüm aktif Zatoi kullanıcıları</span></div>
+        <button id="peopleGeneralButton" class="people-general-btn" type="button" title="Genel sohbete dön">🌐 Genel</button>
       </div>
 
       <div id="peopleMessages" class="people-messages">
         <div class="people-conversation-empty">
-          <div class="people-empty-orb">💬</div>
-          <h2>Özel sohbetler</h2>
-          <p>Aktif bir kullanıcıya tıklayıp özel sohbet başlatabilirsin. Mesajlar Zatoi AI kotasını kullanmaz.</p>
-          <span class="people-stage-badge">V14.30 • Gerçek kullanıcı mesajlaşması</span>
+          <div class="people-empty-orb">🌐</div>
+          <h2>Genel Sohbet</h2>
+          <p>Sohbet bölümündeki herkes burada konuşabilir. Aktif kullanıcıya tıklarsan ikinize özel bir oda açılır.</p>
+          <span class="people-stage-badge">V14.31 • Genel + özel sohbet</span>
         </div>
       </div>
 
-      <form id="peopleComposer" class="people-composer disabled" aria-disabled="true">
-        <input id="peopleMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="Bir özel oda seçince mesaj yazabilirsin..." disabled>
-        <button id="peopleSendButton" type="submit" disabled aria-label="Mesaj gönder">➤</button>
+      <form id="peopleComposer" class="people-composer" aria-disabled="false">
+        <input id="peopleMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="Genel sohbete mesaj yaz...">
+        <button id="peopleSendButton" type="submit" aria-label="Mesaj gönder">➤</button>
       </form>
     </main>
 
@@ -7349,11 +7357,15 @@ const peopleConversationStatus = document.getElementById("peopleConversationStat
 const peopleComposer = document.getElementById("peopleComposer");
 const peopleMessageInput = document.getElementById("peopleMessageInput");
 const peopleSendButton = document.getElementById("peopleSendButton");
+const peopleGeneralButton = document.getElementById("peopleGeneralButton");
+const peopleAiModeButton = document.getElementById("peopleAiModeButton");
+const peopleChatModeButton = document.getElementById("peopleChatModeButton");
 
 let peopleChatActive = false;
 let peopleActiveUsers = [];
 let peopleRooms = [];
 let peopleCurrentRoomId = "";
+let peopleConversationMode = "general";
 let peopleCurrentPartner = null;
 let peoplePollTimer = null;
 let peopleLastMessageSignature = "";
@@ -7540,8 +7552,41 @@ async function loadPeopleMessages({ silent = false } = {}) {
   }
 }
 
+
+async function selectPeopleGeneral() {
+  peopleConversationMode = "general";
+  peopleCurrentRoomId = "";
+  peopleCurrentPartner = null;
+  peopleLastMessageSignature = "";
+  if (peopleConversationAvatar) peopleConversationAvatar.textContent = "🌐";
+  if (peopleConversationName) peopleConversationName.textContent = "Genel Sohbet";
+  if (peopleConversationStatus) peopleConversationStatus.textContent = "Tüm aktif Zatoi kullanıcıları";
+  setPeopleComposerEnabled(true);
+  if (peopleMessageInput) peopleMessageInput.placeholder = "Genel sohbete mesaj yaz...";
+  renderPeopleRooms();
+  await loadPeopleGeneralMessages();
+}
+
+async function loadPeopleGeneralMessages({ silent = false } = {}) {
+  if (!peopleChatActive || peopleConversationMode !== "general") return;
+  try {
+    const data = await peopleApi("get_general_messages");
+    const messages = Array.isArray(data.messages) ? data.messages : [];
+    const signature = messages.map(item => `${item.messageId}:${item.createdAt}`).join("|");
+    if (!silent || signature !== peopleLastMessageSignature) {
+      peopleLastMessageSignature = signature;
+      renderPeopleMessages(messages);
+    }
+  } catch (error) {
+    if (!silent && peopleMessages) {
+      peopleMessages.innerHTML = `<div class="people-empty-small error">${peopleEscape(error.message)}</div>`;
+    }
+  }
+}
+
 async function selectPeopleRoom(roomId) {
   if (!roomId) return;
+  peopleConversationMode = "private";
   peopleCurrentRoomId = roomId;
   const room = peopleRooms.find(item => item.roomId === roomId);
   peopleCurrentPartner = room?.partner || peopleCurrentPartner;
@@ -7563,19 +7608,26 @@ async function selectPeopleRoom(roomId) {
 async function sendPeopleMessage(event) {
   event?.preventDefault();
   const content = String(peopleMessageInput?.value || "").trim();
-  if (!peopleCurrentRoomId || !content) return;
+  if (!content) return;
+  if (peopleConversationMode === "private" && !peopleCurrentRoomId) return;
   if (content.length > 2000) return alert("Mesaj en fazla 2000 karakter olabilir.");
 
   peopleMessageInput.disabled = true;
   peopleSendButton.disabled = true;
   try {
-    await peopleApi("send_message", { roomId: peopleCurrentRoomId, content });
-    peopleMessageInput.value = "";
-    await Promise.all([loadPeopleMessages(), refreshPeopleRooms()]);
+    if (peopleConversationMode === "general") {
+      await peopleApi("send_general_message", { content });
+      peopleMessageInput.value = "";
+      await loadPeopleGeneralMessages();
+    } else {
+      await peopleApi("send_message", { roomId: peopleCurrentRoomId, content });
+      peopleMessageInput.value = "";
+      await Promise.all([loadPeopleMessages(), refreshPeopleRooms()]);
+    }
   } catch (error) {
     alert(error.message);
   } finally {
-    setPeopleComposerEnabled(Boolean(peopleCurrentRoomId));
+    setPeopleComposerEnabled(peopleConversationMode === "general" || Boolean(peopleCurrentRoomId));
     peopleMessageInput?.focus();
   }
 }
@@ -7596,7 +7648,8 @@ function startPeoplePolling() {
     if (!peopleChatActive || document.hidden) return;
     await peopleHeartbeat();
     await Promise.all([refreshPeopleActive(), refreshPeopleRooms()]);
-    if (peopleCurrentRoomId) await loadPeopleMessages({ silent: true });
+    if (peopleConversationMode === "general") await loadPeopleGeneralMessages({ silent: true });
+    else if (peopleCurrentRoomId) await loadPeopleMessages({ silent: true });
   }, 8000);
 }
 
@@ -7609,6 +7662,8 @@ async function enterPeopleChat() {
   }
   await peopleHeartbeat();
   await Promise.all([refreshPeopleActive(), refreshPeopleRooms()]);
+  if (peopleConversationMode === "general") await selectPeopleGeneral();
+  else if (peopleCurrentRoomId) await loadPeopleMessages();
   startPeoplePolling();
 }
 
@@ -7622,8 +7677,12 @@ function setZatoiMode(mode) {
   document.getElementById("app")?.classList.toggle("people-chat-mode", chatMode);
   zatoiAiModeButton?.classList.toggle("active", !chatMode);
   zatoiChatModeButton?.classList.toggle("active", chatMode);
+  peopleAiModeButton?.classList.toggle("active", !chatMode);
+  peopleChatModeButton?.classList.toggle("active", chatMode);
   zatoiAiModeButton?.setAttribute("aria-selected", String(!chatMode));
   zatoiChatModeButton?.setAttribute("aria-selected", String(chatMode));
+  peopleAiModeButton?.setAttribute("aria-selected", String(!chatMode));
+  peopleChatModeButton?.setAttribute("aria-selected", String(chatMode));
   peopleChatPanel?.setAttribute("aria-hidden", String(!chatMode));
   try { sessionStorage.setItem("zatoi_active_mode_v1", chatMode ? "chat" : "ai"); } catch {}
   if (chatMode) enterPeopleChat();
@@ -7632,6 +7691,9 @@ function setZatoiMode(mode) {
 
 zatoiAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 zatoiChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
+peopleAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
+peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
+peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
 peopleRefreshActive?.addEventListener("click", refreshPeopleActive);
 peopleRefreshRooms?.addEventListener("click", refreshPeopleRooms);
 peopleUserSearch?.addEventListener("input", renderPeopleActiveUsers);
@@ -7642,7 +7704,8 @@ document.addEventListener("visibilitychange", () => {
     peopleHeartbeat();
     refreshPeopleActive();
     refreshPeopleRooms();
-    if (peopleCurrentRoomId) loadPeopleMessages({ silent: true });
+    if (peopleConversationMode === "general") loadPeopleGeneralMessages({ silent: true });
+    else if (peopleCurrentRoomId) loadPeopleMessages({ silent: true });
   }
 });
 
@@ -7678,7 +7741,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.30",
+        "./service-worker.js?v=14.31",
         { updateViaCache: "none" }
       );
 
@@ -7722,7 +7785,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.30";
+  window.__ZATOI_BUILD__ = "14.31";
 </script>
 </body>
 </html>
