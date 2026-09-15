@@ -5257,3 +5257,87 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     animation:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.2 — MOBILE ZATOI USER FIX
+   Normal üye premium görünümünü mobil sohbet yapısına da uygular.
+   OWNER kuralları daha güçlü kalır.
+   ========================================================= */
+
+@media (max-width:760px){
+
+  /* Mobil normal üye mesaj balonu */
+  .people-message-row.zatoi-user-message .people-message-bubble,
+  .people-message-row.zatoi-user-message .people-message-content,
+  .zatoi-user-message .people-message{
+    position:relative;
+    border:1px solid rgba(105,143,177,.30)!important;
+    box-shadow:
+      0 4px 13px rgba(0,0,0,.08),
+      0 0 9px rgba(87,124,166,.065)!important;
+  }
+
+  /* Mobilde efekt masaüstünden biraz daha görünür */
+  .people-message-row.zatoi-user-message .people-message-bubble::before{
+    opacity:.40!important;
+    background:linear-gradient(
+      110deg,
+      transparent 28%,
+      rgba(255,255,255,.060) 49%,
+      transparent 70%
+    )!important;
+    background-size:240% 100%!important;
+  }
+
+  /* Mobil avatar */
+  .zatoi-user-message .people-avatar,
+  .zatoi-user-message .people-message-avatar,
+  .zatoi-user-card .people-avatar,
+  .zatoi-user-card .people-user-avatar{
+    border:1px solid rgba(108,151,188,.42)!important;
+    box-shadow:
+      0 0 0 1px rgba(84,136,179,.09),
+      0 0 8px rgba(92,132,177,.14)!important;
+    animation:zatoiUserGlow 6s ease-in-out infinite;
+  }
+
+  /* Mobil Active sekmesindeki normal kullanıcı kartları */
+  .people-user-card.zatoi-user-card{
+    border:1px solid rgba(98,139,174,.30)!important;
+    background:
+      linear-gradient(115deg,rgba(31,76,111,.13),rgba(62,66,99,.12)),
+      rgba(18,27,39,.95)!important;
+    box-shadow:
+      inset 2px 0 0 rgba(96,151,196,.30),
+      0 0 10px rgba(78,116,157,.055)!important;
+  }
+
+  /* Mobil profil */
+  .zatoi-user-profile .people-public-profile-card,
+  .zatoi-user-profile .people-profile-card{
+    border:1px solid rgba(98,139,174,.31)!important;
+    background:
+      radial-gradient(circle at 50% 0%,rgba(77,123,163,.09),transparent 44%),
+      #101824!important;
+    box-shadow:
+      0 16px 42px rgba(0,0,0,.38),
+      0 0 17px rgba(76,112,153,.06)!important;
+  }
+
+  /* OWNER mobilde USER tarafından ezilmesin */
+  .people-message-row.zatoi-owner-message .people-message-bubble{
+    border-color:rgba(139,118,255,.52)!important;
+    box-shadow:
+      0 0 0 1px rgba(102,190,255,.07),
+      0 7px 24px rgba(68,73,190,.16),
+      0 0 22px rgba(137,91,230,.10)!important;
+  }
+
+  .people-user-card.zatoi-owner-card{
+    border-color:rgba(137,109,238,.55)!important;
+    box-shadow:
+      inset 3px 0 0 rgba(108,162,255,.72),
+      0 0 18px rgba(119,87,219,.09)!important;
+  }
+}
