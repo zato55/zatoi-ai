@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.36">
+  <link rel="stylesheet" href="./style.css?v=14.37">
 </head>
 
 <body>
@@ -589,11 +589,20 @@
         <div id="peopleConversationAvatar" class="people-avatar">🌐</div>
         <div><strong id="peopleConversationName">Genel Sohbet</strong><span id="peopleConversationStatus">Tüm aktif Zatoi kullanıcıları</span></div>
         <div id="peopleAdminChatTools" class="people-admin-chat-tools" hidden>
-          <button id="peopleAdminAnnouncement" type="button" title="Admin duyurusu gönder">📢 Duyuru</button>
-          <button id="peopleAdminClearGeneral" type="button" title="Genel sohbeti temizle">🧹 Temizle</button>
+          <button id="peopleAdminManageToggle" class="people-admin-manage-toggle" type="button" aria-expanded="false">🛡️ Yönet ▾</button>
+          <div id="peopleAdminManageMenu" class="people-admin-manage-menu" hidden>
+            <button id="peopleAdminAnnouncement" type="button">📢 Duyuru gönder</button>
+            <button id="peopleAdminClearGeneral" type="button">🧹 Genel sohbeti temizle</button>
+          </div>
         </div>
         <button id="peopleGeneralButton" class="people-general-btn" type="button" title="Genel sohbete dön">🌐 Genel</button>
       </div>
+
+      <button id="peoplePinnedBar" class="people-pinned-bar" type="button" hidden>
+        <span class="people-pinned-bar-icon">📌</span>
+        <span class="people-pinned-bar-copy"><strong>Sabit mesaj</strong><small id="peoplePinnedBarText"></small></span>
+        <span class="people-pinned-bar-go">›</span>
+      </button>
 
       <div id="peopleMessages" class="people-messages">
         <div class="people-conversation-empty">
@@ -7404,6 +7413,10 @@ const peopleMessageInput = document.getElementById("peopleMessageInput");
 const peopleSendButton = document.getElementById("peopleSendButton");
 const peopleGeneralButton = document.getElementById("peopleGeneralButton");
 const peopleAdminChatTools = document.getElementById("peopleAdminChatTools");
+const peopleAdminManageToggle = document.getElementById("peopleAdminManageToggle");
+const peopleAdminManageMenu = document.getElementById("peopleAdminManageMenu");
+const peoplePinnedBar = document.getElementById("peoplePinnedBar");
+const peoplePinnedBarText = document.getElementById("peoplePinnedBarText");
 const peopleAdminAnnouncement = document.getElementById("peopleAdminAnnouncement");
 const peopleAdminClearGeneral = document.getElementById("peopleAdminClearGeneral");
 const peopleAiModeButton = document.getElementById("peopleAiModeButton");
@@ -7606,7 +7619,9 @@ function peopleIsAdmin() {
 }
 
 function syncPeopleAdminTools() {
-  if (peopleAdminChatTools) peopleAdminChatTools.hidden = !peopleIsAdmin();
+  const admin = peopleIsAdmin();
+  if (peopleAdminChatTools) peopleAdminChatTools.hidden = !admin;
+  if (!admin && peopleAdminManageMenu) peopleAdminManageMenu.hidden = true;
 }
 
 async function peopleAdminDeleteMessage(messageId) {
@@ -7692,7 +7707,17 @@ function renderPeopleMessages(messages) {
         return peopleMobileFlow ? (at - bt) : (bt - at);
       })
     : [];
+  const pinnedMessage = messages.find(message => message.pinned);
+  if (peoplePinnedBar && peoplePinnedBarText) {
+    peoplePinnedBar.hidden = !pinnedMessage;
+    peoplePinnedBar.dataset.messageId = pinnedMessage?.messageId || "";
+    peoplePinnedBarText.textContent = pinnedMessage
+      ? `${peopleDisplayName(pinnedMessage.sender)}: ${String(pinnedMessage.content || "").slice(0, 110)}`
+      : "";
+  }
+
   if (!messages.length) {
+    if (peoplePinnedBar) peoplePinnedBar.hidden = true;
     peopleMessages.innerHTML = `<div class="people-conversation-empty compact"><div class="people-empty-orb">🔒</div><h2>Özel oda hazır</h2><p>İlk mesajı gönderebilirsin.</p></div>`;
     return;
   }
@@ -7700,7 +7725,7 @@ function renderPeopleMessages(messages) {
   peopleMessages.innerHTML = messages.map(message => {
     const mine = String(message.senderId) === String(currentUser?.userId);
     return `
-      <div class="people-message-row ${mine ? "mine" : "theirs"}">
+      <div class="people-message-row ${mine ? "mine" : "theirs"}" data-general-message-id="${peopleEscape(message.messageId || "")}">
         <div class="people-message-bubble">
           <button class="people-message-sender" type="button" data-profile-user="${peopleEscape(message.senderId || "")}">
             <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(message.sender))}</span>
@@ -8063,6 +8088,27 @@ zatoiChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
+peopleAdminManageToggle?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  if (!peopleAdminManageMenu) return;
+  const willOpen = peopleAdminManageMenu.hidden;
+  peopleAdminManageMenu.hidden = !willOpen;
+  peopleAdminManageToggle?.setAttribute("aria-expanded", String(willOpen));
+});
+document.addEventListener("click", (event) => {
+  if (!peopleAdminChatTools?.contains(event.target) && peopleAdminManageMenu) {
+    peopleAdminManageMenu.hidden = true;
+    peopleAdminManageToggle?.setAttribute("aria-expanded", "false");
+  }
+});
+peoplePinnedBar?.addEventListener("click", () => {
+  const id = peoplePinnedBar.dataset.messageId;
+  if (!id) return;
+  const target = peopleMessages?.querySelector(`[data-general-message-id="${CSS.escape(id)}"]`);
+  target?.scrollIntoView({ behavior:"smooth", block:"center" });
+  target?.classList.add("people-message-highlight");
+  setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
+});
 peopleAdminClearGeneral?.addEventListener("click", peopleAdminClearChat);
 peopleAdminAnnouncement?.addEventListener("click", peopleAdminSendAnnouncement);
 peoplePublicProfileModerate?.addEventListener("click", () => peopleAdminModerateUser(peoplePublicProfileUserId));
@@ -8159,7 +8205,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.36",
+        "./service-worker.js?v=14.37",
         { updateViaCache: "none" }
       );
 
@@ -8203,7 +8249,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.36";
+  window.__ZATOI_BUILD__ = "14.37";
 </script>
 </body>
 </html>
