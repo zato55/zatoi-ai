@@ -4625,3 +4625,79 @@ body.light-theme .chat-avatar {
   flex-direction:column!important;
   overflow-y:auto!important;
 }
+
+
+/* =========================================================
+   V14.35.3 — GENEL / ÖZEL SOHBET GÖRSEL AYRIMI
+   Sadece PC. Mobil düzen ve işlevler değişmez.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* GENEL SOHBET — mevcut koyu lacivert karakter */
+  .people-conversation{
+    background:
+      linear-gradient(180deg, rgba(35, 92, 155, .055), transparent 180px),
+      #0b1119 !important;
+  }
+
+  .people-conversation > .people-conversation-head{
+    background:rgba(12, 24, 38, .96)!important;
+    border-bottom:1px solid rgba(73, 142, 210, .28)!important;
+    box-shadow:inset 0 3px 0 rgba(65, 145, 230, .60)!important;
+  }
+
+  .people-conversation > .people-composer{
+    background:rgba(10, 20, 31, .94)!important;
+    border-bottom:1px solid rgba(73, 142, 210, .18)!important;
+  }
+
+  .people-conversation > .people-messages{
+    background:
+      radial-gradient(circle at 50% 0%, rgba(48, 118, 190, .055), transparent 34%),
+      transparent!important;
+  }
+
+
+  /* ÖZEL SOHBET — hafif mor/mürdüm karakter */
+  .people-chat-panel[data-mobile-view="private"] .people-private-dock{
+    background:
+      linear-gradient(180deg, rgba(121, 76, 170, .11), transparent 190px),
+      #110f18!important;
+
+    /* İki sohbet arasındaki belirgin ama zarif ayırıcı */
+    border-left:2px solid rgba(157, 112, 214, .58)!important;
+    box-shadow:
+      -8px 0 22px rgba(0, 0, 0, .16),
+      inset 1px 0 0 rgba(202, 169, 244, .06)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-head{
+    background:rgba(29, 21, 39, .96)!important;
+    border-bottom:1px solid rgba(157, 112, 214, .28)!important;
+    box-shadow:inset 0 3px 0 rgba(157, 112, 214, .68)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-composer{
+    background:rgba(24, 18, 33, .95)!important;
+    border-bottom:1px solid rgba(157, 112, 214, .20)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-messages{
+    background:
+      radial-gradient(circle at 50% 0%, rgba(137, 88, 190, .09), transparent 36%),
+      transparent!important;
+  }
+
+  /* Özel sohbet input'una da çok hafif mor kimlik */
+  .people-chat-panel[data-mobile-view="private"] .people-private-input,
+  .people-chat-panel[data-mobile-view="private"] #peoplePrivateInput{
+    border-color:rgba(157, 112, 214, .32)!important;
+    background:rgba(16, 14, 23, .92)!important;
+  }
+
+  .people-chat-panel[data-mobile-view="private"] .people-private-input:focus,
+  .people-chat-panel[data-mobile-view="private"] #peoplePrivateInput:focus{
+    border-color:rgba(174, 126, 230, .72)!important;
+    box-shadow:0 0 0 3px rgba(157, 112, 214, .10)!important;
+  }
+}
