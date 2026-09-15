@@ -2266,6 +2266,272 @@ tyle>
   margin-top:6px;
 }
 </style>
+
+/* ============================================================
+   ZATOI AI — LIGHT THEME FINAL FIX
+   Açık temada kontrast, input, geçmiş ve buton renkleri
+   ============================================================ */
+body.light-theme{
+  background:#edf4fb !important;
+  color:#17243a !important;
+}
+
+body.light-theme .app,
+body.light-theme .chat-column,
+body.light-theme .messages{
+  background:
+    radial-gradient(circle at 48% 12%,rgba(42,124,255,.055),transparent 34%),
+    linear-gradient(180deg,#f4f8fc,#eaf2fa) !important;
+}
+
+/* üst bar ve sağ panel */
+body.light-theme .chat-top,
+body.light-theme .side-panel,
+body.light-theme .side-header{
+  background:rgba(247,250,254,.98) !important;
+  border-color:#d1deeb !important;
+  color:#17243a !important;
+}
+
+body.light-theme .chat-title,
+body.light-theme .side-header{
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+}
+
+/* üst butonlar */
+body.light-theme .account-name,
+body.light-theme .settings-btn,
+body.light-theme .mobile-history-btn,
+body.light-theme .mobile-menu-btn,
+body.light-theme .mobile-history-quick-btn{
+  background:#16395f !important;
+  border-color:#234d78 !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+body.light-theme .new-chat-btn{
+  background:linear-gradient(135deg,#187cf4,#6457f5) !important;
+  border-color:#367eea !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+body.light-theme .logout-btn,
+body.light-theme .settings-logout,
+body.light-theme .mobile-menu-action.logout{
+  background:#fff1f3 !important;
+  border-color:#f2c6cd !important;
+  color:#b42336 !important;
+  -webkit-text-fill-color:#b42336 !important;
+}
+
+/* input alanı */
+body.light-theme .desktop-input-area,
+body.light-theme .mobile-input-area{
+  background:rgba(238,245,252,.98) !important;
+  border-color:#d0deec !important;
+}
+
+body.light-theme .input-box{
+  background:#ffffff !important;
+  border:1px solid #9db9d7 !important;
+  box-shadow:0 8px 24px rgba(31,69,108,.09) !important;
+}
+
+body.light-theme .input-box:focus-within{
+  border-color:#287fe9 !important;
+  box-shadow:0 0 0 3px rgba(40,127,233,.10),0 8px 24px rgba(31,69,108,.10) !important;
+}
+
+body.light-theme textarea,
+body.light-theme .input-box textarea{
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+  caret-color:#17243a !important;
+}
+
+body.light-theme textarea::placeholder,
+body.light-theme .input-box textarea::placeholder{
+  color:#657d98 !important;
+  -webkit-text-fill-color:#657d98 !important;
+  opacity:1 !important;
+}
+
+body.light-theme .action-btn,
+body.light-theme .voice-btn{
+  background:#163e69 !important;
+  border-color:#28557f !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+body.light-theme .send-btn{
+  background:linear-gradient(135deg,#117fe9,#6552f5) !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+/* geçmiş kartları — ekrandaki asıl soluk yazı problemi */
+body.light-theme .history-open{
+  background:#ffffff !important;
+  border:1px solid #c8d8e8 !important;
+  color:#1c3552 !important;
+  -webkit-text-fill-color:#1c3552 !important;
+  box-shadow:0 4px 14px rgba(31,69,108,.045) !important;
+}
+
+body.light-theme .history-open:hover{
+  background:#edf6ff !important;
+  border-color:#82afe0 !important;
+  color:#102d4d !important;
+  -webkit-text-fill-color:#102d4d !important;
+}
+
+body.light-theme .history-open.active{
+  background:linear-gradient(135deg,#e2f0ff,#e8e5ff) !important;
+  border-color:#6a9ee8 !important;
+  color:#15365a !important;
+  -webkit-text-fill-color:#15365a !important;
+}
+
+body.light-theme .history-rename,
+body.light-theme .history-delete{
+  background:#123a65 !important;
+  border-color:#214d78 !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+/* mesajlar */
+body.light-theme .message.assistant{
+  background:#ffffff !important;
+  border:1px solid #d2deea !important;
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+  box-shadow:0 10px 28px rgba(31,69,108,.08) !important;
+}
+
+body.light-theme .message.assistant *{
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+}
+
+body.light-theme .message.user{
+  background:linear-gradient(135deg,#1389f7,#315ff5 58%,#714ef6) !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+body.light-theme .message.user *{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+body.light-theme .message.assistant .message-tool{
+  color:#60758d !important;
+  -webkit-text-fill-color:#60758d !important;
+}
+
+body.light-theme .message.assistant .message-tool:hover{
+  color:#1d4f82 !important;
+  -webkit-text-fill-color:#1d4f82 !important;
+}
+
+/* ayarlar */
+body.light-theme .settings-overlay,
+body.light-theme .privacy-overlay{
+  background:rgba(22,36,54,.38) !important;
+}
+
+body.light-theme .settings-panel,
+body.light-theme .privacy-panel{
+  background:#f7fbff !important;
+  border-color:#cbdbea !important;
+  color:#17243a !important;
+}
+
+body.light-theme .settings-header,
+body.light-theme .privacy-header{
+  background:#eef5fb !important;
+  border-color:#d1deea !important;
+  color:#17243a !important;
+}
+
+body.light-theme .settings-section{
+  background:#ffffff !important;
+  border-color:#d2dfeb !important;
+}
+
+body.light-theme .settings-title,
+body.light-theme .setting-label{
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+}
+
+body.light-theme .settings-section-title{
+  color:#1769b0 !important;
+  -webkit-text-fill-color:#1769b0 !important;
+}
+
+body.light-theme .setting-desc,
+body.light-theme .settings-about{
+  color:#5f748b !important;
+  -webkit-text-fill-color:#5f748b !important;
+}
+
+body.light-theme .settings-select{
+  background:#ffffff !important;
+  border-color:#b9ccdf !important;
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+}
+
+/* giriş ekranı açık temadaysa */
+body.light-theme .auth-screen{
+  background:linear-gradient(145deg,#eef6fd,#e7f0fa) !important;
+}
+
+body.light-theme .auth-card{
+  background:#ffffff !important;
+  border-color:#cbdbea !important;
+  color:#17243a !important;
+  box-shadow:0 24px 70px rgba(31,69,108,.13) !important;
+}
+
+body.light-theme .auth-card h1,
+body.light-theme .auth-title{
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+}
+
+body.light-theme .auth-subtitle,
+body.light-theme .auth-info{
+  color:#5f748b !important;
+  -webkit-text-fill-color:#5f748b !important;
+}
+
+body.light-theme .auth-input{
+  background:#f8fbfe !important;
+  border-color:#b9ccdf !important;
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+}
+
+body.light-theme .auth-input::placeholder{
+  color:#71859b !important;
+  -webkit-text-fill-color:#71859b !important;
+}
+
+/* genel form güvenliği */
+body.light-theme input,
+body.light-theme select{
+  color:#17243a !important;
+  -webkit-text-fill-color:#17243a !important;
+}
+
+
 </head>
 
 <body>
