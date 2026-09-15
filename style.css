@@ -5341,3 +5341,107 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
       0 0 18px rgba(119,87,219,.09)!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.3 — MOBILE USER POLISH + PINNED BAR LAYER FIX
+   - Normal USER: daha koyu mavi/lacivert premium görünüm
+   - OWNER üstünlüğü korunur
+   - Sabit mesaj alanının üstüne sohbet balonu taşması engellenir
+   ========================================================= */
+
+@media (max-width:760px){
+
+  /* ---------- NORMAL USER / MOBILE ---------- */
+  .people-message-row.zatoi-user-message .people-message-bubble{
+    background:
+      linear-gradient(145deg,
+        rgba(20,91,174,.96) 0%,
+        rgba(28,105,204,.96) 48%,
+        rgba(47,66,151,.96) 100%)!important;
+    border:1px solid rgba(121,132,230,.42)!important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.055),
+      0 6px 16px rgba(0,0,0,.13),
+      0 0 13px rgba(91,107,216,.10)!important;
+  }
+
+  .people-message-row.zatoi-user-message .people-message-bubble::before{
+    opacity:.46!important;
+    background:
+      linear-gradient(112deg,
+        transparent 26%,
+        rgba(255,255,255,.075) 48%,
+        transparent 69%)!important;
+    background-size:245% 100%!important;
+    animation:zatoiUserShimmer 11s linear infinite!important;
+  }
+
+  /* USER avatar / yıldız alanı: Owner'dan daha soluk */
+  .zatoi-user-message .people-avatar,
+  .zatoi-user-message .people-message-avatar{
+    border-color:rgba(125,137,233,.46)!important;
+    box-shadow:
+      0 0 0 1px rgba(77,143,225,.10),
+      0 0 9px rgba(115,101,224,.17)!important;
+    animation:zatoiUserGlow 5.8s ease-in-out infinite!important;
+  }
+
+  /* ---------- SABİT MESAJ / MOBILE ---------- */
+
+  /* Sabit mesaj çubuğu her zaman sohbet mesajlarından üstte. */
+  .people-pinned-bar{
+    position:relative;
+    z-index:30!important;
+    isolation:isolate;
+    background:
+      linear-gradient(90deg,rgba(25,18,43,.985),rgba(21,22,39,.985))!important;
+    box-shadow:
+      0 1px 0 rgba(145,88,219,.30),
+      0 8px 18px rgba(4,8,15,.28)!important;
+  }
+
+  /* Mesaj viewport'u kendi katmanında kırpılır.
+     Böylece kaydırılan balonlar pinned bar üzerine çizilemez. */
+  .people-messages,
+  .people-message-list,
+  .people-general-messages{
+    position:relative;
+    z-index:1;
+    overflow-x:hidden!important;
+    isolation:isolate;
+  }
+
+  /* Genel sohbetin konuşma gövdesi sabit barın katmanını korur. */
+  .people-conversation-body,
+  .people-chat-messages-wrap{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+  }
+
+  /* Mesajların kendi z-index'i pinned bardan düşük kalır. */
+  .people-message-row,
+  .people-message-bubble{
+    z-index:2;
+  }
+
+  /* OWNER mobil görünümü USER polish tarafından ezilmesin. */
+  .people-message-row.zatoi-owner-message .people-message-bubble{
+    background:
+      linear-gradient(135deg,rgba(30,87,145,.88),rgba(75,43,118,.88))!important;
+    border-color:rgba(139,118,255,.52)!important;
+    box-shadow:
+      0 0 0 1px rgba(102,190,255,.07),
+      0 7px 24px rgba(68,73,190,.16),
+      0 0 22px rgba(137,91,230,.10)!important;
+  }
+}
+
+@media (max-width:760px) and (prefers-reduced-motion:reduce){
+  .people-message-row.zatoi-user-message .people-message-bubble::before,
+  .zatoi-user-message .people-avatar,
+  .zatoi-user-message .people-message-avatar{
+    animation:none!important;
+  }
+}
