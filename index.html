@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.26 - SEO + ADMIN + STRUCTURED LIMIT ERRORS -->
+<!-- ZATOI AI INDEX V14.27 - PROFIL AVATARLI SOHBET + SEO + ADMIN -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=14.27.1">
 </head>
 
 <body>
@@ -3106,6 +3106,39 @@ function renderMessages() {
         "message-row " +
         message.role;
 
+      const identity = document.createElement("div");
+      identity.className = "message-identity " + message.role;
+
+      const avatar = document.createElement("div");
+      avatar.className = "chat-avatar " + message.role;
+
+      const identityText = document.createElement("div");
+      identityText.className = "message-identity-text";
+
+      const identityName = document.createElement("div");
+      identityName.className = "message-identity-name";
+
+      if (message.role === "user") {
+        const profile = currentUser?.profile || {};
+        const avatarKey = PROFILE_AVATARS[profile.avatarKey] ? profile.avatarKey : "spark";
+        avatar.classList.add("profile-avatar-" + avatarKey);
+        avatar.textContent = PROFILE_AVATARS[avatarKey] || "✦";
+        identityName.textContent = profile.displayName?.trim() || currentUser?.username || "Sen";
+      } else {
+        avatar.classList.add("zatoi-chat-avatar");
+        avatar.innerHTML = '<span class="zatoi-avatar-mark">Z</span>';
+        identityName.textContent = "Zatoi AI";
+
+        const aiBadge = document.createElement("span");
+        aiBadge.className = "message-ai-badge";
+        aiBadge.textContent = "AI";
+        identityName.appendChild(aiBadge);
+      }
+
+      identityText.appendChild(identityName);
+      identity.appendChild(avatar);
+      identity.appendChild(identityText);
+
 
       const bubble =
         document.createElement(
@@ -3401,6 +3434,8 @@ function renderMessages() {
       }
       bubble.appendChild(tools);
 
+
+      row.appendChild(identity);
 
       row.appendChild(
         bubble
@@ -7254,11 +7289,11 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js",
+        "./service-worker.js?v=14.27.1",
         { updateViaCache: "none" }
       );
 
-      console.log("Zatoi V14.24 — PWA Service Worker aktif.");
+      console.log("Zatoi V14.27.1 — PWA Service Worker aktif.");
 
       // Uygulama her açıldığında GitHub/CDN önbelleğini kullanmadan yeni SW kontrolü yap.
       await registration.update();
@@ -7297,5 +7332,8 @@ checkAuth();
 
 </script>
 
+<script>
+  window.__ZATOI_BUILD__ = "14.27.1";
+</script>
 </body>
 </html>
