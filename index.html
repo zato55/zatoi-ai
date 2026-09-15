@@ -2385,6 +2385,38 @@ body.light-theme .auth-info{
 
 </style>
 
+/* ZATOI — TEK GÖRSEL SONUÇ DÜZENİ */
+.generated-pair{
+  display:block !important;
+  width:min(540px,100%) !important;
+  margin:0 0 10px !important;
+}
+.generated-choice{
+  width:100% !important;
+  max-width:540px !important;
+  box-sizing:border-box !important;
+}
+.generated-choice.selected{
+  border-width:1px !important;
+}
+.generated-choice .generated-image{
+  width:100% !important;
+  max-width:512px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+@media(max-width:520px){
+  .generated-pair{
+    display:block !important;
+    width:100% !important;
+  }
+  .generated-choice{
+    max-width:100% !important;
+  }
+}
+
+
+
 
 <style>
 .automatic-reference-box{
@@ -5455,7 +5487,7 @@ function renderMessages() {
             }
           } else {
             generated.src = imageSrc;
-            generated.alt = `Seçenek ${index + 1}: ${message.imagePrompt || "Oluşturulan görsel"}`;
+            generated.alt = message.imagePrompt ? `Oluşturulan görsel: ${message.imagePrompt}` : "Zatoi tarafından oluşturulan görsel";
             generated.onclick = () => openImageViewer(imageSrc, generated.alt);
           }
           const meta = message.generationMeta?.[index] || {};
@@ -5486,19 +5518,11 @@ function renderMessages() {
             choice.classList.add("generation-failed");
           }
 
-          const choose = document.createElement("button");
-          choose.className = "choice-button";
-          choose.textContent = message.chosenImage === index ? "✓ Seçildi" : `Seçenek ${index + 1}'i seç`;
-          choose.disabled = imageExpired;
-          choose.onclick = () => {
-            if (!imageExpired) chooseGeneratedImage(message, index);
-          };
-
           const regenerate = document.createElement("button");
           regenerate.className = "choice-button";
           regenerate.style.marginTop = "6px";
-          regenerate.title = `Seçenek ${index + 1}'i yerinde yeniden oluştur`;
-          regenerate.setAttribute("aria-label", `Seçenek ${index + 1}'i yerinde yeniden oluştur`);
+          regenerate.title = "Görseli yeniden oluştur";
+          regenerate.setAttribute("aria-label", "Görseli yeniden oluştur");
           const isRegenerating = message.regeneratingIndex === index;
           regenerate.disabled = isRegenerating || imageExpired;
           regenerate.textContent = isRegenerating ? "↻ Yeniden oluşturuluyor..." : "↻ Yeniden Oluştur";
@@ -5521,7 +5545,7 @@ function renderMessages() {
           if (meta.error && imageExpired) {
             choice.append(generated, metaText);
           } else {
-            choice.append(generated, metaText, choose, regenerate, download);
+            choice.append(generated, metaText, regenerate, download);
           }
           pair.appendChild(choice);
         });
