@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.32.3">
+  <link rel="stylesheet" href="./style.css?v=14.33">
 </head>
 
 <body>
@@ -7640,7 +7640,8 @@ async function loadPeopleGeneralMessages({ silent = false } = {}) {
 
 
 function peopleIsMobileChat() {
-  return window.matchMedia("(max-width: 720px)").matches;
+  // V14.33: Genel / Aktifler / Odalar tek alan düzeni artık masaüstünde de kullanılır.
+  return true;
 }
 
 function setPeopleMobileView(view) {
@@ -7905,7 +7906,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.32.3",
+        "./service-worker.js?v=14.33",
         { updateViaCache: "none" }
       );
 
@@ -7949,7 +7950,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.32.3";
+  window.__ZATOI_BUILD__ = "14.33";
 </script>
 </body>
 </html>
