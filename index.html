@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.35.1">
+  <link rel="stylesheet" href="./style.css?v=14.35.2">
 </head>
 
 <body>
@@ -7595,12 +7595,12 @@ function setPeopleComposerEnabled(enabled) {
 function renderPeopleMessages(messages) {
   if (!peopleMessages) return;
 
-  // V14.35.1: Eski mesajlar yukarıda, yeni mesajlar aşağıda.
+  // V14.35.2: En yeni mesaj üstte; eski mesajlar aşağı doğru devam eder.
   messages = Array.isArray(messages)
     ? [...messages].sort((a, b) => {
         const at = Date.parse(a?.createdAt || "") || 0;
         const bt = Date.parse(b?.createdAt || "") || 0;
-        return at - bt;
+        return bt - at;
       })
     : [];
   if (!messages.length) {
@@ -7624,7 +7624,7 @@ function renderPeopleMessages(messages) {
       </div>
     `;
   }).join("");
-  peopleMessages.scrollTop = peopleMessages.scrollHeight;
+  peopleMessages.scrollTop = 0;
   peopleMessages.querySelectorAll("[data-profile-user]").forEach(button => {
     button.addEventListener("click", () => openPeoplePublicProfile(button.dataset.profileUser));
   });
@@ -7743,12 +7743,12 @@ function syncPrivateIntoMobileConversation(openPrivate) {
 }
 
 function renderPeoplePrivateMessages(messages) {
-  // V14.35.1: Eski özel mesajlar yukarıda, yeni mesajlar aşağıda.
+  // V14.35.2: En yeni özel mesaj üstte; eski mesajlar aşağı doğru devam eder.
   messages = Array.isArray(messages)
     ? [...messages].sort((a, b) => {
         const at = Date.parse(a?.createdAt || "") || 0;
         const bt = Date.parse(b?.createdAt || "") || 0;
-        return at - bt;
+        return bt - at;
       })
     : [];
   if (!peoplePrivateMessages) return;
@@ -7766,7 +7766,7 @@ function renderPeoplePrivateMessages(messages) {
         </div>
       </div>`;
   }).join("");
-  peoplePrivateMessages.scrollTop = peoplePrivateMessages.scrollHeight;
+  peoplePrivateMessages.scrollTop = 0;
 }
 
 async function loadPeoplePrivateMessages({ silent = false } = {}) {
@@ -7790,18 +7790,22 @@ async function loadPeoplePrivateMessages({ silent = false } = {}) {
 async function selectPeopleRoom(roomId) {
   if (!roomId) return;
 
-  // V14.35.1: Açık olan özel odaya sağ listeden tekrar tıklanırsa kapat.
+  // V14.35.2: Sağdaki AÇIK özel odaya tekrar tıklanınca kapat.
   const clickedRoomId = String(roomId);
-  const currentRoomId = String(peopleSelectedRoomId || "");
+  const openRoomId = String(peopleCurrentRoomId || "");
   const privateIsOpen =
     peopleChatPanel?.dataset.mobileView === "private" &&
-    currentRoomId &&
-    currentRoomId === clickedRoomId;
+    openRoomId === clickedRoomId &&
+    peoplePrivateDock &&
+    !peoplePrivateDock.hidden;
 
   if (privateIsOpen) {
-    peopleSelectedRoomId = "";
+    peopleCurrentRoomId = "";
+    peopleCurrentPartner = null;
     if (peoplePrivateDock) peoplePrivateDock.hidden = true;
     setPeopleMobileView("general");
+    renderPeopleRooms();
+    await loadPeopleGeneralMessages();
     return;
   }
 
@@ -8035,7 +8039,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.35.1",
+        "./service-worker.js?v=14.35.2",
         { updateViaCache: "none" }
       );
 
@@ -8079,7 +8083,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.35.1";
+  window.__ZATOI_BUILD__ = "14.35.2";
 </script>
 </body>
 </html>
