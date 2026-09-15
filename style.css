@@ -2494,3 +2494,174 @@ body.light-theme #accountUsername:hover {
   background: rgba(37, 99, 235, .10);
   border-color: rgba(37, 99, 235, .35);
 }
+
+
+/* ==========================================
+   V14.27 PROFİL AVATARLI SOHBET BALONLARI
+========================================== */
+.message-row {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 52px minmax(0, auto);
+  grid-template-areas:
+    "avatar bubble";
+  align-items: start;
+  column-gap: 11px;
+  width: 100%;
+}
+
+.message-row.user {
+  grid-template-columns: minmax(0, auto) 52px;
+  grid-template-areas: "bubble avatar";
+  justify-content: end;
+}
+
+.message-row .message-identity {
+  grid-area: avatar;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.chat-avatar {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 46px;
+  border-radius: 16px;
+  border: 1px solid #3b82f6;
+  background: #132a46;
+  color: #eaf4ff;
+  box-shadow: 0 6px 22px rgba(0,0,0,.22), inset 0 0 20px rgba(59,130,246,.12);
+  font-size: 21px;
+  font-weight: 900;
+  user-select: none;
+}
+
+.chat-avatar.profile-avatar-orbit { border-radius: 50%; }
+.chat-avatar.profile-avatar-bolt { background: #251f13; border-color: #a67c24; }
+.chat-avatar.profile-avatar-pixel { border-radius: 12px; background: #1b2034; border-color: #6366f1; }
+.chat-avatar.profile-avatar-nova { background: #2b1725; border-color: #a855f7; }
+.chat-avatar.profile-avatar-shield { background: #152820; border-color: #22c55e; }
+
+.chat-avatar.zatoi-chat-avatar {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  border-color: #16b8ff;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(98,239,255,.45), transparent 22%),
+    linear-gradient(145deg, #0b2340, #12235c 55%, #261b55);
+  box-shadow: 0 0 0 2px rgba(22,184,255,.10), 0 0 22px rgba(22,184,255,.22);
+}
+
+.zatoi-avatar-mark {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1fd7ff, #3867ff 55%, #7c3aed);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 950;
+  font-style: italic;
+  text-shadow: 0 1px 3px rgba(0,0,0,.35);
+  transform: skew(-6deg);
+}
+
+.message-identity-text {
+  width: 100%;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.message-identity-name {
+  color: #aebdca;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.message-ai-badge {
+  display: inline-flex;
+  margin-left: 4px;
+  padding: 2px 4px;
+  border-radius: 5px;
+  background: #1267e8;
+  color: #fff;
+  font-size: 8px;
+  vertical-align: 1px;
+}
+
+.message-row > .message {
+  grid-area: bubble;
+  position: relative;
+  margin: 0 !important;
+  max-width: min(760px, calc(100vw - 210px));
+}
+
+.message-row.assistant > .message {
+  border-top-left-radius: 7px !important;
+}
+
+.message-row.user > .message {
+  border-top-right-radius: 7px !important;
+}
+
+.message-row.assistant > .message::before,
+.message-row.user > .message::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  width: 9px;
+  height: 9px;
+  background: inherit;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+.message-row.assistant > .message::before {
+  left: -4px;
+}
+
+.message-row.user > .message::before {
+  right: -4px;
+}
+
+body.light-theme .message-identity-name { color: #526273; }
+body.light-theme .chat-avatar {
+  box-shadow: 0 5px 16px rgba(15,23,42,.12), inset 0 0 18px rgba(59,130,246,.08);
+}
+
+@media (max-width: 720px) {
+  .message-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 8px;
+  }
+  .message-row.user {
+    grid-template-columns: minmax(0, 1fr) 40px;
+  }
+  .chat-avatar {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    border-radius: 12px;
+    font-size: 17px;
+  }
+  .zatoi-avatar-mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .message-identity-name {
+    font-size: 9px;
+  }
+  .message-row > .message {
+    max-width: calc(100vw - 76px) !important;
+  }
+}
