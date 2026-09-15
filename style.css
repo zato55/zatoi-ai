@@ -2464,3 +2464,33 @@ body.light-theme .profile-close { background: #eef2f6; color: #17202a; border-co
   .profile-security-grid { grid-template-columns: 1fr; }
   .profile-actions { padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px)); }
 }
+
+
+/* ==========================================
+   V14.26.1 PROFİL BUTONU İMLEÇ / HOVER FIX
+========================================== */
+#accountUsername {
+  cursor: pointer !important;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+#accountUsername:hover {
+  background: rgba(59, 130, 246, .12);
+  border-color: rgba(96, 165, 250, .55);
+}
+
+#accountUsername:active {
+  transform: translateY(1px);
+}
+
+#accountUsername:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+body.light-theme #accountUsername:hover {
+  background: rgba(37, 99, 235, .10);
+  border-color: rgba(37, 99, 235, .35);
+}
