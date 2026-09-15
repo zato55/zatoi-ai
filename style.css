@@ -2918,7 +2918,7 @@ body.light-theme .chat-avatar {
 }
 
 /* =========================================================
-   V14.31 — GENEL + ÖZEL KULLANICI SOHBETİ
+   V14.32 — GENEL SOHBET SABİT + SAĞDA ÖZEL ODALAR
    ========================================================= */
 .zatoi-mode-switch{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--border,#263548);border-radius:14px;background:rgba(8,15,25,.72);margin-left:auto;margin-right:12px;flex:0 0 auto}
 .zatoi-mode-btn{border:0;background:transparent;color:var(--muted,#9aa9ba);font:inherit;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.2s ease;white-space:nowrap}
@@ -3025,4 +3025,99 @@ body.light-theme .chat-avatar {
   .people-mode-brand{display:none}
   .people-mode-top .zatoi-mode-switch{width:100%}
   .people-general-btn{padding:6px 8px}
+}
+
+/* =========================================================
+   V14.32 — ORTA ALAN DAİMA GENEL, ÖZEL SOHBET SAĞ PANELDE
+   ========================================================= */
+.people-rooms-panel{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  overflow:hidden;
+}
+.people-room-list{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:auto;
+}
+.people-private-dock{
+  flex:0 0 min(58vh,560px);
+  min-height:310px;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  margin:0 0 12px;
+  border:1px solid rgba(25,120,255,.75);
+  border-radius:17px;
+  background:linear-gradient(180deg,rgba(11,24,42,.98),rgba(8,17,29,.98));
+  box-shadow:0 12px 35px rgba(0,65,160,.16);
+  overflow:hidden;
+}
+.people-private-dock[hidden]{display:none!important}
+.people-private-head{
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) 34px 34px;
+  align-items:center;
+  gap:8px;
+  padding:10px;
+  border-bottom:1px solid var(--border,#263548);
+}
+.people-private-person{display:grid;gap:2px;min-width:0}
+.people-private-person strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.people-private-person small{font-size:10px;color:var(--muted,#91a0b2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.people-private-control{
+  width:34px;height:34px;border:1px solid var(--border,#263548);border-radius:10px;
+  background:rgba(255,255,255,.035);color:var(--text,#eef5ff);font-size:19px;cursor:pointer
+}
+.people-private-control:hover{background:rgba(20,104,255,.12)}
+.people-private-messages{
+  min-height:0;overflow:auto;padding:11px;scroll-behavior:smooth
+}
+.people-private-empty{padding:25px 8px;text-align:center;color:var(--muted,#91a0b2);font-size:11px}
+.people-private-message-row{display:flex;margin:7px 0}
+.people-private-message-row.mine{justify-content:flex-end}
+.people-private-message-row.theirs{justify-content:flex-start}
+.people-private-bubble{
+  max-width:86%;padding:8px 10px 5px;border-radius:13px;font-size:12px;
+  line-height:1.4;overflow-wrap:anywhere
+}
+.people-private-message-row.mine .people-private-bubble{
+  background:linear-gradient(135deg,#1168e8,#087cff);color:#fff;border-bottom-right-radius:4px
+}
+.people-private-message-row.theirs .people-private-bubble{
+  background:#172334;color:var(--text,#eef5ff);border:1px solid rgba(255,255,255,.045);
+  border-bottom-left-radius:4px
+}
+.people-private-bubble time{display:block;text-align:right;margin-top:3px;font-size:9px;opacity:.66}
+.people-private-composer{
+  display:flex;gap:7px;padding:9px;border-top:1px solid var(--border,#263548)
+}
+.people-private-composer input{
+  min-width:0;flex:1;height:38px;border:1px solid var(--border,#263548);border-radius:11px;
+  padding:0 10px;background:var(--input,#0b1118);color:var(--text,#eef5ff);outline:none;font:inherit;font-size:11px
+}
+.people-private-composer button{
+  width:40px;border:0;border-radius:11px;background:#126fff;color:#fff;font-size:17px;cursor:pointer
+}
+.people-private-dock.minimized{
+  flex-basis:auto;min-height:0;grid-template-rows:auto
+}
+.people-private-dock.minimized .people-private-messages,
+.people-private-dock.minimized .people-private-composer{display:none}
+
+/* Genel sohbet başlığı artık özel oda seçilince değişmez. */
+.people-conversation-head{position:relative}
+.people-general-btn{display:none!important}
+
+@media(max-width:1000px){
+  .people-private-dock{flex-basis:min(52vh,480px)}
+}
+@media(max-width:720px){
+  .people-private-dock{
+    flex-basis:auto;
+    min-height:420px;
+    max-height:62vh;
+  }
+  .people-rooms-panel{max-height:none!important;overflow:visible}
+  .people-room-list{max-height:260px}
 }
