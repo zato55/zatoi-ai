@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.31">
+  <link rel="stylesheet" href="./style.css?v=14.32">
 </head>
 
 <body>
@@ -587,10 +587,28 @@
 
     <aside class="people-rooms-panel">
       <div class="people-panel-heading">
-        <div><strong>🔒 Özel Odalar</strong><span>Başlattığın birebir sohbetler</span></div>
+        <div><strong>🔒 Özel Odalar</strong><span>Kişisel sohbetlerin</span></div>
         <button id="peopleRefreshRooms" type="button" class="people-icon-btn" title="Odaları yenile">↻</button>
       </div>
-      <div id="peopleRoomList" class="people-list">
+
+      <section id="peoplePrivateDock" class="people-private-dock" hidden>
+        <div class="people-private-head">
+          <div id="peoplePrivateAvatar" class="people-room-avatar">✦</div>
+          <div class="people-private-person">
+            <strong id="peoplePrivateName">Özel sohbet</strong>
+            <small id="peoplePrivateStatus">Yalnızca iki kullanıcı</small>
+          </div>
+          <button id="peoplePrivateMinimize" type="button" class="people-private-control" title="Küçült">−</button>
+          <button id="peoplePrivateClose" type="button" class="people-private-control" title="Kapat">×</button>
+        </div>
+        <div id="peoplePrivateMessages" class="people-private-messages"></div>
+        <form id="peoplePrivateComposer" class="people-private-composer">
+          <input id="peoplePrivateInput" type="text" maxlength="2000" autocomplete="off" placeholder="Özel mesaj yaz...">
+          <button id="peoplePrivateSend" type="submit" aria-label="Özel mesaj gönder">➤</button>
+        </form>
+      </section>
+
+      <div id="peopleRoomList" class="people-list people-room-list">
         <div class="people-loading">Özel odalar yükleniyor...</div>
       </div>
     </aside>
@@ -7360,12 +7378,22 @@ const peopleSendButton = document.getElementById("peopleSendButton");
 const peopleGeneralButton = document.getElementById("peopleGeneralButton");
 const peopleAiModeButton = document.getElementById("peopleAiModeButton");
 const peopleChatModeButton = document.getElementById("peopleChatModeButton");
+const peoplePrivateDock = document.getElementById("peoplePrivateDock");
+const peoplePrivateAvatar = document.getElementById("peoplePrivateAvatar");
+const peoplePrivateName = document.getElementById("peoplePrivateName");
+const peoplePrivateStatus = document.getElementById("peoplePrivateStatus");
+const peoplePrivateMessages = document.getElementById("peoplePrivateMessages");
+const peoplePrivateComposer = document.getElementById("peoplePrivateComposer");
+const peoplePrivateInput = document.getElementById("peoplePrivateInput");
+const peoplePrivateSend = document.getElementById("peoplePrivateSend");
+const peoplePrivateMinimize = document.getElementById("peoplePrivateMinimize");
+const peoplePrivateClose = document.getElementById("peoplePrivateClose");
 
 let peopleChatActive = false;
 let peopleActiveUsers = [];
 let peopleRooms = [];
 let peopleCurrentRoomId = "";
-let peopleConversationMode = "general";
+let peopleConversationMode = "general"; // Orta alan V14.32 itibarıyla daima genel sohbet.
 let peopleCurrentPartner = null;
 let peoplePollTimer = null;
 let peopleLastMessageSignature = "";
@@ -7584,50 +7612,103 @@ async function loadPeopleGeneralMessages({ silent = false } = {}) {
   }
 }
 
+function renderPeoplePrivateMessages(messages) {
+  if (!peoplePrivateMessages) return;
+  if (!messages.length) {
+    peoplePrivateMessages.innerHTML = `<div class="people-private-empty">Henüz mesaj yok. İlk mesajı gönder.</div>`;
+    return;
+  }
+  peoplePrivateMessages.innerHTML = messages.map(message => {
+    const mine = String(message.senderId) === String(currentUser?.userId);
+    return `
+      <div class="people-private-message-row ${mine ? "mine" : "theirs"}">
+        <div class="people-private-bubble">
+          <div>${peopleEscape(message.content)}</div>
+          <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+        </div>
+      </div>`;
+  }).join("");
+  peoplePrivateMessages.scrollTop = peoplePrivateMessages.scrollHeight;
+}
+
+async function loadPeoplePrivateMessages({ silent = false } = {}) {
+  if (!peopleChatActive || !peopleCurrentRoomId) return;
+  try {
+    const data = await peopleApi("get_messages", { roomId: peopleCurrentRoomId });
+    const messages = Array.isArray(data.messages) ? data.messages : [];
+    const signature = messages.map(item => `${item.messageId}:${item.createdAt}`).join("|");
+    const dockSignature = peoplePrivateMessages?.dataset.signature || "";
+    if (!silent || signature !== dockSignature) {
+      if (peoplePrivateMessages) peoplePrivateMessages.dataset.signature = signature;
+      renderPeoplePrivateMessages(messages);
+    }
+  } catch (error) {
+    if (!silent && peoplePrivateMessages) {
+      peoplePrivateMessages.innerHTML = `<div class="people-empty-small error">${peopleEscape(error.message)}</div>`;
+    }
+  }
+}
+
 async function selectPeopleRoom(roomId) {
   if (!roomId) return;
-  peopleConversationMode = "private";
   peopleCurrentRoomId = roomId;
   const room = peopleRooms.find(item => item.roomId === roomId);
-  peopleCurrentPartner = room?.partner || peopleCurrentPartner;
-  peopleLastMessageSignature = "";
+  peopleCurrentPartner = room?.partner || null;
 
-  if (peopleConversationAvatar) peopleConversationAvatar.textContent = peopleAvatarText(peopleCurrentPartner);
-  if (peopleConversationName) peopleConversationName.textContent = peopleDisplayName(peopleCurrentPartner);
-  if (peopleConversationStatus) {
-    peopleConversationStatus.textContent = peopleCurrentPartner?.isActive
+  if (peoplePrivateAvatar) peoplePrivateAvatar.textContent = peopleAvatarText(peopleCurrentPartner);
+  if (peoplePrivateName) peoplePrivateName.textContent = peopleDisplayName(peopleCurrentPartner);
+  if (peoplePrivateStatus) {
+    peoplePrivateStatus.textContent = peopleCurrentPartner?.isActive
       ? `🟢 Aktif • @${peopleCurrentPartner.username || "kullanici"}`
       : `Özel sohbet • @${peopleCurrentPartner?.username || "kullanici"}`;
   }
-  setPeopleComposerEnabled(true);
+  if (peoplePrivateDock) {
+    peoplePrivateDock.hidden = false;
+    peoplePrivateDock.classList.remove("minimized");
+  }
   renderPeopleRooms();
-  await loadPeopleMessages();
-  peopleMessageInput?.focus();
+  await loadPeoplePrivateMessages();
+  peoplePrivateInput?.focus();
+}
+
+async function sendPeoplePrivateMessage(event) {
+  event?.preventDefault();
+  const content = String(peoplePrivateInput?.value || "").trim();
+  if (!peopleCurrentRoomId || !content) return;
+  if (content.length > 2000) return alert("Mesaj en fazla 2000 karakter olabilir.");
+
+  peoplePrivateInput.disabled = true;
+  if (peoplePrivateSend) peoplePrivateSend.disabled = true;
+  try {
+    await peopleApi("send_message", { roomId: peopleCurrentRoomId, content });
+    peoplePrivateInput.value = "";
+    await Promise.all([loadPeoplePrivateMessages(), refreshPeopleRooms()]);
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    peoplePrivateInput.disabled = false;
+    if (peoplePrivateSend) peoplePrivateSend.disabled = false;
+    peoplePrivateInput?.focus();
+  }
 }
 
 async function sendPeopleMessage(event) {
   event?.preventDefault();
   const content = String(peopleMessageInput?.value || "").trim();
   if (!content) return;
-  if (peopleConversationMode === "private" && !peopleCurrentRoomId) return;
   if (content.length > 2000) return alert("Mesaj en fazla 2000 karakter olabilir.");
 
   peopleMessageInput.disabled = true;
   peopleSendButton.disabled = true;
   try {
-    if (peopleConversationMode === "general") {
-      await peopleApi("send_general_message", { content });
-      peopleMessageInput.value = "";
-      await loadPeopleGeneralMessages();
-    } else {
-      await peopleApi("send_message", { roomId: peopleCurrentRoomId, content });
-      peopleMessageInput.value = "";
-      await Promise.all([loadPeopleMessages(), refreshPeopleRooms()]);
-    }
+    await peopleApi("send_general_message", { content });
+    peopleMessageInput.value = "";
+    await loadPeopleGeneralMessages();
   } catch (error) {
     alert(error.message);
   } finally {
-    setPeopleComposerEnabled(peopleConversationMode === "general" || Boolean(peopleCurrentRoomId));
+    peopleMessageInput.disabled = false;
+    peopleSendButton.disabled = false;
     peopleMessageInput?.focus();
   }
 }
@@ -7648,8 +7729,10 @@ function startPeoplePolling() {
     if (!peopleChatActive || document.hidden) return;
     await peopleHeartbeat();
     await Promise.all([refreshPeopleActive(), refreshPeopleRooms()]);
-    if (peopleConversationMode === "general") await loadPeopleGeneralMessages({ silent: true });
-    else if (peopleCurrentRoomId) await loadPeopleMessages({ silent: true });
+    await loadPeopleGeneralMessages({ silent: true });
+    if (peopleCurrentRoomId && peoplePrivateDock && !peoplePrivateDock.hidden) {
+      await loadPeoplePrivateMessages({ silent: true });
+    }
   }, 8000);
 }
 
@@ -7662,8 +7745,10 @@ async function enterPeopleChat() {
   }
   await peopleHeartbeat();
   await Promise.all([refreshPeopleActive(), refreshPeopleRooms()]);
-  if (peopleConversationMode === "general") await selectPeopleGeneral();
-  else if (peopleCurrentRoomId) await loadPeopleMessages();
+  await selectPeopleGeneral();
+  if (peopleCurrentRoomId && peoplePrivateDock && !peoplePrivateDock.hidden) {
+    await loadPeoplePrivateMessages();
+  }
   startPeoplePolling();
 }
 
@@ -7694,6 +7779,16 @@ zatoiChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
+peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
+peoplePrivateMinimize?.addEventListener("click", () => {
+  peoplePrivateDock?.classList.toggle("minimized");
+});
+peoplePrivateClose?.addEventListener("click", () => {
+  if (peoplePrivateDock) peoplePrivateDock.hidden = true;
+  peopleCurrentRoomId = "";
+  peopleCurrentPartner = null;
+  renderPeopleRooms();
+});
 peopleRefreshActive?.addEventListener("click", refreshPeopleActive);
 peopleRefreshRooms?.addEventListener("click", refreshPeopleRooms);
 peopleUserSearch?.addEventListener("input", renderPeopleActiveUsers);
@@ -7704,8 +7799,10 @@ document.addEventListener("visibilitychange", () => {
     peopleHeartbeat();
     refreshPeopleActive();
     refreshPeopleRooms();
-    if (peopleConversationMode === "general") loadPeopleGeneralMessages({ silent: true });
-    else if (peopleCurrentRoomId) loadPeopleMessages({ silent: true });
+    loadPeopleGeneralMessages({ silent: true });
+    if (peopleCurrentRoomId && peoplePrivateDock && !peoplePrivateDock.hidden) {
+      loadPeoplePrivateMessages({ silent: true });
+    }
   }
 });
 
@@ -7741,7 +7838,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.31",
+        "./service-worker.js?v=14.32",
         { updateViaCache: "none" }
       );
 
@@ -7785,7 +7882,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.31";
+  window.__ZATOI_BUILD__ = "14.32";
 </script>
 </body>
 </html>
