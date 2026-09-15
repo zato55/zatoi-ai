@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.32">
+  <link rel="stylesheet" href="./style.css?v=14.32.1">
 </head>
 
 <body>
@@ -545,6 +545,12 @@
 
 
   <section id="peopleChatPanel" class="people-chat-panel" aria-hidden="true">
+    <div id="peopleMobileNav" class="people-mobile-nav" aria-label="Mobil sohbet görünümü">
+      <button id="peopleMobileActiveTab" type="button">🟢 Aktifler</button>
+      <button id="peopleMobileGeneralTab" type="button" class="active">🌐 Genel</button>
+      <button id="peopleMobileRoomsTab" type="button">🔒 Odalar</button>
+    </div>
+
     <div class="people-mode-top">
       <div class="people-mode-brand"><strong>Zatoi</strong><span>AI ve insan sohbeti</span></div>
       <div class="zatoi-mode-switch people-mode-switch" role="tablist" aria-label="Zatoi modu">
@@ -7388,6 +7394,9 @@ const peoplePrivateInput = document.getElementById("peoplePrivateInput");
 const peoplePrivateSend = document.getElementById("peoplePrivateSend");
 const peoplePrivateMinimize = document.getElementById("peoplePrivateMinimize");
 const peoplePrivateClose = document.getElementById("peoplePrivateClose");
+const peopleMobileActiveTab = document.getElementById("peopleMobileActiveTab");
+const peopleMobileGeneralTab = document.getElementById("peopleMobileGeneralTab");
+const peopleMobileRoomsTab = document.getElementById("peopleMobileRoomsTab");
 
 let peopleChatActive = false;
 let peopleActiveUsers = [];
@@ -7583,6 +7592,7 @@ async function loadPeopleMessages({ silent = false } = {}) {
 
 async function selectPeopleGeneral() {
   peopleConversationMode = "general";
+  syncPrivateIntoMobileConversation(false);
   peopleCurrentRoomId = "";
   peopleCurrentPartner = null;
   peopleLastMessageSignature = "";
@@ -7610,6 +7620,24 @@ async function loadPeopleGeneralMessages({ silent = false } = {}) {
       peopleMessages.innerHTML = `<div class="people-empty-small error">${peopleEscape(error.message)}</div>`;
     }
   }
+}
+
+
+function peopleIsMobileChat() {
+  return window.matchMedia("(max-width: 720px)").matches;
+}
+
+function setPeopleMobileView(view) {
+  if (!peopleChatPanel || !peopleIsMobileChat()) return;
+  peopleChatPanel.dataset.mobileView = view;
+  peopleMobileActiveTab?.classList.toggle("active", view === "active");
+  peopleMobileGeneralTab?.classList.toggle("active", view === "general");
+  peopleMobileRoomsTab?.classList.toggle("active", view === "rooms" || view === "private");
+}
+
+function syncPrivateIntoMobileConversation(openPrivate) {
+  if (!peopleIsMobileChat()) return;
+  setPeopleMobileView(openPrivate ? "private" : "general");
 }
 
 function renderPeoplePrivateMessages(messages) {
@@ -7666,6 +7694,7 @@ async function selectPeopleRoom(roomId) {
     peoplePrivateDock.hidden = false;
     peoplePrivateDock.classList.remove("minimized");
   }
+  syncPrivateIntoMobileConversation(true);
   renderPeopleRooms();
   await loadPeoplePrivateMessages();
   peoplePrivateInput?.focus();
@@ -7745,6 +7774,7 @@ async function enterPeopleChat() {
   }
   await peopleHeartbeat();
   await Promise.all([refreshPeopleActive(), refreshPeopleRooms()]);
+  if (peopleIsMobileChat()) setPeopleMobileView("general");
   await selectPeopleGeneral();
   if (peopleCurrentRoomId && peoplePrivateDock && !peoplePrivateDock.hidden) {
     await loadPeoplePrivateMessages();
@@ -7780,6 +7810,20 @@ peopleAiModeButton?.addEventListener("click", () => setZatoiMode("ai"));
 peopleChatModeButton?.addEventListener("click", () => setZatoiMode("chat"));
 peopleGeneralButton?.addEventListener("click", selectPeopleGeneral);
 peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
+peopleMobileActiveTab?.addEventListener("click", () => setPeopleMobileView("active"));
+peopleMobileGeneralTab?.addEventListener("click", async () => {
+  if (peoplePrivateDock) peoplePrivateDock.hidden = true;
+  peopleCurrentRoomId = "";
+  peopleCurrentPartner = null;
+  await selectPeopleGeneral();
+});
+peopleMobileRoomsTab?.addEventListener("click", () => setPeopleMobileView("rooms"));
+
+window.addEventListener("resize", () => {
+  if (peopleIsMobileChat() && peopleChatActive && !peopleChatPanel?.dataset.mobileView) {
+    setPeopleMobileView("general");
+  }
+});
 peoplePrivateMinimize?.addEventListener("click", () => {
   peoplePrivateDock?.classList.toggle("minimized");
 });
@@ -7788,6 +7832,7 @@ peoplePrivateClose?.addEventListener("click", () => {
   peopleCurrentRoomId = "";
   peopleCurrentPartner = null;
   renderPeopleRooms();
+  if (peopleIsMobileChat()) setPeopleMobileView("general");
 });
 peopleRefreshActive?.addEventListener("click", refreshPeopleActive);
 peopleRefreshRooms?.addEventListener("click", refreshPeopleRooms);
@@ -7838,7 +7883,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.32",
+        "./service-worker.js?v=14.32.1",
         { updateViaCache: "none" }
       );
 
@@ -7882,7 +7927,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.32";
+  window.__ZATOI_BUILD__ = "14.32.1";
 </script>
 </body>
 </html>
