@@ -5158,3 +5158,102 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     animation:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.1 — ZATOI USER
+   Owner tasarımının daha soluk, sakin normal üye versiyonu.
+   Owner görünümü bilinçli olarak daha güçlü kalır.
+   ========================================================= */
+
+@keyframes zatoiUserGlow{
+  0%,100%{filter:drop-shadow(0 0 2px rgba(94,156,211,.12))}
+  50%{filter:drop-shadow(0 0 5px rgba(119,132,190,.20))}
+}
+@keyframes zatoiUserShimmer{
+  0%{background-position:200% 50%}
+  100%{background-position:-200% 50%}
+}
+
+/* Normal üye mesajı: mevcut renk yapısını bozmadan hafif premium çerçeve */
+.people-message-row.zatoi-user-message .people-message-bubble{
+  position:relative;
+  border-color:rgba(101,137,173,.24)!important;
+  box-shadow:
+    0 5px 15px rgba(0,0,0,.08),
+    0 0 10px rgba(84,129,171,.035)!important;
+  overflow:visible;
+}
+.people-message-row.zatoi-user-message .people-message-bubble::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.045) 49%,transparent 68%);
+  background-size:240% 100%;
+  animation:zatoiUserShimmer 10s linear infinite;
+  opacity:.42;
+}
+
+/* Aktif kullanıcı kartı: Owner'ın daha soluk versiyonu */
+.people-user-card.zatoi-user-card{
+  position:relative;
+  border-color:rgba(91,126,158,.25)!important;
+  background:
+    linear-gradient(115deg,rgba(28,67,99,.10),rgba(57,61,91,.10)),
+    rgba(18,27,39,.94)!important;
+  box-shadow:
+    inset 2px 0 0 rgba(91,145,190,.25),
+    0 0 11px rgba(77,111,151,.035)!important;
+}
+
+/* Normal kullanıcı avatarı: çok hafif halka/glow */
+.zatoi-user-card .people-avatar,
+.zatoi-user-message .people-avatar,
+.zatoi-user-profile .people-avatar{
+  border:1px solid rgba(105,143,177,.34)!important;
+  box-shadow:
+    0 0 0 1px rgba(78,128,169,.07),
+    0 0 7px rgba(87,124,166,.09)!important;
+  animation:zatoiUserGlow 5.5s ease-in-out infinite;
+}
+
+/* Normal üye profili: sade premium görünüm */
+.zatoi-user-profile .people-public-profile-card,
+.zatoi-user-profile .people-profile-card{
+  border-color:rgba(91,126,158,.27)!important;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(71,113,151,.07),transparent 42%),
+    #101824!important;
+  box-shadow:0 20px 50px rgba(0,0,0,.38),0 0 20px rgba(68,104,143,.045)!important;
+}
+
+/* Owner'ın görsel üstünlüğünü garanti et */
+.people-user-card.zatoi-owner-card{
+  z-index:1;
+}
+.people-message-row.zatoi-owner-message .people-message-bubble{
+  z-index:1;
+}
+
+/* Mobilde efektleri biraz daha hafif tut */
+@media (max-width:760px){
+  .people-message-row.zatoi-user-message .people-message-bubble::before{
+    opacity:.28;
+  }
+  .zatoi-user-card .people-avatar,
+  .zatoi-user-message .people-avatar,
+  .zatoi-user-profile .people-avatar{
+    animation-duration:7s;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .zatoi-user-card .people-avatar,
+  .zatoi-user-message .people-avatar,
+  .zatoi-user-profile .people-avatar,
+  .people-message-row.zatoi-user-message .people-message-bubble::before{
+    animation:none!important;
+  }
+}
