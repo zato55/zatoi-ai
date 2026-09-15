@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.32.2">
+  <link rel="stylesheet" href="./style.css?v=14.32.3">
 </head>
 
 <body>
@@ -7487,14 +7487,22 @@ function renderPeopleRooms() {
   peopleRoomList.innerHTML = peopleRooms.map(room => {
     const active = room.roomId === peopleCurrentRoomId ? " active" : "";
     const preview = room.lastMessage ? peopleEscape(room.lastMessage) : "Yeni özel sohbet";
+    const unreadCount = Math.max(0, Number(room.unreadCount || 0));
+    const unreadClass = unreadCount > 0 ? " has-unread" : "";
+    const unreadBadge = unreadCount > 0
+      ? `<span class="people-room-unread" aria-label="${unreadCount} okunmamış mesaj">${unreadCount > 99 ? "99+" : unreadCount}</span>`
+      : "";
     return `
-      <button class="people-room-card${active}" type="button" data-room-id="${peopleEscape(room.roomId)}">
+      <button class="people-room-card${active}${unreadClass}" type="button" data-room-id="${peopleEscape(room.roomId)}">
         <span class="people-room-avatar">${peopleEscape(peopleAvatarText(room.partner))}${room.partner?.isActive ? "<i></i>" : ""}</span>
         <span class="people-room-info">
           <strong>${peopleEscape(peopleDisplayName(room.partner))}</strong>
           <small>${preview}</small>
         </span>
-        <time>${peopleEscape(peopleTime(room.lastMessageAt))}</time>
+        <span class="people-room-meta">
+          <time>${peopleEscape(peopleTime(room.lastMessageAt))}</time>
+          ${unreadBadge}
+        </span>
       </button>
     `;
   }).join("");
@@ -7502,6 +7510,14 @@ function renderPeopleRooms() {
   peopleRoomList.querySelectorAll("[data-room-id]").forEach(button => {
     button.addEventListener("click", () => selectPeopleRoom(button.dataset.roomId));
   });
+
+  const totalUnread = peopleRooms.reduce((sum, room) => sum + Math.max(0, Number(room.unreadCount || 0)), 0);
+  peopleMobileRoomsTab?.classList.toggle("has-unread", totalUnread > 0);
+  if (peopleMobileRoomsTab) {
+    peopleMobileRoomsTab.setAttribute("aria-label", totalUnread > 0
+      ? `Odalar, ${totalUnread} okunmamış mesaj`
+      : "Odalar");
+  }
 }
 
 async function refreshPeopleActive() {
@@ -7697,6 +7713,12 @@ async function selectPeopleRoom(roomId) {
   syncPrivateIntoMobileConversation(true);
   renderPeopleRooms();
   await loadPeoplePrivateMessages();
+  try {
+    await peopleApi("mark_room_read", { roomId });
+    const current = peopleRooms.find(item => item.roomId === roomId);
+    if (current) current.unreadCount = 0;
+    renderPeopleRooms();
+  } catch {}
   peoplePrivateInput?.focus();
 }
 
@@ -7883,7 +7905,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.32.2",
+        "./service-worker.js?v=14.32.3",
         { updateViaCache: "none" }
       );
 
@@ -7927,7 +7949,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.32.2";
+  window.__ZATOI_BUILD__ = "14.32.3";
 </script>
 </body>
 </html>
