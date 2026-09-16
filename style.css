@@ -6297,3 +6297,66 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     align-self:auto!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.23 — DESKTOP FULL GENERAL COLUMN FROM PAGE TOP
+   SADECE PC
+   - Orta "Genel Sohbet" kolonu sayfanın üstünden başlar.
+   - Başlık + sabit/duyuru üst bölgede kalır.
+   - Mesajlar onların altında akar.
+   - Mobil kurallara dokunulmaz.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* Sohbet ana gövdesinin orta kolonunu tam yükseklikte yukarı taşı. */
+  .people-chat-panel{
+    position:relative!important;
+  }
+
+  .people-chat-panel .people-center,
+  .people-chat-panel .people-center-column,
+  .people-chat-panel .people-main,
+  .people-chat-panel .people-conversation{
+    align-self:stretch!important;
+    margin-top:0!important;
+    padding-top:0!important;
+  }
+
+  /* Genel sohbet kolonu kendi içinde: başlık -> pinned -> mesajlar -> composer */
+  .people-chat-panel .people-conversation{
+    display:grid!important;
+    grid-template-rows:auto auto minmax(0,1fr) auto!important;
+    align-content:stretch!important;
+    height:100%!important;
+    min-height:0!important;
+  }
+
+  .people-chat-panel .people-conversation-head{
+    grid-row:1!important;
+    margin-top:0!important;
+  }
+
+  /* Sabit mesaj / duyuru daima başlığın hemen altında, üstte. */
+  .people-chat-panel #peoplePinnedBar{
+    grid-row:2!important;
+    position:sticky!important;
+    top:0!important;
+    z-index:20!important;
+    width:100%!important;
+    margin:0!important;
+    align-self:start!important;
+  }
+
+  .people-chat-panel #peopleMessages{
+    grid-row:3!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    align-content:start!important;
+    padding-top:12px!important;
+  }
+
+  .people-chat-panel #peopleComposer{
+    grid-row:4!important;
+  }
+}
