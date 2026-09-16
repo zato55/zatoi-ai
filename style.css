@@ -5872,388 +5872,10 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 
 
 /* =========================================================
-   V14.38.16 — MOBILE PEOPLE CHAT NATURAL HEIGHT FIX
-   Kök neden:
-   .people-conversation içinde artık 4 çocuk var:
-   head + pinned + messages + composer.
-   Eski mobil grid hâlâ 3 satır tanımladığı için 1fr alan yanlış
-   elemana dağılıyordu. Burada 4 satır açıkça tanımlanır.
-   Ayrıca mesaj balonları içerik kadar yükseklik kullanır.
+   V14.42.5 — CLEANUP NOTE
+   Eski V14.38.16–V14.38.21 mobil Genel mesaj yamaları kaldırıldı.
+   Mobil Genel için dosyanın sonunda tek kanonik kural seti kullanılır.
    ========================================================= */
-@media (max-width:720px){
-
-  .people-chat-panel[data-mobile-view="general"] .people-conversation{
-    display:grid!important;
-    grid-template-rows:auto auto minmax(0,1fr) auto!important;
-    align-content:stretch!important;
-    overflow:hidden!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] .people-conversation-head{
-    grid-row:1!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peoplePinnedBar{
-    grid-row:2!important;
-    align-self:start!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages{
-    grid-row:3!important;
-    min-height:0!important;
-    height:auto!important;
-    overflow-y:auto!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleComposer{
-    grid-row:4!important;
-  }
-
-  /* Mesaj satırı/balonu yalnız içeriği kadar yükselsin. */
-  .people-chat-panel[data-mobile-view="general"] .people-message-row{
-    height:auto!important;
-    min-height:0!important;
-    align-items:flex-start!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] .people-message-bubble{
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-    align-self:flex-start!important;
-    padding:10px 12px 8px!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] .people-message-sender,
-  .people-chat-panel[data-mobile-view="general"] .people-message-meta-badges,
-  .people-chat-panel[data-mobile-view="general"] .people-message-text,
-  .people-chat-panel[data-mobile-view="general"] .people-message-foot{
-    min-height:0!important;
-    height:auto!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] .people-message-meta-badges{
-    margin-top:6px!important;
-    margin-bottom:7px!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] .people-message-text{
-    margin:0!important;
-    padding:0!important;
-    line-height:1.45!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] .people-message-foot{
-    margin-top:7px!important;
-  }
-}
-
-
-/* =========================================================
-   V14.38.17 — MOBILE GENERAL MESSAGE BUBBLE COMPACT FIX
-   Sabit mesaj V14.38.16 aynen korunur.
-   Normal/USER/OWNER balonunda içerik normal belge akışına alınır.
-   Böylece gönderen, rozet, metin ve saat arasında dev boşluk oluşmaz.
-   ========================================================= */
-@media (max-width:720px){
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-row{
-    display:flex!important;
-    width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:10px 0!important;
-    align-items:flex-start!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-row.mine{
-    justify-content:flex-end!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-row.theirs{
-    justify-content:flex-start!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-bubble{
-    display:block!important;
-    width:fit-content!important;
-    max-width:calc(100% - 22px)!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-    padding:12px 14px 9px!important;
-    box-sizing:border-box!important;
-    align-self:flex-start!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-sender{
-    display:flex!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:0 0 7px!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
-    display:flex!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:0 0 9px!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
-    display:block!important;
-    width:auto!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:0!important;
-    white-space:pre-wrap!important;
-    overflow-wrap:anywhere!important;
-    word-break:break-word!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-foot{
-    display:flex!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:7px 0 0!important;
-    padding:0!important;
-    justify-content:flex-end!important;
-  }
-}
-
-
-/* =========================================================
-   V14.38.18 — MOBILE GENERAL MESSAGE LIST STRETCH FIX
-   Kök düzeltme: #peopleMessages mobilde normal block akışında tutulur.
-   Böylece viewport'un boş yüksekliği mesaj satırlarına dağıtılamaz.
-   Sabit mesaj alanına dokunulmaz.
-   ========================================================= */
-@media (max-width:720px){
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages.people-messages{
-    display:block!important;
-    min-height:0!important;
-    height:auto!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-    align-content:initial!important;
-    align-items:initial!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row{
-    display:flex!important;
-    flex:none!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-    align-self:auto!important;
-    margin:10px 0!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-bubble{
-    flex:none!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-  }
-}
-
-
-/* =========================================================
-   V14.38.19 — MOBILE GENERAL CHAT CARD REDESIGN
-   İstenen mobil düzen:
-   1) Kullanıcı adı satırı üstte, sağa hizalı
-   2) Rol/rozet satırı hemen altında
-   3) Mesaj tam genişlikte ayrı balon
-   4) Gereksiz dikey boşluk yok
-   Sabit mesaj alanına dokunulmaz.
-   ========================================================= */
-@media (max-width:720px){
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row{
-    display:block!important;
-    width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:10px 0 14px!important;
-    padding:0 12px!important;
-    box-sizing:border-box!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-bubble{
-    display:flex!important;
-    flex-direction:column!important;
-    width:100%!important;
-    max-width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-    margin:0!important;
-    padding:10px 11px!important;
-    box-sizing:border-box!important;
-    gap:0!important;
-  }
-
-  /* Kullanıcı adı üst satır — sağ üst. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-sender{
-    order:1!important;
-    display:flex!important;
-    width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:0!important;
-    justify-content:flex-end!important;
-    align-items:center!important;
-    gap:6px!important;
-    text-align:right!important;
-  }
-
-  /* USER / ADMIN / OWNER / DUYURU / SABİT satırı hemen altında. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
-    order:2!important;
-    display:flex!important;
-    width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:5px 0 7px!important;
-    padding:0!important;
-    justify-content:flex-end!important;
-    align-items:center!important;
-    flex-wrap:wrap!important;
-    gap:5px!important;
-  }
-
-  /* Asıl mesaj: kartın tamamını kullanan ayrı iç balon. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
-    order:3!important;
-    display:block!important;
-    width:100%!important;
-    max-width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:11px 12px!important;
-    box-sizing:border-box!important;
-    border-radius:14px!important;
-    background:rgba(4,12,24,.30)!important;
-    white-space:pre-wrap!important;
-    overflow-wrap:anywhere!important;
-    word-break:break-word!important;
-    line-height:1.42!important;
-  }
-
-  /* Saat mesajın hemen altında sağda. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-foot{
-    order:4!important;
-    display:flex!important;
-    width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:5px 0 0!important;
-    padding:0!important;
-    justify-content:flex-end!important;
-    align-items:center!important;
-  }
-
-  /* Owner/User görsel efektleri kalır ama boyutu büyütemez. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .zatoi-owner-message,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .zatoi-user-message{
-    width:100%!important;
-    max-width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-  }
-}
-
-
-/* =========================================================
-   V14.38.20 — MOBILE USER BADGE + MICRO SPACING
-   V14.38.19 kart yapısı korunur.
-   Sadece normal üyeye soluk USER rozeti ve daha sıkı üst bilgi.
-   ========================================================= */
-
-.people-user-badge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  padding:3px 8px;
-  border:1px solid rgba(148,163,184,.30);
-  border-radius:999px;
-  background:rgba(148,163,184,.09);
-  color:rgba(226,232,240,.76);
-  font-size:10px;
-  font-weight:800;
-  line-height:1;
-  letter-spacing:.45px;
-  white-space:nowrap;
-}
-
-@media (max-width:720px){
-
-  /* Kartı mobilde biraz daha ferah kullan. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row{
-    padding-left:8px!important;
-    padding-right:8px!important;
-  }
-
-  /* İsim ve rol birbirine yakın dursun. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-sender{
-    margin-bottom:0!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
-    margin-top:3px!important;
-    margin-bottom:6px!important;
-  }
-
-  /* Kısa mesajlarda gereksiz dikey şişkinliği azalt. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
-    padding-top:9px!important;
-    padding-bottom:9px!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-user-badge{
-    opacity:.82;
-  }
-}
-
-
-/* =========================================================
-   V14.38.21 — NORMAL MEMBER USER BADGE
-   Mevcut V14.38.20 ölçüleri aynen korunur.
-   Normal üyeye sade/soluk USER kimliği eklenir.
-   ========================================================= */
-.people-user-badge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  padding:3px 8px;
-  border:1px solid rgba(125,167,214,.34);
-  border-radius:999px;
-  background:rgba(72,116,164,.12);
-  color:rgba(207,224,241,.78);
-  box-shadow:inset 0 0 10px rgba(88,148,210,.05);
-  font-size:10px;
-  font-weight:800;
-  line-height:1;
-  letter-spacing:.5px;
-  white-space:nowrap;
-}
-
-@media (max-width:720px){
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-user-badge{
-    opacity:.82;
-  }
-}
-
 
 /* =========================================================
    V14.38.22 — DESKTOP GENERAL CHAT TOP ALIGNMENT
@@ -7466,200 +7088,296 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 @media(max-width:720px){.people-message-edit-action{width:28px!important;min-width:28px!important;height:28px!important}}
 
 /* =========================================================
-   V14.42.4 — MOBİL GENEL MESAJ AKIŞI / KÖK DÜZELTME
-   Amaç:
-   - Genel mesaj listesi Özel Oda gibi doğal dikey akış
-   - Kullanıcı kartı solda 92px
-   - Mesaj balonu aynı satırda sağda
-   - Kısa mesaj = kısa balon; boş alan balonlara dağıtılmaz
-   - Sadece mobil Genel Sohbet
+   V14.42.5 — MOBİL GENEL TEK KANONİK MESAJ SİSTEMİ
+   Yalnızca <=720px + Genel sekmesi.
+   PC ve Özel Oda etkilenmez.
    ========================================================= */
 @media (max-width:720px){
 
-  /* KÖK: viewport yüksekliğini mesaj çocuklarına dağıtma.
-     Liste scroll alanı olarak kalır, mesajlar doğal yükseklikte üstten akar. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages.people-messages{
-    display:flex!important;
-    flex-direction:column!important;
-    flex-wrap:nowrap!important;
-    justify-content:flex-start!important;
-    align-items:stretch!important;
-    align-content:flex-start!important;
-    gap:12px!important;
-
+  /* Mesaj listesi viewport'u doldurur; çocuklar doğal blok akışındadır. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  .people-conversation > #peopleMessages.people-messages{
+    display:block!important;
     width:100%!important;
     min-width:0!important;
     height:100%!important;
     min-height:0!important;
     max-height:none!important;
-
+    margin:0!important;
     padding:12px 22px 16px!important;
     box-sizing:border-box!important;
-    overflow-y:auto!important;
     overflow-x:hidden!important;
+    overflow-y:auto!important;
   }
 
-  /* Her mesaj satırı kendi içeriği kadar yüksek.
-     Grid yerine basit yatay flex: kart + balon. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs{
+  /* Her mesaj bağımsız ve doğal yükseklikte bir satırdır.
+     all:unset eski display/grid/flex/height kalıntılarını burada keser. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row{
+    all:unset!important;
     position:relative!important;
-    display:flex!important;
-    flex-direction:row!important;
-    flex-wrap:nowrap!important;
-    flex:0 0 auto!important;
-
-    justify-content:flex-start!important;
-    align-items:flex-start!important;
-    align-content:flex-start!important;
-
+    display:grid!important;
+    grid-template-columns:92px minmax(0,1fr)!important;
+    grid-template-rows:auto!important;
+    align-items:start!important;
+    align-content:start!important;
     width:100%!important;
-    max-width:100%!important;
     min-width:0!important;
-
     height:auto!important;
     min-height:0!important;
     max-height:none!important;
-
-    margin:0!important;
+    margin:0 0 12px 0!important;
     padding:0!important;
-    gap:0!important;
+    box-sizing:border-box!important;
     overflow:visible!important;
   }
 
-  /* Kart: Özel Oda mobil ölçüsü. Tüm Genel mesajlarda solda kalır. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-user-card,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-user-card,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-user-card{
+  /* Mobil Genel'de mine/theirs yön değiştirmez:
+     kullanıcı kartı daima solda, mesaj daima sağda. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.mine,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.theirs{
+    grid-template-columns:92px minmax(0,1fr)!important;
+  }
+
+  /* Kullanıcı kartı */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row > .people-message-user-card{
+    all:unset!important;
     position:relative!important;
+    grid-column:1!important;
+    grid-row:1!important;
     display:grid!important;
     grid-template-columns:29px minmax(0,1fr)!important;
     grid-template-rows:auto auto!important;
-    column-gap:5px!important;
     align-items:center!important;
-
-    flex:0 0 92px!important;
+    column-gap:5px!important;
     width:92px!important;
     min-width:92px!important;
     max-width:92px!important;
-
     height:auto!important;
     min-height:48px!important;
     max-height:none!important;
-
     margin:0!important;
     padding:6px!important;
     box-sizing:border-box!important;
-
+    border:1px solid rgba(148,163,184,.20)!important;
     border-radius:13px 0 0 13px!important;
-    align-self:flex-start!important;
+    background:rgba(15,23,42,.94)!important;
+    color:#e5e7eb!important;
+    text-align:left!important;
+    cursor:pointer!important;
+    box-shadow:0 5px 16px rgba(0,0,0,.14)!important;
     z-index:2!important;
   }
 
-  /* Karttan balona doğru küçük bağlantı oku. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-user-card::after,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-user-card::after,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-user-card::after{
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .zatoi-owner-message > .people-message-user-card{
+    border-color:rgba(129,140,248,.36)!important;
+    background:linear-gradient(135deg,rgba(30,64,175,.92),rgba(88,28,135,.92))!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row > .people-message-user-card::after{
     content:""!important;
     position:absolute!important;
-    left:auto!important;
     right:-9px!important;
+    left:auto!important;
     top:19px!important;
-
     width:17px!important;
     height:17px!important;
     background:inherit!important;
-
-    border-left:0!important;
-    border-bottom:0!important;
     border-top:1px solid rgba(148,163,184,.20)!important;
     border-right:1px solid rgba(148,163,184,.20)!important;
-
+    border-left:0!important;
+    border-bottom:0!important;
     transform:rotate(45deg)!important;
     z-index:-1!important;
   }
 
-  /* BALON: kalan yatay alanı kullanır ama ASLA satırın yüksekliğini doldurmaz. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-bubble,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-bubble,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-bubble,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.zatoi-user-message > .people-message-bubble,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.zatoi-owner-message > .people-message-bubble{
-    position:relative!important;
-    display:block!important;
-
-    flex:1 1 0!important;
-    align-self:flex-start!important;
-
-    width:auto!important;
-    max-width:none!important;
-    min-width:0!important;
-
-    height:auto!important;
-    min-height:48px!important;
-    max-height:none!important;
-
-    margin:0!important;
-    padding:10px 11px!important;
-    box-sizing:border-box!important;
-    border-radius:0 14px 14px 14px!important;
-    overflow:visible!important;
-  }
-
-  /* Eski mobil Genel tasarımından kalan iç eleman ölçülerini nötrleştir. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
-    display:block!important;
-    width:100%!important;
-    max-width:100%!important;
-    min-width:0!important;
-
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-
-    margin:0!important;
-    padding:10px 11px!important;
-    box-sizing:border-box!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
-    width:auto!important;
-    height:auto!important;
-    min-height:0!important;
-    margin:0 0 6px!important;
-  }
-
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-foot{
+  /* Avatar + kart metinleri */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-user-card .people-message-sender-avatar{
+    grid-column:1!important;
+    grid-row:1 / 3!important;
     display:flex!important;
-    width:100%!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-
-    margin:7px 0 0!important;
-    padding:0!important;
-    justify-content:flex-end!important;
     align-items:center!important;
-  }
-
-  /* Dış karttaki kimlik ölçüleri. */
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card .people-message-sender-avatar{
+    justify-content:center!important;
     width:29px!important;
     height:29px!important;
     min-width:29px!important;
+    border-radius:50%!important;
     font-size:11px!important;
   }
 
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card-copy strong{
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-user-card-copy{
+    grid-column:2!important;
+    grid-row:1!important;
+    display:flex!important;
+    flex-direction:column!important;
+    min-width:0!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-user-card-copy strong{
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
     font-size:10px!important;
+    line-height:1.2!important;
   }
 
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card-copy small{
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-user-card-copy small{
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
     font-size:8px!important;
+    line-height:1.2!important;
+    opacity:.72!important;
   }
 
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card-role{
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-user-card-role{
+    grid-column:2!important;
+    grid-row:2!important;
+    margin-top:2px!important;
     font-size:7px!important;
+    font-weight:700!important;
+    opacity:.78!important;
+  }
+
+  /* Mesaj balonu: eski tüm flex/grid boyutlandırmasını sıfırla. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row > .people-message-bubble{
+    all:unset!important;
+    position:relative!important;
+    grid-column:2!important;
+    grid-row:1!important;
+    display:block!important;
+    align-self:start!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:48px!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:10px 11px!important;
+    box-sizing:border-box!important;
+    border:1px solid rgba(101,137,173,.24)!important;
+    border-radius:0 14px 14px 14px!important;
+    background:linear-gradient(145deg,rgba(20,91,174,.96),rgba(28,105,204,.96) 48%,rgba(47,66,151,.96))!important;
+    color:#eef5ff!important;
+    font-size:14px!important;
+    line-height:1.45!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 6px 16px rgba(0,0,0,.13),0 0 13px rgba(91,107,216,.10)!important;
+    overflow:visible!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .zatoi-owner-message > .people-message-bubble{
+    background:linear-gradient(135deg,rgba(30,87,145,.88),rgba(75,43,118,.88))!important;
+    border-color:rgba(139,118,255,.52)!important;
+    box-shadow:0 0 0 1px rgba(102,190,255,.07),0 7px 24px rgba(68,73,190,.16),0 0 22px rgba(137,91,230,.10)!important;
+  }
+
+  /* İç öğelerde eski order/flex/stretch kalıntılarını sıfırla. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-meta-badges{
+    display:flex!important;
+    align-items:center!important;
+    flex-wrap:wrap!important;
+    gap:5px!important;
+    width:auto!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0 0 6px 0!important;
+    padding:0!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-meta-badges:empty{
+    display:none!important;
+    margin:0!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-text{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:9px 11px!important;
+    box-sizing:border-box!important;
+    border-radius:14px!important;
+    background:rgba(4,12,24,.30)!important;
+    color:inherit!important;
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+    line-height:1.42!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-foot{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:7px 0 0 0!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-foot time{
+    display:inline!important;
+    margin:0!important;
+    font-size:9px!important;
+    opacity:.68!important;
+  }
+
+  /* Yanıt kutusu varsa balonun doğal yüksekliğine katılır. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-replied-message{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0 0 7px 0!important;
+    box-sizing:border-box!important;
   }
 }
