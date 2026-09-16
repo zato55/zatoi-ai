@@ -7212,3 +7212,16 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     text-align:left!important;
   }
 }
+
+/* V14.40.0 — A2 MESAJ TEPKİLERİ */
+.people-reaction-summary{display:inline-flex;align-items:center;flex-wrap:wrap;gap:3px;min-width:0}
+.people-reaction-chip{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:3px!important;width:auto!important;min-width:31px!important;height:24px!important;padding:0 6px!important;border:1px solid rgba(148,163,184,.18)!important;border-radius:999px!important;background:rgba(15,23,42,.42)!important;color:#e5e7eb!important;cursor:pointer!important;font-size:12px!important;line-height:1!important}
+.people-reaction-chip b{font-size:10px;font-weight:700;color:#cbd5e1}
+.people-reaction-chip.mine{border-color:rgba(96,165,250,.52)!important;background:rgba(37,99,235,.20)!important}
+.people-message-reaction-action{width:25px!important;min-width:25px!important;height:25px!important;padding:0!important;border:0!important;border-radius:7px!important;background:transparent!important;color:#94a3b8!important;cursor:pointer!important;font-size:15px!important;line-height:1!important;opacity:.82}
+.people-message-reaction-action:hover{opacity:1;background:rgba(96,165,250,.12)!important;color:#e2e8f0!important}
+.people-message-foot,.people-private-message-foot{position:relative!important}
+.people-reaction-picker{position:absolute;right:28px;bottom:30px;z-index:170;display:flex;align-items:center;gap:3px;padding:5px;border:1px solid rgba(148,163,184,.22);border-radius:11px;background:#111827;box-shadow:0 10px 28px rgba(0,0,0,.34)}
+.people-reaction-picker button{width:31px!important;min-width:31px!important;height:31px!important;padding:0!important;border:0!important;border-radius:8px!important;background:transparent!important;cursor:pointer!important;font-size:17px!important;line-height:1!important}
+.people-reaction-picker button:hover{background:rgba(148,163,184,.14)!important}
+@media(max-width:720px){.people-message-reaction-action{width:28px!important;min-width:28px!important;height:28px!important}.people-reaction-picker{right:24px;bottom:32px}}
