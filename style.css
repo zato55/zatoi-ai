@@ -5680,3 +5680,44 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     padding:7px 5px!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.12 — MOBILE PEOPLE CHAT LONG MESSAGE WRAP FIX
+   Yalnızca mobil 💬 Sohbet mesajlarını hedefler.
+   Uzun metin/balon ekran genişliğini aşamaz.
+   AI ve PC yerleşimine dokunmaz.
+   ========================================================= */
+
+@media (max-width:800px){
+
+  .people-chat-panel .people-message-row{
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel .people-message-bubble{
+    max-width:calc(100vw - 44px)!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+
+  .people-chat-panel .people-message-text,
+  .people-chat-panel .people-message-content,
+  .people-chat-panel .people-message-bubble{
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+    word-wrap:break-word!important;
+    word-break:break-word!important;
+    min-width:0!important;
+  }
+
+  /* Owner/User efektleri balonun genişliğini büyütemez. */
+  .people-chat-panel .zatoi-owner-message,
+  .people-chat-panel .zatoi-user-message{
+    max-width:100%!important;
+    min-width:0!important;
+  }
+}
