@@ -6884,3 +6884,63 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     height:100%!important;
   }
 }
+
+/* =========================================================
+   V14.38.31 — ÜST MESAJ ALANI: 2 DUYURU + 1 SABİT MESAJ
+   PC + Mobil ortak görsel destek.
+   Mevcut sohbet akışına dokunmaz.
+   ========================================================= */
+#peoplePinnedBar.people-pinned-bar{
+  height:auto!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:6px!important;
+  padding:7px 10px!important;
+  text-align:left!important;
+}
+#peoplePinnedBar.people-pinned-bar[hidden]{
+  display:none!important;
+}
+#peoplePinnedBar .people-top-message-card{
+  width:100%!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  padding:8px 10px!important;
+  border-radius:10px!important;
+  box-sizing:border-box!important;
+}
+#peoplePinnedBar .people-top-message-card.is-announcement{
+  background:rgba(245,158,11,.08)!important;
+  border:1px solid rgba(245,158,11,.22)!important;
+}
+#peoplePinnedBar .people-top-message-card.is-pinned{
+  background:rgba(59,130,246,.08)!important;
+  border:1px solid rgba(59,130,246,.20)!important;
+  cursor:pointer!important;
+}
+#peoplePinnedBar .people-top-message-card .people-pinned-bar-copy{
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:2px!important;
+}
+#peoplePinnedBar .people-top-message-card small{
+  display:block!important;
+  min-width:0!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+@media (max-width:720px){
+  #peoplePinnedBar.people-pinned-bar{
+    gap:5px!important;
+    padding:6px 8px!important;
+  }
+  #peoplePinnedBar .people-top-message-card{
+    padding:7px 8px!important;
+  }
+}
