@@ -7790,3 +7790,85 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     padding:40px 0 0!important;
   }
 }
+
+/* =========================================================
+   V14.43.4 — MOBİL GENEL PERDE GRID ROW FIX
+   Kök neden:
+   Mobil .people-conversation hâlâ 3 satırdı:
+   başlık / mesajlar / composer.
+   #peoplePinnedBar ayrı bir grid satırı almadığı için açılan kartlar
+   mesaj listesinin ÜZERİNE taşıyordu.
+
+   Yeni mobil sıra:
+   1) Genel başlık
+   2) Duyuru & Sabit perde (auto = açık yüksekliği kadar)
+   3) Mesaj listesi (kalan alan)
+   4) Composer
+   ========================================================= */
+@media (max-width:720px){
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  > .people-conversation{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto minmax(0,1fr) auto!important;
+    align-content:stretch!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  > .people-conversation > .people-conversation-head{
+    grid-column:1!important;
+    grid-row:1!important;
+    min-width:0!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  > .people-conversation > #peoplePinnedBar{
+    grid-column:1!important;
+    grid-row:2!important;
+    position:relative!important;
+    top:auto!important;
+    align-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    max-height:none!important;
+    z-index:20!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  > .people-conversation > #peoplePinnedBar.is-collapsed{
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  > .people-conversation > #peopleMessages{
+    grid-column:1!important;
+    grid-row:3!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  > .people-conversation > #peopleComposer{
+    grid-column:1!important;
+    grid-row:4!important;
+    position:relative!important;
+    min-width:0!important;
+    z-index:30!important;
+  }
+}
