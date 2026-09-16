@@ -7466,112 +7466,200 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 @media(max-width:720px){.people-message-edit-action{width:28px!important;min-width:28px!important;height:28px!important}}
 
 /* =========================================================
-   V14.42.3 — MOBİL GENEL / ÖZEL ODA İLE AYNI MESAJ GEOMETRİSİ
-   Eski Genel mobil kart kurallarını son katmanda kesin olarak ezer.
+   V14.42.4 — MOBİL GENEL MESAJ AKIŞI / KÖK DÜZELTME
+   Amaç:
+   - Genel mesaj listesi Özel Oda gibi doğal dikey akış
+   - Kullanıcı kartı solda 92px
+   - Mesaj balonu aynı satırda sağda
+   - Kısa mesaj = kısa balon; boş alan balonlara dağıtılmaz
+   - Sadece mobil Genel Sohbet
    ========================================================= */
 @media (max-width:720px){
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages{
+
+  /* KÖK: viewport yüksekliğini mesaj çocuklarına dağıtma.
+     Liste scroll alanı olarak kalır, mesajlar doğal yükseklikte üstten akar. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages.people-messages{
+    display:flex!important;
+    flex-direction:column!important;
+    flex-wrap:nowrap!important;
+    justify-content:flex-start!important;
     align-items:stretch!important;
+    align-content:flex-start!important;
+    gap:12px!important;
+
+    width:100%!important;
+    min-width:0!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+
+    padding:12px 22px 16px!important;
+    box-sizing:border-box!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
   }
 
+  /* Her mesaj satırı kendi içeriği kadar yüksek.
+     Grid yerine basit yatay flex: kart + balon. */
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs{
     position:relative!important;
-    display:grid!important;
-    grid-template-columns:92px minmax(0,1fr)!important;
-    grid-template-rows:max-content!important;
-    align-items:start!important;
-    align-content:start!important;
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    flex:0 0 auto!important;
+
+    justify-content:flex-start!important;
+    align-items:flex-start!important;
+    align-content:flex-start!important;
+
     width:100%!important;
     max-width:100%!important;
     min-width:0!important;
-    height:max-content!important;
+
+    height:auto!important;
     min-height:0!important;
     max-height:none!important;
-    flex:0 0 auto!important;
+
     margin:0!important;
     padding:0!important;
     gap:0!important;
     overflow:visible!important;
   }
 
+  /* Kart: Özel Oda mobil ölçüsü. Tüm Genel mesajlarda solda kalır. */
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-user-card,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-user-card,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-user-card{
     position:relative!important;
-    grid-column:1!important;
-    grid-row:1!important;
-    align-self:start!important;
-    justify-self:stretch!important;
+    display:grid!important;
+    grid-template-columns:29px minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:5px!important;
+    align-items:center!important;
+
+    flex:0 0 92px!important;
     width:92px!important;
     min-width:92px!important;
     max-width:92px!important;
+
     height:auto!important;
     min-height:48px!important;
     max-height:none!important;
+
     margin:0!important;
     padding:6px!important;
-    border-radius:13px 0 0 13px!important;
     box-sizing:border-box!important;
+
+    border-radius:13px 0 0 13px!important;
+    align-self:flex-start!important;
     z-index:2!important;
   }
 
+  /* Karttan balona doğru küçük bağlantı oku. */
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-user-card::after,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-user-card::after,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-user-card::after{
+    content:""!important;
+    position:absolute!important;
     left:auto!important;
     right:-9px!important;
     top:19px!important;
+
     width:17px!important;
     height:17px!important;
-    transform:rotate(45deg)!important;
+    background:inherit!important;
+
     border-left:0!important;
     border-bottom:0!important;
     border-top:1px solid rgba(148,163,184,.20)!important;
     border-right:1px solid rgba(148,163,184,.20)!important;
+
+    transform:rotate(45deg)!important;
     z-index:-1!important;
   }
 
+  /* BALON: kalan yatay alanı kullanır ama ASLA satırın yüksekliğini doldurmaz. */
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-bubble,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-bubble,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-bubble,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.zatoi-user-message > .people-message-bubble,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.zatoi-owner-message > .people-message-bubble{
     position:relative!important;
-    grid-column:2!important;
-    grid-row:1!important;
-    align-self:start!important;
-    justify-self:stretch!important;
     display:block!important;
-    flex:none!important;
-    width:100%!important;
-    max-width:100%!important;
+
+    flex:1 1 0!important;
+    align-self:flex-start!important;
+
+    width:auto!important;
+    max-width:none!important;
     min-width:0!important;
-    height:max-content!important;
+
+    height:auto!important;
     min-height:48px!important;
     max-height:none!important;
+
     margin:0!important;
     padding:10px 11px!important;
-    border-radius:0 14px 14px 14px!important;
     box-sizing:border-box!important;
+    border-radius:0 14px 14px 14px!important;
     overflow:visible!important;
   }
 
+  /* Eski mobil Genel tasarımından kalan iç eleman ölçülerini nötrleştir. */
   .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
     display:block!important;
     width:100%!important;
+    max-width:100%!important;
     min-width:0!important;
+
     height:auto!important;
     min-height:0!important;
+    max-height:none!important;
+
     margin:0!important;
-    padding:0!important;
+    padding:10px 11px!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
+    width:auto!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0 0 6px!important;
   }
 
   .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-foot{
+    display:flex!important;
     width:100%!important;
     height:auto!important;
     min-height:0!important;
-    margin-top:7px!important;
+    max-height:none!important;
+
+    margin:7px 0 0!important;
+    padding:0!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+  }
+
+  /* Dış karttaki kimlik ölçüleri. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card .people-message-sender-avatar{
+    width:29px!important;
+    height:29px!important;
+    min-width:29px!important;
+    font-size:11px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card-copy strong{
+    font-size:10px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card-copy small{
+    font-size:8px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-user-card-role{
+    font-size:7px!important;
   }
 }
