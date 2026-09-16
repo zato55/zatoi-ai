@@ -7452,3 +7452,15 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
   .people-message-user-card-copy small{font-size:8px!important;}
   .people-message-user-card-role{font-size:7px!important;}
 }
+
+/* V14.42.0 — A3 MESAJ DÜZENLEME */
+.people-message-edit-action{width:25px!important;min-width:25px!important;height:25px!important;padding:0!important;border:0!important;border-radius:7px!important;background:transparent!important;color:#94a3b8!important;cursor:pointer!important;font-size:13px!important}
+.people-message-edit-action:hover{background:rgba(250,204,21,.10)!important;color:#fde68a!important}
+.people-message-edited{font-size:9px!important;opacity:.58!important;font-style:italic!important;white-space:nowrap!important}
+.people-inline-edit{width:100%!important;margin:4px 0 8px!important}
+.people-inline-edit textarea{display:block!important;width:100%!important;min-height:68px!important;max-height:180px!important;resize:vertical!important;box-sizing:border-box!important;padding:10px 11px!important;border:1px solid rgba(96,165,250,.38)!important;border-radius:10px!important;outline:none!important;background:rgba(2,6,23,.55)!important;color:#f8fafc!important;font:inherit!important;direction:ltr!important;unicode-bidi:plaintext!important;text-align:left!important}
+.people-inline-edit textarea:focus{border-color:rgba(96,165,250,.82)!important;box-shadow:0 0 0 3px rgba(59,130,246,.12)!important}
+.people-inline-edit-actions{display:flex!important;justify-content:flex-end!important;gap:6px!important;margin-top:6px!important}
+.people-inline-edit-actions button{width:auto!important;height:29px!important;padding:0 10px!important;border:1px solid rgba(148,163,184,.22)!important;border-radius:8px!important;background:rgba(15,23,42,.62)!important;color:#cbd5e1!important;cursor:pointer!important;font-size:11px!important}
+.people-inline-edit-actions .save{border-color:rgba(59,130,246,.40)!important;background:rgba(37,99,235,.28)!important;color:#dbeafe!important}
+@media(max-width:720px){.people-message-edit-action{width:28px!important;min-width:28px!important;height:28px!important}}
