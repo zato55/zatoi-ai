@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.40.1 - A2 EMOJI MENU TOGGLE FIX -->
+<!-- ZATOI AI INDEX V14.41.0 - DIS AVATAR KULLANICI KARTI -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.40.0">
+  <link rel="stylesheet" href="./style.css?v=14.41.0">
 </head>
 
 <body>
@@ -7889,14 +7889,16 @@ function renderPeopleMessages(messages) {
     const senderToneClass = message.sender?.role === "admin" ? "" : `people-sender-tone-${Math.abs(senderToneHash) % 4}`;
     return `
       <div class="people-message-row ${mine ? "mine" : "theirs"} ${message.sender?.role === "admin" ? "zatoi-owner-message" : "zatoi-user-message"} ${senderToneClass}" data-general-message-id="${peopleEscape(message.messageId || "")}">
-        <div class="people-message-bubble">
-          <button class="people-message-sender" type="button" data-profile-user="${peopleEscape(message.senderId || "")}">
-            <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(message.sender))}</span>
-            <span>${peopleEscape(peopleDisplayName(message.sender))}</span>
+        <button class="people-message-user-card" type="button" data-profile-user="${peopleEscape(message.senderId || "")}" title="Profili aç">
+          <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(message.sender))}</span>
+          <span class="people-message-user-card-copy">
+            <strong>${peopleEscape(peopleDisplayName(message.sender))}</strong>
             <small>@${peopleEscape(message.sender?.username || "kullanici")}</small>
-          </button>
-          <div class="people-message-meta-badges">${message.sender?.role !== "admin" ? '<span class="people-user-badge">👤 USER</span>' : ""}
-            ${message.sender?.role === "admin" ? '<span class="people-admin-badge zatoi-owner-badge">👑 ZATOI OWNER</span>' : ''}
+          </span>
+          <span class="people-message-user-card-role">${message.sender?.role === "admin" ? "👑 OWNER" : "👤 USER"}</span>
+        </button>
+        <div class="people-message-bubble">
+          <div class="people-message-meta-badges">
             ${message.kind === "announcement" ? '<span class="people-announcement-badge">📢 DUYURU</span>' : ''}
             ${message.pinned ? '<span class="people-pinned-badge">📌 SABİT</span>' : ''}
           </div>
@@ -8094,6 +8096,13 @@ function renderPeoplePrivateMessages(messages) {
     const mine = String(message.senderId) === String(currentUser?.userId);
     return `
       <div class="people-private-message-row ${mine ? "mine" : "theirs"}">
+        <button class="people-private-user-card" type="button" data-profile-user="${peopleEscape(message.senderId || "")}" title="Profili aç">
+          <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(mine ? currentUser : peopleCurrentPartner))}</span>
+          <span class="people-message-user-card-copy">
+            <strong>${mine ? "Sen" : peopleEscape(peopleDisplayName(peopleCurrentPartner))}</strong>
+            <small>${mine ? "Gönderen" : "Özel sohbet"}</small>
+          </span>
+        </button>
         <div class="people-private-bubble" data-private-message-id="${peopleEscape(message.messageId || "")}">
           ${message.reply ? `<button class="people-private-replied-message" type="button" data-private-jump-reply="${peopleEscape(message.reply.messageId || "")}">
             <strong>↩ ${String(message.reply.senderId) === String(currentUser?.userId) ? "Sen" : peopleEscape(peopleDisplayName(peopleCurrentPartner))}</strong>
