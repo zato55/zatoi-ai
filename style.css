@@ -6360,3 +6360,116 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     grid-row:4!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.24 — DESKTOP GENERAL CHAT FLOW POLISH
+   SADECE PC (>=721px)
+   1) Mesajlar pinned bar'ın hemen altından kompakt akar.
+   2) Mine sağda / theirs solda kalır.
+   3) Owner/duyuru kartları içerik kadar yükselir.
+   4) Genel Sohbet başlığı + alt açıklama nefes alır.
+   MOBİL KURALLARA DOKUNULMAZ.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* Başlık satırındaki başlık/açıklama sıkışmasını düzelt. */
+  .people-chat-panel .people-conversation-head{
+    gap:10px!important;
+  }
+
+  .people-chat-panel .people-conversation-head h2,
+  .people-chat-panel .people-conversation-head h3,
+  .people-chat-panel .people-conversation-title{
+    margin-right:10px!important;
+  }
+
+  .people-chat-panel .people-conversation-subtitle,
+  .people-chat-panel .people-conversation-head small{
+    margin-left:2px!important;
+  }
+
+  /* Mesaj listesi viewport boşluğunu mesajlara dağıtmasın. */
+  .people-chat-panel #peopleMessages{
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-start!important;
+    align-items:stretch!important;
+    align-content:initial!important;
+    gap:12px!important;
+    padding:14px 20px 18px!important;
+    box-sizing:border-box!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+
+  /* Her satır doğal yüksekliğinde kalsın. */
+  .people-chat-panel #peopleMessages > .people-message-row{
+    display:flex!important;
+    flex:0 0 auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    align-items:flex-start!important;
+  }
+
+  .people-chat-panel #peopleMessages > .people-message-row.mine{
+    justify-content:flex-end!important;
+  }
+
+  .people-chat-panel #peopleMessages > .people-message-row.theirs{
+    justify-content:flex-start!important;
+  }
+
+  /* Kartlar artık boş yüksekliği dolduramaz. */
+  .people-chat-panel #peopleMessages .people-message-bubble,
+  .people-chat-panel #peopleMessages .zatoi-owner-message,
+  .people-chat-panel #peopleMessages .zatoi-user-message{
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-self:flex-start!important;
+  }
+
+  /* Owner / duyuru uzun metinde geniş olabilir ama gereksiz devleşmez. */
+  .people-chat-panel #peopleMessages .zatoi-owner-message{
+    width:auto!important;
+    max-width:min(72%, 760px)!important;
+  }
+
+  /* Normal kullanıcı kartı kompakt kalsın. */
+  .people-chat-panel #peopleMessages .zatoi-user-message{
+    width:auto!important;
+    max-width:min(62%, 620px)!important;
+  }
+
+  /* Kart içindeki bölümler de doğal yükseklik. */
+  .people-chat-panel #peopleMessages .people-message-sender,
+  .people-chat-panel #peopleMessages .people-message-meta-badges,
+  .people-chat-panel #peopleMessages .people-message-text,
+  .people-chat-panel #peopleMessages .people-message-foot{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+
+  .people-chat-panel #peopleMessages .people-message-meta-badges{
+    margin-top:5px!important;
+    margin-bottom:6px!important;
+  }
+
+  .people-chat-panel #peopleMessages .people-message-text{
+    margin-top:0!important;
+    margin-bottom:0!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+
+  .people-chat-panel #peopleMessages .people-message-foot{
+    margin-top:6px!important;
+  }
+}
