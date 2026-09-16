@@ -6061,3 +6061,112 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     max-height:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.19 — MOBILE GENERAL CHAT CARD REDESIGN
+   İstenen mobil düzen:
+   1) Kullanıcı adı satırı üstte, sağa hizalı
+   2) Rol/rozet satırı hemen altında
+   3) Mesaj tam genişlikte ayrı balon
+   4) Gereksiz dikey boşluk yok
+   Sabit mesaj alanına dokunulmaz.
+   ========================================================= */
+@media (max-width:720px){
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:10px 0 14px!important;
+    padding:0 12px!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-bubble{
+    display:flex!important;
+    flex-direction:column!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:10px 11px!important;
+    box-sizing:border-box!important;
+    gap:0!important;
+  }
+
+  /* Kullanıcı adı üst satır — sağ üst. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-sender{
+    order:1!important;
+    display:flex!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    gap:6px!important;
+    text-align:right!important;
+  }
+
+  /* USER / ADMIN / OWNER / DUYURU / SABİT satırı hemen altında. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
+    order:2!important;
+    display:flex!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:5px 0 7px!important;
+    padding:0!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    flex-wrap:wrap!important;
+    gap:5px!important;
+  }
+
+  /* Asıl mesaj: kartın tamamını kullanan ayrı iç balon. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
+    order:3!important;
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:11px 12px!important;
+    box-sizing:border-box!important;
+    border-radius:14px!important;
+    background:rgba(4,12,24,.30)!important;
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+    line-height:1.42!important;
+  }
+
+  /* Saat mesajın hemen altında sağda. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-foot{
+    order:4!important;
+    display:flex!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:5px 0 0!important;
+    padding:0!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+  }
+
+  /* Owner/User görsel efektleri kalır ama boyutu büyütemez. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .zatoi-owner-message,
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .zatoi-user-message{
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+}
