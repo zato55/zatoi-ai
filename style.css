@@ -5533,3 +5533,49 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     isolation:isolate;
   }
 }
+
+
+/* =========================================================
+   V14.38.7 — MOBILE AI GERÇEK VIEWPORT / TAŞMA FIX
+   Amaç: AI mesaj balonları üst başlık + AI/Sohbet sekme alanına giremez.
+   PC ve People Chat davranışı değiştirilmez.
+   ========================================================= */
+
+@media (max-width:760px){
+
+  /* Üst uygulama başlığı ve mod seçici görsel olarak daima önde. */
+  #mobileTopBar,
+  .mobile-topbar,
+  .topbar,
+  #modeSwitcher,
+  .mode-switcher,
+  .mode-switch{
+    position:relative;
+    z-index:100!important;
+  }
+
+  /* AI mesaj akışının kendisi üst UI'dan daha düşük katmanda kalır.
+     overflow-x dışında dikey scroll davranışına dokunmuyoruz. */
+  #messages,
+  #chatMessages,
+  .chat-messages{
+    position:relative!important;
+    z-index:1!important;
+    overflow-x:hidden!important;
+  }
+
+  /* Üst mod alanı opak bir maske gibi davranır; arkadan mesaj görünmez. */
+  #modeSwitcher,
+  .mode-switcher,
+  .mode-switch{
+    isolation:isolate;
+    background:#0b1524!important;
+  }
+
+  /* Mesajlar hiçbir şekilde üst navigasyonun z-index'ini geçmesin. */
+  #messages > *,
+  #chatMessages > *,
+  .chat-messages > *{
+    z-index:1!important;
+  }
+}
