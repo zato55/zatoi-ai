@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.43.4 - MOBIL PERDE GRID ROW FIX -->
+<!-- ZATOI AI INDEX V14.44.0 - ARDISIK MESAJ GRUPLAMA -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.43.4">
+  <link rel="stylesheet" href="./style.css?v=14.44.0">
 </head>
 
 <body>
@@ -7856,6 +7856,21 @@ function peopleOpenEditBox(scope,messageId,currentContent){
   };
 }
 
+
+function peopleGroupConsecutiveMessages(messages) {
+  const groups = [];
+  for (const message of (Array.isArray(messages) ? messages : [])) {
+    const senderId = String(message?.senderId || "");
+    const last = groups[groups.length - 1];
+    if (last && last.senderId === senderId) {
+      last.messages.push(message);
+    } else {
+      groups.push({ senderId, messages:[message] });
+    }
+  }
+  return groups;
+}
+
 function renderPeopleMessages(messages) {
   if (!peopleMessages) return;
 
@@ -7915,44 +7930,52 @@ function renderPeopleMessages(messages) {
     return;
   }
 
-  peopleMessages.innerHTML = flowMessages.map(message => {
-    const mine = String(message.senderId) === String(currentUser?.userId);
-    const senderKey = String(message.senderId || message.sender?.username || "user");
+  const generalGroups = peopleGroupConsecutiveMessages(flowMessages);
+  peopleMessages.innerHTML = generalGroups.map(group => {
+    const firstMessage = group.messages[0];
+    const mine = String(firstMessage.senderId) === String(currentUser?.userId);
+    const senderKey = String(firstMessage.senderId || firstMessage.sender?.username || "user");
     let senderToneHash = 0;
     for (let i = 0; i < senderKey.length; i++) senderToneHash = ((senderToneHash << 5) - senderToneHash + senderKey.charCodeAt(i)) | 0;
-    const senderToneClass = message.sender?.role === "admin" ? "" : `people-sender-tone-${Math.abs(senderToneHash) % 4}`;
+    const senderToneClass = firstMessage.sender?.role === "admin" ? "" : `people-sender-tone-${Math.abs(senderToneHash) % 4}`;
+
     return `
-      <div class="people-message-row ${mine ? "mine" : "theirs"} ${message.sender?.role === "admin" ? "zatoi-owner-message" : "zatoi-user-message"} ${senderToneClass}" data-general-message-id="${peopleEscape(message.messageId || "")}">
-        <button class="people-message-user-card" type="button" data-profile-user="${peopleEscape(message.senderId || "")}" title="Profili aç">
-          <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(message.sender))}</span>
+      <div class="people-message-row people-message-group ${mine ? "mine" : "theirs"} ${firstMessage.sender?.role === "admin" ? "zatoi-owner-message" : "zatoi-user-message"} ${senderToneClass}">
+        <button class="people-message-user-card" type="button" data-profile-user="${peopleEscape(firstMessage.senderId || "")}" title="Profili aç">
+          <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(firstMessage.sender))}</span>
           <span class="people-message-user-card-copy">
-            <strong>${peopleEscape(peopleDisplayName(message.sender))}</strong>
-            <small>@${peopleEscape(message.sender?.username || "kullanici")}</small>
+            <strong>${peopleEscape(peopleDisplayName(firstMessage.sender))}</strong>
+            <small>@${peopleEscape(firstMessage.sender?.username || "kullanici")}</small>
           </span>
-          <span class="people-message-user-card-role">${message.sender?.role === "admin" ? "👑 OWNER" : "👤 USER"}</span>
+          <span class="people-message-user-card-role">${firstMessage.sender?.role === "admin" ? "👑 OWNER" : "👤 USER"}</span>
         </button>
-        <div class="people-message-bubble">
-          <div class="people-message-meta-badges">
-            ${message.kind === "announcement" ? '<span class="people-announcement-badge">📢 DUYURU</span>' : ''}
-            ${message.pinned ? '<span class="people-pinned-badge">📌 SABİT</span>' : ''}
-          </div>
-          ${message.reply ? `<button class="people-replied-message" type="button" data-jump-reply="${peopleEscape(message.reply.messageId || "")}">
-            <strong>↩ ${peopleEscape(peopleDisplayName(message.reply.sender))}</strong>
-            <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
-          </button>` : ""}
-          <div class="people-message-text">${peopleEscape(message.content)}</div>
-          <div class="people-message-foot">
-            <time>${peopleEscape(peopleTime(message.createdAt))}</time>
-            ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
-            <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"general",message.messageId)}</span>
-            <button class="people-message-reaction-action" type="button" data-reaction-picker="general" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
-            <button class="people-message-reply-action" type="button" data-general-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
-            ${mine && message.kind !== "announcement" ? `<button class="people-message-edit-action" type="button" data-general-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
-            ${peopleIsAdmin() ? `<span class="people-message-admin-actions">
-              <button type="button" data-admin-pin="${peopleEscape(message.messageId)}" data-pinned="${message.pinned ? "1" : "0"}" title="${message.pinned ? "Sabitlemeyi kaldır" : "Mesajı sabitle"}">📌</button>
-              <button type="button" data-admin-delete="${peopleEscape(message.messageId)}" title="Mesajı sil">🗑️</button>
-            </span>` : ""}
-          </div>
+
+        <div class="people-message-group-stack">
+          ${group.messages.map(message => `
+            <div class="people-message-bubble people-message-group-item" data-general-message-id="${peopleEscape(message.messageId || "")}">
+              <div class="people-message-meta-badges">
+                ${message.kind === "announcement" ? '<span class="people-announcement-badge">📢 DUYURU</span>' : ''}
+                ${message.pinned ? '<span class="people-pinned-badge">📌 SABİT</span>' : ''}
+              </div>
+              ${message.reply ? `<button class="people-replied-message" type="button" data-jump-reply="${peopleEscape(message.reply.messageId || "")}">
+                <strong>↩ ${peopleEscape(peopleDisplayName(message.reply.sender))}</strong>
+                <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
+              </button>` : ""}
+              <div class="people-message-text">${peopleEscape(message.content)}</div>
+              <div class="people-message-foot">
+                <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+                ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
+                <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"general",message.messageId)}</span>
+                <button class="people-message-reaction-action" type="button" data-reaction-picker="general" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
+                <button class="people-message-reply-action" type="button" data-general-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
+                ${mine && message.kind !== "announcement" ? `<button class="people-message-edit-action" type="button" data-general-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
+                ${peopleIsAdmin() ? `<span class="people-message-admin-actions">
+                  <button type="button" data-admin-pin="${peopleEscape(message.messageId)}" data-pinned="${message.pinned ? "1" : "0"}" title="${message.pinned ? "Sabitlemeyi kaldır" : "Mesajı sabitle"}">📌</button>
+                  <button type="button" data-admin-delete="${peopleEscape(message.messageId)}" title="Mesajı sil">🗑️</button>
+                </span>` : ""}
+              </div>
+            </div>
+          `).join("")}
         </div>
       </div>
     `;
@@ -8132,31 +8155,38 @@ function renderPeoplePrivateMessages(messages) {
     peoplePrivateMessages.innerHTML = `<div class="people-private-empty">Henüz mesaj yok. İlk mesajı gönder.</div>`;
     return;
   }
-  peoplePrivateMessages.innerHTML = messages.map(message => {
-    const mine = String(message.senderId) === String(currentUser?.userId);
+  const privateGroups = peopleGroupConsecutiveMessages(messages);
+  peoplePrivateMessages.innerHTML = privateGroups.map(group => {
+    const firstMessage = group.messages[0];
+    const mine = String(firstMessage.senderId) === String(currentUser?.userId);
     return `
-      <div class="people-private-message-row ${mine ? "mine" : "theirs"}">
-        <button class="people-private-user-card" type="button" data-profile-user="${peopleEscape(message.senderId || "")}" title="Profili aç">
+      <div class="people-private-message-row people-private-message-group ${mine ? "mine" : "theirs"}">
+        <button class="people-private-user-card" type="button" data-profile-user="${peopleEscape(firstMessage.senderId || "")}" title="Profili aç">
           <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(mine ? currentUser : peopleCurrentPartner))}</span>
           <span class="people-message-user-card-copy">
             <strong>${mine ? "Sen" : peopleEscape(peopleDisplayName(peopleCurrentPartner))}</strong>
             <small>${mine ? "Gönderen" : "Özel sohbet"}</small>
           </span>
         </button>
-        <div class="people-private-bubble" data-private-message-id="${peopleEscape(message.messageId || "")}">
-          ${message.reply ? `<button class="people-private-replied-message" type="button" data-private-jump-reply="${peopleEscape(message.reply.messageId || "")}">
-            <strong>↩ ${String(message.reply.senderId) === String(currentUser?.userId) ? "Sen" : peopleEscape(peopleDisplayName(peopleCurrentPartner))}</strong>
-            <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
-          </button>` : ""}
-          <div class="people-private-message-text">${peopleEscape(message.content)}</div>
-          <div class="people-private-message-foot">
-            <time>${peopleEscape(peopleTime(message.createdAt))}</time>
-            ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
-            <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"private",message.messageId)}</span>
-            <button class="people-message-reaction-action" type="button" data-reaction-picker="private" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
-            <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
-            ${mine ? `<button class="people-message-edit-action" type="button" data-private-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
-          </div>
+
+        <div class="people-private-message-group-stack">
+          ${group.messages.map(message => `
+            <div class="people-private-bubble people-private-message-group-item" data-private-message-id="${peopleEscape(message.messageId || "")}">
+              ${message.reply ? `<button class="people-private-replied-message" type="button" data-private-jump-reply="${peopleEscape(message.reply.messageId || "")}">
+                <strong>↩ ${String(message.reply.senderId) === String(currentUser?.userId) ? "Sen" : peopleEscape(peopleDisplayName(peopleCurrentPartner))}</strong>
+                <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
+              </button>` : ""}
+              <div class="people-private-message-text">${peopleEscape(message.content)}</div>
+              <div class="people-private-message-foot">
+                <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+                ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
+                <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"private",message.messageId)}</span>
+                <button class="people-message-reaction-action" type="button" data-reaction-picker="private" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
+                <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
+                ${mine ? `<button class="people-message-edit-action" type="button" data-private-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
+              </div>
+            </div>
+          `).join("")}
         </div>
       </div>`;
   }).join("");
