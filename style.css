@@ -5486,38 +5486,50 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 
 
 /* =========================================================
-   V14.38.6 — MOBILE AI COMPOSER BORDER FIX
-   Yalnızca mobil Zatoi AI alt yazma alanını hedefler.
-   PC ve People Chat görünümüne dokunmaz.
+   V14.38.6 — MOBILE AI MESSAGE TOP CLIP FIX
+   AI mesaj balonları mod sekmelerinin/header'ın üzerine taşamaz.
+   Sadece mobil AI görünümü hedeflenir.
    ========================================================= */
 
 @media (max-width:760px){
 
-  /* People Chat aktif DEĞİLKEN = Zatoi AI modu.
-     Dış composer çerçevesi korunur, iç editörün ikinci çerçevesi kaldırılır. */
-  .app:not(.people-chat-mode) .composer textarea,
-  .app:not(.people-chat-mode) .composer input[type="text"],
-  .app:not(.people-chat-mode) .composer [contenteditable="true"],
-  .app:not(.people-chat-mode) .input-wrap textarea,
-  .app:not(.people-chat-mode) .input-wrap input[type="text"],
-  .app:not(.people-chat-mode) .input-wrap [contenteditable="true"],
-  .app:not(.people-chat-mode) #messageInput,
-  .app:not(.people-chat-mode) #userInput{
-    border:none!important;
-    outline:none!important;
-    box-shadow:none!important;
+  /* Üst başlık ve AI/Sohbet mod seçici daima mesajlardan üstte. */
+  .topbar,
+  .mode-switch,
+  .mode-tabs,
+  .ai-people-switch{
+    position:relative;
+    z-index:80!important;
   }
 
-  .app:not(.people-chat-mode) .composer textarea:focus,
-  .app:not(.people-chat-mode) .composer input[type="text"]:focus,
-  .app:not(.people-chat-mode) .composer [contenteditable="true"]:focus,
-  .app:not(.people-chat-mode) .input-wrap textarea:focus,
-  .app:not(.people-chat-mode) .input-wrap input[type="text"]:focus,
-  .app:not(.people-chat-mode) .input-wrap [contenteditable="true"]:focus,
-  .app:not(.people-chat-mode) #messageInput:focus,
-  .app:not(.people-chat-mode) #userInput:focus{
-    border:none!important;
-    outline:none!important;
-    box-shadow:none!important;
+  /* AI mesajlarının bulunduğu ana alan kendi viewport'unda kırpılır. */
+  .chat-column{
+    isolation:isolate;
+  }
+
+  .messages,
+  .messages-wrap,
+  .chat-messages,
+  .message-list{
+    position:relative;
+    z-index:1;
+    overflow-x:hidden!important;
+  }
+
+  /* Mesaj balonları header/mod seçicinin altında kalır. */
+  .message,
+  .message-row,
+  .message-bubble{
+    position:relative;
+    z-index:2;
+  }
+
+  /* AI/Sohbet seçicinin arka planını opaklaştır:
+     arkadan geçen balon görünmez. */
+  .mode-switch,
+  .mode-tabs,
+  .ai-people-switch{
+    background:#0b1524;
+    isolation:isolate;
   }
 }
