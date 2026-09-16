@@ -5721,3 +5721,38 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     min-width:0!important;
   }
 }
+
+
+/* V14.38.13 — MOBILE PINNED ANNOUNCEMENT FIX */
+@media (max-width:800px){
+  .people-chat-panel .people-pinned-bar{
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+    padding-right:14px!important;
+  }
+
+  .people-chat-panel .people-pinned-bar > *{
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel .people-pinned-bar .people-pinned-text,
+  .people-chat-panel .people-pinned-bar .people-pinned-message,
+  .people-chat-panel .people-pinned-bar .people-pinned-content,
+  .people-chat-panel .people-pinned-bar p,
+  .people-chat-panel .people-pinned-bar span{
+    max-width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+    text-overflow:clip!important;
+  }
+}
