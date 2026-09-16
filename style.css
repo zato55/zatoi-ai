@@ -7872,3 +7872,141 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     z-index:30!important;
   }
 }
+
+/* =========================================================
+   V14.44.0 — ARDIŞIK AYNI KULLANICI MESAJLARINI GRUPLAMA
+   Veritabanı mesajları ayrı kalır; yalnız render gruplanır.
+   ========================================================= */
+
+/* GENERAL */
+.people-message-group > .people-message-group-stack{
+  grid-column:2!important;
+  grid-row:1!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  gap:5px!important;
+  margin:0!important;
+  padding:0!important;
+}
+
+.people-message-group > .people-message-group-stack > .people-message-bubble{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+}
+
+/* İlk mesaj karta bağlanır; devam mesajları hafif yuvarlanır. */
+.people-message-group > .people-message-group-stack > .people-message-bubble:first-child{
+  border-radius:0 14px 14px 14px!important;
+}
+.people-message-group > .people-message-group-stack > .people-message-bubble:not(:first-child){
+  border-radius:14px!important;
+}
+
+/* PRIVATE */
+.people-private-message-group > .people-private-message-group-stack{
+  grid-column:2!important;
+  grid-row:1!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  gap:5px!important;
+  margin:0!important;
+  padding:0!important;
+}
+
+.people-private-message-group > .people-private-message-group-stack > .people-private-bubble{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+}
+
+.people-private-message-group > .people-private-message-group-stack > .people-private-bubble:first-child{
+  border-radius:0 14px 14px 14px!important;
+}
+.people-private-message-group > .people-private-message-group-stack > .people-private-bubble:not(:first-child){
+  border-radius:14px!important;
+}
+
+/* Desktop'ta kendi mesajlarının sağ-sol ters düzenini koru. */
+@media (min-width:721px){
+  .people-message-group.mine > .people-message-group-stack,
+  .people-private-message-group.mine > .people-private-message-group-stack{
+    grid-column:1!important;
+  }
+}
+
+/* Mobil Genel V14.42.5 kanonik yapıyla uyum:
+   kart solda, grup stack sağda. */
+@media (max-width:720px){
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group > .people-message-group-stack{
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:start!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble{
+    all:unset!important;
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:48px!important;
+    margin:0!important;
+    padding:10px 11px!important;
+    box-sizing:border-box!important;
+    border:1px solid rgba(101,137,173,.24)!important;
+    border-radius:14px!important;
+    background:linear-gradient(145deg,rgba(20,91,174,.96),rgba(28,105,204,.96) 48%,rgba(47,66,151,.96))!important;
+    color:#eef5ff!important;
+    font-size:14px!important;
+    line-height:1.45!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 6px 16px rgba(0,0,0,.13),0 0 13px rgba(91,107,216,.10)!important;
+    overflow:visible!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .zatoi-owner-message
+  > .people-message-group-stack > .people-message-bubble{
+    background:linear-gradient(135deg,rgba(30,87,145,.88),rgba(75,43,118,.88))!important;
+    border-color:rgba(139,118,255,.52)!important;
+    box-shadow:0 0 0 1px rgba(102,190,255,.07),0 7px 24px rgba(68,73,190,.16),0 0 22px rgba(137,91,230,.10)!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble:first-child{
+    border-radius:0 14px 14px 14px!important;
+  }
+}
+
+/* Gruplanmış her alt mesajın highlight/edit hedefi bağımsız kalır. */
+.people-message-group-item.people-message-highlight,
+.people-private-message-group-item.people-message-highlight{
+  position:relative!important;
+  z-index:3!important;
+}
