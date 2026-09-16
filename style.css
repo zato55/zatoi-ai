@@ -7723,3 +7723,70 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     padding:40px 0 0!important;
   }
 }
+
+/* =========================================================
+   V14.43.3 — PERDE: DOĞRUDAN KART MİMARİSİ
+   Wrapper kaldırıldı; çalışan V14.42.5 kart yapısı korunur.
+   ========================================================= */
+#peoplePinnedBar.people-pinned-bar{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:40px!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:46px 8px 6px!important;
+  gap:6px!important;
+  overflow:visible!important;
+  box-sizing:border-box!important;
+  cursor:pointer!important;
+  border-bottom:1px solid rgba(168,85,247,.34)!important;
+  background:linear-gradient(90deg,rgba(25,18,43,.985),rgba(21,22,39,.985))!important;
+}
+#peoplePinnedBar.people-pinned-bar::before{
+  content:"📌  Duyurular & Sabitler"!important;
+  position:absolute!important; left:0!important; right:0!important; top:0!important;
+  height:40px!important; display:flex!important; align-items:center!important;
+  padding:0 46px 0 14px!important; box-sizing:border-box!important;
+  color:#e9ddff!important; font-size:11px!important; font-weight:800!important;
+  white-space:nowrap!important;
+  background:linear-gradient(90deg,rgba(25,18,43,.99),rgba(27,24,49,.99))!important;
+  z-index:10!important; pointer-events:none!important;
+}
+#peoplePinnedBar.people-pinned-bar::after{
+  content:"⌃"!important;
+  position:absolute!important; right:12px!important; top:8px!important;
+  width:24px!important; height:24px!important; display:flex!important;
+  align-items:center!important; justify-content:center!important;
+  border-radius:8px!important; background:rgba(255,255,255,.05)!important;
+  color:#c4b5fd!important; font-size:16px!important; line-height:1!important;
+  z-index:11!important; pointer-events:none!important;
+}
+#peoplePinnedBar.people-pinned-bar > .people-top-message-card{
+  position:relative!important; display:flex!important; flex:0 0 auto!important;
+  width:100%!important; min-width:0!important;
+  height:auto!important; min-height:0!important; max-height:none!important;
+  margin:0!important; padding:8px 10px!important;
+  align-items:center!important; gap:9px!important; box-sizing:border-box!important;
+  opacity:1!important; visibility:visible!important; overflow:hidden!important;
+}
+#peoplePinnedBar.people-pinned-bar.is-collapsed{
+  height:40px!important; min-height:40px!important; max-height:40px!important;
+  padding:40px 0 0!important; gap:0!important; overflow:hidden!important;
+}
+#peoplePinnedBar.people-pinned-bar.is-collapsed::after{content:"⌄"!important;}
+#peoplePinnedBar.people-pinned-bar.is-collapsed > .people-top-message-card{display:none!important;}
+#peoplePinnedBar > .people-top-curtain-toggle,
+#peoplePinnedBar > .people-top-curtain-content{display:none!important;}
+
+@media (max-width:720px){
+  #peoplePinnedBar.people-pinned-bar{padding:45px 8px 5px!important;gap:5px!important;}
+  #peoplePinnedBar.people-pinned-bar > .people-top-message-card{padding:7px 8px!important;}
+  #peoplePinnedBar.people-pinned-bar.is-collapsed{
+    height:40px!important;min-height:40px!important;max-height:40px!important;
+    padding:40px 0 0!important;
+  }
+}
