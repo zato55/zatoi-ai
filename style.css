@@ -6253,3 +6253,47 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     opacity:.82;
   }
 }
+
+
+/* =========================================================
+   V14.38.22 — DESKTOP GENERAL CHAT TOP ALIGNMENT
+   SADECE PC (min-width:721px)
+   - Genel sohbet mesaj alanı üstten başlar.
+   - Sabit mesaj, mesaj listesinin üstünde kalır.
+   - Mobil V14.38.21 düzenine dokunulmaz.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* Genel sohbet kolonunu yukarıdan aşağı doğal sıraya sok. */
+  .people-chat-panel .people-conversation{
+    align-content:start!important;
+  }
+
+  /* Sabit mesaj varsa mesajlardan önce, en üstte göster. */
+  .people-chat-panel #peoplePinnedBar{
+    order:1!important;
+    align-self:stretch!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+  }
+
+  /* Genel mesaj listesi sabit mesajın hemen altından başlasın. */
+  .people-chat-panel #peopleMessages{
+    order:2!important;
+    align-content:start!important;
+    justify-content:flex-start!important;
+    padding-top:12px!important;
+  }
+
+  /* Composer mevcut masaüstü konumunu korusun. */
+  .people-chat-panel #peopleComposer{
+    order:3!important;
+  }
+
+  /* Mesajlar boş alanın ortasına/alta itilmesin. */
+  .people-chat-panel #peopleMessages > .people-message-row{
+    align-self:auto!important;
+  }
+}
