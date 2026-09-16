@@ -8010,3 +8010,176 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
   position:relative!important;
   z-index:3!important;
 }
+
+/* =========================================================
+   V14.44.1 — TEK DIŞ BALON / BAĞIMSIZ MESAJ SATIRLARI
+   V14.44.0 gruplama mantığı korunur.
+   Aynı kullanıcının ardışık mesajlarında dış görünüm tek balondur;
+   reply/reaction/edit/pin/delete hedefleri mesaj bazında kalır.
+   ========================================================= */
+
+/* GENERAL: stack artık tek büyük balonun kendisi */
+.people-message-group > .people-message-group-stack{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:1px solid rgba(101,137,173,.24)!important;
+  border-radius:0 14px 14px 14px!important;
+  background:linear-gradient(145deg,rgba(20,91,174,.96),rgba(28,105,204,.96) 48%,rgba(47,66,151,.96))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 6px 16px rgba(0,0,0,.13),0 0 13px rgba(91,107,216,.10)!important;
+  box-sizing:border-box!important;
+}
+
+/* Admin grubunda tek dış mor balon */
+.people-message-group.zatoi-owner-message > .people-message-group-stack{
+  background:linear-gradient(135deg,rgba(30,87,145,.88),rgba(75,43,118,.88))!important;
+  border-color:rgba(139,118,255,.52)!important;
+  box-shadow:0 0 0 1px rgba(102,190,255,.07),0 7px 24px rgba(68,73,190,.16),0 0 22px rgba(137,91,230,.10)!important;
+}
+
+/* Her DB mesajı aynı dış balon içindeki bağımsız satırdır */
+.people-message-group > .people-message-group-stack > .people-message-bubble{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:10px 11px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+
+/* Ardışık mesajlar arasında hafif ayraç */
+.people-message-group > .people-message-group-stack > .people-message-bubble + .people-message-bubble{
+  border-top:1px solid rgba(255,255,255,.105)!important;
+}
+
+/* İç mesaj metninin mevcut okunabilir paneli korunur */
+.people-message-group > .people-message-group-stack > .people-message-bubble:first-child,
+.people-message-group > .people-message-group-stack > .people-message-bubble:not(:first-child){
+  border-radius:0!important;
+}
+
+/* PRIVATE: aynı mantık */
+.people-private-message-group > .people-private-message-group-stack{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:1px solid rgba(139,92,246,.34)!important;
+  border-radius:0 14px 14px 14px!important;
+  background:linear-gradient(145deg,rgba(61,38,103,.94),rgba(74,42,116,.94))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.13)!important;
+  box-sizing:border-box!important;
+}
+
+.people-private-message-group > .people-private-message-group-stack > .people-private-bubble{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:10px 11px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+
+.people-private-message-group > .people-private-message-group-stack > .people-private-bubble + .people-private-bubble{
+  border-top:1px solid rgba(255,255,255,.105)!important;
+}
+
+/* Mobilde V14.44.0'ın alt mesajlara tekrar ayrı büyük balon çizmesini iptal et.
+   Kullanıcı kartı solda, tek grup balonu sağda kalır. */
+@media (max-width:720px){
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group > .people-message-group-stack{
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:start!important;
+    gap:0!important;
+    overflow:hidden!important;
+    border:1px solid rgba(101,137,173,.24)!important;
+    border-radius:0 14px 14px 14px!important;
+    background:linear-gradient(145deg,rgba(20,91,174,.96),rgba(28,105,204,.96) 48%,rgba(47,66,151,.96))!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 6px 16px rgba(0,0,0,.13),0 0 13px rgba(91,107,216,.10)!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .zatoi-owner-message > .people-message-group-stack{
+    background:linear-gradient(135deg,rgba(30,87,145,.88),rgba(75,43,118,.88))!important;
+    border-color:rgba(139,118,255,.52)!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble:first-child,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble:not(:first-child){
+    all:unset!important;
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:10px 11px!important;
+    box-sizing:border-box!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:#eef5ff!important;
+    font-size:14px!important;
+    line-height:1.45!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble + .people-message-bubble{
+    border-top:1px solid rgba(255,255,255,.105)!important;
+  }
+}
