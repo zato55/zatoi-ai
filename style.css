@@ -6944,3 +6944,59 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     padding:7px 8px!important;
   }
 }
+
+/* =========================================================
+   V14.38.32 — OKUNMAMIŞ ÖZEL ODA KIRMIZI VURGU
+   Mevcut unread sayacı kullanılır.
+   Index / Worker mantığı değişmez.
+   ========================================================= */
+
+/* PC + ortak: okunmamış oda hafif bordo/kırmızı vurgulu */
+.people-room-card.has-unread{
+  border-color:rgba(239,68,68,.52)!important;
+  background:linear-gradient(
+    90deg,
+    rgba(127,29,29,.24),
+    rgba(69,10,10,.13) 42%,
+    rgba(20,29,41,.96)
+  )!important;
+  box-shadow:
+    inset 3px 0 0 rgba(239,68,68,.90),
+    0 0 18px rgba(239,68,68,.08)!important;
+}
+
+/* Okunmamış oda içindeki isim de çok hafif öne çıksın */
+.people-room-card.has-unread .people-room-info strong{
+  color:#ffe4e6!important;
+}
+
+/* Sayaç kırmızı */
+.people-room-card.has-unread .people-room-unread{
+  background:#ef4444!important;
+  color:#fff!important;
+  box-shadow:
+    0 0 0 3px rgba(239,68,68,.14),
+    0 0 12px rgba(239,68,68,.16)!important;
+}
+
+/* Mobil Odalar görünümünde de aynı, ama gözü yormayacak kadar hafif */
+@media (max-width:720px){
+  .people-chat-panel[data-mobile-view="rooms"] .people-room-card.has-unread{
+    border-color:rgba(239,68,68,.48)!important;
+    background:linear-gradient(
+      90deg,
+      rgba(127,29,29,.22),
+      rgba(69,10,10,.11) 48%,
+      rgba(20,29,41,.96)
+    )!important;
+    box-shadow:
+      inset 3px 0 0 rgba(239,68,68,.88),
+      0 0 14px rgba(239,68,68,.07)!important;
+  }
+
+  /* Mobil Odalar sekmesindeki okunmamış nokta da kırmızı */
+  #peopleMobileRoomsTab.has-unread::after{
+    background:#ef4444!important;
+    box-shadow:0 0 0 3px rgba(239,68,68,.14)!important;
+  }
+}
