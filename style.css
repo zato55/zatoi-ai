@@ -5486,96 +5486,55 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 
 
 /* =========================================================
-   V14.38.6 — MOBILE AI MESSAGE TOP CLIP FIX
-   AI mesaj balonları mod sekmelerinin/header'ın üzerine taşamaz.
-   Sadece mobil AI görünümü hedeflenir.
+   V14.38.8 — MOBILE AI STRUCTURAL HEADER FIX
+   Gerçek DOM:
+   .chat-column
+     > .chat-top (başlık + .zatoi-mode-switch)
+     > #messages
+     > .mobile-input-area
+
+   Mobilde chat-top eski 60px yüksekliğe zorlandığı için mod sekmesi
+   header'ın dışına taşıyor ve #messages sekmenin altına giriyordu.
+   Çözüm: header'a mobilde gerçek yüksekliğini ver; mesaj alanı flex'te
+   kalan alanı kullansın. Z-index/transform ile mesajları yamalamıyoruz.
    ========================================================= */
 
-@media (max-width:760px){
+@media (max-width:800px){
 
-  /* Üst başlık ve AI/Sohbet mod seçici daima mesajlardan üstte. */
-  .topbar,
-  .mode-switch,
-  .mode-tabs,
-  .ai-people-switch{
+  /* Başlık + AI/Sohbet sekmesi aynı header içinde gerçekten yer kaplasın. */
+  .chat-column > .chat-top{
+    height:auto!important;
+    min-height:126px!important;
+    flex:0 0 auto!important;
+    padding:0 10px 10px!important;
+    overflow:visible!important;
     position:relative;
-    z-index:80!important;
+    z-index:5;
   }
 
-  /* AI mesajlarının bulunduğu ana alan kendi viewport'unda kırpılır. */
-  .chat-column{
-    isolation:isolate;
+  /* Gerçek mod seçici normal akışta header'ın ikinci satırında kalsın. */
+  .chat-column > .chat-top > .zatoi-mode-switch{
+    position:absolute;
+    left:18px;
+    right:18px;
+    bottom:8px;
+    width:auto!important;
+    z-index:6;
   }
 
-  .messages,
-  .messages-wrap,
-  .chat-messages,
-  .message-list{
+  /* Gerçek AI mesaj viewport'u artık header bittikten sonra başlar. */
+  .chat-column > #messages.messages{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding:15px 11px 110px!important;
     position:relative;
     z-index:1;
-    overflow-x:hidden!important;
   }
 
-  /* Mesaj balonları header/mod seçicinin altında kalır. */
-  .message,
-  .message-row,
-  .message-bubble{
-    position:relative;
-    z-index:2;
-  }
-
-  /* AI/Sohbet seçicinin arka planını opaklaştır:
-     arkadan geçen balon görünmez. */
-  .mode-switch,
-  .mode-tabs,
-  .ai-people-switch{
-    background:#0b1524;
-    isolation:isolate;
-  }
-}
-
-
-/* =========================================================
-   V14.38.7 — MOBILE AI GERÇEK VIEWPORT / TAŞMA FIX
-   Amaç: AI mesaj balonları üst başlık + AI/Sohbet sekme alanına giremez.
-   PC ve People Chat davranışı değiştirilmez.
-   ========================================================= */
-
-@media (max-width:760px){
-
-  /* Üst uygulama başlığı ve mod seçici görsel olarak daima önde. */
-  #mobileTopBar,
-  .mobile-topbar,
-  .topbar,
-  #modeSwitcher,
-  .mode-switcher,
-  .mode-switch{
-    position:relative;
-    z-index:100!important;
-  }
-
-  /* AI mesaj akışının kendisi üst UI'dan daha düşük katmanda kalır.
-     overflow-x dışında dikey scroll davranışına dokunmuyoruz. */
-  #messages,
-  #chatMessages,
-  .chat-messages{
-    position:relative!important;
-    z-index:1!important;
-    overflow-x:hidden!important;
-  }
-
-  /* Üst mod alanı opak bir maske gibi davranır; arkadan mesaj görünmez. */
-  #modeSwitcher,
-  .mode-switcher,
-  .mode-switch{
-    isolation:isolate;
-    background:#0b1524!important;
-  }
-
-  /* Mesajlar hiçbir şekilde üst navigasyonun z-index'ini geçmesin. */
-  #messages > *,
-  #chatMessages > *,
-  .chat-messages > *{
-    z-index:1!important;
+  /* Mobil composer sabit davranışını koru. */
+  .chat-column > .mobile-input-area{
+    z-index:20;
   }
 }
