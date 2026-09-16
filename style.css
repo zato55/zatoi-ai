@@ -7225,3 +7225,59 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 .people-reaction-picker button{width:31px!important;min-width:31px!important;height:31px!important;padding:0!important;border:0!important;border-radius:8px!important;background:transparent!important;cursor:pointer!important;font-size:17px!important;line-height:1!important}
 .people-reaction-picker button:hover{background:rgba(148,163,184,.14)!important}
 @media(max-width:720px){.people-message-reaction-action{width:28px!important;min-width:28px!important;height:28px!important}.people-reaction-picker{right:24px;bottom:32px}}
+
+/* =========================================================
+   V14.40.2 — MESAJ BALONLARI SÜTUNU DOLDURSUN
+   Genel + Özel / PC + Mobil
+   Sadece görünüm değişikliği.
+   ========================================================= */
+
+/* GENEL SOHBET: her mesaj satırı ve balonu kullanılabilir sütun genişliğini doldursun. */
+#peopleMessages > .people-message-row{
+  width:100%!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+
+#peopleMessages > .people-message-row > .people-message-bubble,
+.people-chat-panel #peopleMessages > .people-message-row.zatoi-user-message > .people-message-bubble{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  flex:1 1 100%!important;
+  box-sizing:border-box!important;
+}
+
+/* ÖZEL SOHBET: balonlar da kendi sohbet sütununun tamamını kullansın. */
+#peoplePrivateMessages > .people-private-message,
+#peoplePrivateMessages > .people-private-message-row{
+  width:100%!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+
+#peoplePrivateMessages .people-private-bubble{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+
+/* Yanıt kutuları ana balonun içinde tam genişlikte kalsın. */
+#peopleMessages .people-replied-message,
+#peoplePrivateMessages .people-private-replied-message{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+
+/* Mobilde de ekran dışına taşmadan mevcut içerik alanını doldur. */
+@media (max-width:720px){
+  #peopleMessages > .people-message-row > .people-message-bubble,
+  #peoplePrivateMessages .people-private-bubble{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+}
