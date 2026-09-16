@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.41.0 - DIS AVATAR KULLANICI KARTI -->
+<!-- ZATOI AI INDEX V14.42.0 - A3 MESAJ DUZENLEME -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.41.0">
+  <link rel="stylesheet" href="./style.css?v=14.42.0">
 </head>
 
 <body>
@@ -7786,7 +7786,7 @@ function peopleReactionSignature(messages) {
   return (Array.isArray(messages) ? messages : []).map(item => {
     const r=(Array.isArray(item?.reactions)?item.reactions:[])
       .map(x=>`${x.emoji}:${x.count}:${x.mine?1:0}`).sort().join(",");
-    return `${item?.messageId||""}:${item?.createdAt||""}:${r}`;
+    return `${item?.messageId||""}:${item?.createdAt||""}:${item?.editedAt||""}:${r}`;
   }).join("|");
 }
 function peopleReactionSummaryHtml(reactions, scope, messageId) {
@@ -7827,6 +7827,33 @@ async function peopleToggleReaction(scope,messageId,emoji){
     if(scope==="private")await loadPeoplePrivateMessages();
     else await loadPeopleGeneralMessages();
   }catch(error){alert(error?.message||"Tepki işlemi tamamlanamadı.");}
+}
+
+
+function peopleOpenEditBox(scope,messageId,currentContent){
+  document.querySelectorAll(".people-inline-edit").forEach(x=>x.remove());
+  const bubble=scope==="private"
+    ? document.querySelector(`[data-private-message-id="${CSS.escape(messageId)}"]`)
+    : document.querySelector(`[data-general-message-id="${CSS.escape(messageId)}"] .people-message-bubble`);
+  if(!bubble)return;
+  const textEl=scope==="private"?bubble.querySelector(".people-private-message-text"):bubble.querySelector(".people-message-text");
+  if(!textEl)return;
+  textEl.hidden=true;
+  const form=document.createElement("form");
+  form.className="people-inline-edit";
+  form.innerHTML=`<textarea maxlength="2000">${peopleEscape(currentContent||"")}</textarea>
+    <div class="people-inline-edit-actions"><button type="button" data-edit-cancel>Vazgeç</button><button class="save" type="submit">Kaydet</button></div>`;
+  textEl.insertAdjacentElement("afterend",form);
+  const area=form.querySelector("textarea"); area.focus(); area.setSelectionRange(area.value.length,area.value.length);
+  form.querySelector("[data-edit-cancel]").onclick=()=>{form.remove();textEl.hidden=false;};
+  form.onsubmit=async e=>{
+    e.preventDefault(); const content=String(area.value||"").trim();
+    if(!content||content.length>2000)return;
+    try{
+      await peopleApi("edit_message",{scope,messageId,content,roomId:scope==="private"?(peopleCurrentRoomId||""):""});
+      if(scope==="private")await loadPeoplePrivateMessages(); else await loadPeopleGeneralMessages();
+    }catch(err){alert(err?.message||"Mesaj düzenlenemedi.");}
+  };
 }
 
 function renderPeopleMessages(messages) {
@@ -7909,9 +7936,11 @@ function renderPeopleMessages(messages) {
           <div class="people-message-text">${peopleEscape(message.content)}</div>
           <div class="people-message-foot">
             <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+            ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
             <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"general",message.messageId)}</span>
             <button class="people-message-reaction-action" type="button" data-reaction-picker="general" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
             <button class="people-message-reply-action" type="button" data-general-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
+            ${mine && message.kind !== "announcement" ? `<button class="people-message-edit-action" type="button" data-general-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
             ${peopleIsAdmin() ? `<span class="people-message-admin-actions">
               <button type="button" data-admin-pin="${peopleEscape(message.messageId)}" data-pinned="${message.pinned ? "1" : "0"}" title="${message.pinned ? "Sabitlemeyi kaldır" : "Mesajı sabitle"}">📌</button>
               <button type="button" data-admin-delete="${peopleEscape(message.messageId)}" title="Mesajı sil">🗑️</button>
@@ -7951,6 +7980,10 @@ function renderPeopleMessages(messages) {
     });
   });  peopleMessages.querySelectorAll("[data-reaction-picker]").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleOpenReactionPicker(button);}));
   peopleMessages.querySelectorAll(".people-reaction-chip").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleToggleReaction(button.dataset.reactionToggle,button.dataset.reactionMessage,button.dataset.reactionEmoji);}));
+  peopleMessages.querySelectorAll("[data-general-edit]").forEach(button=>button.addEventListener("click",()=>{
+    const id=String(button.dataset.generalEdit||""); const m=flowMessages.find(x=>String(x.messageId)===id);
+    if(m)peopleOpenEditBox("general",id,m.content);
+  }));
 }
 
 
@@ -8108,12 +8141,14 @@ function renderPeoplePrivateMessages(messages) {
             <strong>↩ ${String(message.reply.senderId) === String(currentUser?.userId) ? "Sen" : peopleEscape(peopleDisplayName(peopleCurrentPartner))}</strong>
             <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
           </button>` : ""}
-          <div>${peopleEscape(message.content)}</div>
+          <div class="people-private-message-text">${peopleEscape(message.content)}</div>
           <div class="people-private-message-foot">
             <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+            ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
             <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"private",message.messageId)}</span>
             <button class="people-message-reaction-action" type="button" data-reaction-picker="private" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
             <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
+            ${mine ? `<button class="people-message-edit-action" type="button" data-private-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
           </div>
         </div>
       </div>`;
@@ -8136,6 +8171,10 @@ function renderPeoplePrivateMessages(messages) {
     });
   });  peoplePrivateMessages.querySelectorAll("[data-reaction-picker]").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleOpenReactionPicker(button);}));
   peoplePrivateMessages.querySelectorAll(".people-reaction-chip").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleToggleReaction(button.dataset.reactionToggle,button.dataset.reactionMessage,button.dataset.reactionEmoji);}));
+  peoplePrivateMessages.querySelectorAll("[data-private-edit]").forEach(button=>button.addEventListener("click",()=>{
+    const id=String(button.dataset.privateEdit||""); const m=messages.find(x=>String(x.messageId)===id);
+    if(m)peopleOpenEditBox("private",id,m.content);
+  }));
 }
 
 
