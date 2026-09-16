@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.27 - PROFIL AVATARLI SOHBET + SEO + ADMIN -->
+<!-- ZATOI AI INDEX V14.38.29 - DUYURU NORMAL MESAJ AKISINDAN AYRILDI -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -7728,6 +7728,7 @@ function renderPeopleMessages(messages) {
         return peopleMobileFlow ? (at - bt) : (bt - at);
       })
     : [];
+  // Sabit mesaj/duyuru üst çubukta gösterilebilir; duyurular normal sohbet akışına girmez.
   const pinnedMessage = messages.find(message => message.pinned);
   if (peoplePinnedBar && peoplePinnedBarText) {
     peoplePinnedBar.hidden = !pinnedMessage;
@@ -7737,13 +7738,15 @@ function renderPeopleMessages(messages) {
       : "";
   }
 
-  if (!messages.length) {
-    if (peoplePinnedBar) peoplePinnedBar.hidden = true;
-    peopleMessages.innerHTML = `<div class="people-conversation-empty compact"><div class="people-empty-orb">🔒</div><h2>Özel oda hazır</h2><p>İlk mesajı gönderebilirsin.</p></div>`;
+  // Duyurular ayrı üst alanda gösterildiği için mesaj balonları arasından çıkarılır.
+  const flowMessages = messages.filter(message => message.kind !== "announcement");
+
+  if (!flowMessages.length) {
+    peopleMessages.innerHTML = `<div class="people-conversation-empty compact"><div class="people-empty-orb">🌐</div><h2>Genel Sohbet</h2><p>Henüz normal sohbet mesajı yok.</p></div>`;
     return;
   }
 
-  peopleMessages.innerHTML = messages.map(message => {
+  peopleMessages.innerHTML = flowMessages.map(message => {
     const mine = String(message.senderId) === String(currentUser?.userId);
     const senderKey = String(message.senderId || message.sender?.username || "user");
     let senderToneHash = 0;
