@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.38.24">
+  <link rel="stylesheet" href="./style.css?v=14.38.26">
 </head>
 
 <body>
@@ -7745,8 +7745,12 @@ function renderPeopleMessages(messages) {
 
   peopleMessages.innerHTML = messages.map(message => {
     const mine = String(message.senderId) === String(currentUser?.userId);
+    const senderKey = String(message.senderId || message.sender?.username || "user");
+    let senderToneHash = 0;
+    for (let i = 0; i < senderKey.length; i++) senderToneHash = ((senderToneHash << 5) - senderToneHash + senderKey.charCodeAt(i)) | 0;
+    const senderToneClass = message.sender?.role === "admin" ? "" : `people-sender-tone-${Math.abs(senderToneHash) % 4}`;
     return `
-      <div class="people-message-row ${mine ? "mine" : "theirs"} ${message.sender?.role === "admin" ? "zatoi-owner-message" : "zatoi-user-message"}" data-general-message-id="${peopleEscape(message.messageId || "")}">
+      <div class="people-message-row ${mine ? "mine" : "theirs"} ${message.sender?.role === "admin" ? "zatoi-owner-message" : "zatoi-user-message"} ${senderToneClass}" data-general-message-id="${peopleEscape(message.messageId || "")}">
         <div class="people-message-bubble">
           <button class="people-message-sender" type="button" data-profile-user="${peopleEscape(message.senderId || "")}">
             <span class="people-message-sender-avatar">${peopleEscape(peopleAvatarText(message.sender))}</span>
@@ -8239,7 +8243,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.38.24",
+        "./service-worker.js?v=14.38.26",
         { updateViaCache: "none" }
       );
 
@@ -8283,7 +8287,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.38.24";
+  window.__ZATOI_BUILD__ = "14.38.26";
 </script>
 </body>
 </html>
