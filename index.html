@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.40.0 - MESAJ ETKILESIM PAKETI A2: TEPKILER -->
+<!-- ZATOI AI INDEX V14.40.1 - A2 EMOJI MENU TOGGLE FIX -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -7798,6 +7798,15 @@ function peopleReactionSummaryHtml(reactions, scope, messageId) {
       <span>${peopleEscape(x.emoji)}</span><b>${Number(x.count||0)}</b></button>`).join("");
 }
 function peopleOpenReactionPicker(button) {
+  // Aynı emoji butonuna ikinci kez basılırsa açık menüyü kapat.
+  const parent = button?.parentElement;
+  const existingPicker = parent?.querySelector(":scope > .people-reaction-picker");
+  if (existingPicker) {
+    existingPicker.remove();
+    return;
+  }
+
+  // Başka mesajın menüsü açıksa onu kapatıp yenisini aç.
   document.querySelectorAll(".people-reaction-picker").forEach(x=>x.remove());
   const scope=String(button?.dataset?.reactionPicker||"");
   const messageId=String(button?.dataset?.reactionMessage||"");
