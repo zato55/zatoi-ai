@@ -7137,3 +7137,78 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     height:28px!important;
   }
 }
+
+/* =========================================================
+   V14.39.1 — YANITLAMA A1 DÜZELTME
+   1) Yanıt önizlemesi açıkken input ayrı satırda kalır.
+      Daralan input / tersten yazılıyor hissi engellenir.
+   2) Genel normal kullanıcı kartı tekrar kompakt kalır.
+   Worker ve Index değişmez.
+   ========================================================= */
+
+/* Genel ve özel composer: cevap önizlemesi üst satır, input + gönder alt satır. */
+.people-composer,
+.people-private-composer{
+  flex-wrap:wrap!important;
+}
+
+.people-composer > .people-reply-preview,
+.people-private-composer > .people-reply-preview{
+  flex:0 0 100%!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  order:0!important;
+}
+
+.people-composer > input,
+.people-private-composer > input{
+  flex:1 1 0!important;
+  width:auto!important;
+  min-width:0!important;
+  direction:ltr!important;
+  unicode-bidi:plaintext!important;
+  text-align:left!important;
+  order:1!important;
+}
+
+.people-composer > #peopleSendButton,
+.people-private-composer > #peoplePrivateSend{
+  flex:0 0 auto!important;
+  order:2!important;
+}
+
+/* Türkçe/Latin mesaj yazımında caret ve karakter sırası daima doğal soldan sağa. */
+#peopleMessageInput,
+#peoplePrivateInput{
+  direction:ltr!important;
+  unicode-bidi:plaintext!important;
+  text-align:left!important;
+}
+
+/* PC Genel: normal kullanıcı kartı eski kompakt davranışına dönsün. */
+@media (min-width:721px){
+  .people-chat-panel #peopleMessages > .people-message-row.zatoi-user-message > .people-message-bubble{
+    width:fit-content!important;
+    max-width:min(72%,560px)!important;
+    min-width:180px!important;
+    flex:0 0 auto!important;
+  }
+
+  /* Yanıt kutusu kartı gereksiz yere büyütmesin. */
+  .people-chat-panel #peopleMessages .people-replied-message{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+}
+
+/* Mobil mesaj kartı davranışına dokunma; yalnızca yazım yönünü koru. */
+@media (max-width:720px){
+  #peopleMessageInput,
+  #peoplePrivateInput{
+    direction:ltr!important;
+    unicode-bidi:plaintext!important;
+    text-align:left!important;
+  }
+}
