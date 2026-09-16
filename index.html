@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.38.20">
+  <link rel="stylesheet" href="./style.css?v=14.38.21">
 </head>
 
 <body>
@@ -7753,7 +7753,7 @@ function renderPeopleMessages(messages) {
             <span>${peopleEscape(peopleDisplayName(message.sender))}</span>
             <small>@${peopleEscape(message.sender?.username || "kullanici")}</small>
           </button>
-          <div class="people-message-meta-badges">
+          <div class="people-message-meta-badges">${message.sender?.role !== "admin" ? '<span class="people-user-badge">👤 USER</span>' : ""}
             ${message.sender?.role === "admin" ? '<span class="people-admin-badge zatoi-owner-badge">👑 ZATOI OWNER</span>' : ''}
             ${message.kind === "announcement" ? '<span class="people-announcement-badge">📢 DUYURU</span>' : ''}
             ${message.pinned ? '<span class="people-pinned-badge">📌 SABİT</span>' : ''}
@@ -8239,7 +8239,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.38.20",
+        "./service-worker.js?v=14.38.21",
         { updateViaCache: "none" }
       );
 
@@ -8283,7 +8283,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.38.20";
+  window.__ZATOI_BUILD__ = "14.38.21";
 </script>
 </body>
 </html>
