@@ -8183,3 +8183,125 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     border-top:1px solid rgba(255,255,255,.105)!important;
   }
 }
+
+/* =========================================================
+   V14.44.2 — SADECE PC: KOMPAKT ARDIŞIK MESAJ GRUBU
+   Mobil V14.44.1 aynen korunur.
+   Sorun: eski desktop grid/stretch kuralları grup stack'ini
+   satır yüksekliğine yayıp alt mesajları gereksiz uzatıyordu.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* GENERAL: grup satırı içeriği kadar büyüsün, stretch olmasın. */
+  #peopleMessages > .people-message-row.people-message-group{
+    align-items:start!important;
+    align-content:start!important;
+    height:auto!important;
+    min-height:0!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-user-card{
+    align-self:start!important;
+    height:auto!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack{
+    align-self:start!important;
+    justify-self:stretch!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    gap:0!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble{
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:9px 14px!important;
+  }
+
+  /* Mesaj metni kendi içeriği kadar yer kaplar. */
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  > .people-message-text{
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+  }
+
+  /* Saat/aksiyon satırı metnin hemen altında; büyük boşluk bırakmaz. */
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  > .people-message-foot{
+    min-height:24px!important;
+    height:auto!important;
+    margin-top:5px!important;
+  }
+
+  /* Ardışık mesajları ince çizgi ayırır. */
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  + .people-message-bubble{
+    border-top:1px solid rgba(255,255,255,.10)!important;
+  }
+
+  /* PRIVATE: aynı kompakt davranış. */
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group{
+    align-items:start!important;
+    align-content:start!important;
+    height:auto!important;
+    min-height:0!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-user-card{
+    align-self:start!important;
+    height:auto!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack{
+    align-self:start!important;
+    justify-self:stretch!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    gap:0!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble{
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:9px 14px!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  > .people-private-message-text{
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  > .people-private-message-foot{
+    min-height:24px!important;
+    height:auto!important;
+    margin-top:5px!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  + .people-private-bubble{
+    border-top:1px solid rgba(255,255,255,.10)!important;
+  }
+}
