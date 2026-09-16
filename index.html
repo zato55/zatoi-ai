@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.43.1 - DUYURU SABIT PERDE GORUNURLUK FIX -->
+<!-- ZATOI AI INDEX V14.43.2 - PERDE PARENT HEADER FIX -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.43.1">
+  <link rel="stylesheet" href="./style.css?v=14.43.2">
 </head>
 
 <body>
@@ -8401,35 +8401,24 @@ document.addEventListener("click", (event) => {
   }
 });
 peoplePinnedBar?.addEventListener("click", event => {
-  const curtainToggle = event.target.closest("[data-top-curtain-toggle]");
-
-  // Kapalı perdede bütün ince şerit açma alanıdır.
-  // Böylece içerideki başlık herhangi bir CSS/HTML nedenle görünmese bile perde erişilebilir kalır.
-  if (peoplePinnedBar.classList.contains("is-collapsed")) {
-    event.preventDefault();
-    event.stopPropagation();
-    peoplePinnedBar.classList.remove("is-collapsed");
-    peoplePinnedBar.setAttribute("aria-expanded", "true");
-    localStorage.setItem("zatoi_people_top_curtain_v1", "expanded");
-    return;
-  }
-
-  if (curtainToggle) {
-    event.preventDefault();
-    event.stopPropagation();
-    peoplePinnedBar.classList.add("is-collapsed");
-    peoplePinnedBar.setAttribute("aria-expanded", "false");
-    localStorage.setItem("zatoi_people_top_curtain_v1", "collapsed");
-    return;
-  }
-
   const pinnedCard = event.target.closest("[data-top-pinned-id]");
-  const id = pinnedCard?.dataset.topPinnedId || "";
-  if (!id) return;
-  const target = peopleMessages?.querySelector(`[data-general-message-id="${CSS.escape(id)}"]`);
-  target?.scrollIntoView({ behavior:"smooth", block:"center" });
-  target?.classList.add("people-message-highlight");
-  setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
+
+  // Perde açıkken sabit mesaj kartına basılırsa eski "mesaja git" davranışı korunur.
+  if (pinnedCard && !peoplePinnedBar.classList.contains("is-collapsed")) {
+    const id = pinnedCard.dataset.topPinnedId || "";
+    if (!id) return;
+    const target = peopleMessages?.querySelector(`[data-general-message-id="${CSS.escape(id)}"]`);
+    target?.scrollIntoView({ behavior:"smooth", block:"center" });
+    target?.classList.add("people-message-highlight");
+    setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
+    return;
+  }
+
+  // Başlık artık parent barın kendisidir; görünmez bir child butona bağımlı değil.
+  const willCollapse = !peoplePinnedBar.classList.contains("is-collapsed");
+  peoplePinnedBar.classList.toggle("is-collapsed", willCollapse);
+  peoplePinnedBar.setAttribute("aria-expanded", String(!willCollapse));
+  localStorage.setItem("zatoi_people_top_curtain_v1", willCollapse ? "collapsed" : "expanded");
 });
 peopleAdminClearGeneral?.addEventListener("click", async () => {
   if (peopleAdminManageMenu) peopleAdminManageMenu.hidden = true;
