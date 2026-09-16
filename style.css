@@ -6698,3 +6698,75 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     grid-row:4!important;
   }
 }
+
+/* =========================================================
+   V14.38.28 — PC HEADER SYMMETRY
+   SADECE MASAÜSTÜ (>=721px)
+   - Sol / orta / sağ başlık satırları aynı yükseklikte.
+   - Genel Sohbet başlığı orta sütunun tamamını doldurur.
+   - Yönet butonu aynı satırda dikey merkezde kalır.
+   - Mesaj, sabit mesaj, mobil ve AI görünümü değişmez.
+   ========================================================= */
+@media (min-width:721px){
+
+  .app.people-chat-mode > .people-chat-panel{
+    --people-pc-head-height:80px;
+    grid-template-rows:var(--people-pc-head-height) minmax(0,1fr)!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel > .people-mode-top{
+    min-height:var(--people-pc-head-height)!important;
+    height:var(--people-pc-head-height)!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel > .people-active-panel,
+  .app.people-chat-mode > .people-chat-panel > .people-rooms-panel{
+    border-top:1px solid var(--border,#263548)!important;
+  }
+
+  .app.people-chat-mode .people-active-head,
+  .app.people-chat-mode .people-rooms-head{
+    min-height:var(--people-pc-head-height)!important;
+    height:var(--people-pc-head-height)!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel > .people-conversation{
+    grid-template-rows:var(--people-pc-head-height) auto minmax(0,1fr) auto!important;
+  }
+
+  .app.people-chat-mode .people-conversation-head{
+    width:100%!important;
+    max-width:none!important;
+    min-height:var(--people-pc-head-height)!important;
+    height:var(--people-pc-head-height)!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:0 20px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:16px!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+  }
+
+  .app.people-chat-mode .people-conversation-head > *{
+    min-width:0!important;
+  }
+
+  .app.people-chat-mode .people-conversation-head .people-conversation-title,
+  .app.people-chat-mode .people-conversation-head .people-conversation-info,
+  .app.people-chat-mode .people-conversation-head .people-conversation-heading{
+    align-self:center!important;
+    margin-top:0!important;
+    margin-bottom:0!important;
+  }
+
+  .app.people-chat-mode .people-admin-chat-tools{
+    align-self:center!important;
+    margin-top:0!important;
+    margin-bottom:0!important;
+  }
+}
