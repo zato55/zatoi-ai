@@ -7381,3 +7381,142 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     box-sizing:border-box!important;
   }
 }
+
+/* =========================================================
+   V14.43.0 — DUYURU + SABİT AÇILIR/KAPANIR PERDE
+   Index ile birlikte çalışır. Worker değişmez.
+   ========================================================= */
+#peoplePinnedBar.people-pinned-bar{
+  overflow:hidden!important;
+}
+
+#peoplePinnedBar .people-top-curtain-toggle{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:38px!important;
+  padding:7px 10px!important;
+  box-sizing:border-box!important;
+  border:1px solid rgba(139,92,246,.22)!important;
+  border-radius:11px!important;
+  background:linear-gradient(90deg,rgba(30,41,59,.96),rgba(49,46,129,.18))!important;
+  cursor:pointer!important;
+  user-select:none!important;
+}
+
+#peoplePinnedBar .people-top-curtain-title{
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  min-width:0!important;
+  color:var(--text,#eef5ff)!important;
+}
+
+#peoplePinnedBar .people-top-curtain-title strong{
+  font-size:12px!important;
+  white-space:nowrap!important;
+}
+
+#peoplePinnedBar .people-top-curtain-title small{
+  min-width:0!important;
+  color:var(--muted,#91a0b2)!important;
+  font-size:9px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+#peoplePinnedBar .people-top-curtain-icon{
+  flex:0 0 auto!important;
+}
+
+#peoplePinnedBar .people-top-curtain-chevron{
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:24px!important;
+  height:24px!important;
+  border-radius:8px!important;
+  background:rgba(255,255,255,.045)!important;
+  color:#c4b5fd!important;
+  font-size:17px!important;
+  line-height:1!important;
+  transform:rotate(0deg)!important;
+  transition:transform .22s ease!important;
+}
+
+#peoplePinnedBar .people-top-curtain-content{
+  display:grid!important;
+  grid-template-rows:1fr!important;
+  gap:6px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-height:360px!important;
+  opacity:1!important;
+  overflow:hidden!important;
+  transition:max-height .24s ease,opacity .18s ease,margin .24s ease!important;
+  margin-top:0!important;
+}
+
+/* Kapalı: sadece ince başlık şeridi kalır. */
+#peoplePinnedBar.is-collapsed .people-top-curtain-content{
+  max-height:0!important;
+  opacity:0!important;
+  margin:0!important;
+  pointer-events:none!important;
+}
+
+#peoplePinnedBar.is-collapsed .people-top-curtain-chevron{
+  transform:rotate(180deg)!important;
+}
+
+/* Eski doğrudan çocuk kart düzenini yeni content sarmalayıcısında da koru. */
+#peoplePinnedBar .people-top-curtain-content > .people-top-message-card{
+  width:100%!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  padding:8px 10px!important;
+  border-radius:10px!important;
+  box-sizing:border-box!important;
+}
+
+#peoplePinnedBar .people-top-curtain-content > .people-top-message-card.is-announcement{
+  background:rgba(245,158,11,.08)!important;
+  border:1px solid rgba(245,158,11,.22)!important;
+}
+
+#peoplePinnedBar .people-top-curtain-content > .people-top-message-card.is-pinned{
+  background:rgba(59,130,246,.08)!important;
+  border:1px solid rgba(59,130,246,.20)!important;
+  cursor:pointer!important;
+}
+
+@media (max-width:720px){
+  #peoplePinnedBar.people-pinned-bar{
+    gap:5px!important;
+    padding:5px 8px!important;
+  }
+
+  #peoplePinnedBar .people-top-curtain-toggle{
+    min-height:36px!important;
+    padding:6px 9px!important;
+  }
+
+  #peoplePinnedBar .people-top-curtain-title strong{
+    font-size:11px!important;
+  }
+
+  #peoplePinnedBar .people-top-curtain-title small{
+    font-size:8px!important;
+  }
+
+  #peoplePinnedBar .people-top-curtain-content > .people-top-message-card{
+    padding:7px 8px!important;
+  }
+}
