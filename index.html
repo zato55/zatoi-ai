@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.42.5 - MOBIL GENEL TEMIZ CSS CACHE -->
+<!-- ZATOI AI INDEX V14.43.0 - DUYURU SABIT PERDE -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.42.5">
+  <link rel="stylesheet" href="./style.css?v=14.43.0">
 </head>
 
 <body>
@@ -7888,16 +7888,35 @@ function renderPeopleMessages(messages) {
   if (peoplePinnedBar) {
     peoplePinnedBar.hidden = topCards.length === 0;
     peoplePinnedBar.dataset.messageId = normalPinnedMessage?.messageId || "";
-    peoplePinnedBar.innerHTML = topCards.map(message => `
-      <span class="people-top-message-card ${message.topType === "announcement" ? "is-announcement" : "is-pinned"}"
-            ${message.topType === "pinned" ? `data-top-pinned-id="${peopleEscape(message.messageId || "")}"` : ""}>
-        <span class="people-pinned-bar-icon">${message.topType === "announcement" ? "📢" : "📌"}</span>
-        <span class="people-pinned-bar-copy">
-          <strong>${message.topType === "announcement" ? "Duyuru" : "Sabit mesaj"}</strong>
-          <small>${peopleEscape(peopleDisplayName(message.sender))}: ${peopleEscape(String(message.content || "").slice(0, 180))}</small>
+
+    const curtainCollapsed = localStorage.getItem("zatoi_people_top_curtain_v1") === "collapsed";
+    const announcementCount = topCards.filter(message => message.topType === "announcement").length;
+    const pinnedCount = topCards.filter(message => message.topType === "pinned").length;
+
+    peoplePinnedBar.classList.toggle("is-collapsed", curtainCollapsed);
+    peoplePinnedBar.setAttribute("aria-expanded", String(!curtainCollapsed));
+    peoplePinnedBar.innerHTML = `
+      <span class="people-top-curtain-toggle" data-top-curtain-toggle="1">
+        <span class="people-top-curtain-title">
+          <span class="people-top-curtain-icon">📌</span>
+          <strong>Duyurular & Sabitler</strong>
+          <small>${announcementCount ? `${announcementCount} duyuru` : ""}${announcementCount && pinnedCount ? " • " : ""}${pinnedCount ? `${pinnedCount} sabit` : ""}</small>
         </span>
+        <span class="people-top-curtain-chevron" aria-hidden="true">⌃</span>
       </span>
-    `).join("");
+      <span class="people-top-curtain-content">
+        ${topCards.map(message => `
+          <span class="people-top-message-card ${message.topType === "announcement" ? "is-announcement" : "is-pinned"}"
+                ${message.topType === "pinned" ? `data-top-pinned-id="${peopleEscape(message.messageId || "")}"` : ""}>
+            <span class="people-pinned-bar-icon">${message.topType === "announcement" ? "📢" : "📌"}</span>
+            <span class="people-pinned-bar-copy">
+              <strong>${message.topType === "announcement" ? "Duyuru" : "Sabit mesaj"}</strong>
+              <small>${peopleEscape(peopleDisplayName(message.sender))}: ${peopleEscape(String(message.content || "").slice(0, 180))}</small>
+            </span>
+          </span>
+        `).join("")}
+      </span>
+    `;
   }
 
   // Duyurular yalnızca üst alanda gösterilir; normal sohbet balonlarına düşmez.
@@ -8382,6 +8401,18 @@ document.addEventListener("click", (event) => {
   }
 });
 peoplePinnedBar?.addEventListener("click", event => {
+  const curtainToggle = event.target.closest("[data-top-curtain-toggle]");
+  if (curtainToggle) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const willCollapse = !peoplePinnedBar.classList.contains("is-collapsed");
+    peoplePinnedBar.classList.toggle("is-collapsed", willCollapse);
+    peoplePinnedBar.setAttribute("aria-expanded", String(!willCollapse));
+    localStorage.setItem("zatoi_people_top_curtain_v1", willCollapse ? "collapsed" : "expanded");
+    return;
+  }
+
   const pinnedCard = event.target.closest("[data-top-pinned-id]");
   const id = pinnedCard?.dataset.topPinnedId || "";
   if (!id) return;
