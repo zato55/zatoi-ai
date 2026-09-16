@@ -7464,3 +7464,64 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 .people-inline-edit-actions button{width:auto!important;height:29px!important;padding:0 10px!important;border:1px solid rgba(148,163,184,.22)!important;border-radius:8px!important;background:rgba(15,23,42,.62)!important;color:#cbd5e1!important;cursor:pointer!important;font-size:11px!important}
 .people-inline-edit-actions .save{border-color:rgba(59,130,246,.40)!important;background:rgba(37,99,235,.28)!important;color:#dbeafe!important}
 @media(max-width:720px){.people-message-edit-action{width:28px!important;min-width:28px!important;height:28px!important}}
+
+/* =========================================================
+   V14.42.1 — SADECE MOBİL GENEL SOHBET
+   Genel mesajlar, Özel Oda'daki solda kart + sağda balon
+   düzenine getirildi. PC ve Özel Oda değiştirilmedi.
+   ========================================================= */
+@media (max-width:720px){
+  #peopleMessages > .people-message-row,
+  #peopleMessages > .people-message-row.mine{
+    display:grid!important;
+    grid-template-columns:155px minmax(0,1fr)!important;
+    align-items:start!important;
+    gap:0!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+
+  #peopleMessages > .people-message-row > .people-message-user-card,
+  #peopleMessages > .people-message-row.mine > .people-message-user-card{
+    grid-column:1!important;
+    grid-row:1!important;
+    width:155px!important;
+    min-width:155px!important;
+    max-width:155px!important;
+    min-height:80px!important;
+    margin:0!important;
+    border-radius:14px 0 0 14px!important;
+    align-self:start!important;
+  }
+
+  #peopleMessages > .people-message-row > .people-message-user-card::after,
+  #peopleMessages > .people-message-row.mine > .people-message-user-card::after{
+    left:auto!important;
+    right:-9px!important;
+    top:24px!important;
+    transform:rotate(45deg)!important;
+  }
+
+  #peopleMessages > .people-message-row > .people-message-bubble,
+  #peopleMessages > .people-message-row.mine > .people-message-bubble{
+    grid-column:2!important;
+    grid-row:1!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    border-radius:0 14px 14px 14px!important;
+    align-self:start!important;
+  }
+
+  #peopleMessages .people-message-user-card-copy{
+    min-width:0!important;
+  }
+
+  #peopleMessages .people-message-user-card-copy strong,
+  #peopleMessages .people-message-user-card-copy small{
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+}
