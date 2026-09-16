@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.43.0 - DUYURU SABIT PERDE -->
+<!-- ZATOI AI INDEX V14.43.1 - DUYURU SABIT PERDE GORUNURLUK FIX -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.43.0">
+  <link rel="stylesheet" href="./style.css?v=14.43.1">
 </head>
 
 <body>
@@ -8402,14 +8402,24 @@ document.addEventListener("click", (event) => {
 });
 peoplePinnedBar?.addEventListener("click", event => {
   const curtainToggle = event.target.closest("[data-top-curtain-toggle]");
+
+  // Kapalı perdede bütün ince şerit açma alanıdır.
+  // Böylece içerideki başlık herhangi bir CSS/HTML nedenle görünmese bile perde erişilebilir kalır.
+  if (peoplePinnedBar.classList.contains("is-collapsed")) {
+    event.preventDefault();
+    event.stopPropagation();
+    peoplePinnedBar.classList.remove("is-collapsed");
+    peoplePinnedBar.setAttribute("aria-expanded", "true");
+    localStorage.setItem("zatoi_people_top_curtain_v1", "expanded");
+    return;
+  }
+
   if (curtainToggle) {
     event.preventDefault();
     event.stopPropagation();
-
-    const willCollapse = !peoplePinnedBar.classList.contains("is-collapsed");
-    peoplePinnedBar.classList.toggle("is-collapsed", willCollapse);
-    peoplePinnedBar.setAttribute("aria-expanded", String(!willCollapse));
-    localStorage.setItem("zatoi_people_top_curtain_v1", willCollapse ? "collapsed" : "expanded");
+    peoplePinnedBar.classList.add("is-collapsed");
+    peoplePinnedBar.setAttribute("aria-expanded", "false");
+    localStorage.setItem("zatoi_people_top_curtain_v1", "collapsed");
     return;
   }
 
