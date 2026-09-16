@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.39.0 - MESAJ ETKILESIM PAKETI A1: YANITLAMA -->
+<!-- ZATOI AI INDEX V14.40.0 - MESAJ ETKILESIM PAKETI A2: TEPKILER -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.39.0">
+  <link rel="stylesheet" href="./style.css?v=14.40.0">
 </head>
 
 <body>
@@ -7779,6 +7779,47 @@ Numara yaz:`);
   } catch (error) { alert(error.message); }
 }
 
+
+const PEOPLE_REACTION_EMOJIS = ["👍", "❤️", "😂", "😮"];
+
+function peopleReactionSignature(messages) {
+  return (Array.isArray(messages) ? messages : []).map(item => {
+    const r=(Array.isArray(item?.reactions)?item.reactions:[])
+      .map(x=>`${x.emoji}:${x.count}:${x.mine?1:0}`).sort().join(",");
+    return `${item?.messageId||""}:${item?.createdAt||""}:${r}`;
+  }).join("|");
+}
+function peopleReactionSummaryHtml(reactions, scope, messageId) {
+  return (Array.isArray(reactions)?reactions:[])
+    .filter(x=>PEOPLE_REACTION_EMOJIS.includes(String(x?.emoji||"")) && Number(x?.count||0)>0)
+    .map(x=>`<button class="people-reaction-chip ${x.mine?"mine":""}" type="button"
+      data-reaction-toggle="${peopleEscape(scope)}" data-reaction-message="${peopleEscape(messageId||"")}"
+      data-reaction-emoji="${peopleEscape(x.emoji)}" title="${x.mine?"Tepkiyi geri al":"Bu tepkiyi ver"}">
+      <span>${peopleEscape(x.emoji)}</span><b>${Number(x.count||0)}</b></button>`).join("");
+}
+function peopleOpenReactionPicker(button) {
+  document.querySelectorAll(".people-reaction-picker").forEach(x=>x.remove());
+  const scope=String(button?.dataset?.reactionPicker||"");
+  const messageId=String(button?.dataset?.reactionMessage||"");
+  if(!scope||!messageId)return;
+  const picker=document.createElement("div");
+  picker.className="people-reaction-picker";
+  picker.innerHTML=PEOPLE_REACTION_EMOJIS.map(emoji=>`<button type="button"
+    data-reaction-toggle="${peopleEscape(scope)}" data-reaction-message="${peopleEscape(messageId)}"
+    data-reaction-emoji="${peopleEscape(emoji)}">${peopleEscape(emoji)}</button>`).join("");
+  button.parentElement?.appendChild(picker);
+}
+async function peopleToggleReaction(scope,messageId,emoji){
+  if(!["general","private"].includes(scope)||!messageId||!PEOPLE_REACTION_EMOJIS.includes(emoji))return;
+  try{
+    await peopleApi("toggle_message_reaction",{scope,messageId,emoji,
+      roomId:scope==="private"?(peopleCurrentRoomId||""):""});
+    document.querySelectorAll(".people-reaction-picker").forEach(x=>x.remove());
+    if(scope==="private")await loadPeoplePrivateMessages();
+    else await loadPeopleGeneralMessages();
+  }catch(error){alert(error?.message||"Tepki işlemi tamamlanamadı.");}
+}
+
 function renderPeopleMessages(messages) {
   if (!peopleMessages) return;
 
@@ -7857,6 +7898,8 @@ function renderPeopleMessages(messages) {
           <div class="people-message-text">${peopleEscape(message.content)}</div>
           <div class="people-message-foot">
             <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+            <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"general",message.messageId)}</span>
+            <button class="people-message-reaction-action" type="button" data-reaction-picker="general" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
             <button class="people-message-reply-action" type="button" data-general-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
             ${peopleIsAdmin() ? `<span class="people-message-admin-actions">
               <button type="button" data-admin-pin="${peopleEscape(message.messageId)}" data-pinned="${message.pinned ? "1" : "0"}" title="${message.pinned ? "Sabitlemeyi kaldır" : "Mesajı sabitle"}">📌</button>
@@ -7895,15 +7938,17 @@ function renderPeopleMessages(messages) {
       target?.classList.add("people-message-highlight");
       setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
     });
-  });
+  });  peopleMessages.querySelectorAll("[data-reaction-picker]").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleOpenReactionPicker(button);}));
+  peopleMessages.querySelectorAll(".people-reaction-chip").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleToggleReaction(button.dataset.reactionToggle,button.dataset.reactionMessage,button.dataset.reactionEmoji);}));
 }
+
 
 async function loadPeopleMessages({ silent = false } = {}) {
   if (!peopleChatActive || !peopleCurrentRoomId) return;
   try {
     const data = await peopleApi("get_messages", { roomId: peopleCurrentRoomId });
     const messages = Array.isArray(data.messages) ? data.messages : [];
-    const signature = messages.map(item => `${item.messageId}:${item.createdAt}`).join("|");
+    const signature = peopleReactionSignature(messages);
     if (!silent || signature !== peopleLastMessageSignature) {
       peopleLastMessageSignature = signature;
       renderPeopleMessages(messages);
@@ -7939,7 +7984,7 @@ async function loadPeopleGeneralMessages({ silent = false } = {}) {
   try {
     const data = await peopleApi("get_general_messages");
     const messages = Array.isArray(data.messages) ? data.messages : [];
-    const signature = messages.map(item => `${item.messageId}:${item.createdAt}`).join("|");
+    const signature = peopleReactionSignature(messages);
     if (!silent || signature !== peopleLastMessageSignature) {
       peopleLastMessageSignature = signature;
       renderPeopleMessages(messages);
@@ -8048,6 +8093,8 @@ function renderPeoplePrivateMessages(messages) {
           <div>${peopleEscape(message.content)}</div>
           <div class="people-private-message-foot">
             <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+            <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"private",message.messageId)}</span>
+            <button class="people-message-reaction-action" type="button" data-reaction-picker="private" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
             <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
           </div>
         </div>
@@ -8069,15 +8116,17 @@ function renderPeoplePrivateMessages(messages) {
       target?.classList.add("people-message-highlight");
       setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
     });
-  });
+  });  peoplePrivateMessages.querySelectorAll("[data-reaction-picker]").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleOpenReactionPicker(button);}));
+  peoplePrivateMessages.querySelectorAll(".people-reaction-chip").forEach(button=>button.addEventListener("click",event=>{event.stopPropagation();peopleToggleReaction(button.dataset.reactionToggle,button.dataset.reactionMessage,button.dataset.reactionEmoji);}));
 }
+
 
 async function loadPeoplePrivateMessages({ silent = false } = {}) {
   if (!peopleChatActive || !peopleCurrentRoomId) return;
   try {
     const data = await peopleApi("get_messages", { roomId: peopleCurrentRoomId });
     const messages = Array.isArray(data.messages) ? data.messages : [];
-    const signature = messages.map(item => `${item.messageId}:${item.createdAt}`).join("|");
+    const signature = peopleReactionSignature(messages);
     const dockSignature = peoplePrivateMessages?.dataset.signature || "";
     if (!silent || signature !== dockSignature) {
       if (peoplePrivateMessages) peoplePrivateMessages.dataset.signature = signature;
@@ -8345,6 +8394,18 @@ peopleRefreshRooms?.addEventListener("click", refreshPeopleRooms);
 peopleUserSearch?.addEventListener("input", renderPeopleActiveUsers);
 peopleComposer?.addEventListener("submit", sendPeopleMessage);
 peopleReplyCancel?.addEventListener("click", clearPeopleGeneralReply);
+
+document.addEventListener("click",event=>{
+  const choice=event.target.closest(".people-reaction-picker [data-reaction-toggle]");
+  if(choice){
+    event.preventDefault();event.stopPropagation();
+    peopleToggleReaction(choice.dataset.reactionToggle,choice.dataset.reactionMessage,choice.dataset.reactionEmoji);
+    return;
+  }
+  if(!event.target.closest(".people-reaction-picker")&&!event.target.closest("[data-reaction-picker]"))
+    document.querySelectorAll(".people-reaction-picker").forEach(x=>x.remove());
+});
+
 
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && peopleChatActive) {
