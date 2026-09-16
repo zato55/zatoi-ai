@@ -6170,3 +6170,56 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     max-height:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.20 — MOBILE USER BADGE + MICRO SPACING
+   V14.38.19 kart yapısı korunur.
+   Sadece normal üyeye soluk USER rozeti ve daha sıkı üst bilgi.
+   ========================================================= */
+
+.people-user-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:3px 8px;
+  border:1px solid rgba(148,163,184,.30);
+  border-radius:999px;
+  background:rgba(148,163,184,.09);
+  color:rgba(226,232,240,.76);
+  font-size:10px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:.45px;
+  white-space:nowrap;
+}
+
+@media (max-width:720px){
+
+  /* Kartı mobilde biraz daha ferah kullan. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row{
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+
+  /* İsim ve rol birbirine yakın dursun. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-sender{
+    margin-bottom:0!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
+    margin-top:3px!important;
+    margin-bottom:6px!important;
+  }
+
+  /* Kısa mesajlarda gereksiz dikey şişkinliği azalt. */
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
+    padding-top:9px!important;
+    padding-bottom:9px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-user-badge{
+    opacity:.82;
+  }
+}
