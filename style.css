@@ -6223,3 +6223,33 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     opacity:.82;
   }
 }
+
+
+/* =========================================================
+   V14.38.21 — NORMAL MEMBER USER BADGE
+   Mevcut V14.38.20 ölçüleri aynen korunur.
+   Normal üyeye sade/soluk USER kimliği eklenir.
+   ========================================================= */
+.people-user-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:3px 8px;
+  border:1px solid rgba(125,167,214,.34);
+  border-radius:999px;
+  background:rgba(72,116,164,.12);
+  color:rgba(207,224,241,.78);
+  box-shadow:inset 0 0 10px rgba(88,148,210,.05);
+  font-size:10px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:.5px;
+  white-space:nowrap;
+}
+
+@media (max-width:720px){
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-user-badge{
+    opacity:.82;
+  }
+}
