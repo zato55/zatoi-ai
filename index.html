@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.43.2 - PERDE PARENT HEADER FIX -->
+<!-- ZATOI AI INDEX V14.43.3 - PERDE DIREKT KART FIX -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.43.2">
+  <link rel="stylesheet" href="./style.css?v=14.43.3">
 </head>
 
 <body>
@@ -7895,28 +7895,16 @@ function renderPeopleMessages(messages) {
 
     peoplePinnedBar.classList.toggle("is-collapsed", curtainCollapsed);
     peoplePinnedBar.setAttribute("aria-expanded", String(!curtainCollapsed));
-    peoplePinnedBar.innerHTML = `
-      <span class="people-top-curtain-toggle" data-top-curtain-toggle="1">
-        <span class="people-top-curtain-title">
-          <span class="people-top-curtain-icon">📌</span>
-          <strong>Duyurular & Sabitler</strong>
-          <small>${announcementCount ? `${announcementCount} duyuru` : ""}${announcementCount && pinnedCount ? " • " : ""}${pinnedCount ? `${pinnedCount} sabit` : ""}</small>
+    peoplePinnedBar.innerHTML = topCards.map(message => `
+      <span class="people-top-message-card ${message.topType === "announcement" ? "is-announcement" : "is-pinned"}"
+            ${message.topType === "pinned" ? `data-top-pinned-id="${peopleEscape(message.messageId || "")}"` : ""}>
+        <span class="people-pinned-bar-icon">${message.topType === "announcement" ? "📢" : "📌"}</span>
+        <span class="people-pinned-bar-copy">
+          <strong>${message.topType === "announcement" ? "Duyuru" : "Sabit mesaj"}</strong>
+          <small>${peopleEscape(peopleDisplayName(message.sender))}: ${peopleEscape(String(message.content || "").slice(0, 180))}</small>
         </span>
-        <span class="people-top-curtain-chevron" aria-hidden="true">⌃</span>
       </span>
-      <span class="people-top-curtain-content">
-        ${topCards.map(message => `
-          <span class="people-top-message-card ${message.topType === "announcement" ? "is-announcement" : "is-pinned"}"
-                ${message.topType === "pinned" ? `data-top-pinned-id="${peopleEscape(message.messageId || "")}"` : ""}>
-            <span class="people-pinned-bar-icon">${message.topType === "announcement" ? "📢" : "📌"}</span>
-            <span class="people-pinned-bar-copy">
-              <strong>${message.topType === "announcement" ? "Duyuru" : "Sabit mesaj"}</strong>
-              <small>${peopleEscape(peopleDisplayName(message.sender))}: ${peopleEscape(String(message.content || "").slice(0, 180))}</small>
-            </span>
-          </span>
-        `).join("")}
-      </span>
-    `;
+    `).join("");
   }
 
   // Duyurular yalnızca üst alanda gösterilir; normal sohbet balonlarına düşmez.
