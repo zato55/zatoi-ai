@@ -8305,3 +8305,171 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     border-top:1px solid rgba(255,255,255,.10)!important;
   }
 }
+
+/* =========================================================
+   V14.44.3 — SADECE PC: WHATSAPP TARZI YOĞUN GRUP
+   Mobil V14.44.1 aynen korunur.
+   Eski PC kurallarındaki min-height / foot dağılımını kesin ezer.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* GENERAL — dış grup sadece içeriği kadar yer kaplar */
+  #peopleMessages > .people-message-row.people-message-group{
+    grid-auto-rows:max-content!important;
+    align-items:start!important;
+    height:max-content!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack{
+    display:block!important;
+    align-self:start!important;
+    height:max-content!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+
+  /* Her mesaj: metin + aynı satırda sağda saat/aksiyonlar */
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-rows:auto!important;
+    align-items:center!important;
+    column-gap:12px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:42px!important;
+    max-height:none!important;
+    padding:6px 12px!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  > .people-message-meta-badges,
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  > .people-replied-message{
+    grid-column:1 / -1!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  > .people-message-text{
+    grid-column:1!important;
+    grid-row:auto!important;
+    align-self:center!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    line-height:1.35!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  > .people-message-foot{
+    grid-column:2!important;
+    grid-row:auto!important;
+    align-self:center!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    flex-wrap:nowrap!important;
+    width:auto!important;
+    min-width:max-content!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    gap:7px!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group
+  > .people-message-group-stack > .people-message-bubble
+  + .people-message-bubble{
+    border-top:1px solid rgba(255,255,255,.085)!important;
+  }
+
+  /* PRIVATE — aynı yoğunluk */
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group{
+    grid-auto-rows:max-content!important;
+    align-items:start!important;
+    height:max-content!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack{
+    display:block!important;
+    align-self:start!important;
+    height:max-content!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-rows:auto!important;
+    align-items:center!important;
+    column-gap:12px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:42px!important;
+    max-height:none!important;
+    padding:6px 12px!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  > .people-private-replied-message{
+    grid-column:1 / -1!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  > .people-private-message-text{
+    grid-column:1!important;
+    align-self:center!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    line-height:1.35!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  > .people-private-message-foot{
+    grid-column:2!important;
+    align-self:center!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    flex-wrap:nowrap!important;
+    width:auto!important;
+    min-width:max-content!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    gap:7px!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  + .people-private-bubble{
+    border-top:1px solid rgba(255,255,255,.085)!important;
+  }
+}
