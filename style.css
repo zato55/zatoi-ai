@@ -5869,3 +5869,84 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     margin-left:auto!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.16 — MOBILE PEOPLE CHAT NATURAL HEIGHT FIX
+   Kök neden:
+   .people-conversation içinde artık 4 çocuk var:
+   head + pinned + messages + composer.
+   Eski mobil grid hâlâ 3 satır tanımladığı için 1fr alan yanlış
+   elemana dağılıyordu. Burada 4 satır açıkça tanımlanır.
+   Ayrıca mesaj balonları içerik kadar yükseklik kullanır.
+   ========================================================= */
+@media (max-width:720px){
+
+  .people-chat-panel[data-mobile-view="general"] .people-conversation{
+    display:grid!important;
+    grid-template-rows:auto auto minmax(0,1fr) auto!important;
+    align-content:stretch!important;
+    overflow:hidden!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-conversation-head{
+    grid-row:1!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peoplePinnedBar{
+    grid-row:2!important;
+    align-self:start!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages{
+    grid-row:3!important;
+    min-height:0!important;
+    height:auto!important;
+    overflow-y:auto!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleComposer{
+    grid-row:4!important;
+  }
+
+  /* Mesaj satırı/balonu yalnız içeriği kadar yükselsin. */
+  .people-chat-panel[data-mobile-view="general"] .people-message-row{
+    height:auto!important;
+    min-height:0!important;
+    align-items:flex-start!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-message-bubble{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-self:flex-start!important;
+    padding:10px 12px 8px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-message-sender,
+  .people-chat-panel[data-mobile-view="general"] .people-message-meta-badges,
+  .people-chat-panel[data-mobile-view="general"] .people-message-text,
+  .people-chat-panel[data-mobile-view="general"] .people-message-foot{
+    min-height:0!important;
+    height:auto!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-message-meta-badges{
+    margin-top:6px!important;
+    margin-bottom:7px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-message-text{
+    margin:0!important;
+    padding:0!important;
+    line-height:1.45!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] .people-message-foot{
+    margin-top:7px!important;
+  }
+}
