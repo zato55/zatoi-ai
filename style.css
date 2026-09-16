@@ -7466,49 +7466,60 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 @media(max-width:720px){.people-message-edit-action{width:28px!important;min-width:28px!important;height:28px!important}}
 
 /* =========================================================
-   V14.42.2 — MOBİL GENEL: ÖZEL ODA YERLEŞİMİNİ BİREBİR UYGULA
-   Sadece data-mobile-view="general" içindeki Genel mesajlar.
+   V14.42.3 — MOBİL GENEL / ÖZEL ODA İLE AYNI MESAJ GEOMETRİSİ
+   Eski Genel mobil kart kurallarını son katmanda kesin olarak ezer.
    ========================================================= */
 @media (max-width:720px){
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages{
+    align-items:stretch!important;
+  }
+
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs{
+    position:relative!important;
     display:grid!important;
     grid-template-columns:92px minmax(0,1fr)!important;
-    grid-template-rows:auto!important;
+    grid-template-rows:max-content!important;
     align-items:start!important;
-    justify-content:stretch!important;
+    align-content:start!important;
     width:100%!important;
     max-width:100%!important;
     min-width:0!important;
-    height:auto!important;
+    height:max-content!important;
+    min-height:0!important;
+    max-height:none!important;
+    flex:0 0 auto!important;
     margin:0!important;
     padding:0!important;
     gap:0!important;
+    overflow:visible!important;
   }
 
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-user-card,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-user-card,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-user-card{
+    position:relative!important;
     grid-column:1!important;
     grid-row:1!important;
-    position:relative!important;
+    align-self:start!important;
+    justify-self:stretch!important;
     width:92px!important;
     min-width:92px!important;
     max-width:92px!important;
-    min-height:48px!important;
     height:auto!important;
+    min-height:48px!important;
+    max-height:none!important;
     margin:0!important;
     padding:6px!important;
     border-radius:13px 0 0 13px!important;
     box-sizing:border-box!important;
-    align-self:start!important;
-    justify-self:stretch!important;
     z-index:2!important;
   }
 
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-user-card::after,
-  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-user-card::after{
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.mine > .people-message-user-card::after,
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-user-card::after{
     left:auto!important;
     right:-9px!important;
     top:19px!important;
@@ -7519,6 +7530,7 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     border-bottom:0!important;
     border-top:1px solid rgba(148,163,184,.20)!important;
     border-right:1px solid rgba(148,163,184,.20)!important;
+    z-index:-1!important;
   }
 
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-bubble,
@@ -7526,18 +7538,40 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.theirs > .people-message-bubble,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.zatoi-user-message > .people-message-bubble,
   .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row.zatoi-owner-message > .people-message-bubble{
+    position:relative!important;
     grid-column:2!important;
     grid-row:1!important;
+    align-self:start!important;
+    justify-self:stretch!important;
     display:block!important;
+    flex:none!important;
     width:100%!important;
     max-width:100%!important;
+    min-width:0!important;
+    height:max-content!important;
+    min-height:48px!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:10px 11px!important;
+    border-radius:0 14px 14px 14px!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
+    display:block!important;
+    width:100%!important;
     min-width:0!important;
     height:auto!important;
     min-height:0!important;
     margin:0!important;
-    border-radius:0 14px 14px 14px!important;
-    box-sizing:border-box!important;
-    align-self:start!important;
-    justify-self:stretch!important;
+    padding:0!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-foot{
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin-top:7px!important;
   }
 }
