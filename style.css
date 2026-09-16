@@ -5950,3 +5950,77 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     margin-top:7px!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.17 — MOBILE GENERAL MESSAGE BUBBLE COMPACT FIX
+   Sabit mesaj V14.38.16 aynen korunur.
+   Normal/USER/OWNER balonunda içerik normal belge akışına alınır.
+   Böylece gönderen, rozet, metin ve saat arasında dev boşluk oluşmaz.
+   ========================================================= */
+@media (max-width:720px){
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-row{
+    display:flex!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:10px 0!important;
+    align-items:flex-start!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-row.mine{
+    justify-content:flex-end!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-row.theirs{
+    justify-content:flex-start!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-bubble{
+    display:block!important;
+    width:fit-content!important;
+    max-width:calc(100% - 22px)!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:12px 14px 9px!important;
+    box-sizing:border-box!important;
+    align-self:flex-start!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-sender{
+    display:flex!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0 0 7px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-meta-badges{
+    display:flex!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0 0 9px!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-text{
+    display:block!important;
+    width:auto!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages .people-message-foot{
+    display:flex!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:7px 0 0!important;
+    padding:0!important;
+    justify-content:flex-end!important;
+  }
+}
