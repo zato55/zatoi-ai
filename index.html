@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.38.29 - DUYURU NORMAL MESAJ AKISINDAN AYRILDI -->
+<!-- ZATOI AI INDEX V14.38.31 - 2 DUYURU + 1 SABIT MESAJ -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -7728,17 +7728,37 @@ function renderPeopleMessages(messages) {
         return peopleMobileFlow ? (at - bt) : (bt - at);
       })
     : [];
-  // Sabit mesaj/duyuru üst çubukta gösterilebilir; duyurular normal sohbet akışına girmez.
-  const pinnedMessage = messages.find(message => message.pinned);
-  if (peoplePinnedBar && peoplePinnedBarText) {
-    peoplePinnedBar.hidden = !pinnedMessage;
-    peoplePinnedBar.dataset.messageId = pinnedMessage?.messageId || "";
-    peoplePinnedBarText.textContent = pinnedMessage
-      ? `${peopleDisplayName(pinnedMessage.sender)}: ${String(pinnedMessage.content || "").slice(0, 110)}`
-      : "";
+  // V14.38.31 — Üst alan: maksimum 2 duyuru + 1 normal sabit mesaj.
+  const announcementMessages = messages
+    .filter(message => message.kind === "announcement")
+    .sort((a, b) => (Date.parse(b?.createdAt || "") || 0) - (Date.parse(a?.createdAt || "") || 0))
+    .slice(0, 2);
+
+  const normalPinnedMessage = messages
+    .filter(message => message.kind !== "announcement" && message.pinned)
+    .sort((a, b) => (Date.parse(b?.createdAt || "") || 0) - (Date.parse(a?.createdAt || "") || 0))[0] || null;
+
+  const topCards = [
+    ...announcementMessages.map(message => ({ ...message, topType:"announcement" })),
+    ...(normalPinnedMessage ? [{ ...normalPinnedMessage, topType:"pinned" }] : [])
+  ];
+
+  if (peoplePinnedBar) {
+    peoplePinnedBar.hidden = topCards.length === 0;
+    peoplePinnedBar.dataset.messageId = normalPinnedMessage?.messageId || "";
+    peoplePinnedBar.innerHTML = topCards.map(message => `
+      <span class="people-top-message-card ${message.topType === "announcement" ? "is-announcement" : "is-pinned"}"
+            ${message.topType === "pinned" ? `data-top-pinned-id="${peopleEscape(message.messageId || "")}"` : ""}>
+        <span class="people-pinned-bar-icon">${message.topType === "announcement" ? "📢" : "📌"}</span>
+        <span class="people-pinned-bar-copy">
+          <strong>${message.topType === "announcement" ? "Duyuru" : "Sabit mesaj"}</strong>
+          <small>${peopleEscape(peopleDisplayName(message.sender))}: ${peopleEscape(String(message.content || "").slice(0, 180))}</small>
+        </span>
+      </span>
+    `).join("");
   }
 
-  // Duyurular ayrı üst alanda gösterildiği için mesaj balonları arasından çıkarılır.
+  // Duyurular yalnızca üst alanda gösterilir; normal sohbet balonlarına düşmez.
   const flowMessages = messages.filter(message => message.kind !== "announcement");
 
   if (!flowMessages.length) {
@@ -8134,8 +8154,9 @@ document.addEventListener("click", (event) => {
     peopleAdminManageToggle?.setAttribute("aria-expanded", "false");
   }
 });
-peoplePinnedBar?.addEventListener("click", () => {
-  const id = peoplePinnedBar.dataset.messageId;
+peoplePinnedBar?.addEventListener("click", event => {
+  const pinnedCard = event.target.closest("[data-top-pinned-id]");
+  const id = pinnedCard?.dataset.topPinnedId || "";
   if (!id) return;
   const target = peopleMessages?.querySelector(`[data-general-message-id="${CSS.escape(id)}"]`);
   target?.scrollIntoView({ behavior:"smooth", block:"center" });
