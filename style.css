@@ -6473,3 +6473,108 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     margin-top:6px!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.25 — DESKTOP GENERAL MESSAGE WIDTH FIX
+   SADECE PC (>=721px)
+   - V14.38.24'te width:auto yüzünden çöken kart genişliklerini düzeltir.
+   - Mesajlar sabit mesajın hemen altında doğal akışta kalır.
+   - Normal kullanıcı kartı kompakt, owner/duyuru kartı daha geniştir.
+   - Mine sağda / theirs solda kalır.
+   - Mobil kurallara DOKUNMAZ.
+   ========================================================= */
+@media (min-width:721px){
+
+  /* Satır tüm orta kolonu kullanır; kartın hizasını satır belirler. */
+  .people-chat-panel #peopleMessages > .people-message-row{
+    display:flex!important;
+    flex:0 0 auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel #peopleMessages > .people-message-row.mine{
+    justify-content:flex-end!important;
+  }
+
+  .people-chat-panel #peopleMessages > .people-message-row.theirs{
+    justify-content:flex-start!important;
+  }
+
+  /* NORMAL USER:
+     width:auto kaldırıldı. Kart artık yazı kadar daralıp sütun gibi çökmez. */
+  .people-chat-panel #peopleMessages > .people-message-row.zatoi-user-message{
+    width:100%!important;
+    max-width:100%!important;
+  }
+
+  .people-chat-panel #peopleMessages > .people-message-row.zatoi-user-message > .people-message-bubble{
+    width:clamp(300px, 42%, 560px)!important;
+    max-width:560px!important;
+    min-width:300px!important;
+    height:auto!important;
+    min-height:0!important;
+    flex:0 0 auto!important;
+    box-sizing:border-box!important;
+  }
+
+  /* OWNER / DUYURU:
+     Uzun metin rahat okunur; yine de tüm ekranı gereksiz doldurmaz. */
+  .people-chat-panel #peopleMessages > .people-message-row.zatoi-owner-message{
+    width:100%!important;
+    max-width:100%!important;
+  }
+
+  .people-chat-panel #peopleMessages > .people-message-row.zatoi-owner-message > .people-message-bubble{
+    width:min(68%, 760px)!important;
+    max-width:760px!important;
+    min-width:420px!important;
+    height:auto!important;
+    min-height:0!important;
+    flex:0 0 auto!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Genel fallback: özel sınıf gelmeyen mesaj da çökmeyecek. */
+  .people-chat-panel #peopleMessages > .people-message-row:not(.zatoi-user-message):not(.zatoi-owner-message) > .people-message-bubble{
+    width:clamp(300px, 42%, 560px)!important;
+    max-width:560px!important;
+    min-width:300px!important;
+    height:auto!important;
+    min-height:0!important;
+    flex:0 0 auto!important;
+    box-sizing:border-box!important;
+  }
+
+  /* İçerik genişliği kartı taşırmasın. */
+  .people-chat-panel #peopleMessages .people-message-sender,
+  .people-chat-panel #peopleMessages .people-message-meta-badges,
+  .people-chat-panel #peopleMessages .people-message-text,
+  .people-chat-panel #peopleMessages .people-message-foot{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .people-chat-panel #peopleMessages .people-message-text{
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+
+  /* Mesajlar pinned alanın hemen altında, 12px aralıkla doğal yükseklikte akar. */
+  .people-chat-panel #peopleMessages{
+    justify-content:flex-start!important;
+    align-items:stretch!important;
+    align-content:flex-start!important;
+    gap:12px!important;
+  }
+}
+
