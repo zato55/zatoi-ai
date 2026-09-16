@@ -7466,42 +7466,56 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
 @media(max-width:720px){.people-message-edit-action{width:28px!important;min-width:28px!important;height:28px!important}}
 
 /* =========================================================
-   V14.42.1 — SADECE MOBİL GENEL SOHBET
-   Genel mesajlar, Özel Oda'daki solda kart + sağda balon
-   düzenine getirildi. PC ve Özel Oda değiştirilmedi.
+   V14.42.1 — MOBİL GENEL SOHBET: ÖZEL ODA GİBİ YAN KART
+   Sadece mobil Genel mesajları etkilenir.
+   Özel oda + masaüstü değişmez.
    ========================================================= */
 @media (max-width:720px){
+
+  /* Genel mesaj: kullanıcı kartı solda, balon sağda aynı satır */
   #peopleMessages > .people-message-row,
   #peopleMessages > .people-message-row.mine{
     display:grid!important;
-    grid-template-columns:155px minmax(0,1fr)!important;
+    grid-template-columns:142px minmax(0,1fr)!important;
+    grid-template-rows:auto!important;
     align-items:start!important;
-    gap:0!important;
     width:100%!important;
     max-width:100%!important;
+    gap:0!important;
+    padding:0!important;
   }
 
+  /* Kendi mesajında da kartı sağa taşımıyoruz; Özel Oda görünümü gibi solda kalır */
   #peopleMessages > .people-message-row > .people-message-user-card,
   #peopleMessages > .people-message-row.mine > .people-message-user-card{
     grid-column:1!important;
     grid-row:1!important;
-    width:155px!important;
-    min-width:155px!important;
-    max-width:155px!important;
-    min-height:80px!important;
+    position:relative!important;
+    width:142px!important;
+    min-width:142px!important;
+    max-width:142px!important;
+    min-height:72px!important;
+    height:auto!important;
     margin:0!important;
-    border-radius:14px 0 0 14px!important;
+    padding:9px 10px!important;
+    border-radius:13px 0 0 13px!important;
     align-self:start!important;
+    z-index:2!important;
   }
 
+  /* Kartın balona bağlanan oku */
   #peopleMessages > .people-message-row > .people-message-user-card::after,
   #peopleMessages > .people-message-row.mine > .people-message-user-card::after{
     left:auto!important;
     right:-9px!important;
-    top:24px!important;
+    top:22px!important;
+    width:17px!important;
+    height:17px!important;
     transform:rotate(45deg)!important;
+    z-index:3!important;
   }
 
+  /* Mesaj balonu kartın hemen sağından başlar */
   #peopleMessages > .people-message-row > .people-message-bubble,
   #peopleMessages > .people-message-row.mine > .people-message-bubble{
     grid-column:2!important;
@@ -7514,6 +7528,13 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     align-self:start!important;
   }
 
+  /* Kart içeriğini mobilde kompakt tut */
+  #peopleMessages .people-message-user-card .people-message-sender-avatar{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+  }
+
   #peopleMessages .people-message-user-card-copy{
     min-width:0!important;
   }
@@ -7523,5 +7544,27 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     overflow:hidden!important;
     text-overflow:ellipsis!important;
     white-space:nowrap!important;
+  }
+
+  #peopleMessages .people-message-user-card-role{
+    font-size:9px!important;
+    white-space:nowrap!important;
+  }
+}
+
+/* Çok dar telefonlarda karta biraz daha az alan ver */
+@media (max-width:390px){
+  #peopleMessages > .people-message-row,
+  #peopleMessages > .people-message-row.mine{
+    grid-template-columns:126px minmax(0,1fr)!important;
+  }
+
+  #peopleMessages > .people-message-row > .people-message-user-card,
+  #peopleMessages > .people-message-row.mine > .people-message-user-card{
+    width:126px!important;
+    min-width:126px!important;
+    max-width:126px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
   }
 }
