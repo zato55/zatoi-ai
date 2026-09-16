@@ -6770,3 +6770,64 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     margin-bottom:0!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.29 — PC GENEL SOHBET: ÖZEL ODA GİBİ ÜSTTEN AKIŞ
+   SADECE MASAÜSTÜ (>=721px)
+   - Mobil görünüm değişmez.
+   - Sabit mesaj başlığın hemen altında kalır.
+   - Genel mesaj yazma alanı sabit mesajın hemen altında olur.
+   - Yeni mesajlar bunun altında, yukarıdan aşağı doğru akar.
+   - Özel oda mantığıyla aynı görsel sıra elde edilir.
+   ========================================================= */
+@media (min-width:721px){
+
+  .app.people-chat-mode > .people-chat-panel > .people-conversation{
+    grid-template-rows:
+      var(--people-pc-head-height,80px)
+      auto
+      auto
+      minmax(0,1fr)!important;
+  }
+
+  .app.people-chat-mode #peoplePinnedBar{
+    grid-row:2!important;
+  }
+
+  .app.people-chat-mode #peopleComposer{
+    grid-row:3!important;
+    position:relative!important;
+    top:auto!important;
+    bottom:auto!important;
+    margin:0!important;
+    padding:10px 14px!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+    background:var(--panel,#0f1620)!important;
+    z-index:25!important;
+  }
+
+  .app.people-chat-mode #peopleComposer input{
+    height:46px!important;
+    border-radius:12px!important;
+  }
+
+  .app.people-chat-mode #peopleComposer button{
+    width:50px!important;
+    min-width:50px!important;
+    height:46px!important;
+    border-radius:12px!important;
+  }
+
+  .app.people-chat-mode #peopleMessages{
+    grid-row:4!important;
+    min-height:0!important;
+    justify-content:flex-start!important;
+    align-content:flex-start!important;
+    padding-top:12px!important;
+    padding-bottom:18px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+}
