@@ -6578,4 +6578,123 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
   }
 }
 
-\n\n/* =========================================================\n   V14.38.26 — PC TOP GENERAL CHAT / MOBILE-LIKE MESSAGE FLOW\n   SADECE MASAÜSTÜ (>=721px)\n   - Genel Sohbet orta kolonu sayfanın en üstünden başlar.\n   - Sol marka ve sağ mod anahtarı kendi köşelerinde kalır.\n   - Sabit mesaj / duyuru Genel Sohbet başlığının hemen altındadır.\n   - Yeni mesajlar pinned alanının hemen altında üstten aşağı akar.\n   - Mesaj kartları mobildeki kompakt yapıya yaklaşır.\n   - Normal kullanıcılar sender-id bazlı hafif ton farkı alır.\n   - Mobil ve AI modu etkilenmez.\n   ========================================================= */\n@media (min-width:721px){\n  .app.people-chat-mode > .people-chat-panel{\n    grid-template-columns:260px minmax(0,1fr) 260px!important;\n    grid-template-rows:72px minmax(0,1fr)!important;\n    height:100%!important;\n    min-height:0!important;\n    overflow:hidden!important;\n    position:relative!important;\n  }\n\n  /* Üst şerit artık orta kolonu kapatmaz: marka solda, mod anahtarı sağda. */\n  .app.people-chat-mode > .people-chat-panel > .people-mode-top{\n    grid-column:1 / -1!important;\n    grid-row:1!important;\n    display:grid!important;\n    grid-template-columns:260px minmax(0,1fr) 260px!important;\n    align-items:center!important;\n    min-height:72px!important;\n    padding:0!important;\n    background:transparent!important;\n    border-bottom:1px solid var(--border,#263548)!important;\n    pointer-events:none!important;\n    z-index:40!important;\n  }\n  .people-mode-top .people-mode-brand{\n    grid-column:1!important;\n    padding:0 16px!important;\n    pointer-events:auto!important;\n  }\n  .people-mode-top .people-mode-switch{\n    grid-column:3!important;\n    justify-self:end!important;\n    margin-right:12px!important;\n    pointer-events:auto!important;\n  }\n\n  .app.people-chat-mode > .people-chat-panel > .people-active-panel{\n    grid-column:1!important;\n    grid-row:2!important;\n    min-height:0!important;\n  }\n  .app.people-chat-mode > .people-chat-panel > .people-rooms-panel{\n    grid-column:3!important;\n    grid-row:2!important;\n    min-height:0!important;\n  }\n\n  /* Orta kolon gerçek anlamda sayfanın tepesinden başlar. */\n  .app.people-chat-mode > .people-chat-panel > .people-conversation{\n    grid-column:2!important;\n    grid-row:1 / 3!important;\n    display:grid!important;\n    grid-template-rows:auto auto minmax(0,1fr) auto!important;\n    height:100%!important;\n    min-height:0!important;\n    margin:0!important;\n    padding:0!important;\n    z-index:45!important;\n    border-left:1px solid var(--border,#263548)!important;\n    border-right:1px solid var(--border,#263548)!important;\n  }\n  .people-chat-panel .people-conversation-head{\n    grid-row:1!important;\n    min-height:72px!important;\n    margin:0!important;\n    padding:10px 18px!important;\n    box-sizing:border-box!important;\n  }\n  .people-chat-panel #peoplePinnedBar{\n    grid-row:2!important;\n    position:relative!important;\n    top:auto!important;\n    z-index:30!important;\n    margin:0!important;\n    width:100%!important;\n  }\n  .people-chat-panel #peopleMessages{\n    grid-row:3!important;\n    display:flex!important;\n    flex-direction:column!important;\n    justify-content:flex-start!important;\n    align-items:stretch!important;\n    gap:10px!important;\n    min-height:0!important;\n    padding:12px 18px 18px!important;\n    overflow-y:auto!important;\n    overflow-x:hidden!important;\n    scroll-behavior:smooth!important;\n  }\n  .people-chat-panel #peopleComposer{\n    grid-row:4!important;\n  }\n\n  /* Mobil hissine yakın, kompakt masaüstü kartları. */\n  .people-chat-panel #peopleMessages > .people-message-row{\n    width:100%!important;\n    max-width:100%!important;\n    min-width:0!important;\n    height:auto!important;\n    min-height:0!important;\n    flex:0 0 auto!important;\n    margin:0!important;\n    padding:0!important;\n  }\n  .people-chat-panel #peopleMessages > .people-message-row.mine{justify-content:flex-end!important}\n  .people-chat-panel #peopleMessages > .people-message-row.theirs{justify-content:flex-start!important}\n\n  .people-chat-panel #peopleMessages > .people-message-row > .people-message-bubble{\n    width:clamp(320px,48%,620px)!important;\n    min-width:320px!important;\n    max-width:620px!important;\n    height:auto!important;\n    min-height:0!important;\n    padding:11px 13px 9px!important;\n    border-radius:18px!important;\n    box-sizing:border-box!important;\n  }\n  .people-chat-panel #peopleMessages > .people-message-row.zatoi-owner-message > .people-message-bubble{\n    width:min(64%,760px)!important;\n    min-width:420px!important;\n    max-width:760px!important;\n  }\n  .people-chat-panel #peopleMessages .people-message-sender{\n    min-height:0!important;\n    margin:0!important;\n    gap:6px!important;\n  }\n  .people-chat-panel #peopleMessages .people-message-meta-badges{\n    margin:5px 0 6px!important;\n  }\n  .people-chat-panel #peopleMessages .people-message-text{\n    width:100%!important;\n    min-height:0!important;\n    margin:0!important;\n    padding:8px 10px!important;\n    border-radius:13px!important;\n    background:rgba(4,15,31,.24)!important;\n    white-space:pre-wrap!important;\n    overflow-wrap:anywhere!important;\n    word-break:break-word!important;\n    box-sizing:border-box!important;\n  }\n  .people-chat-panel #peopleMessages .people-message-foot{\n    min-height:0!important;\n    margin-top:5px!important;\n  }\n\n  /* Farklı normal kullanıcılar aynı mavi kart içinde kaybolmasın.\n     Ton farkı bilinçli olarak hafif tutuldu. */\n  .people-chat-panel #peopleMessages .zatoi-user-message.people-sender-tone-0 > .people-message-bubble{\n    background:linear-gradient(145deg,rgba(18,86,163,.94),rgba(31,74,151,.94))!important;\n  }\n  .people-chat-panel #peopleMessages .zatoi-user-message.people-sender-tone-1 > .people-message-bubble{\n    background:linear-gradient(145deg,rgba(17,96,145,.94),rgba(31,79,139,.94))!important;\n  }\n  .people-chat-panel #peopleMessages .zatoi-user-message.people-sender-tone-2 > .people-message-bubble{\n    background:linear-gradient(145deg,rgba(35,83,158,.94),rgba(52,67,145,.94))!important;\n  }\n  .people-chat-panel #peopleMessages .zatoi-user-message.people-sender-tone-3 > .people-message-bubble{\n    background:linear-gradient(145deg,rgba(22,91,153,.94),rgba(45,72,132,.94))!important;\n  }\n}\n
+/* =========================================================
+   V14.38.27 — PC GENERAL COLUMN REALLY FROM PAGE TOP
+   SADECE MASAÜSTÜ (>=721px)
+   - Orta Genel Sohbet kolonu uygulamanın en tepesinden başlar.
+   - Sol Aktif Kullanıcılar ve sağ Özel Odalar eski yerinde kalır.
+   - Sabit mesaj/duyuru başlığın hemen altında kalır.
+   - Mesajlar onun altından doğal şekilde akar.
+   - Mobil kurallara dokunulmaz.
+   ========================================================= */
+@media (min-width:721px){
+
+  .app.people-chat-mode > .people-chat-panel{
+    grid-template-columns:260px minmax(0,1fr) 260px!important;
+    grid-template-rows:72px minmax(0,1fr)!important;
+    height:100vh!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    position:relative!important;
+  }
+
+  /* Üst marka / mod alanı sadece sol ve sağ köşeleri kullanır.
+     Orta kolonun üstünü kapatmaz. */
+  .app.people-chat-mode > .people-chat-panel > .people-mode-top{
+    grid-column:1 / -1!important;
+    grid-row:1!important;
+    display:grid!important;
+    grid-template-columns:260px minmax(0,1fr) 260px!important;
+    align-items:center!important;
+    width:100%!important;
+    min-height:72px!important;
+    padding:0!important;
+    margin:0!important;
+    background:transparent!important;
+    border-bottom:1px solid var(--border,#263548)!important;
+    pointer-events:none!important;
+    z-index:20!important;
+  }
+
+  .app.people-chat-mode .people-mode-brand{
+    grid-column:1!important;
+    padding:0 16px!important;
+    pointer-events:auto!important;
+  }
+
+  .app.people-chat-mode .people-mode-switch{
+    grid-column:3!important;
+    justify-self:end!important;
+    margin-right:12px!important;
+    pointer-events:auto!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel > .people-active-panel{
+    grid-column:1!important;
+    grid-row:2!important;
+    min-height:0!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel > .people-rooms-panel{
+    grid-column:3!important;
+    grid-row:2!important;
+    min-height:0!important;
+  }
+
+  /* ANA DÜZELTME:
+     Genel Sohbet, people-mode-top satırını da kapsayarak en tepeden başlar. */
+  .app.people-chat-mode > .people-chat-panel > .people-conversation{
+    grid-column:2!important;
+    grid-row:1 / 3!important;
+    align-self:stretch!important;
+    display:grid!important;
+    grid-template-rows:auto auto minmax(0,1fr) auto!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    position:relative!important;
+    z-index:30!important;
+    background:var(--bg,#0b0f14)!important;
+    border-left:1px solid var(--border,#263548)!important;
+    border-right:1px solid var(--border,#263548)!important;
+    border-top:3px solid rgba(38,132,218,.72)!important;
+  }
+
+  .app.people-chat-mode .people-conversation-head{
+    grid-row:1!important;
+    min-height:72px!important;
+    margin:0!important;
+    padding:10px 18px!important;
+    box-sizing:border-box!important;
+  }
+
+  .app.people-chat-mode #peoplePinnedBar{
+    grid-row:2!important;
+    width:100%!important;
+    margin:0!important;
+    position:relative!important;
+    top:auto!important;
+    z-index:30!important;
+  }
+
+  .app.people-chat-mode #peopleMessages{
+    grid-row:3!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-start!important;
+    align-items:stretch!important;
+    align-content:flex-start!important;
+    gap:10px!important;
+    min-height:0!important;
+    padding:12px 18px 18px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+
+  .app.people-chat-mode #peopleComposer{
+    grid-row:4!important;
+  }
+}
