@@ -5756,3 +5756,76 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     text-overflow:clip!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.14 — EXACT MOBILE PINNED BAR FIX
+   Gerçek DOM selector'ları kullanılır.
+   Sabit alan artık dev boşluk oluşturmaz; metin satıra sarılır.
+   ========================================================= */
+@media (max-width:800px){
+
+  #peoplePinnedBar.people-pinned-bar{
+    display:flex!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:58px!important;
+    max-height:none!important;
+    align-items:flex-start!important;
+    gap:9px!important;
+    padding:10px 12px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+
+  #peoplePinnedBar.people-pinned-bar[hidden]{
+    display:none!important;
+  }
+
+  #peoplePinnedBar .people-pinned-bar-icon{
+    flex:0 0 auto!important;
+    margin-top:2px!important;
+  }
+
+  #peoplePinnedBar .people-pinned-bar-copy{
+    display:flex!important;
+    flex:1 1 0!important;
+    min-width:0!important;
+    width:auto!important;
+    max-width:100%!important;
+    flex-direction:column!important;
+    gap:2px!important;
+    overflow:visible!important;
+  }
+
+  #peoplePinnedBar .people-pinned-bar-copy strong{
+    display:block!important;
+    width:auto!important;
+    max-width:100%!important;
+    white-space:normal!important;
+    line-height:1.2!important;
+  }
+
+  #peoplePinnedBarText{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+    line-height:1.35!important;
+  }
+
+  #peoplePinnedBar .people-pinned-bar-go{
+    flex:0 0 auto!important;
+    align-self:center!important;
+  }
+}
