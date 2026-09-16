@@ -6831,3 +6831,56 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     overflow-x:hidden!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.30 — PC ÖZEL ODA AÇIKKEN GENEL SOHBET AKIŞ FIX
+   SADECE MASAÜSTÜ (>=721px)
+   Genel yarı:
+   Başlık -> Sabit mesaj -> Mesaj yazma -> Mesajlar
+   Özel yarı kendi düzenini korur.
+   Mobil değişmez.
+   ========================================================= */
+@media (min-width:721px){
+
+  .app.people-chat-mode > .people-chat-panel[data-mobile-view="private"] > .people-conversation{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    grid-template-rows:
+      var(--people-pc-head-height,80px)
+      auto
+      auto
+      minmax(0,1fr)!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel[data-mobile-view="private"] > .people-conversation > .people-conversation-head{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel[data-mobile-view="private"] > .people-conversation > #peoplePinnedBar{
+    grid-column:1!important;
+    grid-row:2!important;
+    min-width:0!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel[data-mobile-view="private"] > .people-conversation > #peopleComposer{
+    grid-column:1!important;
+    grid-row:3!important;
+    min-width:0!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel[data-mobile-view="private"] > .people-conversation > #peopleMessages{
+    grid-column:1!important;
+    grid-row:4!important;
+    min-width:0!important;
+    min-height:0!important;
+  }
+
+  .app.people-chat-mode > .people-chat-panel[data-mobile-view="private"] > .people-conversation > .people-private-dock{
+    grid-column:2!important;
+    grid-row:1 / 5!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:100%!important;
+  }
+}
