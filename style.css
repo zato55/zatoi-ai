@@ -5829,3 +5829,43 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     align-self:center!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.15 — COMPACT MOBILE PINNED BAR
+   Metin sarma korunur; yalnız gereksiz dikey boşluk kaldırılır.
+   ========================================================= */
+@media (max-width:800px){
+
+  #peoplePinnedBar.people-pinned-bar{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:10px 14px 10px 18px!important;
+    align-items:center!important;
+    align-content:center!important;
+    justify-content:flex-start!important;
+  }
+
+  #peoplePinnedBar .people-pinned-bar-copy{
+    align-self:center!important;
+    justify-content:center!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  #peoplePinnedBar .people-pinned-bar-copy strong,
+  #peoplePinnedBarText{
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+  }
+
+  #peoplePinnedBar .people-pinned-bar-go{
+    align-self:center!important;
+    margin-left:auto!important;
+  }
+}
