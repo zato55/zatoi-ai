@@ -6024,3 +6024,40 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     justify-content:flex-end!important;
   }
 }
+
+
+/* =========================================================
+   V14.38.18 — MOBILE GENERAL MESSAGE LIST STRETCH FIX
+   Kök düzeltme: #peopleMessages mobilde normal block akışında tutulur.
+   Böylece viewport'un boş yüksekliği mesaj satırlarına dağıtılamaz.
+   Sabit mesaj alanına dokunulmaz.
+   ========================================================= */
+@media (max-width:720px){
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages.people-messages{
+    display:block!important;
+    min-height:0!important;
+    height:auto!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    align-content:initial!important;
+    align-items:initial!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row{
+    display:flex!important;
+    flex:none!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-self:auto!important;
+    margin:10px 0!important;
+  }
+
+  .people-chat-panel[data-mobile-view="general"] #peopleMessages > .people-message-row > .people-message-bubble{
+    flex:none!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+}
