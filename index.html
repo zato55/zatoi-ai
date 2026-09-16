@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.38.31 - 2 DUYURU + 1 SABIT MESAJ -->
+<!-- ZATOI AI INDEX V14.39.0 - MESAJ ETKILESIM PAKETI A1: YANITLAMA -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.38.28">
+  <link rel="stylesheet" href="./style.css?v=14.39.0">
 </head>
 
 <body>
@@ -614,6 +614,11 @@
       </div>
 
       <form id="peopleComposer" class="people-composer" aria-disabled="false">
+        <div id="peopleReplyPreview" class="people-reply-preview" hidden>
+          <span class="people-reply-preview-icon">↩️</span>
+          <span class="people-reply-preview-copy"><strong id="peopleReplyPreviewName">Yanıt</strong><small id="peopleReplyPreviewText"></small></span>
+          <button id="peopleReplyCancel" class="people-reply-cancel" type="button" aria-label="Yanıtı iptal et">×</button>
+        </div>
         <input id="peopleMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="Genel sohbete mesaj yaz...">
         <button id="peopleSendButton" type="submit" aria-label="Mesaj gönder">➤</button>
       </form>
@@ -637,6 +642,11 @@
         </div>
         <div id="peoplePrivateMessages" class="people-private-messages"></div>
         <form id="peoplePrivateComposer" class="people-private-composer">
+          <div id="peoplePrivateReplyPreview" class="people-reply-preview people-private-reply-preview" hidden>
+            <span class="people-reply-preview-icon">↩️</span>
+            <span class="people-reply-preview-copy"><strong id="peoplePrivateReplyPreviewName">Yanıt</strong><small id="peoplePrivateReplyPreviewText"></small></span>
+            <button id="peoplePrivateReplyCancel" class="people-reply-cancel" type="button" aria-label="Yanıtı iptal et">×</button>
+          </div>
           <input id="peoplePrivateInput" type="text" maxlength="2000" autocomplete="off" placeholder="Özel mesaj yaz...">
           <button id="peoplePrivateSend" type="submit" aria-label="Özel mesaj gönder">➤</button>
         </form>
@@ -7411,6 +7421,10 @@ const peopleConversationStatus = document.getElementById("peopleConversationStat
 const peopleComposer = document.getElementById("peopleComposer");
 const peopleMessageInput = document.getElementById("peopleMessageInput");
 const peopleSendButton = document.getElementById("peopleSendButton");
+const peopleReplyPreview = document.getElementById("peopleReplyPreview");
+const peopleReplyPreviewName = document.getElementById("peopleReplyPreviewName");
+const peopleReplyPreviewText = document.getElementById("peopleReplyPreviewText");
+const peopleReplyCancel = document.getElementById("peopleReplyCancel");
 const peopleGeneralButton = document.getElementById("peopleGeneralButton");
 const peopleAdminChatTools = document.getElementById("peopleAdminChatTools");
 const peopleAdminManageToggle = document.getElementById("peopleAdminManageToggle");
@@ -7429,6 +7443,10 @@ const peoplePrivateMessages = document.getElementById("peoplePrivateMessages");
 const peoplePrivateComposer = document.getElementById("peoplePrivateComposer");
 const peoplePrivateInput = document.getElementById("peoplePrivateInput");
 const peoplePrivateSend = document.getElementById("peoplePrivateSend");
+const peoplePrivateReplyPreview = document.getElementById("peoplePrivateReplyPreview");
+const peoplePrivateReplyPreviewName = document.getElementById("peoplePrivateReplyPreviewName");
+const peoplePrivateReplyPreviewText = document.getElementById("peoplePrivateReplyPreviewText");
+const peoplePrivateReplyCancel = document.getElementById("peoplePrivateReplyCancel");
 const peoplePrivateMinimize = document.getElementById("peoplePrivateMinimize");
 const peoplePrivateClose = document.getElementById("peoplePrivateClose");
 const peopleMobileActiveTab = document.getElementById("peopleMobileActiveTab");
@@ -7453,6 +7471,53 @@ let peopleConversationMode = "general"; // Orta alan V14.32 itibarıyla daima ge
 let peopleCurrentPartner = null;
 let peoplePollTimer = null;
 let peopleLastMessageSignature = "";
+let peopleGeneralReplyTarget = null;
+let peoplePrivateReplyTarget = null;
+
+function peopleReplySnippet(value) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, 140);
+}
+
+function clearPeopleGeneralReply() {
+  peopleGeneralReplyTarget = null;
+  if (peopleReplyPreview) peopleReplyPreview.hidden = true;
+  if (peopleReplyPreviewName) peopleReplyPreviewName.textContent = "Yanıt";
+  if (peopleReplyPreviewText) peopleReplyPreviewText.textContent = "";
+}
+
+function setPeopleGeneralReply(message) {
+  if (!message?.messageId || message.kind === "announcement") return;
+  peopleGeneralReplyTarget = {
+    messageId: String(message.messageId),
+    senderName: peopleDisplayName(message.sender),
+    content: String(message.content || "")
+  };
+  if (peopleReplyPreviewName) peopleReplyPreviewName.textContent = `${peopleGeneralReplyTarget.senderName} adlı kullanıcıya yanıt`;
+  if (peopleReplyPreviewText) peopleReplyPreviewText.textContent = peopleReplySnippet(peopleGeneralReplyTarget.content);
+  if (peopleReplyPreview) peopleReplyPreview.hidden = false;
+  peopleMessageInput?.focus();
+}
+
+function clearPeoplePrivateReply() {
+  peoplePrivateReplyTarget = null;
+  if (peoplePrivateReplyPreview) peoplePrivateReplyPreview.hidden = true;
+  if (peoplePrivateReplyPreviewName) peoplePrivateReplyPreviewName.textContent = "Yanıt";
+  if (peoplePrivateReplyPreviewText) peoplePrivateReplyPreviewText.textContent = "";
+}
+
+function setPeoplePrivateReply(message) {
+  if (!message?.messageId) return;
+  const mine = String(message.senderId) === String(currentUser?.userId);
+  peoplePrivateReplyTarget = {
+    messageId: String(message.messageId),
+    senderName: mine ? "Sen" : peopleDisplayName(peopleCurrentPartner),
+    content: String(message.content || "")
+  };
+  if (peoplePrivateReplyPreviewName) peoplePrivateReplyPreviewName.textContent = `${peoplePrivateReplyTarget.senderName} mesajına yanıt`;
+  if (peoplePrivateReplyPreviewText) peoplePrivateReplyPreviewText.textContent = peopleReplySnippet(peoplePrivateReplyTarget.content);
+  if (peoplePrivateReplyPreview) peoplePrivateReplyPreview.hidden = false;
+  peoplePrivateInput?.focus();
+}
 
 function peopleEscape(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -7785,9 +7850,14 @@ function renderPeopleMessages(messages) {
             ${message.kind === "announcement" ? '<span class="people-announcement-badge">📢 DUYURU</span>' : ''}
             ${message.pinned ? '<span class="people-pinned-badge">📌 SABİT</span>' : ''}
           </div>
+          ${message.reply ? `<button class="people-replied-message" type="button" data-jump-reply="${peopleEscape(message.reply.messageId || "")}">
+            <strong>↩ ${peopleEscape(peopleDisplayName(message.reply.sender))}</strong>
+            <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
+          </button>` : ""}
           <div class="people-message-text">${peopleEscape(message.content)}</div>
           <div class="people-message-foot">
             <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+            <button class="people-message-reply-action" type="button" data-general-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
             ${peopleIsAdmin() ? `<span class="people-message-admin-actions">
               <button type="button" data-admin-pin="${peopleEscape(message.messageId)}" data-pinned="${message.pinned ? "1" : "0"}" title="${message.pinned ? "Sabitlemeyi kaldır" : "Mesajı sabitle"}">📌</button>
               <button type="button" data-admin-delete="${peopleEscape(message.messageId)}" title="Mesajı sil">🗑️</button>
@@ -7810,6 +7880,22 @@ function renderPeopleMessages(messages) {
       button.dataset.pinned === "1"
     ));
   });
+  peopleMessages.querySelectorAll("[data-general-reply]").forEach(button => {
+    button.addEventListener("click", () => {
+      const message = flowMessages.find(item => String(item.messageId) === String(button.dataset.generalReply));
+      if (message) setPeopleGeneralReply(message);
+    });
+  });
+  peopleMessages.querySelectorAll("[data-jump-reply]").forEach(button => {
+    button.addEventListener("click", () => {
+      const id = String(button.dataset.jumpReply || "");
+      if (!id) return;
+      const target = peopleMessages.querySelector(`[data-general-message-id="${CSS.escape(id)}"]`);
+      target?.scrollIntoView({ behavior:"smooth", block:"center" });
+      target?.classList.add("people-message-highlight");
+      setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
+    });
+  });
 }
 
 async function loadPeopleMessages({ silent = false } = {}) {
@@ -7831,6 +7917,8 @@ async function loadPeopleMessages({ silent = false } = {}) {
 
 
 async function selectPeopleGeneral() {
+  clearPeopleGeneralReply();
+  clearPeoplePrivateReply();
   peopleConversationMode = "general";
   syncPrivateIntoMobileConversation(false);
   peopleCurrentRoomId = "";
@@ -7952,13 +8040,36 @@ function renderPeoplePrivateMessages(messages) {
     const mine = String(message.senderId) === String(currentUser?.userId);
     return `
       <div class="people-private-message-row ${mine ? "mine" : "theirs"}">
-        <div class="people-private-bubble">
+        <div class="people-private-bubble" data-private-message-id="${peopleEscape(message.messageId || "")}">
+          ${message.reply ? `<button class="people-private-replied-message" type="button" data-private-jump-reply="${peopleEscape(message.reply.messageId || "")}">
+            <strong>↩ ${String(message.reply.senderId) === String(currentUser?.userId) ? "Sen" : peopleEscape(peopleDisplayName(peopleCurrentPartner))}</strong>
+            <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
+          </button>` : ""}
           <div>${peopleEscape(message.content)}</div>
-          <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+          <div class="people-private-message-foot">
+            <time>${peopleEscape(peopleTime(message.createdAt))}</time>
+            <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
+          </div>
         </div>
       </div>`;
   }).join("");
   peoplePrivateMessages.scrollTop = window.matchMedia("(max-width: 720px)").matches ? peoplePrivateMessages.scrollHeight : 0;
+  peoplePrivateMessages.querySelectorAll("[data-private-reply]").forEach(button => {
+    button.addEventListener("click", () => {
+      const message = messages.find(item => String(item.messageId) === String(button.dataset.privateReply));
+      if (message) setPeoplePrivateReply(message);
+    });
+  });
+  peoplePrivateMessages.querySelectorAll("[data-private-jump-reply]").forEach(button => {
+    button.addEventListener("click", () => {
+      const id = String(button.dataset.privateJumpReply || "");
+      if (!id) return;
+      const target = peoplePrivateMessages.querySelector(`[data-private-message-id="${CSS.escape(id)}"]`);
+      target?.scrollIntoView({ behavior:"smooth", block:"center" });
+      target?.classList.add("people-message-highlight");
+      setTimeout(() => target?.classList.remove("people-message-highlight"), 1400);
+    });
+  });
 }
 
 async function loadPeoplePrivateMessages({ silent = false } = {}) {
@@ -7981,6 +8092,7 @@ async function loadPeoplePrivateMessages({ silent = false } = {}) {
 
 async function selectPeopleRoom(roomId) {
   if (!roomId) return;
+  clearPeoplePrivateReply();
 
   // V14.35.2: Sağdaki AÇIK özel odaya tekrar tıklanınca kapat.
   const clickedRoomId = String(roomId);
@@ -8038,8 +8150,13 @@ async function sendPeoplePrivateMessage(event) {
   peoplePrivateInput.disabled = true;
   if (peoplePrivateSend) peoplePrivateSend.disabled = true;
   try {
-    await peopleApi("send_message", { roomId: peopleCurrentRoomId, content });
+    await peopleApi("send_message", {
+      roomId: peopleCurrentRoomId,
+      content,
+      replyToMessageId: peoplePrivateReplyTarget?.messageId || ""
+    });
     peoplePrivateInput.value = "";
+    clearPeoplePrivateReply();
     await Promise.all([loadPeoplePrivateMessages(), refreshPeopleRooms()]);
   } catch (error) {
     alert(error.message);
@@ -8059,8 +8176,12 @@ async function sendPeopleMessage(event) {
   peopleMessageInput.disabled = true;
   peopleSendButton.disabled = true;
   try {
-    await peopleApi("send_general_message", { content });
+    await peopleApi("send_general_message", {
+      content,
+      replyToMessageId: peopleGeneralReplyTarget?.messageId || ""
+    });
     peopleMessageInput.value = "";
+    clearPeopleGeneralReply();
     await loadPeopleGeneralMessages();
   } catch (error) {
     alert(error.message);
@@ -8175,6 +8296,7 @@ peopleAdminAnnouncement?.addEventListener("click", async () => {
 });
 peoplePublicProfileModerate?.addEventListener("click", () => peopleAdminModerateUser(peoplePublicProfileUserId));
 peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
+peoplePrivateReplyCancel?.addEventListener("click", clearPeoplePrivateReply);
 peoplePrivateSend?.addEventListener("click", (event) => {
   event.preventDefault();
   sendPeoplePrivateMessage(event);
@@ -8222,6 +8344,7 @@ peopleRefreshActive?.addEventListener("click", refreshPeopleActive);
 peopleRefreshRooms?.addEventListener("click", refreshPeopleRooms);
 peopleUserSearch?.addEventListener("input", renderPeopleActiveUsers);
 peopleComposer?.addEventListener("submit", sendPeopleMessage);
+peopleReplyCancel?.addEventListener("click", clearPeopleGeneralReply);
 
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && peopleChatActive) {
