@@ -8473,3 +8473,39 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     border-top:1px solid rgba(255,255,255,.085)!important;
   }
 }
+
+/* =========================================================
+   V14.44.4 — ÖZEL SOHBET RENK AYRIMI
+   SADECE RENK.
+   Boyut, padding, grid, yükseklik, genişlik, gruplama ve
+   mobil/desktop yerleşim kurallarına dokunulmaz.
+   ========================================================= */
+
+/* Karşı taraf: mevcut özel sohbet moru */
+#peoplePrivateMessages
+> .people-private-message-row.people-private-message-group
+> .people-private-message-group-stack{
+  background:linear-gradient(
+    145deg,
+    rgba(61,38,103,.94),
+    rgba(74,42,116,.94)
+  )!important;
+  border-color:rgba(139,92,246,.34)!important;
+}
+
+/* Benim mesajlarım: mavi */
+#peoplePrivateMessages
+> .people-private-message-row.people-private-message-group.mine
+> .people-private-message-group-stack{
+  background:linear-gradient(
+    145deg,
+    rgba(20,91,174,.96),
+    rgba(28,105,204,.96) 48%,
+    rgba(47,66,151,.96)
+  )!important;
+  border-color:rgba(74,144,226,.48)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 6px 16px rgba(0,0,0,.13),
+    0 0 13px rgba(42,128,255,.10)!important;
+}
