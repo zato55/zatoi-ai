@@ -641,6 +641,93 @@
 }
 </style>
 
+
+<style id="zatoi-global-account-menu-portal-style">
+@media (min-width:801px){
+  /* Dropdown body altında olduğu için AI/Sohbet parent görünürlüğünden etkilenmez. */
+  body > #desktopAccountDropdown{
+    position:fixed!important;
+    display:none!important;
+    width:190px!important;
+    max-width:calc(100vw - 16px)!important;
+    max-height:calc(100vh - 16px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    z-index:999999!important;
+    background:#191b20!important;
+    border:1px solid #3a3e48!important;
+    border-radius:12px!important;
+    padding:6px!important;
+    box-shadow:0 16px 38px rgba(0,0,0,.48)!important;
+  }
+
+  body > #desktopAccountDropdown.open{
+    display:flex!important;
+    flex-direction:column!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+
+  /* Parent değiştiği için eski #app descendant kurallarını global menüye yeniden uygula. */
+  body > #desktopAccountDropdown .account-area{
+    display:contents!important;
+  }
+
+  body > #desktopAccountDropdown .account-name,
+  body > #desktopAccountDropdown .logout-btn,
+  body > #desktopAccountDropdown .settings-btn,
+  body > #desktopAccountDropdown .admin-btn,
+  body > #desktopAccountDropdown .admin-btn.show{
+    display:grid!important;
+    grid-template-columns:22px minmax(0,1fr)!important;
+    align-items:center!important;
+    justify-items:start!important;
+    column-gap:7px!important;
+    width:100%!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+    padding:0 10px!important;
+    box-sizing:border-box!important;
+    border:0!important;
+    border-radius:8px!important;
+    background:#17191e!important;
+    color:var(--zatoi-text,#f5f5f5)!important;
+    font:inherit!important;
+    font-size:13px!important;
+    font-weight:650!important;
+    line-height:1!important;
+    text-align:left!important;
+    white-space:nowrap!important;
+    cursor:pointer!important;
+  }
+
+  body > #desktopAccountDropdown .account-name:hover,
+  body > #desktopAccountDropdown .logout-btn:hover,
+  body > #desktopAccountDropdown .settings-btn:hover,
+  body > #desktopAccountDropdown .admin-btn:hover,
+  body > #desktopAccountDropdown .admin-btn.show:hover{
+    background:#24272e!important;
+  }
+
+  body > #desktopAccountDropdown .logout-btn{
+    color:#ff8f98!important;
+  }
+
+  body > #desktopAccountDropdown .admin-btn[hidden]{
+    display:none!important;
+  }
+
+  body > #desktopAccountDropdown .settings-btn > span,
+  body > #desktopAccountDropdown .admin-btn > span{
+    grid-column:2!important;
+    margin:0!important;
+    line-height:1!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -9379,6 +9466,86 @@ checkAuth();
     subtree: true,
     characterData: true
   });
+})();
+</script>
+
+
+<script id="zatoi-global-account-menu-portal-fix">
+(() => {
+  const dropdown = document.getElementById("desktopAccountDropdown");
+  if (!dropdown) return;
+
+  /* Kritik düzeltme:
+     Dropdown AI header içinde kalırsa Sohbet modunda gizlenen parent ile birlikte kaybolur.
+     Body'ye taşıyarak gerçekten global hale getiriyoruz. */
+  if (dropdown.parentElement !== document.body) {
+    document.body.appendChild(dropdown);
+  }
+
+  const triggers = [...document.querySelectorAll(".stable-bar-menu-btn")];
+  if (!triggers.length) return;
+
+  const closeMenu = () => {
+    dropdown.classList.remove("open");
+    dropdown.setAttribute("aria-hidden", "true");
+    triggers.forEach(btn => btn.setAttribute("aria-expanded", "false"));
+  };
+
+  const openFor = (btn) => {
+    closeMenu();
+
+    dropdown.classList.add("open");
+    dropdown.setAttribute("aria-hidden", "false");
+    btn.setAttribute("aria-expanded", "true");
+
+    requestAnimationFrame(() => {
+      const margin = 8;
+      const gap = 8;
+      const b = btn.getBoundingClientRect();
+      const d = dropdown.getBoundingClientRect();
+
+      let left = b.right - d.width;
+      left = Math.max(margin, Math.min(left, window.innerWidth - d.width - margin));
+
+      let top = b.bottom + gap;
+      if (top + d.height > window.innerHeight - margin) {
+        top = b.top - d.height - gap;
+      }
+      top = Math.max(margin, Math.min(top, window.innerHeight - d.height - margin));
+
+      dropdown.style.position = "fixed";
+      dropdown.style.left = Math.round(left) + "px";
+      dropdown.style.top = Math.round(top) + "px";
+      dropdown.style.right = "auto";
+      dropdown.style.bottom = "auto";
+      dropdown.style.zIndex = "999999";
+    });
+  };
+
+  /* Capture kullanıyoruz; eski AI-only listener'ların davranışından bağımsız çalışır. */
+  triggers.forEach(btn => {
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (dropdown.classList.contains("open") &&
+          btn.getAttribute("aria-expanded") === "true") {
+        closeMenu();
+      } else {
+        openFor(btn);
+      }
+    }, true);
+  });
+
+  dropdown.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+
+  document.addEventListener("click", closeMenu);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
+  });
+  window.addEventListener("resize", closeMenu);
 })();
 </script>
 
