@@ -8759,3 +8759,107 @@ html {
     display:flex!important;
   }
 }
+
+
+/* =========================================================
+   V14.47.1 — MOBİL SOHBET REGRESYON KİLİDİ
+   Amaç:
+   1) Genel'de kendi mesajlarını kesin olarak sağ sütunda tutmak.
+   2) Özel'de reply/edit/reaction aksiyonlarını yalnız dokununca göstermek.
+   3) Duyurular & Sabitler, üst bar, composer ve desktop'a dokunmamak.
+   Bu blok yalnız <=720px ve yalnız mesaj akışlarını hedefler.
+   ========================================================= */
+@media (max-width:720px){
+  /* GENEL — mine satırı ekran genişliğini aşamaz ve sağa hizalanır. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.people-message-group.mine{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    transform:none!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0 0 14px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.people-message-group.mine
+  > .people-message-group-stack{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    transform:none!important;
+    grid-column:1!important;
+    justify-self:end!important;
+    width:max-content!important;
+    min-width:92px!important;
+    max-width:78%!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.people-message-group.mine
+  > .people-message-group-stack > .people-message-bubble{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    transform:none!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* ÖZEL — aksiyonlar varsayılan kapalı. Saat ve reaksiyon özeti kalır. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble
+  .people-message-reaction-action,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble
+  .people-message-reply-action,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble
+  .people-message-edit-action{
+    display:none!important;
+  }
+
+  /* Yalnız dokunulan özel mesajın aksiyonları görünür. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble.people-mobile-actions-open
+  .people-message-reaction-action,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble.people-mobile-actions-open
+  .people-message-reply-action,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble.people-mobile-actions-open
+  .people-message-edit-action{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble{
+    cursor:pointer!important;
+    -webkit-tap-highlight-color:transparent!important;
+  }
+}
