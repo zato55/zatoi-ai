@@ -9868,3 +9868,22 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     box-sizing:border-box!important;
   }
 }
+
+/* V14.49.1 — Kullanıcı menüsü renk düzeltmesi */
+@media (min-width:801px){
+  .stable-global-mode-bar > .stable-bar-menu-btn{
+    background:transparent!important;
+    color:var(--zatoi-text,#f5f5f5)!important;
+    box-shadow:none!important;
+  }
+
+  .stable-global-mode-bar > .stable-bar-menu-btn:hover,
+  .stable-global-mode-bar > .stable-bar-menu-btn[aria-expanded="true"]{
+    background:var(--zatoi-accent,#e50914)!important;
+    color:#fff!important;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.10),
+      0 0 0 1px rgba(229,9,20,.20)!important;
+  }
+}
+
