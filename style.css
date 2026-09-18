@@ -9710,81 +9710,70 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
 }
 
 /* =========================================================
-   ZATOI AI V14.24 — PC HEADER: SOHBET SAYFASIYLA AYNI YERLEŞİM
-   Yalnızca PC (>=801px)
-   - Zatoi Sohbetleri başlığı üst sağ bardan aşağı alınır.
-   - Zatoi AI / Sohbet ayrımı en sağ üst bölüme yerleşir.
+   ZATOI AI V14.24 — PC HEADER FIX V2
+   - Yönetim dahil mevcut top-actions korunur.
+   - Zatoi AI / Sohbet seçici sağ panelin ÜST satırına taşınır.
+   - Zatoi Sohbetleri sağ panelde bir satır aşağı iner.
+   - Sadece masaüstü. Mobil etkilenmez.
    ========================================================= */
 @media (min-width: 801px) {
 
-  /* AI ana üst bar */
+  /* AI ana üst barı: mevcut butonların hiçbirini gizleme. */
   .app:not(.people-chat-mode) .chat-column > .chat-top {
+    position: relative !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     flex-wrap: nowrap !important;
+    overflow: visible !important;
     min-width: 0 !important;
   }
 
   .app:not(.people-chat-mode) .chat-column > .chat-top > .chat-title {
-    flex: 0 1 auto !important;
+    flex: 1 1 auto !important;
     min-width: 0 !important;
-    max-width: min(420px, 32vw) !important;
+    max-width: none !important;
+    margin-right: 16px !important;
   }
 
+  /* Hesap + çıkış + ayarlar + yönetim + yeni sohbet aynen görünür. */
   .app:not(.people-chat-mode) .chat-column > .chat-top > .top-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
-    margin-left: auto !important;
     flex: 0 0 auto !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Admin butonunun mevcut JS .show davranışını koru. */
+  .app:not(.people-chat-mode) .chat-column > .chat-top .admin-btn.show {
+    display: grid !important;
+    place-items: center !important;
   }
 
   /*
-   * Sağ geçmiş panelinin ilk satırı artık sohbet sayfasındaki sağ panel
-   * başlığı gibi davranır. Zatoi Sohbetleri ikinci satırda kalır.
+   * Seçiciyi chat barının SAĞINA, yani 320px'lik Zatoi Sohbetleri
+   * panelinin üst satırına geçiriyoruz. Fixed kullanmıyoruz:
+   * böylece yönetim/yeni sohbet butonlarının üstünü kapatamaz.
    */
-  .app:not(.people-chat-mode) .side-panel {
-    position: relative !important;
-    padding-top: 58px !important;
-  }
-
-  .app:not(.people-chat-mode) .side-panel > .side-header {
-    position: relative !important;
-    top: auto !important;
+  .app:not(.people-chat-mode) .chat-column > .chat-top > .zatoi-mode-switch {
+    position: absolute !important;
+    top: 7px !important;
+    right: -310px !important;
     left: auto !important;
-    right: auto !important;
-    height: 58px !important;
-    min-height: 58px !important;
-    width: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    padding: 0 18px !important;
-    border-top: 1px solid var(--zatoi-border) !important;
-    border-bottom: 1px solid var(--zatoi-border) !important;
-    background: var(--zatoi-bg) !important;
-  }
-
-  /*
-   * Mod ayrımı, sağ panelin boşalan en üst 58px alanına taşınır.
-   * Böylece Sohbet sayfasındaki Zatoi AI / Sohbet kutusuyla aynı
-   * sağ kolon konumunda görünür.
-   */
-  .app:not(.people-chat-mode) .zatoi-mode-switch {
-    position: fixed !important;
-    top: 8px !important;
-    right: 10px !important;
-    left: auto !important;
+    bottom: auto !important;
     transform: none !important;
-    z-index: 120 !important;
+    z-index: 50 !important;
 
-    display: flex !important;
-    align-items: center !important;
-    width: auto !important;
-    max-width: 300px !important;
-    height: 48px !important;
+    width: 300px !important;
+    height: 44px !important;
     margin: 0 !important;
     padding: 4px !important;
+    display: flex !important;
+    align-items: center !important;
     gap: 4px !important;
 
     border: 1px solid var(--zatoi-switch-border, var(--zatoi-border)) !important;
@@ -9792,13 +9781,28 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     background: var(--zatoi-switch-bg, var(--zatoi-bg)) !important;
   }
 
-  .app:not(.people-chat-mode) .zatoi-mode-switch .zatoi-mode-btn {
-    width: auto !important;
+  .app:not(.people-chat-mode) .chat-column > .chat-top > .zatoi-mode-switch .zatoi-mode-btn {
+    flex: 1 1 0 !important;
     min-width: 0 !important;
-    height: 38px !important;
-    padding: 0 14px !important;
-    flex: 0 0 auto !important;
+    height: 36px !important;
+    padding: 0 12px !important;
     white-space: nowrap !important;
+  }
+
+  /* Sağ panel: ilk 58px seçiciye ayrılır; Zatoi Sohbetleri onun altına gelir. */
+  .app:not(.people-chat-mode) .side-panel {
+    position: relative !important;
+    padding-top: 58px !important;
+  }
+
+  .app:not(.people-chat-mode) .side-panel > .side-header {
+    height: 58px !important;
+    min-height: 58px !important;
+    padding: 0 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    border-top: 1px solid var(--zatoi-border) !important;
+    border-bottom: 1px solid var(--zatoi-border) !important;
   }
 }
 
