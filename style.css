@@ -9461,3 +9461,215 @@ select:focus-visible, a:focus-visible {
 }
 ::selection { background:rgba(233,22,24,.35); color:inherit; }
 /* Basari/cevrimici yesili, uyari amberi ve hata renkleri korunur. */
+
+/* =========================================================
+   ZATOI BRAND V2.1 — BILDIRIM / MOD SECIMI / AI YAZMA ALANI
+   Mevcut has-unread ve active siniflarini kullanir.
+   ========================================================= */
+body {
+  --zatoi-unread-bg:linear-gradient(110deg,#493317,#302315);
+  --zatoi-unread-border:#d9aa57;
+  --zatoi-unread-accent:#ffd178;
+  --zatoi-unread-title:#fff0cf;
+  --zatoi-unread-preview:#ead2a8;
+  --zatoi-unread-time:#dfc395;
+  --zatoi-switch-bg:#101013;
+  --zatoi-switch-border:#494952;
+  --zatoi-switch-idle:#c7c7cf;
+  --zatoi-composer-bg:linear-gradient(155deg,#202026,#17171c);
+  --zatoi-composer-button:#29292f;
+}
+body.light-theme {
+  --zatoi-unread-bg:linear-gradient(110deg,#fff0c6,#fff8e8);
+  --zatoi-unread-border:#b57a1d;
+  --zatoi-unread-accent:#ffd178;
+  --zatoi-unread-title:#5d3507;
+  --zatoi-unread-preview:#714917;
+  --zatoi-unread-time:#785321;
+  --zatoi-switch-bg:#e7e7ec;
+  --zatoi-switch-border:#b8b8c3;
+  --zatoi-switch-idle:#4a4a56;
+  --zatoi-composer-bg:linear-gradient(155deg,#ffffff,#fafafa);
+  --zatoi-composer-button:#f0f0f4;
+}
+
+/* Okunmamis oda: marka kirmizisindan ayri, sabit amber bildirim rengi. */
+.app .people-chat-panel .people-room-card.has-unread {
+  background:var(--zatoi-unread-bg)!important;
+  border-color:var(--zatoi-unread-border)!important;
+  box-shadow:inset 4px 0 0 var(--zatoi-unread-accent),0 4px 14px rgba(0,0,0,.13)!important;
+}
+.app .people-chat-panel .people-room-card.has-unread:hover,
+.app .people-chat-panel .people-room-card.has-unread:focus-visible {
+  border-color:var(--zatoi-unread-accent)!important;
+  box-shadow:inset 4px 0 0 var(--zatoi-unread-accent),0 0 0 2px rgba(255,209,120,.18)!important;
+}
+.app .people-chat-panel .people-room-card.has-unread.active {
+  box-shadow:inset 4px 0 0 var(--zatoi-unread-accent),inset 0 0 0 1px var(--zatoi-unread-border),0 4px 14px rgba(0,0,0,.13)!important;
+}
+.app .people-chat-panel .people-room-card.has-unread .people-room-info strong {
+  color:var(--zatoi-unread-title)!important;
+  -webkit-text-fill-color:var(--zatoi-unread-title)!important;
+  font-weight:800;
+}
+.app .people-chat-panel .people-room-card.has-unread .people-room-info small {
+  color:var(--zatoi-unread-preview)!important;
+  -webkit-text-fill-color:var(--zatoi-unread-preview)!important;
+}
+.app .people-chat-panel .people-room-card.has-unread time {
+  color:var(--zatoi-unread-time)!important;
+  -webkit-text-fill-color:var(--zatoi-unread-time)!important;
+}
+.app .people-chat-panel .people-room-card.has-unread .people-room-unread {
+  min-width:24px!important;
+  height:24px!important;
+  padding:0 7px!important;
+  background:var(--zatoi-unread-accent)!important;
+  color:#281a07!important;
+  -webkit-text-fill-color:#281a07!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  box-shadow:0 0 0 3px rgba(255,209,120,.16)!important;
+}
+.app #peopleMobileRoomsTab.has-unread::after {
+  background:var(--zatoi-unread-accent)!important;
+  box-shadow:0 0 0 3px rgba(255,209,120,.20)!important;
+}
+
+/* Mod secimi: koyu bir cerceve, yalniz secili dugmede kirmizi dolgu. */
+body .app .zatoi-mode-switch {
+  background:var(--zatoi-switch-bg)!important;
+  border-color:var(--zatoi-switch-border)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 4px 12px rgba(0,0,0,.10)!important;
+}
+body .app .zatoi-mode-switch .zatoi-mode-btn,
+body .app .people-mode-switch .zatoi-mode-btn {
+  background:transparent!important;
+  color:var(--zatoi-switch-idle)!important;
+  -webkit-text-fill-color:var(--zatoi-switch-idle)!important;
+  box-shadow:none!important;
+}
+body .app .zatoi-mode-switch .zatoi-mode-btn:not(.active):hover,
+body .app .people-mode-switch .zatoi-mode-btn:not(.active):hover {
+  background:var(--zatoi-surface-3)!important;
+  color:var(--zatoi-text)!important;
+  -webkit-text-fill-color:var(--zatoi-text)!important;
+}
+body .app .zatoi-mode-switch .zatoi-mode-btn.active,
+body .app .people-mode-switch .zatoi-mode-btn.active {
+  background:var(--zatoi-action)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),inset 0 -2px 0 rgba(255,255,255,.30),0 3px 10px rgba(0,0,0,.18)!important;
+}
+body .app .zatoi-mode-btn :is(span,strong,b) {
+  background:transparent!important;
+  color:inherit!important;
+  -webkit-text-fill-color:inherit!important;
+}
+body .app .zatoi-mode-btn:focus-visible {
+  outline:2px solid var(--zatoi-text)!important;
+  outline-offset:2px!important;
+}
+
+/* AI composer: kirmizi dis bant yerine sakin yuzey ve belirgin metin alani. */
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) {
+  background:var(--zatoi-bg)!important;
+  border-color:var(--zatoi-line)!important;
+  box-shadow:none!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) .input-box {
+  background:var(--zatoi-composer-bg)!important;
+  border-color:var(--zatoi-border)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 26px rgba(0,0,0,.12)!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) .input-box:focus-within {
+  border-color:var(--zatoi-brand-red)!important;
+  box-shadow:0 0 0 3px rgba(233,22,24,.12),0 8px 26px rgba(0,0,0,.12)!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) .input-box textarea,
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) .input-box textarea:focus,
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) .input-box textarea:focus-visible {
+  background:transparent!important;
+  border:0!important;
+  outline:none!important;
+  box-shadow:none!important;
+  color:var(--zatoi-text)!important;
+  -webkit-text-fill-color:var(--zatoi-text)!important;
+  caret-color:var(--zatoi-brand-red);
+  scrollbar-width:thin;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) textarea::placeholder {
+  color:var(--zatoi-subtle)!important;
+  -webkit-text-fill-color:var(--zatoi-subtle)!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) :is(.action-btn,.voice-btn):not(.send-btn) {
+  background:var(--zatoi-composer-button)!important;
+  border-color:var(--zatoi-line)!important;
+  color:var(--zatoi-text)!important;
+  -webkit-text-fill-color:var(--zatoi-text)!important;
+  box-shadow:none!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) :is(.action-btn,.voice-btn):not(.send-btn):hover {
+  background:var(--zatoi-surface-3)!important;
+  border-color:var(--zatoi-border-strong)!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) :is(.action-btn,.voice-btn).active:not(.send-btn) {
+  background:var(--zatoi-brand-red-deep)!important;
+  border-color:var(--zatoi-brand-red)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn {
+  background:var(--zatoi-action)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  box-shadow:0 3px 10px rgba(233,22,24,.15)!important;
+}
+body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:not(:disabled) {
+  background:var(--zatoi-brand-red-hover)!important;
+}
+
+/* Masaustu: metin ust satirda, araclar altta ve Gonder sagda. */
+@media (min-width:801px) {
+  body .chat-column > .desktop-input-area {
+    padding:16px 24px 18px!important;
+  }
+  body .chat-column > .desktop-input-area .input-box {
+    max-width:1080px;
+    margin-inline:auto;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    padding:10px!important;
+    border-radius:22px!important;
+  }
+  body .chat-column > .desktop-input-area .input-box > textarea {
+    flex:1 0 100%;
+    width:100%;
+    min-height:52px;
+    max-height:140px;
+    padding:12px 10px;
+  }
+  body .chat-column > .desktop-input-area .input-box > :is(.action-btn,.voice-btn) {
+    height:40px;
+    min-width:40px;
+    border-radius:12px!important;
+  }
+  body .chat-column > .desktop-input-area .input-box > .send-btn {
+    margin-left:auto;
+    min-width:100px;
+    padding-inline:20px;
+  }
+  body .chat-column > .desktop-input-area > .selected-file {
+    max-width:1080px;
+    margin-inline:auto;
+  }
+}
+
+/* Mobilde sabit composer ve mevcut kompakt yerlesim devam eder. */
+@media (max-width:800px) {
+  body .chat-column > .mobile-input-area .input-box {
+    border-radius:18px!important;
+  }
+}
