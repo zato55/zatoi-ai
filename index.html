@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.50.1">
+  <link rel="stylesheet" href="./style.css?v=14.51">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -907,6 +907,9 @@
 
     <div class="people-mode-top">
       <div class="people-mode-brand"><strong>Zatoi</strong><span>AI ve insan sohbeti</span></div>
+      <button id="peopleMobileAccountButton" class="people-mobile-account-btn" type="button" aria-label="Hesap menüsünü aç" aria-expanded="false">
+        <span id="peopleMobileAccountAvatar" class="people-mobile-account-avatar">👤</span>
+      </button>
       <div class="zatoi-mode-switch people-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
         <button id="peopleAiModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">🤖 Zatoi AI</button>
         <button id="peopleChatModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">💬 Sohbet</button>
@@ -9135,6 +9138,89 @@ checkAuth();
   }
 
   sync();
+})();
+</script>
+
+
+<script id="zatoi-v14-51-mobile-chat-account">
+(() => {
+  const mobileButton = document.getElementById("peopleMobileAccountButton");
+  const mobileAvatar = document.getElementById("peopleMobileAccountAvatar");
+  if (!mobileButton || !mobileAvatar) return;
+
+  function syncMobileAccountAvatar() {
+    const user = window.currentUser || (typeof currentUser !== "undefined" ? currentUser : null);
+    const profileAvatar =
+      user?.avatarUrl ||
+      user?.avatar ||
+      user?.profileImage ||
+      user?.photoURL ||
+      "";
+
+    if (profileAvatar && /^https?:|^data:image\//i.test(String(profileAvatar))) {
+      mobileAvatar.textContent = "";
+      mobileAvatar.style.backgroundImage = `url("${String(profileAvatar).replace(/"/g, '\\"')}")`;
+      mobileAvatar.classList.add("has-image");
+    } else {
+      mobileAvatar.style.backgroundImage = "";
+      mobileAvatar.classList.remove("has-image");
+      const username = user?.username || document.getElementById("accountUsername")?.textContent?.replace(/^👤\s*/, "").trim() || "";
+      mobileAvatar.textContent = username ? username.charAt(0).toUpperCase() : "👤";
+    }
+  }
+
+  function getGlobalDropdown() {
+    return document.getElementById("globalStableAccountDropdown");
+  }
+
+  function closeMobileAccountMenu() {
+    const dropdown = getGlobalDropdown();
+    dropdown?.classList.remove("open");
+    dropdown?.setAttribute("aria-hidden", "true");
+    mobileButton.setAttribute("aria-expanded", "false");
+  }
+
+  function openMobileAccountMenu() {
+    const dropdown = getGlobalDropdown();
+    if (!dropdown) return;
+
+    syncMobileAccountAvatar();
+
+    const rect = mobileButton.getBoundingClientRect();
+    const width = Math.min(210, window.innerWidth - 16);
+    dropdown.style.width = `${width}px`;
+    dropdown.style.left = `${Math.max(8, Math.min(window.innerWidth - width - 8, rect.right - width))}px`;
+    dropdown.style.top = `${Math.min(window.innerHeight - 8, rect.bottom + 8)}px`;
+    dropdown.classList.add("open");
+    dropdown.setAttribute("aria-hidden", "false");
+    mobileButton.setAttribute("aria-expanded", "true");
+  }
+
+  mobileButton.addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    const dropdown = getGlobalDropdown();
+    if (dropdown?.classList.contains("open") && mobileButton.getAttribute("aria-expanded") === "true") {
+      closeMobileAccountMenu();
+    } else {
+      openMobileAccountMenu();
+    }
+  });
+
+  document.addEventListener("click", event => {
+    const dropdown = getGlobalDropdown();
+    if (!mobileButton.contains(event.target) && !dropdown?.contains(event.target)) {
+      mobileButton.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  window.addEventListener("resize", closeMobileAccountMenu);
+  window.addEventListener("orientationchange", closeMobileAccountMenu);
+
+  syncMobileAccountAvatar();
+  const observer = new MutationObserver(syncMobileAccountAvatar);
+  const accountName = document.getElementById("accountUsername");
+  if (accountName) observer.observe(accountName, { childList:true, subtree:true, characterData:true });
 })();
 </script>
 
