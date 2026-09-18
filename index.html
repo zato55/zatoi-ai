@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.51.2">
+  <link rel="stylesheet" href="./style.css?v=14.51.3">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -9180,11 +9180,33 @@ checkAuth();
     mobileButton.setAttribute("aria-expanded", "false");
   }
 
+  function syncMobileAdminVisibility() {
+    const dropdown = getGlobalDropdown();
+    if (!dropdown) return;
+
+    const sourceAdmin = document.getElementById("adminButton");
+    const adminMenuButton = Array.from(dropdown.querySelectorAll("button")).find(button =>
+      /yönetim/i.test(button.textContent || "")
+    );
+
+    if (!adminMenuButton) return;
+
+    /* Yetki kaynağı mevcut adminButton'dır.
+       hidden=true veya .show yoksa mobil menüde Yönetim görünmez. */
+    const allowed = !!sourceAdmin &&
+      !sourceAdmin.hidden &&
+      sourceAdmin.classList.contains("show");
+
+    adminMenuButton.hidden = !allowed;
+    adminMenuButton.style.display = allowed ? "" : "none";
+  }
+
   function openMobileAccountMenu() {
     const dropdown = getGlobalDropdown();
     if (!dropdown) return;
 
     syncMobileAccountAvatar();
+    syncMobileAdminVisibility();
 
     const rect = mobileButton.getBoundingClientRect();
     const width = Math.min(210, window.innerWidth - 16);
