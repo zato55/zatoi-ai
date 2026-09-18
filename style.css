@@ -9869,25 +9869,68 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
-/* =========================================================
-   V14.50 — SAFE CLEAN FINAL OVERRIDES
-   V14.49.8 görünümünü tek blokta korur.
-   ========================================================= */
+/* V14.49.1 — Kullanıcı menüsü renk düzeltmesi */
 @media (min-width:801px){
+  .stable-global-mode-bar > .stable-bar-menu-btn{
+    background:transparent!important;
+    color:var(--zatoi-text,#f5f5f5)!important;
+    box-shadow:none!important;
+  }
 
-  /* Sağ üst bar satırı ana chat-top (68px) ile aynı çizgide biter. */
+  .stable-global-mode-bar > .stable-bar-menu-btn:hover,
+  .stable-global-mode-bar > .stable-bar-menu-btn[aria-expanded="true"]{
+    background:var(--zatoi-accent,#e50914)!important;
+    color:#fff!important;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.10),
+      0 0 0 1px rgba(229,9,20,.20)!important;
+  }
+}
+
+/* V14.49.4 — AI üst satır yatay çizgilerini birebir hizala
+   Ana .chat-top = 68px. Sağdaki switch satırı da tam 68px olur. */
+@media (min-width:801px){
   #app:not(.people-chat-mode) .desktop-side-mode-switch-wrap{
     flex:0 0 68px!important;
     height:68px!important;
     min-height:68px!important;
     max-height:68px!important;
     padding:8px var(--zatoi-right-bar-side)!important;
+    box-sizing:border-box!important;
+  }
+}
+
+/* V14.49.5 — AI sağ panel başlığını kaldır + üst kutuyu çizgide bitir */
+@media (min-width:801px){
+
+  /* Geçmiş Sohbetler başlığını tamamen kaldır */
+  #app:not(.people-chat-mode) > .side-panel .history-header{
+    display:none!important;
+  }
+
+  /* Sağdaki AI/Sohbet/kullanıcı satırı ana üst satırla tam aynı yerde biter */
+  #app:not(.people-chat-mode) > .side-panel > .desktop-side-mode-switch-wrap{
+    height:68px!important;
+    min-height:68px!important;
+    max-height:68px!important;
+    flex:0 0 68px!important;
+    padding:8px var(--zatoi-right-bar-side)!important;
     margin:0!important;
     box-sizing:border-box!important;
     border-bottom:1px solid var(--zatoi-border,#343842)!important;
   }
 
-  /* Geçmiş Sohbetler: başlık korunur ama kompakt kalır. */
+  /* Geçmiş listesi artık doğrudan ortak çizginin altından başlar */
+  #app:not(.people-chat-mode) > .side-panel .history-list{
+    margin-top:0!important;
+    padding-top:16px!important;
+  }
+}
+
+/* V14.49.7 — Doğru çizgiyi KORU, Geçmiş Sohbetler başlığını kompakt geri getir */
+@media (min-width:801px){
+
+  /* Başlığı geri getir; üst çizgi üretmesine izin verme */
   #app:not(.people-chat-mode) > .side-panel .history-header{
     display:flex!important;
     align-items:center!important;
@@ -9909,28 +9952,29 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     font-weight:750!important;
   }
 
+  /* Liste kompakt başlığın hemen altından devam etsin */
   #app:not(.people-chat-mode) > .side-panel .history-list{
     margin-top:0!important;
     padding-top:10px!important;
   }
+}
 
-  /* Kullanıcı segmenti pasifken diğer pasif segmentlerle aynı. */
+/* V14.49.8 — Kullanıcı butonu AI/Sohbet ile aynı yuvarlak hover */
+@media (min-width:801px){
   .stable-global-mode-bar > .stable-bar-menu-btn{
-    background:transparent!important;
-    color:var(--zatoi-text,#f5f5f5)!important;
-    box-shadow:none!important;
     border-radius:11px!important;
   }
 
-  /* Hover ve açık durumda AI/Sohbet segmentleriyle aynı kırmızı/yuvarlak görünüm. */
   .stable-global-mode-bar > .stable-bar-menu-btn:hover,
   .stable-global-mode-bar > .stable-bar-menu-btn[aria-expanded="true"]{
-    background:var(--zatoi-accent,#e50914)!important;
-    color:#fff!important;
     border-radius:11px!important;
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,.10),
-      0 0 0 1px rgba(229,9,20,.20)!important;
   }
 }
+
+/* =========================================================
+   V14.50.1 — GEOMETRY LOCK
+   V14.49.8 çalışan cascade ve çizgi geometrisi aynen korunur.
+   Bundan sonraki temizlikte right-column/header geometry blokları
+   kaldırılmayacak veya birleştirilmeyecek.
+   ========================================================= */
 
