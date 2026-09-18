@@ -10619,3 +10619,245 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     border-color:rgba(var(--zatoi-red-rgb),.34)!important;
   }
 }
+
+
+/* =========================================================
+   V14.52.1 — PC CHAT LOG VISUAL CORRECTION
+   14.52 yapısını bozmadan son katmanda gerçek hedef görünüm.
+   ========================================================= */
+@media (min-width:801px){
+
+  /* Genel chat: satırları rahatlat */
+  #peopleMessages{
+    padding:18px 24px 32px!important;
+  }
+
+  #peopleMessages > .people-message-row.people-message-group{
+    grid-template-columns:48px minmax(0,1fr)!important;
+    column-gap:10px!important;
+    margin-bottom:18px!important;
+  }
+
+  /* Soldaki kişi kartı artık sadece avatar görevi görür */
+  #peopleMessages > .people-message-group.theirs > .people-message-user-card{
+    width:48px!important;
+    min-width:48px!important;
+    height:48px!important;
+    min-height:48px!important;
+    margin-top:0!important;
+    overflow:visible!important;
+  }
+
+  #peopleMessages > .people-message-group.theirs
+  > .people-message-user-card .people-message-sender-avatar{
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    border-radius:50%!important;
+  }
+
+  /* İsim avatarın yanında; rol küçük badge */
+  #peopleMessages > .people-message-group.theirs
+  > .people-message-user-card .people-message-user-card-copy{
+    left:58px!important;
+    top:0!important;
+    height:20px!important;
+    max-width:420px!important;
+    z-index:3!important;
+  }
+
+  #peopleMessages > .people-message-group.theirs
+  > .people-message-user-card .people-message-user-card-copy strong{
+    font-size:13px!important;
+    line-height:20px!important;
+  }
+
+  #peopleMessages > .people-message-group.theirs
+  > .people-message-user-card .people-message-user-card-role{
+    left:58px!important;
+    top:21px!important;
+    z-index:3!important;
+  }
+
+  /* En kritik düzeltme: stack dar sütuna dönüşmesin */
+  #peopleMessages > .people-message-group.theirs > .people-message-group-stack{
+    grid-column:2!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:36px 0 0!important;
+  }
+
+  #peopleMessages > .people-message-group.mine > .people-message-group-stack{
+    grid-column:1!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-end!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+
+  /* Her balon içeriği kadar; uzun mesajlarda kontrollü büyür */
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble,
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble:first-child,
+  #peopleMessages > .people-message-group
+  > .people-message-group-stack > .people-message-bubble:not(:first-child){
+    display:inline-flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    width:fit-content!important;
+    min-width:170px!important;
+    max-width:min(72%,720px)!important;
+    margin:0 0 6px!important;
+    padding:10px 12px 8px!important;
+    border-radius:15px!important;
+  }
+
+  #peopleMessages > .people-message-group.mine
+  > .people-message-group-stack > .people-message-bubble{
+    min-width:145px!important;
+    max-width:min(68%,680px)!important;
+    background:linear-gradient(145deg,rgba(var(--zatoi-red-rgb),.32),rgba(var(--zatoi-red-rgb),.18))!important;
+    border-color:rgba(var(--zatoi-red-rgb),.38)!important;
+  }
+
+  #peopleMessages > .people-message-group.theirs
+  > .people-message-group-stack > .people-message-bubble{
+    background:rgba(var(--zatoi-surface-2-rgb),.88)!important;
+  }
+
+  #peopleMessages .people-message-text{
+    width:auto!important;
+    min-width:0!important;
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  /* Footer içeriğin altında tek satır */
+  #peopleMessages .people-message-foot{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    width:100%!important;
+    min-height:28px!important;
+  }
+
+  /* ---------- ÖZEL ODA ----------
+     Genel chat ile aynı görsel davranış.
+     Eski sağdaki "Sen / Gönderen" kartını tamamen kaldır. */
+  #peoplePrivateMessages{
+    padding:18px 22px 30px!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group{
+    grid-template-columns:44px minmax(0,1fr)!important;
+    column-gap:9px!important;
+    margin-bottom:17px!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.mine{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.mine > .people-private-message-user-card{
+    display:none!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-message-user-card{
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    overflow:visible!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-message-user-card .people-message-sender-avatar{
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-message-user-card .people-message-user-card-copy{
+    left:53px!important;
+    top:0!important;
+    z-index:3!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-message-group-stack{
+    grid-column:2!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:25px 0 0!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.mine > .people-private-message-group-stack{
+    grid-column:1!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-end!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble,
+  #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble:first-child,
+  #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble:not(:first-child){
+    display:inline-flex!important;
+    flex-direction:column!important;
+    width:fit-content!important;
+    min-width:130px!important;
+    max-width:82%!important;
+    margin:0 0 5px!important;
+    padding:9px 11px 7px!important;
+    border-radius:14px!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.mine
+  > .people-private-message-group-stack > .people-private-bubble{
+    min-width:120px!important;
+    max-width:78%!important;
+    background:linear-gradient(145deg,rgba(var(--zatoi-red-rgb),.32),rgba(var(--zatoi-red-rgb),.18))!important;
+    border-color:rgba(var(--zatoi-red-rgb),.38)!important;
+  }
+
+  /* Kodda kalmış olabilecek "Sen / Gönderen" benzeri eski kartları
+     mine grubunda görünmez kıl. */
+  #peoplePrivateMessages > .mine .people-private-message-user-card,
+  #peoplePrivateMessages > .mine .people-message-user-card{
+    display:none!important;
+  }
+
+  #peoplePrivateMessages .people-private-message-text{
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  /* Aynı kullanıcıdan art arda gelen mesajlar iç içe görünmesin */
+  #peopleMessages .people-message-group-stack > * + *,
+  #peoplePrivateMessages .people-private-message-group-stack > * + *{
+    margin-top:0!important;
+  }
+}
