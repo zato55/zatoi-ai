@@ -10849,3 +10849,70 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     border:1px solid rgba(var(--zatoi-red-rgb),.48)!important;
   }
 }
+
+
+/* =========================================================
+   V14.53.2 — SABİT ROZETİ HİZALAMA
+   Sadece PC Genel Sohbet'teki sabit mesaj üst satırını düzeltir.
+   ========================================================= */
+@media (min-width:801px){
+
+  /* Sabit mesajda isim ve USER rozeti normal üst satırda kalsın. */
+  .app.people-chat-mode #peopleMessages
+  > .people-message-group.theirs
+  > .people-message-user-card .people-message-user-card-copy{
+    left:66px!important;
+    top:0!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    height:20px!important;
+  }
+
+  .app.people-chat-mode #peopleMessages
+  > .people-message-group.theirs
+  > .people-message-user-card .people-message-user-card-role{
+    left:108px!important;
+    top:0!important;
+  }
+
+  /* SABİT etiketi mesaj metninin üstüne, ayrı satıra alınır.
+     Böylece zato / USER ile asla üst üste binmez. */
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge){
+    padding-top:36px!important;
+  }
+
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge)
+  .people-message-meta-badges{
+    position:absolute!important;
+    left:12px!important;
+    top:9px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    width:auto!important;
+    height:20px!important;
+    margin:0!important;
+    z-index:4!important;
+    transform:none!important;
+  }
+
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge)
+  .people-pinned-badge{
+    position:static!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:auto!important;
+    height:20px!important;
+    margin:0!important;
+    padding:0 8px!important;
+    border-radius:999px!important;
+    line-height:20px!important;
+    white-space:nowrap!important;
+    transform:none!important;
+  }
+}
