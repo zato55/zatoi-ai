@@ -507,6 +507,54 @@
 }
 </style>
 
+
+<style id="zatoi-stable-menu-ai-chat-bar">
+@media (min-width:801px){
+  /* Ayrı duran eski Menü butonu PC'de kalkar. */
+  #desktopAccountMenuButton{display:none!important}
+
+  /* AI ve Sohbet ekranlarında aynı stabil üçlü bar. */
+  .stable-global-mode-bar{
+    display:grid!important;
+    grid-template-columns:86px minmax(0,1fr) minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:4px!important;
+    width:100%!important;
+  }
+  .stable-global-mode-bar .stable-bar-menu-btn{
+    height:42px!important;
+    min-width:0!important;
+    padding:0 8px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    border:0!important;
+    border-radius:11px!important;
+    background:transparent!important;
+    color:var(--zatoi-text,#f5f5f5)!important;
+    font:inherit!important;
+    font-size:13px!important;
+    font-weight:750!important;
+    white-space:nowrap!important;
+    cursor:pointer!important;
+  }
+  .stable-global-mode-bar .stable-bar-menu-btn:hover,
+  .stable-global-mode-bar .stable-bar-menu-btn[aria-expanded="true"]{
+    background:rgba(255,255,255,.07)!important;
+  }
+
+  /* Dropdown artık barın Menü düğmesinin altına JS ile yerleşir. */
+  #desktopAccountDropdown{
+    position:fixed!important;
+    z-index:99999!important;
+  }
+}
+@media(max-width:800px){
+  .stable-bar-menu-btn{display:none!important}
+}
+</style>
+
 </head>
 
 <body>
@@ -1002,7 +1050,8 @@
 
     <div class="people-mode-top">
       <div class="people-mode-brand"><strong>Zatoi</strong><span>AI ve insan sohbeti</span></div>
-      <div class="zatoi-mode-switch people-mode-switch" role="tablist" aria-label="Zatoi modu">
+      <div class="zatoi-mode-switch people-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
+        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
         <button id="peopleAiModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">🤖 Zatoi AI</button>
         <button id="peopleChatModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">💬 Sohbet</button>
       </div>
@@ -1095,7 +1144,8 @@
   <aside class="side-panel">
 
     <div class="desktop-side-mode-switch-wrap">
-      <div class="zatoi-mode-switch desktop-side-mode-switch" role="tablist" aria-label="Zatoi modu">
+      <div class="zatoi-mode-switch desktop-side-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
+        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
         <button id="desktopSideAiModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">🤖 Zatoi AI</button>
         <button id="desktopSideChatModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">💬 Sohbet</button>
       </div>
@@ -9140,6 +9190,44 @@ checkAuth();
       menuButton.focus();
     }
   });
+})();
+</script>
+
+
+<script id="zatoi-stable-menu-ai-chat-script">
+(() => {
+  const dropdown=document.getElementById("desktopAccountDropdown");
+  const buttons=[...document.querySelectorAll(".stable-bar-menu-btn")];
+  if(!dropdown || !buttons.length) return;
+
+  function closeStableMenu(){
+    dropdown.classList.remove("open");
+    dropdown.setAttribute("aria-hidden","true");
+    buttons.forEach(b=>b.setAttribute("aria-expanded","false"));
+  }
+
+  buttons.forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const opening=!dropdown.classList.contains("open");
+      closeStableMenu();
+      if(!opening) return;
+
+      const r=btn.getBoundingClientRect();
+      dropdown.classList.add("open");
+      dropdown.setAttribute("aria-hidden","false");
+      btn.setAttribute("aria-expanded","true");
+      dropdown.style.left=Math.round(r.left)+"px";
+      dropdown.style.top=Math.round(r.bottom+8)+"px";
+      dropdown.style.right="auto";
+    });
+  });
+
+  dropdown.addEventListener("click",e=>e.stopPropagation());
+  document.addEventListener("click",closeStableMenu);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape") closeStableMenu();});
+  window.addEventListener("resize",closeStableMenu);
 })();
 </script>
 
