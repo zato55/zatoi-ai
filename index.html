@@ -679,6 +679,66 @@
 }
 </style>
 
+
+<style id="zatoi-chat-stable-bar-width-fix">
+/* =========================================================
+   PC SOHBET: stabil Zatoi AI | Sohbet | kullanıcı barını
+   sağ kolonun genişliğine düzgün yay.
+   AI tarafındaki görünümü değiştirme.
+   ========================================================= */
+@media (min-width:801px){
+
+  #app.people-chat-mode .people-right-head{
+    min-width:0!important;
+    padding:10px 12px!important;
+    box-sizing:border-box!important;
+  }
+
+  #app.people-chat-mode .people-right-head .stable-global-mode-bar{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(88px,auto)!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    height:60px!important;
+    margin:0!important;
+    padding:4px!important;
+    gap:4px!important;
+    box-sizing:border-box!important;
+  }
+
+  #app.people-chat-mode .people-right-head .stable-global-mode-bar .zatoi-mode-btn{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:50px!important;
+    padding:0 10px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  #app.people-chat-mode .people-right-head .stable-global-mode-bar .stable-bar-menu-btn{
+    width:100%!important;
+    min-width:88px!important;
+    max-width:120px!important;
+    height:50px!important;
+    padding:0 9px!important;
+    box-sizing:border-box!important;
+  }
+
+  #app.people-chat-mode .people-right-head .stable-bar-username{
+    max-width:70px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
