@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.45.0 - MOBIL MODERN MESAJ ALANI A1 -->
+<!-- ZATOI AI INDEX V14.45.1 - MOBIL DOKUN AKSIYONLAR A2 -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.45.0">
+  <link rel="stylesheet" href="./style.css?v=14.45.1">
 </head>
 
 <body>
@@ -8014,6 +8014,32 @@ function renderPeopleMessages(messages) {
     const id=String(button.dataset.generalEdit||""); const m=flowMessages.find(x=>String(x.messageId)===id);
     if(m)peopleOpenEditBox("general",id,m.content);
   }));
+
+  // V14.45.1 — Mobilde aksiyonlar yalnız seçilen mesaja dokununca görünür.
+  // Desktop davranışı ve mevcut reply/reaction/edit/admin eventleri korunur.
+  if (window.matchMedia("(max-width: 720px)").matches) {
+    const actionSelector = ".people-message-reaction-action,.people-message-reply-action,.people-message-edit-action,.people-message-admin-actions";
+    const closeMobileActions = (except = null) => {
+      peopleMessages.querySelectorAll(".people-message-bubble.people-mobile-actions-open").forEach(bubble => {
+        if (bubble !== except) bubble.classList.remove("people-mobile-actions-open");
+      });
+    };
+
+    peopleMessages.querySelectorAll(".people-message-bubble").forEach(bubble => {
+      bubble.addEventListener("click", event => {
+        // Buton, tepki çipi, yanıt önizlemesi veya edit alanı kendi işlevini çalıştırsın.
+        if (event.target.closest("button,.people-reaction-chip,.people-reaction-picker,textarea,input")) return;
+        const willOpen = !bubble.classList.contains("people-mobile-actions-open");
+        closeMobileActions(bubble);
+        bubble.classList.toggle("people-mobile-actions-open", willOpen);
+      });
+    });
+
+    // Mesaj alanındaki boş bir yere dokununca açık aksiyonları kapat.
+    peopleMessages.addEventListener("click", event => {
+      if (!event.target.closest(".people-message-bubble")) closeMobileActions();
+    });
+  }
 }
 
 
