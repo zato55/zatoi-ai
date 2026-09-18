@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.52.2">
+  <link rel="stylesheet" href="./style.css?v=14.53">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -8290,7 +8290,9 @@ function renderPeopleMessages(messages) {
     return;
   }
 
-  const generalGroups = peopleGroupConsecutiveMessages(flowMessages);
+  const generalGroups = window.matchMedia("(min-width: 801px)").matches
+    ? flowMessages.map(message => ({ messages:[message] }))
+    : peopleGroupConsecutiveMessages(flowMessages);
   peopleMessages.innerHTML = generalGroups.map(group => {
     const firstMessage = group.messages[0];
     const mine = String(firstMessage.senderId) === String(currentUser?.userId);
@@ -8541,7 +8543,9 @@ function renderPeoplePrivateMessages(messages) {
     peoplePrivateMessages.innerHTML = `<div class="people-private-empty">Henüz mesaj yok. İlk mesajı gönder.</div>`;
     return;
   }
-  const privateGroups = peopleGroupConsecutiveMessages(messages);
+  const privateGroups = window.matchMedia("(min-width: 801px)").matches
+    ? messages.map(message => ({ messages:[message] }))
+    : peopleGroupConsecutiveMessages(messages);
   peoplePrivateMessages.innerHTML = privateGroups.map(group => {
     const firstMessage = group.messages[0];
     const mine = String(firstMessage.senderId) === String(currentUser?.userId);
