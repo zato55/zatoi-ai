@@ -620,6 +620,27 @@
 }
 </style>
 
+
+<style id="zatoi-stable-bar-username-style">
+@media (min-width:801px){
+  .stable-global-mode-bar{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(86px,auto)!important;
+  }
+  .stable-global-mode-bar .stable-bar-menu-btn{
+    max-width:130px!important;
+    overflow:hidden!important;
+  }
+  .stable-global-mode-bar .stable-bar-username{
+    display:block!important;
+    min-width:0!important;
+    max-width:82px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -1118,7 +1139,7 @@
       <div class="zatoi-mode-switch people-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
         <button id="peopleAiModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">🤖 Zatoi AI</button>
         <button id="peopleChatModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">💬 Sohbet</button>
-        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
+        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 <span class="stable-bar-username">Kullanıcı</span> ▾</button>
       </div>
     </div>
     <aside class="people-active-panel">
@@ -1212,7 +1233,7 @@
       <div class="zatoi-mode-switch desktop-side-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
         <button id="desktopSideAiModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">🤖 Zatoi AI</button>
         <button id="desktopSideChatModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">💬 Sohbet</button>
-        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
+        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 <span class="stable-bar-username">Kullanıcı</span> ▾</button>
       </div>
     </div>
 
@@ -9334,6 +9355,29 @@ checkAuth();
 
   buttons.forEach(btn => {
     btn.addEventListener("click", () => keepInsideViewport(btn));
+  });
+})();
+</script>
+
+
+<script id="zatoi-stable-bar-username-sync">
+(() => {
+  const source = document.getElementById("accountUsername");
+  const targets = [...document.querySelectorAll(".stable-bar-username")];
+  if (!source || !targets.length) return;
+
+  const syncUsername = () => {
+    const name = (source.textContent || "").trim();
+    if (name) targets.forEach(el => el.textContent = name);
+  };
+
+  syncUsername();
+
+  const observer = new MutationObserver(syncUsername);
+  observer.observe(source, {
+    childList: true,
+    subtree: true,
+    characterData: true
   });
 })();
 </script>
