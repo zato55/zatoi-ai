@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.45.1 - MOBIL DOKUN AKSIYONLAR A2 -->
+<!-- ZATOI AI INDEX V14.45.2 - MOBIL AKSIYON + KENDI MESAJ TASMA FIX -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -100,7 +100,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.45.1">
+  <link rel="stylesheet" href="./style.css?v=14.45.2">
 </head>
 
 <body>
@@ -8238,6 +8238,26 @@ function renderPeoplePrivateMessages(messages) {
     const id=String(button.dataset.privateEdit||""); const m=messages.find(x=>String(x.messageId)===id);
     if(m)peopleOpenEditBox("private",id,m.content);
   }));
+
+  // V14.45.2 — Özel sohbette de aksiyonlar yalnız dokunulan mesajda açılır.
+  if (window.matchMedia("(max-width: 720px)").matches) {
+    const closePrivateMobileActions = (except = null) => {
+      peoplePrivateMessages.querySelectorAll(".people-private-bubble.people-mobile-actions-open").forEach(bubble => {
+        if (bubble !== except) bubble.classList.remove("people-mobile-actions-open");
+      });
+    };
+    peoplePrivateMessages.querySelectorAll(".people-private-bubble").forEach(bubble => {
+      bubble.addEventListener("click", event => {
+        if (event.target.closest("button,.people-reaction-chip,.people-reaction-picker,textarea,input")) return;
+        const willOpen = !bubble.classList.contains("people-mobile-actions-open");
+        closePrivateMobileActions(bubble);
+        bubble.classList.toggle("people-mobile-actions-open", willOpen);
+      });
+    });
+    peoplePrivateMessages.addEventListener("click", event => {
+      if (!event.target.closest(".people-private-bubble")) closePrivateMobileActions();
+    });
+  }
 }
 
 
