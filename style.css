@@ -10080,3 +10080,63 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.51.1 — MOBİL SOHBET HEADER ÇAKIŞMA DÜZELTMESİ
+   Avatar artık robot/AI geçiş ikonunun üstüne binmez.
+   Sadece mobil + Sohbet modu.
+   ========================================================= */
+@media (max-width:800px){
+
+  /* Header sağında iki ayrı kontrol için sabit alan bırak:
+     [AI robot] [hesap avatarı] */
+  #app.people-chat-mode .people-mode-top{
+    position:relative!important;
+    padding-right:132px!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Var olan AI/Sohbet mobil geçiş kutusunu avatarın solunda tut. */
+  #app.people-chat-mode .people-mode-switch{
+    position:absolute!important;
+    top:10px!important;
+    right:72px!important;
+    width:50px!important;
+    min-width:50px!important;
+    max-width:50px!important;
+    height:50px!important;
+    margin:0!important;
+    z-index:39!important;
+  }
+
+  /* Mobilde bu switch içinde yalnız AI'ye dönüş butonu görünür.
+     Sohbet zaten aktif ekran olduğu için ikinci sohbet butonunu gizle. */
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton{
+    display:flex!important;
+    width:50px!important;
+    min-width:50px!important;
+    height:50px!important;
+    padding:0!important;
+    font-size:0!important;
+    border-radius:16px!important;
+  }
+
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton::before{
+    content:"🤖";
+    font-size:22px!important;
+  }
+
+  #app.people-chat-mode .people-mode-switch > #peopleChatModeButton,
+  #app.people-chat-mode .people-mode-switch > .stable-bar-menu-btn{
+    display:none!important;
+  }
+
+  /* Hesap avatarı en sağda, AI ikonundan tamamen ayrı. */
+  #app.people-chat-mode .people-mobile-account-btn{
+    top:10px!important;
+    right:14px!important;
+    width:50px!important;
+    height:50px!important;
+    z-index:40!important;
+  }
+}
+
