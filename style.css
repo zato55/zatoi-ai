@@ -10861,3 +10861,219 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     margin-top:0!important;
   }
 }
+
+
+/* =========================================================
+   V14.52.2 — PC CHAT LOG TARGET FIX
+   Gerçek DOM sınıflarına göre düzeltildi.
+   ========================================================= */
+@media (min-width:801px){
+
+  /* ===== GENEL SOHBET ===== */
+  #peopleMessages > .people-message-group{
+    background:transparent!important;
+  }
+
+  #peopleMessages > .people-message-group.theirs > .people-message-group-stack{
+    width:100%!important;
+    max-width:none!important;
+    align-items:flex-start!important;
+    background:transparent!important;
+  }
+
+  #peopleMessages > .people-message-group.mine > .people-message-group-stack{
+    width:100%!important;
+    max-width:none!important;
+    align-items:flex-end!important;
+    background:transparent!important;
+  }
+
+  /* Balon genişliğini aksiyon butonları değil mesaj metni belirlesin */
+  #peopleMessages .people-message-bubble{
+    position:relative!important;
+    width:fit-content!important;
+    min-width:0!important;
+    max-width:min(72%,680px)!important;
+    padding:10px 13px 34px!important;
+    border-radius:15px!important;
+  }
+
+  #peopleMessages .people-message-text{
+    display:block!important;
+    width:auto!important;
+    min-width:72px!important;
+    max-width:100%!important;
+  }
+
+  /* Alt satır balonun altında; butonlar kompakt */
+  #peopleMessages .people-message-foot{
+    position:absolute!important;
+    left:12px!important;
+    right:10px!important;
+    bottom:5px!important;
+    width:auto!important;
+    min-height:25px!important;
+    margin:0!important;
+    justify-content:flex-start!important;
+    gap:5px!important;
+  }
+
+  #peopleMessages .people-message-foot time{
+    margin-right:3px!important;
+  }
+
+  #peopleMessages .people-message-reaction-action,
+  #peopleMessages .people-message-reply-action,
+  #peopleMessages .people-message-edit-action,
+  #peopleMessages .people-message-admin-actions button{
+    width:25px!important;
+    height:25px!important;
+    min-width:25px!important;
+    padding:0!important;
+    border-radius:8px!important;
+    font-size:12px!important;
+  }
+
+  /* Mine daha sakin, hedefteki gibi koyu bordo */
+  #peopleMessages > .mine .people-message-bubble{
+    background:linear-gradient(145deg,rgba(var(--zatoi-red-rgb),.28),rgba(var(--zatoi-red-rgb),.15))!important;
+    border-color:rgba(var(--zatoi-red-rgb),.40)!important;
+  }
+
+  /* Aynı gruptaki mesajlar birbirinden bağımsız kart */
+  #peopleMessages .people-message-group-stack > .people-message-bubble + .people-message-bubble{
+    margin-top:7px!important;
+  }
+
+  /* ===== ÖZEL ODA =====
+     Gerçek DOM sınıfı: .people-private-user-card */
+  #peoplePrivateMessages > .people-private-message-group.mine > .people-private-user-card{
+    display:none!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-user-card{
+    grid-column:1!important;
+    position:relative!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-sender-avatar{
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    border-radius:50%!important;
+    border:1px solid rgba(var(--zatoi-red-rgb),.38)!important;
+    box-shadow:0 4px 14px rgba(var(--zatoi-red-rgb),.16)!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-user-card-copy{
+    position:absolute!important;
+    left:53px!important;
+    top:0!important;
+    display:flex!important;
+    width:max-content!important;
+    max-width:220px!important;
+    z-index:3!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-user-card-copy strong{
+    font-size:12px!important;
+    line-height:18px!important;
+    font-weight:800!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-user-card-copy small{
+    display:none!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.mine{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs{
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr)!important;
+    column-gap:9px!important;
+    width:100%!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.mine > .people-private-message-group-stack{
+    grid-column:1!important;
+    width:100%!important;
+    max-width:none!important;
+    align-items:flex-end!important;
+    justify-self:stretch!important;
+  }
+
+  #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-message-group-stack{
+    grid-column:2!important;
+    width:100%!important;
+    max-width:none!important;
+    align-items:flex-start!important;
+    justify-self:stretch!important;
+    margin-top:24px!important;
+  }
+
+  #peoplePrivateMessages .people-private-bubble{
+    position:relative!important;
+    width:fit-content!important;
+    min-width:0!important;
+    max-width:78%!important;
+    padding:9px 11px 32px!important;
+    border-radius:14px!important;
+  }
+
+  #peoplePrivateMessages .people-private-message-text{
+    display:block!important;
+    width:auto!important;
+    min-width:64px!important;
+    max-width:100%!important;
+  }
+
+  #peoplePrivateMessages .people-private-message-foot{
+    position:absolute!important;
+    left:10px!important;
+    right:9px!important;
+    bottom:4px!important;
+    width:auto!important;
+    min-height:24px!important;
+    margin:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:5px!important;
+  }
+
+  #peoplePrivateMessages > .mine .people-private-bubble{
+    margin-left:auto!important;
+    background:linear-gradient(145deg,rgba(var(--zatoi-red-rgb),.28),rgba(var(--zatoi-red-rgb),.15))!important;
+    border-color:rgba(var(--zatoi-red-rgb),.40)!important;
+  }
+
+  #peoplePrivateMessages > .theirs .people-private-bubble{
+    margin-right:auto!important;
+    background:rgba(var(--zatoi-surface-2-rgb),.90)!important;
+  }
+
+  #peoplePrivateMessages .people-private-message-group-stack > .people-private-bubble + .people-private-bubble{
+    margin-top:7px!important;
+  }
+}
