@@ -386,6 +386,44 @@
 }
 </style>
 
+
+<style id="zatoi-desktop-account-dropdown-compact-fix">
+@media (min-width: 801px) {
+  #app:not(.people-chat-mode) .desktop-account-dropdown {
+    width: 190px !important;
+    padding: 6px !important;
+    gap: 2px !important;
+    border-radius: 12px !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown .desktop-account-dropdown-item,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .account-name,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .logout-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .settings-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn.show {
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 9px !important;
+    gap: 7px !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    border-radius: 8px !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown .account-name {
+    font-size: 13px !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown .desktop-account-danger {
+    margin-top: 2px !important;
+    padding-top: 0 !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
