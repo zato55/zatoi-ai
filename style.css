@@ -9673,3 +9673,17 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     border-radius:18px!important;
   }
 }
+
+/* =========================================================
+   ZATOI BRAND V2.2 — PC ARACLAR MENUSU KATMAN DUZELTMESI
+   backdrop-filter, desktop-input-area icinde ayri bir katman
+   olusturur. Menunun z-index'i bu ust katmanin disina cikamaz.
+   Yazma alanini mesaj kartlarinin onune al; mobil kurallari koru.
+   ========================================================= */
+@media (min-width:801px) {
+  body .chat-column > .desktop-input-area {
+    position:relative;
+    z-index:40;
+    overflow:visible;
+  }
+}
