@@ -8527,3 +8527,91 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     word-break:break-word!important;
   }
 }
+
+/* =========================================================
+   V14.45.1 — MOBİL DOKUNUNCA AKSİYONLAR / AŞAMA 2
+   Sadece mobil Genel Sohbet.
+   Mesaj metni ve saat görünür kalır.
+   Tepki / yanıt / düzenle / admin araçları dokununca açılır.
+   ========================================================= */
+@media (max-width:720px){
+
+  /* Saat her zaman görünür; gerçek aksiyon düğmeleri varsayılan kapalı. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble
+  .people-message-reaction-action,
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble
+  .people-message-reply-action,
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble
+  .people-message-edit-action,
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble
+  .people-message-admin-actions{
+    display:none!important;
+  }
+
+  /* Seçili mesaj: mevcut butonlar yeniden görünür.
+     İşlevlerine veya data-* hedeflerine dokunulmuyor. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble.people-mobile-actions-open
+  .people-message-reaction-action,
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble.people-mobile-actions-open
+  .people-message-reply-action,
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble.people-mobile-actions-open
+  .people-message-edit-action{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble.people-mobile-actions-open
+  .people-message-admin-actions{
+    display:inline-flex!important;
+    align-items:center!important;
+    gap:4px!important;
+  }
+
+  /* Açık aksiyon satırı hedef tasarımdaki gibi hafifçe belirginleşsin. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble.people-mobile-actions-open
+  .people-message-foot{
+    margin-top:5px!important;
+  }
+
+  /* Aksiyon yokken alt satır sadece saat + mevcut reaksiyon özetini taşır. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble:not(.people-mobile-actions-open)
+  .people-message-foot{
+    gap:4px!important;
+    min-height:14px!important;
+    margin-top:3px!important;
+  }
+
+  /* Dokunulabilir olduğunu belli et ama tarayıcı seçimini bozma. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages .people-message-bubble{
+    cursor:pointer!important;
+    -webkit-tap-highlight-color:transparent!important;
+  }
+}
