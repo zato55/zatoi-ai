@@ -8703,3 +8703,341 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     -webkit-tap-highlight-color:transparent!important;
   }
 }
+
+/* =========================================================
+   V14.45.3 — MOBİL ÖZEL SOHBET = GENEL SOHBET DÜZENİ
+   Yalnız mobil Private görünümü etkiler.
+   - Benim mesajlarım sağda, kullanıcı kartı yok
+   - Karşı taraf solda, avatar + isim yalnız grup başında
+   - Ardışık mesaj gruplaması korunur
+   - Aksiyonlar V14.45.2'deki gibi dokununca açılır
+   - Desktop ve Genel Sohbet etkilenmez
+   ========================================================= */
+@media (max-width:720px){
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages{
+    padding:12px 12px 18px!important;
+    overflow-x:hidden!important;
+  }
+
+  /* Eski özel-sohbet 118/92px kart gridini mobilde iptal et. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group{
+    position:relative!important;
+    display:grid!important;
+    grid-template-columns:42px minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:9px!important;
+    row-gap:4px!important;
+    align-items:start!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0 0 14px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  /* KARŞI TARAF: sade avatar. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card{
+    grid-column:1!important;
+    grid-row:1 / span 2!important;
+    position:relative!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    width:42px!important;
+    min-width:42px!important;
+    max-width:42px!important;
+    height:42px!important;
+    min-height:42px!important;
+    margin:2px 0 0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:50%!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    transform:none!important;
+    left:auto!important;
+    right:auto!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card::before,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card::after{
+    content:none!important;
+    display:none!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-sender-avatar{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    margin:0!important;
+    border:1px solid rgba(159,122,255,.42)!important;
+    border-radius:50%!important;
+    background:linear-gradient(145deg,#1768ff,#6537d7)!important;
+    box-shadow:0 4px 14px rgba(69,55,190,.22)!important;
+    font-size:16px!important;
+  }
+
+  /* İsim avatarın sağında, Genel'deki gibi yalnız grup başında. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-user-card-copy{
+    position:absolute!important;
+    left:51px!important;
+    top:-1px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    width:max-content!important;
+    max-width:220px!important;
+    pointer-events:none!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-user-card-copy strong{
+    color:#e7ddff!important;
+    font-size:12px!important;
+    line-height:18px!important;
+    font-weight:800!important;
+    white-space:nowrap!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-user-card .people-message-user-card-copy small{
+    display:none!important;
+  }
+
+  /* KARŞI TARAFIN mesaj grubu solda ve ismin altında. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-message-group-stack{
+    grid-column:2!important;
+    grid-row:2!important;
+    justify-self:start!important;
+    align-self:start!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    width:fit-content!important;
+    min-width:118px!important;
+    max-width:78%!important;
+    margin:0!important;
+    padding:0!important;
+    gap:3px!important;
+    overflow:visible!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    transform:none!important;
+    left:auto!important;
+    right:auto!important;
+  }
+
+  /* BENİM özel mesajlarımda avatar/kart gösterme. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.mine
+  > .people-private-user-card{
+    display:none!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-row.people-private-message-group.mine{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:flex-start!important;
+    justify-content:flex-end!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0 0 14px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.mine
+  > .people-private-message-group-stack{
+    position:relative!important;
+    display:flex!important;
+    flex:0 1 auto!important;
+    flex-direction:column!important;
+    align-items:flex-end!important;
+    width:fit-content!important;
+    min-width:92px!important;
+    max-width:78%!important;
+    margin:0!important;
+    padding:0!important;
+    gap:3px!important;
+    overflow:visible!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    box-sizing:border-box!important;
+    transform:none!important;
+    left:auto!important;
+    right:auto!important;
+  }
+
+  /* Her gerçek özel mesaj Genel'deki gibi bağımsız kompakt balon. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble:first-child,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble:not(:first-child){
+    all:unset!important;
+    position:relative!important;
+    display:block!important;
+    width:fit-content!important;
+    min-width:92px!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:8px 10px 6px!important;
+    box-sizing:border-box!important;
+    border:1px solid rgba(153,116,216,.25)!important;
+    border-radius:13px!important;
+    background:rgba(39,31,58,.97)!important;
+    color:#f3efff!important;
+    font-size:14px!important;
+    line-height:1.38!important;
+    box-shadow:0 4px 12px rgba(0,0,0,.12)!important;
+    overflow:visible!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+
+  /* Kendi özel mesajım: sağda mor vurgu. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group.mine
+  > .people-private-message-group-stack > .people-private-bubble{
+    margin-left:auto!important;
+    border-color:rgba(165,113,255,.42)!important;
+    background:linear-gradient(145deg,#6236a4,#7540b8)!important;
+    box-shadow:0 5px 14px rgba(83,42,150,.20)!important;
+  }
+
+  /* Ardışık mesajlar ayrı kart spamı gibi görünmesin; aralık küçük. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble
+  + .people-private-bubble{
+    border-top:1px solid rgba(153,116,216,.25)!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-message-text{
+    margin:0!important;
+    padding:0!important;
+    min-height:0!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    font-size:14px!important;
+    line-height:1.38!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-message-foot{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    flex-wrap:wrap!important;
+    gap:5px!important;
+    min-height:18px!important;
+    margin-top:4px!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-message-foot time,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-message-edited{
+    font-size:9px!important;
+    line-height:14px!important;
+    opacity:.72!important;
+  }
+
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-message-reaction-action,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-message-reply-action,
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-message-edit-action{
+    width:22px!important;
+    height:22px!important;
+    min-width:22px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:7px!important;
+    background:transparent!important;
+    font-size:13px!important;
+    opacity:.72!important;
+  }
+
+  /* Reply önizlemesi balonun içinde ve taşmadan kalır. */
+  .app.people-chat-mode
+  .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-replied-message{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0 0 6px!important;
+    box-sizing:border-box!important;
+  }
+}
