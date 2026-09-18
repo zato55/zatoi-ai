@@ -1,4 +1,4 @@
-<!-- ZATOI AI INDEX V14.46.1 - PRIVATE FIX + KOMPAKT UST + GENEL BASLIK TEMIZLEME -->
+<!-- ZATOI AI INDEX V14.45.1 - MOBIL DOKUN AKSIYONLAR A2 -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -21,6 +21,14 @@
 
 
   <link rel="canonical" href="https://zato55.github.io/zatoi-ai/">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; connect-src 'self' https://zatoi-ai.fbboytr.workers.dev https://*.workers.dev; img-src 'self' data: blob: https:; media-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://zatoi-ai.fbboytr.workers.dev">
+
   <link rel="sitemap" type="application/xml" title="Sitemap" href="https://zato55.github.io/zatoi-ai/sitemap.xml">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
@@ -100,12 +108,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.46.1">
+  <link rel="stylesheet" href="./style.css?v=14.45.1">
 </head>
 
 <body>
-
-
+<a href="#app" class="skip-link" style="position:absolute;left:-9999px;top:0;z-index:99999;padding:12px 20px;background:#60a5fa;color:#fff;border-radius:0 0 8px 0;font-weight:600;">Ana içeriğe geç</a>
 <!-- ==========================================
      AUTH EKRANI
 ========================================== -->
@@ -212,7 +219,7 @@
 
 </div>
 
-<div id="networkBanner" class="network-banner" role="status" aria-live="polite">İnternet bağlantısı yok. Mesaj gönderilemez.</div>
+<div id="networkBanner" class="network-banner" role="status" aria-live="polite"></div>
 
 
 <div
@@ -268,13 +275,12 @@
 
         <div class="account-area">
 
-          <span
+          <button
             id="accountUsername"
             class="account-name"
-            role="button"
-            tabindex="0"
             title="Profilimi aç"
-          ></span>
+            style="background:none;border:0;padding:0;margin:0;cursor:pointer;color:inherit;font:inherit;text-align:left;width:auto;min-width:0;">
+          </button>
 
           <button
             id="logoutButton"
@@ -619,7 +625,7 @@
           <span class="people-reply-preview-copy"><strong id="peopleReplyPreviewName">Yanıt</strong><small id="peopleReplyPreviewText"></small></span>
           <button id="peopleReplyCancel" class="people-reply-cancel" type="button" aria-label="Yanıtı iptal et">×</button>
         </div>
-        <input id="peopleMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="Genel sohbete mesaj yaz...">
+        <input id="peopleMessageInput" aria-label="Genel sohbete mesaj yaz...">
         <button id="peopleSendButton" type="submit" aria-label="Mesaj gönder">➤</button>
       </form>
     </main>
@@ -647,7 +653,7 @@
             <span class="people-reply-preview-copy"><strong id="peoplePrivateReplyPreviewName">Yanıt</strong><small id="peoplePrivateReplyPreviewText"></small></span>
             <button id="peoplePrivateReplyCancel" class="people-reply-cancel" type="button" aria-label="Yanıtı iptal et">×</button>
           </div>
-          <input id="peoplePrivateInput" type="text" maxlength="2000" autocomplete="off" placeholder="Özel mesaj yaz...">
+          <input id="peoplePrivateInput" aria-label="Özel mesaj yaz...">
           <button id="peoplePrivateSend" type="submit" aria-label="Özel mesaj gönder">➤</button>
         </form>
       </section>
@@ -726,7 +732,7 @@
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Zatoi Hakkında</div>
-        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14.26 • Profesyonel Profil + Yönetici Paneli + Akıllı Router</span></div>
+        <div class="settings-about">Zatoi AI; sohbet, web araştırması, PDF analizi, görsel anlama, kişisel hafıza ve bulut sohbet geçmişini tek arayüzde birleştirir. Sohbetler hesabında saklanır; yüklenen içerikler yalnızca yanıt üretmek için işlenir. Hesap bölümünden verilerini temizleyebilir veya hesabını silebilirsin.<br><span class="settings-version">V14.45.1 • Profesyonel Profil + Yönetici Paneli + Akıllı Router</span></div>
       </div>
     </div>
   </section>
@@ -883,7 +889,7 @@
       <button id="privacyCloseButton" class="privacy-close" type="button" aria-label="Gizlilik politikasını kapat" title="Kapat">×</button>
     </div>
     <div class="privacy-content">
-      <h3>Hangi veriler işlenir?</h3>
+      <h2>Hangi veriler işlenir?</h2>
       <p>Zatoi AI; kullanıcı adı, oturum bilgileri, sohbet geçmişi, kişisel hafıza tercihleri ve kullandığın özelliklere göre yüklediğin PDF/görselleri işleyebilir. Şifreler düz metin olarak saklanmaz; sunucu tarafında türetilmiş parola özeti kullanılır.</p>
       <h3>Sohbetler ve cihaz verileri</h3>
       <p>Sohbet geçmişi hesabınla bulutta eşitlenebilir. Aynı cihazdaki yerel sohbet önbelleği hesap kimliğine göre ayrı tutulur. Tema ve yazı boyutu gibi arayüz tercihleri cihazda saklanabilir.</p>
@@ -909,6 +915,7 @@
   class="file-input"
   type="file"
   accept="application/pdf,.pdf"
+  aria-label="PDF dosyası yükle"
 >
 
 <input
@@ -925,6 +932,7 @@
   type="file"
   accept="image/*"
   capture="environment"
+  aria-label="Kamera ile fotoğraf çek"
 >
 
 
@@ -945,13 +953,15 @@
 <div
   id="mobileHistoryOverlay"
   class="mobile-history-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="mobileHistoryTitle"
 >
 
   <div class="mobile-history-panel">
 
     <div class="mobile-history-header">
-
-      <span>
+      <span id="mobileHistoryTitle">
         💬 Zatoi Sohbetleri
       </span>
 
@@ -983,6 +993,7 @@
   class="image-viewer"
   aria-hidden="true"
   role="dialog"
+  aria-modal="true"
   aria-label="Görsel önizleme"
 >
   <button
@@ -2548,7 +2559,7 @@ function queueCloudSave(chat) {
   saveChatToCloud(chat)
     .catch(error => {
       if (error?.message !== "AUTH_REQUIRED") {
-        console.log("Cloud save error:", error);
+        console.warn("Cloud save error:", error);
       }
     });
 }
@@ -2570,7 +2581,7 @@ async function deleteChatFromCloud(chatId, updatedAt = Date.now()) {
     );
   } catch (error) {
     if (error?.message !== "AUTH_REQUIRED") {
-      console.log("Cloud delete error:", error);
+      console.warn("Cloud delete error:", error);
     }
   }
 }
@@ -2680,13 +2691,13 @@ async function syncChatsWithCloud(silent = false) {
       try {
         await saveChatToCloud(chat);
       } catch (error) {
-        console.log("Initial cloud upload error:", error);
+        console.warn("Initial cloud upload error:", error);
       }
     }
 
   } catch (error) {
 
-    console.log("Cloud sync error:", error);
+    console.warn("Cloud sync error:", error);
 
     // Bulut erişilemezse yerel sohbetler çalışmaya devam eder.
 
@@ -3247,7 +3258,9 @@ function renderMessages() {
         avatar.classList.add("zatoi-chat-avatar");
         const zatoiAvatarImage = document.createElement("img");
         zatoiAvatarImage.className = "zatoi-chat-avatar-image";
-        zatoiAvatarImage.src = "./zatoi-ai-samurai-avatar.png?v=14.28";
+        zatoiAvatarImage.src = "./zatoi-ai-samurai-avatar.png?v=14.45.1";
+      zatoiAvatarImage.width = 64;
+      zatoiAvatarImage.height = 64;
         zatoiAvatarImage.alt = "Zatoi AI siber samuray avatarı";
         zatoiAvatarImage.loading = "lazy";
         avatar.appendChild(zatoiAvatarImage);
@@ -4843,7 +4856,7 @@ function chooseGeneratedImage(message, index) {
   if (index === 1) imagePreference.cinematic += 1;
   message.chosenImage = index;
   localStorage.setItem(imagePreferenceKey(), JSON.stringify(imagePreference));
-  const choiceId = message.preferenceChoiceId || (message.preferenceChoiceId = crypto.randomUUID());
+  const choiceId = message.preferenceChoiceId || (message.preferenceChoiceId = (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))));
   const userId = currentUser?.userId || "";
   pendingImageChoices = pendingImageChoices.filter(item => !(item.userId === userId && item.choiceId === choiceId));
   pendingImageChoices.push({ userId, choiceId, choice: index === 0 ? "A" : "B" });
@@ -4894,7 +4907,7 @@ async function regenerateGeneratedImageCore(message, index) {
   const variant = isFourModelComparison ? "A" : (index === 0 ? "A" : "B");
   const modelChoice = ""; // Yeniden üretim tek varsayılan model kullanır.
   let referenceImage = String(targetMessage.sourceReferenceImage || "");
-  const generationId = String(targetMessage.generationId || crypto.randomUUID());
+  const generationId = String(targetMessage.generationId || (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))));
   targetMessage.generationId = generationId;
   targetMessage.regeneratingIndex = index;
   renderMessages();
@@ -5236,13 +5249,13 @@ async function generateImageCore(promptText = "", referenceImage = "", reference
       imageNames: referenceName ? [referenceName] : [], imagePreviews: referencePreview ? [referencePreview] : [], time: Date.now() });
     updateTitle(chat, description); chat.updatedAt = Date.now();
     saveChats(); queueCloudSave(chat); setInput(""); renderAll(); showTyping();
-    const generationId = crypto.randomUUID();
+    const generationId = (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)));
     const image = await requestGeneratedImage(description, "A", safeReferenceImage, generationId, !!options.isEdit, "");
     if (ownerToken !== authToken || !chats.includes(chat)) return;
     chat.messages.push({ role: "assistant", content: options.isEdit ? "Düzenlenen görsel hazır." : "Görsel hazır. İstersen değişiklik isteyebilirsin.",
       generatedImages: [image.dataUrl], generatedImageIds: [image.imageId],
       generationMeta: [{ model: image.model, referenceMode: image.referenceMode }],
-      preferenceChoiceId: crypto.randomUUID(), generationId, imagePrompt: description,
+      preferenceChoiceId: (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))), generationId, imagePrompt: description,
       baseImagePrompt: options.basePrompt || cleanBaseImagePrompt(description), isImageEdit: !!options.isEdit,
       chosenImage: 0, comparisonMode: "", sourceReferenceImage: safeReferenceImage,
       sourceReferenceImageId: image.referenceImageId || "", sourceReferencePreview: referencePreview,
@@ -5715,7 +5728,7 @@ async function sendMessageCore() {
         }
       }
     } catch (readError) {
-      console.log("Response read error:", readError);
+      console.warn("Response read error:", readError);
     }
 
 
@@ -6359,8 +6372,8 @@ function speakText(text) {
 
   const sentences =
     text.split(
-      /(?<=[.!?])\s+/
-    );
+      /([.!?]+\s+)/
+    ).filter(Boolean);
 
 
   sentences.forEach(
@@ -7054,7 +7067,7 @@ document.querySelector(".account-area")?.addEventListener("click", event => {
   if (event.target.closest("#logoutButton, #settingsButton, #adminButton, button:not(#accountUsername)")) return;
   openProfile();
 });
-document.getElementById("mobileMenuAccount")?.addEventListener("click", () => {
+document.getElementById("mobileMenuUsername")?.addEventListener("click", () => {
   document.getElementById("mobileMenuOverlay")?.classList.remove("show");
   openProfile();
 });
@@ -8238,26 +8251,6 @@ function renderPeoplePrivateMessages(messages) {
     const id=String(button.dataset.privateEdit||""); const m=messages.find(x=>String(x.messageId)===id);
     if(m)peopleOpenEditBox("private",id,m.content);
   }));
-
-  // V14.45.2 — Özel sohbette de aksiyonlar yalnız dokunulan mesajda açılır.
-  if (window.matchMedia("(max-width: 720px)").matches) {
-    const closePrivateMobileActions = (except = null) => {
-      peoplePrivateMessages.querySelectorAll(".people-private-bubble.people-mobile-actions-open").forEach(bubble => {
-        if (bubble !== except) bubble.classList.remove("people-mobile-actions-open");
-      });
-    };
-    peoplePrivateMessages.querySelectorAll(".people-private-bubble").forEach(bubble => {
-      bubble.addEventListener("click", event => {
-        if (event.target.closest("button,.people-reaction-chip,.people-reaction-picker,textarea,input")) return;
-        const willOpen = !bubble.classList.contains("people-mobile-actions-open");
-        closePrivateMobileActions(bubble);
-        bubble.classList.toggle("people-mobile-actions-open", willOpen);
-      });
-    });
-    peoplePrivateMessages.addEventListener("click", event => {
-      if (!event.target.closest(".people-private-bubble")) closePrivateMobileActions();
-    });
-  }
 }
 
 
@@ -8602,7 +8595,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js?v=14.38.26",
+        "./service-worker.js?v=14.45.1",
         { updateViaCache: "none" }
       );
 
@@ -8646,7 +8639,7 @@ checkAuth();
 </script>
 
 <script>
-  window.__ZATOI_BUILD__ = "14.38.26";
+  window.__ZATOI_BUILD__ = "14.45.1";
 </script>
 </body>
 </html>
