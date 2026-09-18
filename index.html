@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.47.6">
+  <link rel="stylesheet" href="./style.css?v=14.47.7">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -681,6 +681,153 @@
 
 
 
+
+
+<style id="zatoi-v14-47-7-final-shared-rightbar">
+@media (min-width:801px){
+  :root{
+    --zatoi-right-col:360px;
+    --zatoi-right-bar-side:12px;
+    --zatoi-right-bar-h:52px;
+  }
+
+  /* ===== AI RIGHT COLUMN ===== */
+  #app:not(.people-chat-mode) > .side-panel{
+    width:var(--zatoi-right-col)!important;
+    min-width:var(--zatoi-right-col)!important;
+    max-width:var(--zatoi-right-col)!important;
+    flex:0 0 var(--zatoi-right-col)!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-side-mode-switch-wrap{
+    width:100%!important;
+    height:80px!important;
+    min-height:80px!important;
+    padding:14px var(--zatoi-right-bar-side)!important;
+    box-sizing:border-box!important;
+  }
+
+  /* ===== CHAT RIGHT COLUMN ===== */
+  #app.people-chat-mode > .people-chat-panel{
+    grid-template-columns:
+      260px
+      minmax(0,1fr)
+      var(--zatoi-right-col)!important;
+  }
+
+  #app.people-chat-mode > .people-chat-panel > .people-mode-top{
+    grid-template-columns:
+      260px
+      minmax(0,1fr)
+      var(--zatoi-right-col)!important;
+  }
+
+  #app.people-chat-mode > .people-chat-panel > .people-rooms-panel{
+    width:var(--zatoi-right-col)!important;
+    min-width:var(--zatoi-right-col)!important;
+    max-width:var(--zatoi-right-col)!important;
+    box-sizing:border-box!important;
+  }
+
+  /* ===== SAME BAR, SAME SIZE, BOTH MODES ===== */
+  #app:not(.people-chat-mode)
+  .desktop-side-mode-switch-wrap > .desktop-side-mode-switch.stable-global-mode-bar,
+
+  #app.people-chat-mode
+  .people-mode-top > .people-mode-switch.stable-global-mode-bar{
+    position:static!important;
+    inset:auto!important;
+    transform:none!important;
+
+    display:grid!important;
+    grid-template-columns:
+      minmax(0,1fr)
+      minmax(0,1fr)
+      minmax(0,1fr)!important;
+
+    width:calc(var(--zatoi-right-col) - (var(--zatoi-right-bar-side) * 2))!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:var(--zatoi-right-bar-h)!important;
+
+    margin:0!important;
+    padding:4px!important;
+    gap:4px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+
+    border:1px solid var(--zatoi-border,#343842)!important;
+    border-radius:15px!important;
+    background:var(--zatoi-bg-soft,#111318)!important;
+  }
+
+  /* Sohbet barını sağ sütunun içinde tam aynı 12px kenar payına koy. */
+  #app.people-chat-mode
+  .people-mode-top > .people-mode-switch.stable-global-mode-bar{
+    grid-column:3!important;
+    justify-self:start!important;
+    align-self:center!important;
+    margin-left:var(--zatoi-right-bar-side)!important;
+    margin-right:var(--zatoi-right-bar-side)!important;
+  }
+
+  /* ===== THREE READABLE SEGMENTS ===== */
+  #app:not(.people-chat-mode)
+  .desktop-side-mode-switch.stable-global-mode-bar > .zatoi-mode-btn,
+  #app:not(.people-chat-mode)
+  .desktop-side-mode-switch.stable-global-mode-bar > .stable-bar-menu-btn,
+
+  #app.people-chat-mode
+  .people-mode-switch.stable-global-mode-bar > .zatoi-mode-btn,
+  #app.people-chat-mode
+  .people-mode-switch.stable-global-mode-bar > .stable-bar-menu-btn{
+    display:flex!important;
+    flex:none!important;
+    align-items:center!important;
+    justify-content:center!important;
+
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:42px!important;
+
+    margin:0!important;
+    padding:0 5px!important;
+    gap:4px!important;
+    box-sizing:border-box!important;
+
+    font-size:13px!important;
+    font-weight:750!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+  }
+
+  /* Kullanıcı adı alanı artık gereksiz 58/72px limitlerine bağlı değil. */
+  #app:not(.people-chat-mode)
+  .desktop-side-mode-switch .stable-bar-username,
+  #app.people-chat-mode
+  .people-mode-switch .stable-bar-username{
+    display:block!important;
+    min-width:0!important;
+    width:auto!important;
+    max-width:none!important;
+    flex:1 1 auto!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  /* Tek kullanıcı ikonu. */
+  .stable-global-mode-bar .stable-bar-username::before,
+  .stable-global-mode-bar .stable-bar-username::after{
+    content:none!important;
+    display:none!important;
+  }
+}
+</style>
 
 </head>
 
