@@ -10215,3 +10215,5 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
 
 
 /* V14.51.3 — Mobil hesap menüsü admin yetki görünürlüğü JS ile senkronlanır. */
+
+/* V14.51.4 — Mobil Yönetim görünürlüğü doğrudan currentUser.role ile belirlenir. */
