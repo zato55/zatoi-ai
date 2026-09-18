@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.47.3">
+  <link rel="stylesheet" href="./style.css?v=14.47.4">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -9408,7 +9408,8 @@ checkAuth();
   if (!source || !targets.length) return;
 
   const syncUsername = () => {
-    const name = (source.textContent || "").trim();
+    const rawName = (source.textContent || "").trim();
+    const name = rawName.replace(/^[👤♟♟️\s]+/u, "").trim();
     if (name) targets.forEach(el => el.textContent = name);
   };
 
@@ -9446,7 +9447,8 @@ checkAuth();
   };
 
   function sync(){
-    const name=(original.profile?.textContent||"").trim()||"Kullanıcı";
+    const rawName=(original.profile?.textContent||"").trim();
+    const name=rawName.replace(/^[👤♟♟️\s]+/u,"").trim()||"Kullanıcı";
     menu.querySelector(".global-menu-name").textContent=name;
     stableButtons.forEach(b=>{
       const n=b.querySelector(".stable-bar-username");
