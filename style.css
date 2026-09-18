@@ -9708,3 +9708,70 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     display:none!important;
   }
 }
+
+/* =========================================================
+   ZATOI AI — PC TOP BAR / SOHBET TARZI SAĞ MOD SEÇİCİ
+   Sadece masaüstü (>= 801px). Mobil davranışa dokunmaz.
+   Amaç:
+   [Sohbet başlığı] ... [hesap/ayar/yönetim/yeni sohbet] [Zatoi AI | Sohbet]
+   ========================================================= */
+@media (min-width: 801px) {
+
+  /* Header tek satır ve stabil kalsın. */
+  .app:not(.people-chat-mode) .chat-column > .chat-top {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+
+  /* Sol tarafta aktif AI sohbet başlığı. */
+  .app:not(.people-chat-mode) .chat-column > .chat-top > .chat-title {
+    order: 1 !important;
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    max-width: min(420px, 34vw) !important;
+    margin-right: 12px !important;
+  }
+
+  /* Hesap / ayarlar / yönetim / yeni sohbet grubu sağa yaslanır. */
+  .app:not(.people-chat-mode) .chat-column > .chat-top > .top-actions {
+    order: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    gap: 8px !important;
+    margin-left: auto !important;
+  }
+
+  /* AI / Sohbet geçişi en sağda; Sohbet sayfasındaki görünüm korunur. */
+  .app:not(.people-chat-mode) .chat-column > .chat-top > .zatoi-mode-switch {
+    order: 3 !important;
+    position: static !important;
+    inset: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 0 0 8px !important;
+    padding: 4px !important;
+    gap: 4px !important;
+    border: 1px solid var(--zatoi-switch-border, var(--zatoi-border)) !important;
+    border-radius: 14px !important;
+    background: var(--zatoi-switch-bg, var(--zatoi-bg)) !important;
+    z-index: auto !important;
+  }
+
+  .app:not(.people-chat-mode) .chat-column > .chat-top > .zatoi-mode-switch .zatoi-mode-btn {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    padding: 8px 14px !important;
+    white-space: nowrap !important;
+  }
+}
+
