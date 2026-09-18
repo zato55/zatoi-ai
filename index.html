@@ -234,6 +234,122 @@
 }
 </style>
 
+
+<style id="zatoi-desktop-account-dropdown-style">
+/* =========================================================
+   PC: HESAP + AYARLAR + YÖNETİM + ÇIKIŞ TEK AÇILIR MENÜ
+   Mobil menüye dokunmaz.
+   ========================================================= */
+@media (min-width: 801px) {
+  .desktop-account-menu {
+    position: relative !important;
+    display: block !important;
+    flex: 0 0 auto !important;
+  }
+
+  .desktop-account-menu-button {
+    height: 46px !important;
+    min-width: 92px !important;
+    padding: 0 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    border: 1px solid var(--zatoi-border, #343842) !important;
+    border-radius: 13px !important;
+    background: var(--zatoi-bg-soft, #15171c) !important;
+    color: var(--zatoi-text, #f5f5f5) !important;
+    font: inherit !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+  }
+
+  .desktop-account-menu-button:hover,
+  .desktop-account-menu-button[aria-expanded="true"] {
+    border-color: var(--zatoi-accent, #e50914) !important;
+  }
+
+  .desktop-account-dropdown {
+    position: absolute !important;
+    top: calc(100% + 9px) !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    width: 220px !important;
+    padding: 8px !important;
+    display: none !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    box-sizing: border-box !important;
+    border: 1px solid var(--zatoi-border, #343842) !important;
+    border-radius: 14px !important;
+    background: var(--zatoi-bg-soft, #15171c) !important;
+    box-shadow: 0 14px 36px rgba(0,0,0,.35) !important;
+  }
+
+  .desktop-account-dropdown.open {
+    display: flex !important;
+  }
+
+  .desktop-account-dropdown .account-area {
+    display: contents !important;
+  }
+
+  .desktop-account-dropdown .desktop-account-dropdown-item,
+  .desktop-account-dropdown .account-name,
+  .desktop-account-dropdown .logout-btn,
+  .desktop-account-dropdown .settings-btn,
+  .desktop-account-dropdown .admin-btn,
+  .desktop-account-dropdown .admin-btn.show {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 9px !important;
+    box-sizing: border-box !important;
+    border: 0 !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+    color: var(--zatoi-text, #f5f5f5) !important;
+    font: inherit !important;
+    font-size: 14px !important;
+    font-weight: 650 !important;
+    text-align: left !important;
+    cursor: pointer !important;
+  }
+
+  .desktop-account-dropdown .desktop-account-dropdown-item:hover {
+    background: rgba(255,255,255,.07) !important;
+  }
+
+  .desktop-account-dropdown .desktop-account-danger {
+    color: #ff8f98 !important;
+    border-top: 1px solid var(--zatoi-border, #343842) !important;
+    border-radius: 0 0 9px 9px !important;
+    margin-top: 3px !important;
+    padding-top: 3px !important;
+  }
+
+  .desktop-account-dropdown .admin-btn[hidden] {
+    display: none !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .desktop-account-menu-button {
+    display: none !important;
+  }
+
+  .desktop-account-dropdown {
+    display: contents !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -404,45 +520,69 @@
 
       <div class="top-actions">
 
-        <div class="account-area">
-
+        <!-- PC: hesap / ayarlar / yönetim / çıkış tek açılır menü -->
+        <div class="desktop-account-menu">
           <button
-            id="accountUsername"
-            class="account-name"
-            title="Profilimi aç"
-            style="background:none;border:0;padding:0;margin:0;cursor:pointer;color:inherit;font:inherit;text-align:left;width:auto;min-width:0;">
-          </button>
-
-          <button
-            id="logoutButton"
-            class="logout-btn"
-            aria-label="Hesaptan çıkış yap"
+            id="desktopAccountMenuButton"
+            class="desktop-account-menu-button"
+            type="button"
+            aria-label="Hesap menüsünü aç"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            title="Hesap ve ayarlar"
           >
-            Oturumu Kapat
+            👤 <span>Menü</span> ▾
           </button>
 
+          <div
+            id="desktopAccountDropdown"
+            class="desktop-account-dropdown"
+            role="menu"
+            aria-hidden="true"
+          >
+            <div class="account-area">
+
+              <button
+                id="accountUsername"
+                class="account-name desktop-account-dropdown-item"
+                title="Profilimi aç"
+                role="menuitem"
+              >
+              </button>
+
+              <button
+                id="logoutButton"
+                class="logout-btn desktop-account-dropdown-item desktop-account-danger"
+                aria-label="Hesaptan çıkış yap"
+                role="menuitem"
+              >
+                ↪ Oturumu Kapat
+              </button>
+
+            </div>
+
+            <button
+              id="settingsButton"
+              class="settings-btn desktop-account-dropdown-item"
+              aria-label="Ayarları aç"
+              title="Ayarlar"
+              role="menuitem"
+            >
+              ⚙️ <span>Ayarlar</span>
+            </button>
+
+            <button
+              id="adminButton"
+              class="admin-btn desktop-account-dropdown-item"
+              aria-label="Yönetici panelini aç"
+              title="Yönetici Paneli"
+              role="menuitem"
+              hidden
+            >
+              🛡️ <span>Yönetim</span>
+            </button>
+          </div>
         </div>
-
-
-        <button
-          id="settingsButton"
-          class="settings-btn"
-          aria-label="Ayarları aç"
-          title="Ayarlar"
-        >
-          ⚙️
-        </button>
-
-
-        <button
-          id="adminButton"
-          class="admin-btn"
-          aria-label="Yönetici panelini aç"
-          title="Yönetici Paneli"
-          hidden
-        >
-          🛡️
-        </button>
 
 
         <button
@@ -8810,5 +8950,41 @@ checkAuth();
 <script>
   window.__ZATOI_BUILD__ = "14.45.1";
 </script>
+
+<script id="zatoi-desktop-account-dropdown-script">
+(() => {
+  const menuButton = document.getElementById("desktopAccountMenuButton");
+  const dropdown = document.getElementById("desktopAccountDropdown");
+  if (!menuButton || !dropdown) return;
+
+  const setOpen = (open) => {
+    dropdown.classList.toggle("open", open);
+    dropdown.setAttribute("aria-hidden", String(!open));
+    menuButton.setAttribute("aria-expanded", String(open));
+  };
+
+  menuButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setOpen(!dropdown.classList.contains("open"));
+  });
+
+  dropdown.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (event.target.closest("button")) {
+      setOpen(false);
+    }
+  });
+
+  document.addEventListener("click", () => setOpen(false));
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setOpen(false);
+      menuButton.focus();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
