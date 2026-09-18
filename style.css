@@ -9203,4 +9203,178 @@ html {
     box-sizing:border-box!important;
   }
 }
+/* =========================================================
+   ZATOI BRAND THEME V1 — ICON-BASED RED / BLACK / SILVER
+   Stabil arayüzün yalnızca renk katmanıdır.
+   Yapısal sohbet kurallarına, hizalamaya, gruplamaya veya JS davranışına dokunmaz.
+   ========================================================= */
+:root{
+  --zatoi-brand-red:#e91618;
+  --zatoi-brand-red-bright:#ff2024;
+  --zatoi-brand-red-deep:#950101;
+  --zatoi-brand-black:#080606;
+  --zatoi-brand-bg:#0d0808;
+  --zatoi-brand-surface:#151011;
+  --zatoi-brand-surface-2:#211516;
+  --zatoi-brand-white:#f8f7f7;
+  --zatoi-brand-silver:#cececf;
+  --zatoi-brand-muted:#9d9697;
+  --zatoi-brand-border:#3a2022;
+  --zatoi-brand-line:rgba(233,22,24,.28);
+  --zatoi-brand-glow:rgba(233,22,24,.30);
 
+  /* Eski merkezi tema değişkenlerini marka paletine bağla */
+  --z-bg:#080606;
+  --z-bg2:#0d0808;
+  --z-card:#151011;
+  --z-card2:#211516;
+  --z-line:rgba(233,22,24,.28);
+  --z-line2:rgba(255,255,255,.18);
+  --z-text:#f8f7f7;
+  --z-muted:#b7b1b2;
+  --z-blue:#e91618;
+  --z-blue2:#b60204;
+  --z-violet:#950101;
+  --z-danger:#ff6b78;
+}
+
+/* ANA ZEMİN */
+html,body{
+  background:
+    radial-gradient(circle at 15% 0%,rgba(233,22,24,.12),transparent 34%),
+    radial-gradient(circle at 82% 10%,rgba(149,1,1,.10),transparent 30%),
+    linear-gradient(145deg,#080606,#0d0808 55%,#080606)!important;
+  color:var(--zatoi-brand-white)!important;
+}
+.app{
+  background:
+    radial-gradient(circle at 50% 10%,rgba(233,22,24,.055),transparent 35%),
+    linear-gradient(180deg,rgba(13,8,8,.97),rgba(8,6,6,.995))!important;
+}
+
+/* GİRİŞ — ikonun kırmızı/siyah/gümüş kimliği */
+.auth-screen{
+  background:
+    radial-gradient(circle at 50% 4%,rgba(233,22,24,.20),transparent 31%),
+    radial-gradient(circle at 84% 72%,rgba(149,1,1,.12),transparent 32%),
+    linear-gradient(145deg,#080606,#120a0a 55%,#080606)!important;
+}
+.auth-card{
+  background:linear-gradient(180deg,rgba(28,17,18,.97),rgba(13,8,8,.98))!important;
+  border-color:rgba(233,22,24,.32)!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.48),0 0 48px rgba(233,22,24,.08)!important;
+}
+.auth-logo{
+  background:linear-gradient(145deg,rgba(233,22,24,.12),rgba(255,255,255,.045))!important;
+  border:1px solid rgba(233,22,24,.28)!important;
+  box-shadow:0 0 24px rgba(233,22,24,.12)!important;
+}
+.auth-input:focus{
+  border-color:var(--zatoi-brand-red)!important;
+}
+.auth-submit{
+  background:linear-gradient(135deg,var(--zatoi-brand-red-deep),var(--zatoi-brand-red))!important;
+}
+.auth-switch,.privacy-link-btn{
+  color:#f1b8b9!important;
+}
+
+/* ODAK / ANA AKSİYONLAR */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible{
+  outline-color:var(--zatoi-brand-red-bright)!important;
+}
+.send-btn{
+  background:linear-gradient(135deg,var(--zatoi-brand-red-deep),var(--zatoi-brand-red))!important;
+}
+.sync-spinner{
+  border-top-color:var(--zatoi-brand-red-bright)!important;
+}
+
+/* AI / SOHBET MODU + SOHBET NAVİGASYONU */
+.zatoi-mode-btn.active,
+.people-mobile-nav button.active,
+.people-mobile-tab.active,
+.people-mobile-tabs button.active{
+  color:#fff!important;
+  border-color:rgba(233,22,24,.62)!important;
+  background:linear-gradient(135deg,#950101,#e91618)!important;
+  box-shadow:0 7px 22px rgba(233,22,24,.16)!important;
+}
+
+/* Genel sohbet: master yapı AYNI, yalnızca marka rengi.
+   Kendi mesajları Zatoi kırmızısı; karşı taraf koyu/siyah-gümüş. */
+.app.people-chat-mode .people-message-row.mine .people-message-bubble,
+.app.people-chat-mode .people-message-group.mine .people-message-bubble{
+  background:linear-gradient(145deg,#b60204,#e91618)!important;
+  border-color:rgba(255,92,94,.42)!important;
+  color:#fff!important;
+  box-shadow:0 8px 24px rgba(149,1,1,.18)!important;
+}
+.app.people-chat-mode .people-message-row.theirs .people-message-bubble,
+.app.people-chat-mode .people-message-group.theirs .people-message-bubble{
+  background:linear-gradient(145deg,#211516,#151011)!important;
+  border-color:rgba(206,206,207,.18)!important;
+  color:#f8f7f7!important;
+}
+
+/* Özel sohbet: master mesaj düzeni korunur; ayrı mor kimlik yerine
+   aynı Zatoi marka ailesinin daha koyu kırmızı tonları kullanılır. */
+.app.people-chat-mode #peoplePrivateMessages .people-private-message-group.mine .people-private-bubble,
+.app.people-chat-mode #peoplePrivateMessages .people-private-message-group.mine .people-message-bubble{
+  background:linear-gradient(145deg,#950101,#c30b0d)!important;
+  border-color:rgba(255,92,94,.38)!important;
+  color:#fff!important;
+  box-shadow:0 8px 24px rgba(149,1,1,.17)!important;
+}
+.app.people-chat-mode #peoplePrivateMessages .people-private-message-group.theirs .people-private-bubble,
+.app.people-chat-mode #peoplePrivateMessages .people-private-message-group.theirs .people-message-bubble{
+  background:linear-gradient(145deg,#211516,#151011)!important;
+  border-color:rgba(206,206,207,.18)!important;
+  color:#f8f7f7!important;
+}
+
+/* Avatarlar / seçili kartlar */
+.app.people-chat-mode .people-message-sender-avatar,
+.app.people-chat-mode .people-avatar,
+.app.people-chat-mode .people-user-avatar{
+  border-color:rgba(233,22,24,.38)!important;
+}
+.app.people-chat-mode .people-message-sender-avatar{
+  background:linear-gradient(145deg,#950101,#e91618)!important;
+  box-shadow:0 4px 14px rgba(149,1,1,.22)!important;
+}
+
+/* Duyuru / sabit alanının YAPISI korunur; yalnız marka yüzeyi */
+.people-pinned-shell,
+.people-pinned-area,
+.people-pinned-strip,
+.people-pinned-curtain{
+  border-color:rgba(233,22,24,.26)!important;
+}
+.people-pinned-badge{
+  background:rgba(233,22,24,.14)!important;
+  border-color:rgba(255,92,94,.32)!important;
+}
+.people-admin-badge{
+  background:rgba(233,22,24,.15)!important;
+  border-color:rgba(255,92,94,.30)!important;
+}
+
+/* Form ve ortak yüzeylerde mavi focus kalıntılarını marka rengine çek */
+@media (max-width:800px){
+  .chat-column > .mobile-input-area .input-box textarea:focus,
+  .chat-column > .mobile-input-area .input-box textarea:focus-visible,
+  .chat-column > .mobile-input-area textarea:focus,
+  .chat-column > .mobile-input-area textarea:focus-visible{
+    outline-color:var(--zatoi-brand-red-bright)!important;
+    border-color:var(--zatoi-brand-red-bright)!important;
+    box-shadow:0 0 0 3px rgba(233,22,24,.20)!important;
+  }
+}
+
+/* Semantik renkler bilinçli olarak korunur:
+   başarı=yeşil, uyarı=amber, hata/tehlike=ayrı kırmızı tonu. */
