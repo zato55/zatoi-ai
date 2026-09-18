@@ -10142,3 +10142,46 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.47.7 — FINAL PC RIGHT COLUMN / MODE BAR GEOMETRY
+   AI ve Sohbet sağ sütunları ayrı; ölçüleri birebir aynı.
+   ========================================================= */
+@media (min-width:801px){
+  :root{
+    --zatoi-right-col:360px;
+    --zatoi-right-bar-side:12px;
+    --zatoi-right-bar-h:52px;
+  }
+
+  /* AI: gerçek sağ sütun */
+  #app:not(.people-chat-mode) > .side-panel{
+    width:var(--zatoi-right-col)!important;
+    min-width:var(--zatoi-right-col)!important;
+    max-width:var(--zatoi-right-col)!important;
+    flex:0 0 var(--zatoi-right-col)!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Sohbet: gerçek 3. grid sütunu */
+  #app.people-chat-mode > .people-chat-panel{
+    grid-template-columns:
+      260px
+      minmax(0,1fr)
+      var(--zatoi-right-col)!important;
+  }
+
+  #app.people-chat-mode > .people-chat-panel > .people-mode-top{
+    grid-template-columns:
+      260px
+      minmax(0,1fr)
+      var(--zatoi-right-col)!important;
+  }
+
+  #app.people-chat-mode > .people-chat-panel > .people-rooms-panel{
+    width:var(--zatoi-right-col)!important;
+    min-width:var(--zatoi-right-col)!important;
+    max-width:var(--zatoi-right-col)!important;
+    box-sizing:border-box!important;
+  }
+}
+
