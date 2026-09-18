@@ -9710,67 +9710,94 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
 }
 
 /* =========================================================
-   ZATOI AI — PC TOP BAR / SOHBET TARZI SAĞ MOD SEÇİCİ
-   Sadece masaüstü (>= 801px). Mobil davranışa dokunmaz.
-   Amaç:
-   [Sohbet başlığı] ... [hesap/ayar/yönetim/yeni sohbet] [Zatoi AI | Sohbet]
+   ZATOI AI V14.24 — PC HEADER: SOHBET SAYFASIYLA AYNI YERLEŞİM
+   Yalnızca PC (>=801px)
+   - Zatoi Sohbetleri başlığı üst sağ bardan aşağı alınır.
+   - Zatoi AI / Sohbet ayrımı en sağ üst bölüme yerleşir.
    ========================================================= */
 @media (min-width: 801px) {
 
-  /* Header tek satır ve stabil kalsın. */
+  /* AI ana üst bar */
   .app:not(.people-chat-mode) .chat-column > .chat-top {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
     flex-wrap: nowrap !important;
-    gap: 8px !important;
     min-width: 0 !important;
   }
 
-  /* Sol tarafta aktif AI sohbet başlığı. */
   .app:not(.people-chat-mode) .chat-column > .chat-top > .chat-title {
-    order: 1 !important;
     flex: 0 1 auto !important;
     min-width: 0 !important;
-    max-width: min(420px, 34vw) !important;
-    margin-right: 12px !important;
+    max-width: min(420px, 32vw) !important;
   }
 
-  /* Hesap / ayarlar / yönetim / yeni sohbet grubu sağa yaslanır. */
   .app:not(.people-chat-mode) .chat-column > .chat-top > .top-actions {
-    order: 2 !important;
     display: flex !important;
     align-items: center !important;
-    flex: 0 0 auto !important;
     gap: 8px !important;
     margin-left: auto !important;
+    flex: 0 0 auto !important;
   }
 
-  /* AI / Sohbet geçişi en sağda; Sohbet sayfasındaki görünüm korunur. */
-  .app:not(.people-chat-mode) .chat-column > .chat-top > .zatoi-mode-switch {
-    order: 3 !important;
-    position: static !important;
-    inset: auto !important;
+  /*
+   * Sağ geçmiş panelinin ilk satırı artık sohbet sayfasındaki sağ panel
+   * başlığı gibi davranır. Zatoi Sohbetleri ikinci satırda kalır.
+   */
+  .app:not(.people-chat-mode) .side-panel {
+    position: relative !important;
+    padding-top: 58px !important;
+  }
+
+  .app:not(.people-chat-mode) .side-panel > .side-header {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    width: 100% !important;
     display: flex !important;
     align-items: center !important;
-    flex: 0 0 auto !important;
+    padding: 0 18px !important;
+    border-top: 1px solid var(--zatoi-border) !important;
+    border-bottom: 1px solid var(--zatoi-border) !important;
+    background: var(--zatoi-bg) !important;
+  }
+
+  /*
+   * Mod ayrımı, sağ panelin boşalan en üst 58px alanına taşınır.
+   * Böylece Sohbet sayfasındaki Zatoi AI / Sohbet kutusuyla aynı
+   * sağ kolon konumunda görünür.
+   */
+  .app:not(.people-chat-mode) .zatoi-mode-switch {
+    position: fixed !important;
+    top: 8px !important;
+    right: 10px !important;
+    left: auto !important;
+    transform: none !important;
+    z-index: 120 !important;
+
+    display: flex !important;
+    align-items: center !important;
     width: auto !important;
-    height: auto !important;
-    margin: 0 0 0 8px !important;
+    max-width: 300px !important;
+    height: 48px !important;
+    margin: 0 !important;
     padding: 4px !important;
     gap: 4px !important;
+
     border: 1px solid var(--zatoi-switch-border, var(--zatoi-border)) !important;
     border-radius: 14px !important;
     background: var(--zatoi-switch-bg, var(--zatoi-bg)) !important;
-    z-index: auto !important;
   }
 
-  .app:not(.people-chat-mode) .chat-column > .chat-top > .zatoi-mode-switch .zatoi-mode-btn {
-    flex: 0 0 auto !important;
+  .app:not(.people-chat-mode) .zatoi-mode-switch .zatoi-mode-btn {
     width: auto !important;
     min-width: 0 !important;
-    height: auto !important;
-    padding: 8px 14px !important;
+    height: 38px !important;
+    padding: 0 14px !important;
+    flex: 0 0 auto !important;
     white-space: nowrap !important;
   }
 }
