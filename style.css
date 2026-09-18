@@ -10694,3 +10694,158 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     font-size:10px!important;
   }
 }
+
+
+/* =========================================================
+   V14.53.1 — PC CHAT STACK SPECIFICITY FIX
+   Eski masaüstü "grup zemini" kuralını kesin olarak ezer.
+   ========================================================= */
+@media (min-width:801px){
+
+  /* ESKİ DEV DIŞ KARTLARI KAPAT */
+  .app.people-chat-mode #peopleMessages > .people-message-group,
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+
+  .app.people-chat-mode #peopleMessages > .people-message-group > .people-message-group-stack,
+  .app.people-chat-mode #peopleMessages > .people-message-group.mine > .people-message-group-stack,
+  .app.people-chat-mode #peopleMessages > .people-message-group.theirs > .people-message-group-stack{
+    background:transparent!important;
+    color:inherit!important;
+    border:0!important;
+    border-color:transparent!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group > .people-private-message-group-stack,
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.mine > .people-private-message-group-stack,
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-message-group-stack{
+    background:transparent!important;
+    color:inherit!important;
+    border:0!important;
+    border-color:transparent!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+
+  /* GENEL: karşı taraf kartı sadece içerik kadar */
+  .app.people-chat-mode #peopleMessages > .people-message-group.theirs > .people-message-group-stack{
+    width:auto!important;
+    min-width:0!important;
+    max-width:min(66%,680px)!important;
+    justify-self:start!important;
+    align-items:flex-start!important;
+  }
+
+  .app.people-chat-mode #peopleMessages > .people-message-group.mine > .people-message-group-stack{
+    width:auto!important;
+    min-width:0!important;
+    max-width:min(66%,680px)!important;
+    margin-left:auto!important;
+    align-items:flex-end!important;
+  }
+
+  /* Balon gerçekten tek görünen yüzey */
+  .app.people-chat-mode #peopleMessages > .people-message-group > .people-message-group-stack > .people-message-bubble,
+  .app.people-chat-mode #peopleMessages > .people-message-group > .people-message-group-stack > .people-message-bubble:first-child,
+  .app.people-chat-mode #peopleMessages > .people-message-group > .people-message-group-stack > .people-message-bubble:not(:first-child){
+    width:fit-content!important;
+    min-width:180px!important;
+    max-width:100%!important;
+    border-radius:14px!important;
+    box-sizing:border-box!important;
+  }
+
+  .app.people-chat-mode #peopleMessages > .people-message-group.theirs
+  > .people-message-group-stack > .people-message-bubble{
+    background:linear-gradient(145deg,rgba(var(--zatoi-surface-2-rgb),.97),rgba(var(--zatoi-surface-rgb),.94))!important;
+    color:var(--zatoi-text)!important;
+    border:1px solid rgba(var(--zatoi-border-rgb),.20)!important;
+  }
+
+  .app.people-chat-mode #peopleMessages > .people-message-group.mine
+  > .people-message-group-stack > .people-message-bubble{
+    background:linear-gradient(145deg,rgba(var(--zatoi-red-rgb),.30),rgba(var(--zatoi-red-rgb),.16))!important;
+    color:var(--zatoi-on-red)!important;
+    border:1px solid rgba(var(--zatoi-red-rgb),.48)!important;
+  }
+
+  /* Kendi mesaj satırının kendisi de kırmızı blok olmasın */
+  .app.people-chat-mode #peopleMessages > .people-message-group.mine{
+    width:100%!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    padding:0!important;
+  }
+
+  /* İsim / rol üst üste binmesini düzelt */
+  .app.people-chat-mode #peopleMessages > .people-message-group.theirs
+  > .people-message-user-card .people-message-user-card-copy{
+    left:66px!important;
+    top:0!important;
+  }
+
+  .app.people-chat-mode #peopleMessages > .people-message-group.theirs
+  > .people-message-user-card .people-message-user-card-role{
+    left:108px!important;
+    top:0!important;
+  }
+
+  /* Sabit etiketi isim/rol satırına değil mesaj içine bırak */
+  .app.people-chat-mode #peopleMessages .people-message-meta-badges{
+    position:static!important;
+    transform:none!important;
+  }
+
+  /* ÖZEL ODA da aynı mantık */
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-message-group-stack{
+    width:auto!important;
+    min-width:0!important;
+    max-width:82%!important;
+    justify-self:start!important;
+    align-items:flex-start!important;
+  }
+
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.mine > .people-private-message-group-stack{
+    width:auto!important;
+    min-width:0!important;
+    max-width:82%!important;
+    margin-left:auto!important;
+    align-items:flex-end!important;
+  }
+
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble,
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble:first-child,
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group
+  > .people-private-message-group-stack > .people-private-bubble:not(:first-child){
+    width:fit-content!important;
+    min-width:145px!important;
+    max-width:100%!important;
+    border-radius:13px!important;
+  }
+
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.theirs
+  > .people-private-message-group-stack > .people-private-bubble{
+    background:linear-gradient(145deg,rgba(var(--zatoi-surface-2-rgb),.97),rgba(var(--zatoi-surface-rgb),.94))!important;
+    color:var(--zatoi-text)!important;
+    border:1px solid rgba(var(--zatoi-border-rgb),.20)!important;
+  }
+
+  .app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.mine
+  > .people-private-message-group-stack > .people-private-bubble{
+    background:linear-gradient(145deg,rgba(var(--zatoi-red-rgb),.30),rgba(var(--zatoi-red-rgb),.16))!important;
+    color:var(--zatoi-on-red)!important;
+    border:1px solid rgba(var(--zatoi-red-rgb),.48)!important;
+  }
+}
