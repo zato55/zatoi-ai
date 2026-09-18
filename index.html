@@ -574,6 +574,52 @@
 }
 </style>
 
+
+<style id="zatoi-stable-menu-hover-red-dropdown-tone">
+@media (min-width:801px){
+
+  /* Menü butonu: hover ve açıkken AI aktif butonu gibi kırmızı */
+  .stable-global-mode-bar .stable-bar-menu-btn:hover,
+  .stable-global-mode-bar .stable-bar-menu-btn[aria-expanded="true"]{
+    background:var(--zatoi-accent,#e50914)!important;
+    color:#fff!important;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.10),
+      0 0 0 1px rgba(229,9,20,.20)!important;
+  }
+
+  /* Açılan kutu ana sayfadan bir ton ayrışsın */
+  #desktopAccountDropdown{
+    background:#191b20!important;
+    border-color:#3a3e48!important;
+    box-shadow:0 16px 38px rgba(0,0,0,.48)!important;
+  }
+
+  /* Menü seçenekleri kendi yüzeyinde hafif ayrışsın */
+  #desktopAccountDropdown .account-name,
+  #desktopAccountDropdown .logout-btn,
+  #desktopAccountDropdown .settings-btn,
+  #desktopAccountDropdown .admin-btn,
+  #desktopAccountDropdown .admin-btn.show{
+    background:#17191e!important;
+  }
+
+  /* Seçenek hover'ında daha belirgin ikinci ton */
+  #desktopAccountDropdown .account-name:hover,
+  #desktopAccountDropdown .logout-btn:hover,
+  #desktopAccountDropdown .settings-btn:hover,
+  #desktopAccountDropdown .admin-btn:hover,
+  #desktopAccountDropdown .admin-btn.show:hover{
+    background:#24272e!important;
+  }
+
+  /* Çıkış yazısının mevcut kırmızı vurgusu korunsun */
+  #desktopAccountDropdown .logout-btn{
+    color:#ff8f98!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
