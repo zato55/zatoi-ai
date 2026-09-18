@@ -9908,3 +9908,54 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.47.4 — GLOBAL BAR USERNAME FINAL FIX
+   - Tek kullanıcı ikonu
+   - Kullanıcı adı için yeterli alan
+   - Uzun adlarda kontrollü ellipsis
+   ========================================================= */
+@media (min-width:801px){
+
+  /* Sohbet tarafında kullanıcı bölümü içeriğine göre büyüyebilsin. */
+  .app.people-chat-mode > .people-chat-panel > .people-mode-top
+  .people-mode-switch.stable-global-mode-bar{
+    grid-template-columns:
+      minmax(92px,1fr)
+      minmax(92px,1fr)
+      minmax(112px,auto)!important;
+  }
+
+  /* Kullanıcı butonunda tek ikon + isim + ok düzeni. */
+  .stable-global-mode-bar .stable-bar-menu-btn{
+    width:100%!important;
+    min-width:112px!important;
+    max-width:170px!important;
+    padding:0 10px!important;
+    gap:6px!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+  }
+
+  /* Önceki 58px sınırını kaldır. */
+  .stable-global-mode-bar .stable-bar-username,
+  .app.people-chat-mode > .people-chat-panel > .people-mode-top
+  .people-mode-switch.stable-global-mode-bar .stable-bar-username{
+    display:block!important;
+    min-width:0!important;
+    width:auto!important;
+    max-width:105px!important;
+    flex:1 1 auto!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  /* Eski kullanıcı adı pseudo/icon'u varsa global bardaki butonda gösterme.
+     Butonun HTML'indeki 👤 tek ikon olarak kalır. */
+  .stable-global-mode-bar .stable-bar-menu-btn .stable-bar-username::before,
+  .stable-global-mode-bar .stable-bar-menu-btn .stable-bar-username::after{
+    content:none!important;
+    display:none!important;
+  }
+}
+
