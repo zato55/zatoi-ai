@@ -424,6 +424,49 @@
 }
 </style>
 
+
+<style id="zatoi-desktop-account-dropdown-final-alignment">
+@media (min-width: 801px) {
+  /* Menüdeki tüm seçenekler: ikon solda, yazı hemen yanında, tek satır */
+  #app:not(.people-chat-mode) .desktop-account-dropdown .account-name,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .logout-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .settings-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn.show {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 10px !important;
+    gap: 8px !important;
+    line-height: 36px !important;
+    white-space: nowrap !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn.show {
+    place-items: unset !important;
+    grid-template-columns: none !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn > span,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .settings-btn > span {
+    display: inline !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown {
+    width: 190px !important;
+    padding: 6px !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
