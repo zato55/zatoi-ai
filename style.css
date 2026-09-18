@@ -10916,3 +10916,63 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     transform:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.53.3 — SABİT ROZETİ KESİN DÜZELTME
+   Eski rozeti gizler, temiz rozeti mesaj içinde yeniden çizer.
+   ========================================================= */
+@media (min-width:801px){
+
+  /* Eski SABİT rozeti metnin üstüne biniyordu: tamamen gizle. */
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge)
+  .people-message-meta-badges,
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge)
+  .people-pinned-badge{
+    display:none!important;
+  }
+
+  /* Sabit mesaj kartında rozet için gerçek boşluk aç. */
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge){
+    position:relative!important;
+    padding-top:54px!important;
+  }
+
+  /* Temiz SABİT rozeti */
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge)::before{
+    content:"📌 SABİT"!important;
+    position:absolute!important;
+    left:14px!important;
+    top:28px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:auto!important;
+    height:20px!important;
+    padding:0 8px!important;
+    margin:0!important;
+    border:1px solid rgba(var(--zatoi-red-rgb),.48)!important;
+    border-radius:999px!important;
+    background:rgba(var(--zatoi-red-rgb),.18)!important;
+    color:#ffd7d9!important;
+    font-size:9px!important;
+    line-height:20px!important;
+    font-weight:800!important;
+    white-space:nowrap!important;
+    z-index:6!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Mesaj metni rozetin altında başlasın. */
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge)
+  .people-message-text{
+    position:relative!important;
+    margin-top:0!important;
+    z-index:2!important;
+  }
+}
