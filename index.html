@@ -467,6 +467,46 @@
 }
 </style>
 
+
+<style id="zatoi-account-menu-perfect-icon-alignment">
+@media (min-width: 801px) {
+  /* Her satır aynı grid: 22px ikon sütunu + metin sütunu */
+  #app:not(.people-chat-mode) .desktop-account-dropdown .account-name,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .logout-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .settings-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn.show {
+    display: grid !important;
+    grid-template-columns: 22px minmax(0, 1fr) !important;
+    align-items: center !important;
+    justify-items: start !important;
+    column-gap: 7px !important;
+    width: 100% !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 10px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ayarlar ve Yönetim HTML'de ikon + span olduğu için kesin hizalama */
+  #app:not(.people-chat-mode) .desktop-account-dropdown .settings-btn > span,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn > span {
+    grid-column: 2 !important;
+    align-self: center !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown .settings-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn,
+  #app:not(.people-chat-mode) .desktop-account-dropdown .admin-btn.show {
+    text-align: left !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
