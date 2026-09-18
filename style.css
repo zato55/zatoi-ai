@@ -10001,3 +10001,144 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.47.6 — PC RIGHT COLUMNS + SHARED BAR SIZE STANDARD
+   AI ve Sohbet sağ sütunları AYRI kalır.
+   Sadece genişlik standardı ve üst bar ölçüleri ortaktır.
+   ========================================================= */
+@media (min-width:801px){
+
+  :root{
+    --zatoi-pc-right-column-width: 360px;
+    --zatoi-modebar-gap: 4px;
+    --zatoi-modebar-pad: 4px;
+  }
+
+  /* ---------------------------------------------------------
+     1) İKİ AYRI SAĞ SÜTUN — AYNI GENİŞLİK
+     --------------------------------------------------------- */
+
+  /* AI sağ sütunu */
+  #app:not(.people-chat-mode) .history-column{
+    width:var(--zatoi-pc-right-column-width)!important;
+    min-width:var(--zatoi-pc-right-column-width)!important;
+    max-width:var(--zatoi-pc-right-column-width)!important;
+    flex:0 0 var(--zatoi-pc-right-column-width)!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Sohbet sağ sütunu */
+  #app.people-chat-mode .people-right-panel{
+    width:var(--zatoi-pc-right-column-width)!important;
+    min-width:var(--zatoi-pc-right-column-width)!important;
+    max-width:var(--zatoi-pc-right-column-width)!important;
+    flex:0 0 var(--zatoi-pc-right-column-width)!important;
+    box-sizing:border-box!important;
+  }
+
+  /* ---------------------------------------------------------
+     2) İKİ BAR İÇİN AYNI ÖLÇÜ SİSTEMİ
+     --------------------------------------------------------- */
+
+  #app:not(.people-chat-mode) .desktop-side-mode-switch.stable-global-mode-bar,
+  #app.people-chat-mode .people-mode-switch.stable-global-mode-bar{
+    display:grid!important;
+    grid-template-columns:
+      minmax(96px,1fr)
+      minmax(88px,1fr)
+      minmax(104px,1fr)!important;
+
+    width:calc(100% - 16px)!important;
+    max-width:calc(100% - 16px)!important;
+    min-width:0!important;
+
+    height:58px!important;
+    margin:8px!important;
+    padding:var(--zatoi-modebar-pad)!important;
+    gap:var(--zatoi-modebar-gap)!important;
+
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+
+  /* ---------------------------------------------------------
+     3) ÜÇ İÇ SEÇENEK DE OKUNAKLI VE AYNI HİZADA
+     --------------------------------------------------------- */
+
+  #app:not(.people-chat-mode) .desktop-side-mode-switch.stable-global-mode-bar > .zatoi-mode-btn,
+  #app:not(.people-chat-mode) .desktop-side-mode-switch.stable-global-mode-bar > .stable-bar-menu-btn,
+  #app.people-chat-mode .people-mode-switch.stable-global-mode-bar > .zatoi-mode-btn,
+  #app.people-chat-mode .people-mode-switch.stable-global-mode-bar > .stable-bar-menu-btn{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:48px!important;
+
+    margin:0!important;
+    padding:0 8px!important;
+    gap:6px!important;
+
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+
+    font-size:14px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+
+  /* AI / Sohbet metinleri gereksiz yere ezilmesin */
+  #app:not(.people-chat-mode) .desktop-side-mode-switch.stable-global-mode-bar > .zatoi-mode-btn,
+  #app.people-chat-mode .people-mode-switch.stable-global-mode-bar > .zatoi-mode-btn{
+    text-overflow:clip!important;
+  }
+
+  /* Kullanıcı bölümü: tek ikon + okunabilir isim + ok */
+  #app:not(.people-chat-mode) .desktop-side-mode-switch.stable-global-mode-bar > .stable-bar-menu-btn,
+  #app.people-chat-mode .people-mode-switch.stable-global-mode-bar > .stable-bar-menu-btn{
+    min-width:0!important;
+    padding-left:7px!important;
+    padding-right:7px!important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-side-mode-switch .stable-bar-username,
+  #app.people-chat-mode .people-mode-switch .stable-bar-username{
+    display:block!important;
+    min-width:0!important;
+    width:auto!important;
+    max-width:72px!important;
+    flex:0 1 auto!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  /* ---------------------------------------------------------
+     4) SOHBET ÜST GRID'İN SAĞ KOLONU DA AYNI STANDARDA BAĞLA
+     --------------------------------------------------------- */
+
+  #app.people-chat-mode .people-mode-top{
+    grid-template-columns:
+      minmax(260px,1fr)
+      minmax(0,3fr)
+      var(--zatoi-pc-right-column-width)!important;
+  }
+
+  #app.people-chat-mode .people-mode-top .people-mode-switch.stable-global-mode-bar{
+    grid-column:3!important;
+    justify-self:stretch!important;
+    align-self:center!important;
+  }
+
+  /* ---------------------------------------------------------
+     5) GLOBAL DROPDOWN BARIN DIŞINA TAŞABİLİR,
+        AMA VIEWPORT DIŞINA JS ZATEN ÇIKARMIYOR.
+     --------------------------------------------------------- */
+  #globalStableAccountDropdown{
+    max-width:calc(100vw - 16px)!important;
+  }
+}
+
