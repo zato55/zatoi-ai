@@ -350,6 +350,42 @@
 }
 </style>
 
+
+<style id="zatoi-desktop-account-dropdown-visibility-fix">
+/* PC açılır hesap menüsü: header tarafından kırpılmasını engelle */
+@media (min-width: 801px) {
+  #app:not(.people-chat-mode) .chat-column,
+  #app:not(.people-chat-mode) .chat-top,
+  #app:not(.people-chat-mode) .top-actions,
+  #app:not(.people-chat-mode) .desktop-account-menu {
+    overflow: visible !important;
+  }
+
+  #app:not(.people-chat-mode) .chat-top {
+    z-index: 500 !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-menu {
+    z-index: 510 !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown {
+    top: calc(100% + 8px) !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-account-dropdown.open {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
