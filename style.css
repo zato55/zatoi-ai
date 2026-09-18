@@ -9959,3 +9959,15 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* V14.49.8 — Kullanıcı butonu AI/Sohbet ile aynı yuvarlak hover */
+@media (min-width:801px){
+  .stable-global-mode-bar > .stable-bar-menu-btn{
+    border-radius:11px!important;
+  }
+
+  .stable-global-mode-bar > .stable-bar-menu-btn:hover,
+  .stable-global-mode-bar > .stable-bar-menu-btn[aria-expanded="true"]{
+    border-radius:11px!important;
+  }
+}
+
