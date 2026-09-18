@@ -9900,30 +9900,62 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
-/* V14.49.6 — Geçmiş Sohbetler başlığını kompaktlaştır
-   Çizgi hizasına ve üst bara dokunmaz. */
+/* V14.49.5 — AI sağ panel başlığını kaldır + üst kutuyu çizgide bitir */
 @media (min-width:801px){
+
+  /* Geçmiş Sohbetler başlığını tamamen kaldır */
   #app:not(.people-chat-mode) > .side-panel .history-header{
-    min-height:46px!important;
-    height:46px!important;
-    padding:0 18px!important;
+    display:none!important;
+  }
+
+  /* Sağdaki AI/Sohbet/kullanıcı satırı ana üst satırla tam aynı yerde biter */
+  #app:not(.people-chat-mode) > .side-panel > .desktop-side-mode-switch-wrap{
+    height:68px!important;
+    min-height:68px!important;
+    max-height:68px!important;
+    flex:0 0 68px!important;
+    padding:8px var(--zatoi-right-bar-side)!important;
     margin:0!important;
+    box-sizing:border-box!important;
+    border-bottom:1px solid var(--zatoi-border,#343842)!important;
+  }
+
+  /* Geçmiş listesi artık doğrudan ortak çizginin altından başlar */
+  #app:not(.people-chat-mode) > .side-panel .history-list{
+    margin-top:0!important;
+    padding-top:16px!important;
+  }
+}
+
+/* V14.49.7 — Doğru çizgiyi KORU, Geçmiş Sohbetler başlığını kompakt geri getir */
+@media (min-width:801px){
+
+  /* Başlığı geri getir; üst çizgi üretmesine izin verme */
+  #app:not(.people-chat-mode) > .side-panel .history-header{
     display:flex!important;
     align-items:center!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    margin:0!important;
+    padding:0 18px!important;
     box-sizing:border-box!important;
+    border-top:0!important;
   }
 
   #app:not(.people-chat-mode) > .side-panel .history-header h2,
   #app:not(.people-chat-mode) > .side-panel .history-header h3,
   #app:not(.people-chat-mode) > .side-panel .history-header .history-title{
     margin:0!important;
-    font-size:16px!important;
-    line-height:1.15!important;
+    font-size:15px!important;
+    line-height:1!important;
     font-weight:750!important;
   }
 
-  #app:not(.people-chat-mode) > .side-panel .history-header .history-title-icon{
-    font-size:14px!important;
+  /* Liste kompakt başlığın hemen altından devam etsin */
+  #app:not(.people-chat-mode) > .side-panel .history-list{
+    margin-top:0!important;
+    padding-top:10px!important;
   }
 }
 
