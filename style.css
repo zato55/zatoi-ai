@@ -9887,33 +9887,43 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
-/* V14.49.3 — Sağ sütun yatay çizgi geometri düzeltmesi
-   AI üst barının alt sınırı ile ana üst header alt sınırını aynı Y eksenine kilitler. */
+/* V14.49.4 — AI üst satır yatay çizgilerini birebir hizala
+   Ana .chat-top = 68px. Sağdaki switch satırı da tam 68px olur. */
 @media (min-width:801px){
-  :root{
-    --zatoi-pc-header-row-h:92px;
-  }
-
-  /* Ana AI header satırı */
-  #app:not(.people-chat-mode) > .main-column > .topbar{
-    height:var(--zatoi-pc-header-row-h)!important;
-    min-height:var(--zatoi-pc-header-row-h)!important;
-    max-height:var(--zatoi-pc-header-row-h)!important;
+  #app:not(.people-chat-mode) .desktop-side-mode-switch-wrap{
+    flex:0 0 68px!important;
+    height:68px!important;
+    min-height:68px!important;
+    max-height:68px!important;
+    padding:8px var(--zatoi-right-bar-side)!important;
     box-sizing:border-box!important;
   }
+}
 
-  /* Sağ sütunun bar satırı aynı yükseklikte biter */
+/* V14.49.5 — AI sağ panel başlığını kaldır + üst kutuyu çizgide bitir */
+@media (min-width:801px){
+
+  /* Geçmiş Sohbetler başlığını tamamen kaldır */
+  #app:not(.people-chat-mode) > .side-panel .history-header{
+    display:none!important;
+  }
+
+  /* Sağdaki AI/Sohbet/kullanıcı satırı ana üst satırla tam aynı yerde biter */
   #app:not(.people-chat-mode) > .side-panel > .desktop-side-mode-switch-wrap{
-    height:var(--zatoi-pc-header-row-h)!important;
-    min-height:var(--zatoi-pc-header-row-h)!important;
-    max-height:var(--zatoi-pc-header-row-h)!important;
+    height:68px!important;
+    min-height:68px!important;
+    max-height:68px!important;
+    flex:0 0 68px!important;
+    padding:8px var(--zatoi-right-bar-side)!important;
+    margin:0!important;
     box-sizing:border-box!important;
     border-bottom:1px solid var(--zatoi-border,#343842)!important;
   }
 
-  /* Geçmiş Sohbetler başlığı kendi üst çizgisini tekrar üretmesin */
-  #app:not(.people-chat-mode) > .side-panel .history-header{
-    border-top:0!important;
+  /* Geçmiş listesi artık doğrudan ortak çizginin altından başlar */
+  #app:not(.people-chat-mode) > .side-panel .history-list{
+    margin-top:0!important;
+    padding-top:16px!important;
   }
 }
 
