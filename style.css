@@ -10140,3 +10140,75 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.51.2 — MOBİL SOHBET HEADER: SADE / GÖRSELİ BOZMAYAN
+   Robot + avatar, başlığın doğal parçaları gibi görünür.
+   ========================================================= */
+@media (max-width:800px){
+
+  #app.people-chat-mode .people-mode-top{
+    padding-right:112px!important;
+  }
+
+  /* AI'ye dönüş: kırmızı kart yok, sade dairesel ikon */
+  #app.people-chat-mode .people-mode-switch{
+    top:13px!important;
+    right:62px!important;
+    width:42px!important;
+    min-width:42px!important;
+    max-width:42px!important;
+    height:42px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton{
+    width:42px!important;
+    min-width:42px!important;
+    max-width:42px!important;
+    height:42px!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    border-radius:50%!important;
+    background:#191b20!important;
+    box-shadow:none!important;
+  }
+
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton::before{
+    font-size:20px!important;
+  }
+
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton:active{
+    background:#24272e!important;
+    transform:scale(.95);
+  }
+
+  /* Hesap avatarı: küçük daire, ekstra kırmızı dış kutu kaldırıldı */
+  #app.people-chat-mode .people-mobile-account-btn{
+    top:13px!important;
+    right:14px!important;
+    width:42px!important;
+    height:42px!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    border-radius:50%!important;
+    background:#191b20!important;
+    box-shadow:none!important;
+  }
+
+  #app.people-chat-mode .people-mobile-account-avatar{
+    width:34px!important;
+    height:34px!important;
+    border-radius:50%!important;
+    background:#24272e center/cover no-repeat!important;
+    font-size:15px!important;
+  }
+
+  #app.people-chat-mode .people-mobile-account-btn[aria-expanded="true"]{
+    border-color:rgba(229,9,20,.72)!important;
+    background:#202126!important;
+    transform:none!important;
+    filter:none!important;
+  }
+}
+
