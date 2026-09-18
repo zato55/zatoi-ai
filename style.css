@@ -9687,3 +9687,24 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     overflow:visible;
   }
 }
+
+/* =========================================================
+   ZATOI BRAND V2.3 — MOBIL ODALAR / OZEL SOHBET GORUNURLUGU
+   Odalar sekmesi data-mobile-view degerini degistirir, acik
+   dock'un hidden durumunu degistirmez. Mobil dock oda panelinin
+   icinde kaldigindan, private disinda gorunurse eski kart gridi
+   oda listesine siziyordu. Gorunurlugu mevcut ekranla sinirla;
+   secili oda, mesaj verileri ve PC'deki dock davranisi korunur.
+   ========================================================= */
+@media (max-width:720px) {
+  .app.people-chat-mode > .people-chat-panel:not([data-mobile-view="private"])
+  .people-private-dock {
+    display:none!important;
+  }
+
+  /* Private ekraninin display:grid kurali hidden niteligini ezmesin. */
+  .app.people-chat-mode > .people-chat-panel[data-mobile-view="private"]
+  .people-private-dock[hidden] {
+    display:none!important;
+  }
+}
