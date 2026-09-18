@@ -10976,3 +10976,30 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     z-index:2!important;
   }
 }
+
+
+/* =========================================================
+   V14.53.4 — SABİT ROZETİ SADELEŞTİRME
+   Kırmızı şerit kaldırıldı; sade pin göstergesi.
+   ========================================================= */
+@media (min-width:801px){
+
+  .app.people-chat-mode #peopleMessages
+  .people-message-bubble:has(.people-pinned-badge)::before{
+    content:"📌 Sabit"!important;
+    left:14px!important;
+    top:29px!important;
+    height:18px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:var(--zatoi-muted)!important;
+    font-size:10px!important;
+    line-height:18px!important;
+    font-weight:700!important;
+    letter-spacing:.01em!important;
+    opacity:.82!important;
+  }
+}
