@@ -642,89 +642,40 @@
 </style>
 
 
-<style id="zatoi-global-account-menu-portal-style">
-@media (min-width:801px){
-  /* Dropdown body altında olduğu için AI/Sohbet parent görünürlüğünden etkilenmez. */
-  body > #desktopAccountDropdown{
-    position:fixed!important;
-    display:none!important;
-    width:190px!important;
-    max-width:calc(100vw - 16px)!important;
-    max-height:calc(100vh - 16px)!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-    z-index:999999!important;
-    background:#191b20!important;
-    border:1px solid #3a3e48!important;
-    border-radius:12px!important;
-    padding:6px!important;
-    box-shadow:0 16px 38px rgba(0,0,0,.48)!important;
+<style id="zatoi-global-menu-clean-fix">
+@media(min-width:801px){
+  #globalStableAccountDropdown{
+    position:fixed;
+    display:none;
+    width:190px;
+    padding:6px;
+    z-index:999999;
+    box-sizing:border-box;
+    border:1px solid #3a3e48;
+    border-radius:12px;
+    background:#191b20;
+    box-shadow:0 16px 38px rgba(0,0,0,.48);
   }
-
-  body > #desktopAccountDropdown.open{
-    display:flex!important;
-    flex-direction:column!important;
-    visibility:visible!important;
-    opacity:1!important;
-    pointer-events:auto!important;
+  #globalStableAccountDropdown.open{display:flex;flex-direction:column;gap:2px}
+  #globalStableAccountDropdown button{
+    display:grid;
+    grid-template-columns:22px minmax(0,1fr);
+    align-items:center;
+    width:100%;
+    height:38px;
+    padding:0 10px;
+    border:0;
+    border-radius:8px;
+    background:#17191e;
+    color:var(--zatoi-text,#f5f5f5);
+    font:inherit;
+    font-size:13px;
+    font-weight:650;
+    text-align:left;
+    cursor:pointer;
   }
-
-  /* Parent değiştiği için eski #app descendant kurallarını global menüye yeniden uygula. */
-  body > #desktopAccountDropdown .account-area{
-    display:contents!important;
-  }
-
-  body > #desktopAccountDropdown .account-name,
-  body > #desktopAccountDropdown .logout-btn,
-  body > #desktopAccountDropdown .settings-btn,
-  body > #desktopAccountDropdown .admin-btn,
-  body > #desktopAccountDropdown .admin-btn.show{
-    display:grid!important;
-    grid-template-columns:22px minmax(0,1fr)!important;
-    align-items:center!important;
-    justify-items:start!important;
-    column-gap:7px!important;
-    width:100%!important;
-    height:38px!important;
-    min-height:38px!important;
-    margin:0!important;
-    padding:0 10px!important;
-    box-sizing:border-box!important;
-    border:0!important;
-    border-radius:8px!important;
-    background:#17191e!important;
-    color:var(--zatoi-text,#f5f5f5)!important;
-    font:inherit!important;
-    font-size:13px!important;
-    font-weight:650!important;
-    line-height:1!important;
-    text-align:left!important;
-    white-space:nowrap!important;
-    cursor:pointer!important;
-  }
-
-  body > #desktopAccountDropdown .account-name:hover,
-  body > #desktopAccountDropdown .logout-btn:hover,
-  body > #desktopAccountDropdown .settings-btn:hover,
-  body > #desktopAccountDropdown .admin-btn:hover,
-  body > #desktopAccountDropdown .admin-btn.show:hover{
-    background:#24272e!important;
-  }
-
-  body > #desktopAccountDropdown .logout-btn{
-    color:#ff8f98!important;
-  }
-
-  body > #desktopAccountDropdown .admin-btn[hidden]{
-    display:none!important;
-  }
-
-  body > #desktopAccountDropdown .settings-btn > span,
-  body > #desktopAccountDropdown .admin-btn > span{
-    grid-column:2!important;
-    margin:0!important;
-    line-height:1!important;
-  }
+  #globalStableAccountDropdown button:hover{background:#24272e}
+  #globalStableAccountDropdown .danger{color:#ff8f98}
 }
 </style>
 
@@ -9470,82 +9421,82 @@ checkAuth();
 </script>
 
 
-<script id="zatoi-global-account-menu-portal-fix">
+<script id="zatoi-global-menu-clean-script">
 (() => {
-  const dropdown = document.getElementById("desktopAccountDropdown");
-  if (!dropdown) return;
+  const stableButtons=[...document.querySelectorAll(".stable-bar-menu-btn")];
+  if(!stableButtons.length) return;
 
-  /* Kritik düzeltme:
-     Dropdown AI header içinde kalırsa Sohbet modunda gizlenen parent ile birlikte kaybolur.
-     Body'ye taşıyarak gerçekten global hale getiriyoruz. */
-  if (dropdown.parentElement !== document.body) {
-    document.body.appendChild(dropdown);
+  const menu=document.createElement("div");
+  menu.id="globalStableAccountDropdown";
+  menu.innerHTML=`
+    <button type="button" data-action="profile"><span>👤</span><span class="global-menu-name">Kullanıcı</span></button>
+    <button type="button" class="danger" data-action="logout"><span>↪</span><span>Oturumu Kapat</span></button>
+    <button type="button" data-action="settings"><span>⚙️</span><span>Ayarlar</span></button>
+    <button type="button" data-action="admin"><span>🛡️</span><span>Yönetim</span></button>`;
+  document.body.appendChild(menu);
+
+  const original={
+    profile:document.getElementById("accountUsername"),
+    logout:document.getElementById("logoutButton"),
+    settings:document.getElementById("settingsButton"),
+    admin:document.getElementById("adminButton")
+  };
+
+  function sync(){
+    const name=(original.profile?.textContent||"").trim()||"Kullanıcı";
+    menu.querySelector(".global-menu-name").textContent=name;
+    stableButtons.forEach(b=>{
+      const n=b.querySelector(".stable-bar-username");
+      if(n) n.textContent=name;
+    });
+    const adminItem=menu.querySelector('[data-action="admin"]');
+    if(adminItem) adminItem.style.display =
+      original.admin && !original.admin.hidden ? "grid" : "none";
   }
 
-  const triggers = [...document.querySelectorAll(".stable-bar-menu-btn")];
-  if (!triggers.length) return;
+  function close(){
+    menu.classList.remove("open");
+    stableButtons.forEach(b=>b.setAttribute("aria-expanded","false"));
+  }
 
-  const closeMenu = () => {
-    dropdown.classList.remove("open");
-    dropdown.setAttribute("aria-hidden", "true");
-    triggers.forEach(btn => btn.setAttribute("aria-expanded", "false"));
-  };
-
-  const openFor = (btn) => {
-    closeMenu();
-
-    dropdown.classList.add("open");
-    dropdown.setAttribute("aria-hidden", "false");
-    btn.setAttribute("aria-expanded", "true");
-
-    requestAnimationFrame(() => {
-      const margin = 8;
-      const gap = 8;
-      const b = btn.getBoundingClientRect();
-      const d = dropdown.getBoundingClientRect();
-
-      let left = b.right - d.width;
-      left = Math.max(margin, Math.min(left, window.innerWidth - d.width - margin));
-
-      let top = b.bottom + gap;
-      if (top + d.height > window.innerHeight - margin) {
-        top = b.top - d.height - gap;
-      }
-      top = Math.max(margin, Math.min(top, window.innerHeight - d.height - margin));
-
-      dropdown.style.position = "fixed";
-      dropdown.style.left = Math.round(left) + "px";
-      dropdown.style.top = Math.round(top) + "px";
-      dropdown.style.right = "auto";
-      dropdown.style.bottom = "auto";
-      dropdown.style.zIndex = "999999";
+  function open(btn){
+    sync();
+    menu.classList.add("open");
+    btn.setAttribute("aria-expanded","true");
+    requestAnimationFrame(()=>{
+      const margin=8,gap=8,b=btn.getBoundingClientRect(),m=menu.getBoundingClientRect();
+      let left=Math.max(margin,Math.min(b.right-m.width,innerWidth-m.width-margin));
+      let top=b.bottom+gap;
+      if(top+m.height>innerHeight-margin) top=b.top-m.height-gap;
+      top=Math.max(margin,Math.min(top,innerHeight-m.height-margin));
+      menu.style.left=Math.round(left)+"px";
+      menu.style.top=Math.round(top)+"px";
     });
-  };
+  }
 
-  /* Capture kullanıyoruz; eski AI-only listener'ların davranışından bağımsız çalışır. */
-  triggers.forEach(btn => {
-    btn.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-
-      if (dropdown.classList.contains("open") &&
-          btn.getAttribute("aria-expanded") === "true") {
-        closeMenu();
-      } else {
-        openFor(btn);
-      }
-    }, true);
+  stableButtons.forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const wasOpen=menu.classList.contains("open") && btn.getAttribute("aria-expanded")==="true";
+      close();
+      if(!wasOpen) open(btn);
+    },true);
   });
 
-  dropdown.addEventListener("click", (event) => {
-    event.stopPropagation();
+  menu.addEventListener("click",e=>{
+    e.stopPropagation();
+    const item=e.target.closest("[data-action]");
+    if(!item) return;
+    const target=original[item.dataset.action];
+    close();
+    if(target) target.click();
   });
 
-  document.addEventListener("click", closeMenu);
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeMenu();
-  });
-  window.addEventListener("resize", closeMenu);
+  document.addEventListener("click",close);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape") close();});
+  window.addEventListener("resize",close);
+  sync();
 })();
 </script>
 
