@@ -8615,3 +8615,91 @@ body.zatoi-chat-admin .people-public-profile-moderate[hidden]{
     -webkit-tap-highlight-color:transparent!important;
   }
 }
+
+/* V14.45.2 — MOBİL TAŞMA + ÖZEL AKSİYON FIX */
+@media (max-width:720px){
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.people-message-group.mine{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:flex-start!important;
+    justify-content:flex-end!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0 0 14px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.people-message-group.mine > .people-message-user-card{
+    display:none!important;
+  }
+
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.people-message-group.mine > .people-message-group-stack{
+    position:relative!important;
+    display:flex!important;
+    flex:0 1 auto!important;
+    flex-direction:column!important;
+    align-items:flex-end!important;
+    width:fit-content!important;
+    min-width:92px!important;
+    max-width:78%!important;
+    margin:0!important;
+    padding:0!important;
+    gap:3px!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    transform:none!important;
+    left:auto!important;
+    right:auto!important;
+  }
+
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="general"]
+  #peopleMessages > .people-message-row.people-message-group.mine
+  > .people-message-group-stack > .people-message-bubble{
+    position:relative!important;
+    display:block!important;
+    width:fit-content!important;
+    min-width:92px!important;
+    max-width:100%!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    transform:none!important;
+    left:auto!important;
+    right:auto!important;
+  }
+
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble .people-message-reaction-action,
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble .people-message-reply-action,
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble .people-message-edit-action{
+    display:none!important;
+  }
+
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble.people-mobile-actions-open .people-message-reaction-action,
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble.people-mobile-actions-open .people-message-reply-action,
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble.people-mobile-actions-open .people-message-edit-action{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+
+  .app.people-chat-mode .people-chat-panel[data-mobile-view="private"]
+  #peoplePrivateMessages .people-private-bubble{
+    cursor:pointer!important;
+    -webkit-tap-highlight-color:transparent!important;
+  }
+}
