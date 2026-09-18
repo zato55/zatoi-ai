@@ -555,6 +555,25 @@
 }
 </style>
 
+
+<style id="zatoi-stable-menu-last-safe-style">
+@media (min-width:801px){
+  .stable-global-mode-bar{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) 86px!important;
+  }
+
+  /* Dropdown viewport dışına taşmasın. */
+  #desktopAccountDropdown{
+    position:fixed!important;
+    max-width:calc(100vw - 16px)!important;
+    max-height:calc(100vh - 16px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    z-index:99999!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -1051,9 +1070,9 @@
     <div class="people-mode-top">
       <div class="people-mode-brand"><strong>Zatoi</strong><span>AI ve insan sohbeti</span></div>
       <div class="zatoi-mode-switch people-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
-        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
         <button id="peopleAiModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">🤖 Zatoi AI</button>
         <button id="peopleChatModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">💬 Sohbet</button>
+        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
       </div>
     </div>
     <aside class="people-active-panel">
@@ -1145,9 +1164,9 @@
 
     <div class="desktop-side-mode-switch-wrap">
       <div class="zatoi-mode-switch desktop-side-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
-        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
         <button id="desktopSideAiModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">🤖 Zatoi AI</button>
         <button id="desktopSideChatModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">💬 Sohbet</button>
+        <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 Menü ▾</button>
       </div>
     </div>
 
@@ -9228,6 +9247,48 @@ checkAuth();
   document.addEventListener("click",closeStableMenu);
   document.addEventListener("keydown",e=>{if(e.key==="Escape") closeStableMenu();});
   window.addEventListener("resize",closeStableMenu);
+})();
+</script>
+
+
+<script id="zatoi-stable-menu-viewport-safe-position">
+(() => {
+  const dropdown = document.getElementById("desktopAccountDropdown");
+  const buttons = [...document.querySelectorAll(".stable-bar-menu-btn")];
+  if (!dropdown || !buttons.length) return;
+
+  function keepInsideViewport(btn){
+    requestAnimationFrame(() => {
+      if (!dropdown.classList.contains("open")) return;
+
+      const gap = 8;
+      const margin = 8;
+      const b = btn.getBoundingClientRect();
+      const d = dropdown.getBoundingClientRect();
+
+      /* Menü son segmentte: varsayılan olarak sağ kenarı butonun sağ kenarına hizala. */
+      let left = b.right - d.width;
+      left = Math.max(margin, Math.min(left, window.innerWidth - d.width - margin));
+
+      let top = b.bottom + gap;
+
+      /* Aşağı sığmazsa barın üstüne aç. */
+      if (top + d.height > window.innerHeight - margin) {
+        top = b.top - d.height - gap;
+      }
+
+      /* Yine taşma varsa viewport içine sıkıştır. */
+      top = Math.max(margin, Math.min(top, window.innerHeight - d.height - margin));
+
+      dropdown.style.left = Math.round(left) + "px";
+      dropdown.style.top = Math.round(top) + "px";
+      dropdown.style.right = "auto";
+    });
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => keepInsideViewport(btn));
+  });
 })();
 </script>
 
