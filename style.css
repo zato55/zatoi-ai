@@ -9887,3 +9887,25 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* V14.49.2 — PC üst yatay geometri hizası
+   Sol/orta header alt çizgisi ile sağ mod barının alt çizgisini aynı Y seviyesine getirir. */
+@media (min-width:801px){
+  :root{
+    --zatoi-pc-top-row-h:84px;
+  }
+
+  #app:not(.people-chat-mode) .topbar,
+  #app:not(.people-chat-mode) .desktop-side-mode-switch-wrap{
+    height:var(--zatoi-pc-top-row-h)!important;
+    min-height:var(--zatoi-pc-top-row-h)!important;
+    max-height:var(--zatoi-pc-top-row-h)!important;
+    box-sizing:border-box!important;
+  }
+
+  #app:not(.people-chat-mode) .desktop-side-mode-switch-wrap{
+    padding:14px var(--zatoi-right-bar-side)!important;
+    display:flex!important;
+    align-items:center!important;
+  }
+}
+
