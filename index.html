@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.51.4">
+  <link rel="stylesheet" href="./style.css?v=14.51.5">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -9209,6 +9209,14 @@ checkAuth();
 
     syncMobileAccountAvatar();
     syncMobileAdminVisibility();
+
+    /* Oturumu Kapat her zaman menünün en altında olsun. */
+    const logoutMenuButton = Array.from(dropdown.querySelectorAll("button")).find(button =>
+      /oturumu kapat/i.test(button.textContent || "")
+    );
+    if (logoutMenuButton) {
+      dropdown.appendChild(logoutMenuButton);
+    }
 
     const rect = mobileButton.getBoundingClientRect();
     const width = Math.min(210, window.innerWidth - 16);
