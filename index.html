@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.57.4">
+  <link rel="stylesheet" href="./style.css?v=14.57.5">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -9441,18 +9441,6 @@ checkAuth();
 
 </body>
 </html>
-/* V14.57.4 — Yönetim menüsü sadece gerçek admin rolünde görünür. */
-function zatoiEnforceAdminMenuVisibility(){
-  const adminButton = document.getElementById("adminMenuButton");
-  if (!adminButton) return;
-  const allowed = String(currentUser?.role || "").trim().toLowerCase() === "admin";
-  adminButton.hidden = !allowed;
-  adminButton.setAttribute("aria-hidden", allowed ? "false" : "true");
-  adminButton.style.setProperty("display", allowed ? "" : "none", "important");
-  if (!allowed) adminButton.setAttribute("tabindex", "-1");
-  else adminButton.removeAttribute("tabindex");
-}
-
 
 <script id="zatoi-v14-57-4-account-menu-guard">
 (() => {
