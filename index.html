@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.60">
+  <link rel="stylesheet" href="./style.css?v=14.61">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -1206,6 +1206,20 @@
           <button type="button" data-avatar="pixel" class="profile-avatar-choice" aria-label="Kristal" title="Kristal">◆</button>
           <button type="button" data-avatar="nova" class="profile-avatar-choice" aria-label="Nova" title="Nova">✺</button>
           <button type="button" data-avatar="shield" class="profile-avatar-choice" aria-label="Kalkan" title="Kalkan">⬡</button>
+        </div>
+        <div id="profileAdminAvatarCollection" class="profile-admin-avatar-collection" hidden>
+          <div class="profile-admin-avatar-heading">
+            <span class="profile-admin-avatar-kicker">YÖNETİCİ KOLEKSİYONU</span>
+            <span class="profile-admin-avatar-lock">ZATOI • ADMIN</span>
+          </div>
+          <div class="profile-admin-avatar-choices" role="radiogroup" aria-label="Yönetici avatarı seç">
+            <button type="button" data-avatar="admin-commander" class="profile-avatar-choice profile-admin-avatar-choice" aria-label="Komutan" title="Komutan"><img src="./admin-commander.webp?v=14.61" alt=""></button>
+            <button type="button" data-avatar="admin-guardian" class="profile-avatar-choice profile-admin-avatar-choice" aria-label="Siber Muhafız" title="Siber Muhafız"><img src="./admin-guardian.webp?v=14.61" alt=""></button>
+            <button type="button" data-avatar="admin-operator" class="profile-avatar-choice profile-admin-avatar-choice" aria-label="Maskeli Operatör" title="Maskeli Operatör"><img src="./admin-operator.webp?v=14.61" alt=""></button>
+            <button type="button" data-avatar="admin-android" class="profile-avatar-choice profile-admin-avatar-choice" aria-label="Android" title="Android"><img src="./admin-android.webp?v=14.61" alt=""></button>
+            <button type="button" data-avatar="admin-shadow" class="profile-avatar-choice profile-admin-avatar-choice" aria-label="Gölge Ajan" title="Gölge Ajan"><img src="./admin-shadow.webp?v=14.61" alt=""></button>
+            <button type="button" data-avatar="admin-sentinel" class="profile-avatar-choice profile-admin-avatar-choice" aria-label="Zatoi Sentinel" title="Zatoi Sentinel"><img src="./admin-sentinel.webp?v=14.61" alt=""></button>
+          </div>
         </div>
         <div class="profile-help">Zatoi profilinde görünecek simgeyi seç.</div>
       </div>
@@ -3671,7 +3685,15 @@ function renderMessages() {
         const profile = currentUser?.profile || {};
         const avatarKey = PROFILE_AVATARS[profile.avatarKey] ? profile.avatarKey : "spark";
         avatar.classList.add("profile-avatar-" + avatarKey);
-        avatar.textContent = PROFILE_AVATARS[avatarKey] || "✦";
+        if (ADMIN_PROFILE_AVATARS.has(avatarKey)) {
+          const profileAvatarImage = document.createElement("img");
+          profileAvatarImage.src = PROFILE_AVATARS[avatarKey];
+          profileAvatarImage.alt = "";
+          profileAvatarImage.className = "profile-avatar-character-image";
+          avatar.appendChild(profileAvatarImage);
+        } else {
+          avatar.textContent = PROFILE_AVATARS[avatarKey] || "✦";
+        }
         identityName.textContent = profile.displayName?.trim() || currentUser?.username || "Sen";
       } else {
         avatar.classList.add("zatoi-chat-avatar");
@@ -7392,8 +7414,34 @@ const profileLogoutOthersButton = document.getElementById("profileLogoutOthersBu
 const openProfileButton = document.getElementById("openProfileButton");
 
 const PROFILE_AVATARS = {
-  spark: "✦", orbit: "◉", bolt: "ϟ", pixel: "◆", nova: "✺", shield: "⬡"
+  spark: "✦", orbit: "◉", bolt: "ϟ", pixel: "◆", nova: "✺", shield: "⬡",
+  "admin-commander": "./admin-commander.webp?v=14.61",
+  "admin-guardian": "./admin-guardian.webp?v=14.61",
+  "admin-operator": "./admin-operator.webp?v=14.61",
+  "admin-android": "./admin-android.webp?v=14.61",
+  "admin-shadow": "./admin-shadow.webp?v=14.61",
+  "admin-sentinel": "./admin-sentinel.webp?v=14.61"
 };
+const ADMIN_PROFILE_AVATARS = new Set([
+  "admin-commander","admin-guardian","admin-operator",
+  "admin-android","admin-shadow","admin-sentinel"
+]);
+
+function renderProfileAvatarElement(element, key) {
+  if (!element) return;
+  element.replaceChildren();
+  element.className = element.className.replace(/\bprofile-avatar-[^\s]+/g, "").trim();
+  element.classList.add(`profile-avatar-${key}`);
+  if (ADMIN_PROFILE_AVATARS.has(key)) {
+    const image = document.createElement("img");
+    image.src = PROFILE_AVATARS[key];
+    image.alt = "";
+    image.className = "profile-avatar-character-image";
+    element.appendChild(image);
+  } else {
+    element.textContent = PROFILE_AVATARS[key] || "✦";
+  }
+}
 let selectedProfileAvatar = "spark";
 
 function profileData() {
@@ -7408,12 +7456,17 @@ function formatProfileDate(value) {
 }
 
 function paintProfileAvatar(key) {
-  selectedProfileAvatar = PROFILE_AVATARS[key] ? key : "spark";
-  profileAvatarPreview.textContent = PROFILE_AVATARS[selectedProfileAvatar];
-  profileAvatarPreview.className = `profile-avatar profile-avatar-${selectedProfileAvatar}`;
+  const requested = PROFILE_AVATARS[key] ? key : "spark";
+  selectedProfileAvatar = (ADMIN_PROFILE_AVATARS.has(requested) && currentUser?.role !== "admin")
+    ? "spark"
+    : requested;
+
+  renderProfileAvatarElement(profileAvatarPreview, selectedProfileAvatar);
+
   document.querySelectorAll(".profile-avatar-choice").forEach(button => {
     const active = button.dataset.avatar === selectedProfileAvatar;
     button.classList.toggle("active", active);
+    button.classList.toggle("selected", active);
     button.setAttribute("aria-checked", String(active));
   });
 }
@@ -7422,7 +7475,7 @@ function refreshProfilePreview() {
   const display = profileDisplayName.value.trim() || currentUser?.username || "Zatoi kullanıcısı";
   profileDisplayPreview.textContent = display;
   profileUsernamePreview.textContent = `@${currentUser?.username || "kullanici"}`;
-  profileRoleBadge.textContent = currentUser?.role === "admin" ? "ADMIN" : "USER";
+  profileRoleBadge.textContent = currentUser?.role === "admin" ? "YÖNETİCİ" : "ZATOI ÜYESİ";
   profileRoleBadge.classList.toggle("admin", currentUser?.role === "admin");
   profileBioCount.textContent = String(profileBio.value.length);
 }
@@ -7435,6 +7488,8 @@ function fillProfileForm() {
   profileMetaUsername.textContent = currentUser?.username || "—";
   profileMetaRole.textContent = currentUser?.role === "admin" ? "Yönetici" : "Kullanıcı";
   profileMetaCreated.textContent = formatProfileDate(profile.profileCreatedAt);
+  const adminCollection = document.getElementById("profileAdminAvatarCollection");
+  if (adminCollection) adminCollection.hidden = currentUser?.role !== "admin";
   paintProfileAvatar(profile.avatarKey || "spark");
   refreshProfilePreview();
 }
