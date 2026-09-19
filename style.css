@@ -11167,3 +11167,205 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     font-size:10px;
   }
 }
+
+
+/* =========================================================
+   V14.57 — MODERN YANITLA (REPLY)
+   Mevcut reply altyapısı korunur; sadece kullanım/görünüm modernleşir.
+   Genel sohbet + özel oda / PC + mobil.
+   ========================================================= */
+
+/* Yazma alanındaki aktif yanıt önizlemesi */
+.people-composer > .people-reply-preview,
+.people-private-composer > .people-reply-preview{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 30px!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-height:48px!important;
+  margin:0 0 7px!important;
+  padding:7px 8px 7px 12px!important;
+  border:1px solid rgba(var(--zatoi-red-rgb),.28)!important;
+  border-left:3px solid var(--zatoi-brand-red,#e50914)!important;
+  border-radius:11px!important;
+  background:linear-gradient(90deg,rgba(var(--zatoi-red-rgb),.10),rgba(var(--zatoi-surface-rgb),.78))!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+
+.people-composer > .people-reply-preview[hidden],
+.people-private-composer > .people-reply-preview[hidden]{
+  display:none!important;
+}
+
+/* Eski ayrı reply emojisi artık gereksiz; isimde temiz ↩ var. */
+.people-reply-preview > .people-reply-preview-icon{
+  display:none!important;
+}
+
+.people-reply-preview-copy{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-width:0!important;
+  gap:3px!important;
+}
+
+.people-reply-preview-copy strong{
+  display:block!important;
+  margin:0!important;
+  color:#ff7c84!important;
+  font-size:11px!important;
+  line-height:1.15!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+.people-reply-preview-copy small{
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+  color:var(--zatoi-muted,#9ca3af)!important;
+  font-size:11px!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+.people-reply-cancel{
+  display:grid!important;
+  place-items:center!important;
+  width:28px!important;
+  min-width:28px!important;
+  height:28px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:8px!important;
+  background:rgba(var(--zatoi-black-rgb),.34)!important;
+  color:var(--zatoi-muted,#9ca3af)!important;
+  font-size:18px!important;
+  line-height:1!important;
+  transition:background .14s ease,color .14s ease,border-color .14s ease!important;
+}
+
+.people-reply-cancel:hover{
+  border-color:rgba(var(--zatoi-red-rgb),.42)!important;
+  background:rgba(var(--zatoi-red-rgb),.15)!important;
+  color:#fff!important;
+}
+
+/* Gönderilmiş mesajın içindeki alıntı */
+#peopleMessages .people-replied-message,
+#peoplePrivateMessages .people-private-replied-message{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0 0 7px!important;
+  padding:7px 9px 7px 11px!important;
+  border:0!important;
+  border-left:2px solid rgba(var(--zatoi-red-rgb),.78)!important;
+  border-radius:7px!important;
+  background:rgba(var(--zatoi-black-rgb),.28)!important;
+  color:inherit!important;
+  box-shadow:none!important;
+  text-align:left!important;
+  overflow:hidden!important;
+}
+
+#peopleMessages .people-replied-message:hover,
+#peoplePrivateMessages .people-private-replied-message:hover{
+  background:rgba(var(--zatoi-red-rgb),.09)!important;
+}
+
+#peopleMessages .people-replied-message strong,
+#peoplePrivateMessages .people-private-replied-message strong{
+  display:flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0 0 3px!important;
+  color:#ff7c84!important;
+  font-size:10px!important;
+  line-height:1.15!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+.people-reply-mini-arrow{
+  flex:0 0 auto!important;
+  font-size:11px!important;
+}
+
+#peopleMessages .people-replied-message span:not(.people-reply-mini-arrow),
+#peoplePrivateMessages .people-private-replied-message span:not(.people-reply-mini-arrow){
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  color:var(--zatoi-muted,#9ca3af)!important;
+  font-size:10px!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* Yanıtla aksiyonu: emoji görünümünden sade ikon düğmesine */
+#peopleMessages .people-message-reply-action,
+#peoplePrivateMessages .people-message-reply-action{
+  font-family:Arial,sans-serif!important;
+  font-weight:900!important;
+  color:var(--zatoi-muted,#9ca3af)!important;
+}
+
+#peopleMessages .people-message-reply-action:hover,
+#peoplePrivateMessages .people-message-reply-action:hover{
+  color:#fff!important;
+  border-color:rgba(var(--zatoi-red-rgb),.42)!important;
+  background:rgba(var(--zatoi-red-rgb),.14)!important;
+}
+
+/* Yanıtlanan mesaja atlayınca kısa, temiz vurgu. */
+#peopleMessages .people-message-highlight,
+#peoplePrivateMessages .people-message-highlight{
+  animation:zatoiReplyHighlight 1.35s ease!important;
+}
+
+@keyframes zatoiReplyHighlight{
+  0%,100%{ box-shadow:0 6px 16px rgba(0,0,0,.13); }
+  30%{ box-shadow:0 0 0 2px rgba(var(--zatoi-red-rgb),.48),0 8px 24px rgba(0,0,0,.22); }
+}
+
+@media(max-width:720px){
+  .people-composer > .people-reply-preview,
+  .people-private-composer > .people-reply-preview{
+    min-height:44px!important;
+    margin-bottom:6px!important;
+    padding:6px 7px 6px 10px!important;
+    border-radius:10px!important;
+  }
+
+  #peopleMessages .people-replied-message,
+  #peoplePrivateMessages .people-private-replied-message{
+    padding:6px 8px 6px 10px!important;
+    margin-bottom:6px!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  #peopleMessages .people-message-highlight,
+  #peoplePrivateMessages .people-message-highlight{
+    animation:none!important;
+  }
+}
