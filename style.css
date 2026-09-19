@@ -11831,3 +11831,179 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.58.1 — ZATOI PROFILE / COMPACT IDENTITY
+   - PC + mobil: yatay kimlik kompozisyonu
+   - Mobil sheet daha kısa ve sıkı
+   - Durum rozeti gerçek aktiflik verisine göre stillenir
+   - V14.57.5 sohbet davranışlarına dokunmaz
+   ========================================================= */
+
+.people-public-profile-card{
+  display:grid!important;
+  grid-template-columns:86px minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto auto!important;
+  column-gap:18px!important;
+  align-items:center!important;
+  width:min(430px,calc(100vw - 32px))!important;
+  padding:24px!important;
+}
+
+.people-public-profile-avatar{
+  grid-column:1!important;
+  grid-row:1 / span 4!important;
+  width:86px!important;
+  height:86px!important;
+  margin:0!important;
+  border-radius:25px!important;
+  align-self:start!important;
+}
+
+.people-public-profile-kicker{
+  position:static!important;
+  grid-column:2!important;
+  grid-row:1!important;
+  align-self:end!important;
+  margin:0 44px 7px 0!important;
+  font-size:9px!important;
+}
+
+.people-public-profile-card>strong{
+  grid-column:2!important;
+  grid-row:2!important;
+  align-self:center!important;
+  font-size:24px!important;
+}
+
+.people-public-profile-card>span{
+  grid-column:2!important;
+  grid-row:3!important;
+  margin:3px 0 0!important;
+  align-self:start!important;
+}
+
+.people-public-profile-meta{
+  grid-column:2!important;
+  grid-row:4!important;
+  margin:10px 0 0!important;
+  align-self:start!important;
+}
+
+.people-public-profile-card>p{
+  grid-column:1 / -1!important;
+  grid-row:auto!important;
+  width:100%!important;
+  min-height:62px!important;
+  margin:19px 0 13px!important;
+  padding:13px 15px 13px 16px!important;
+  box-sizing:border-box!important;
+}
+
+.people-public-profile-actions{
+  grid-column:1 / -1!important;
+  width:100%!important;
+}
+
+.people-public-profile-actions button{
+  min-height:44px!important;
+}
+
+.people-public-profile-close{
+  top:14px!important;
+  right:14px!important;
+}
+
+.people-public-profile-state{
+  color:#7f8792!important;
+}
+.people-public-profile-state.online{
+  color:#aeb5bf!important;
+}
+.people-public-profile-state.online::first-letter{
+  color:#55d98a!important;
+}
+
+/* Yönetici kartında rozet ve ince üst çizgi biraz daha belirgin. */
+.people-public-profile-role.admin{
+  color:#fff!important;
+  border-color:rgba(229,9,20,.55)!important;
+  background:linear-gradient(180deg,rgba(229,9,20,.22),rgba(229,9,20,.10))!important;
+}
+.people-public-profile-modal.zatoi-owner-profile .people-public-profile-card::before{
+  width:118px!important;
+  background:linear-gradient(90deg,transparent,#e50914,#ff6269,transparent)!important;
+}
+
+/* MOBİL — daha kısa, yatay kimlikli bottom sheet */
+@media (max-width:720px){
+  .people-public-profile-card{
+    grid-template-columns:74px minmax(0,1fr)!important;
+    column-gap:15px!important;
+    width:100%!important;
+    max-width:none!important;
+    max-height:min(72dvh,590px)!important;
+    padding:29px 18px calc(16px + env(safe-area-inset-bottom,0px))!important;
+    border-radius:26px 26px 0 0!important;
+  }
+
+  .people-public-profile-avatar{
+    width:74px!important;
+    height:74px!important;
+    border-radius:22px!important;
+    font-size:28px!important;
+  }
+
+  .people-public-profile-kicker{
+    margin:0 42px 5px 0!important;
+    font-size:8px!important;
+    letter-spacing:.14em!important;
+  }
+
+  .people-public-profile-card>strong{
+    font-size:21px!important;
+    line-height:1.08!important;
+  }
+
+  .people-public-profile-card>span{
+    font-size:11px!important;
+  }
+
+  .people-public-profile-meta{
+    gap:5px!important;
+    margin-top:8px!important;
+  }
+
+  .people-public-profile-role,
+  .people-public-profile-state{
+    min-height:21px!important;
+    padding:0 7px!important;
+    font-size:8px!important;
+  }
+
+  .people-public-profile-card>p{
+    min-height:56px!important;
+    margin:16px 0 12px!important;
+    padding:12px 14px 12px 15px!important;
+    border-radius:15px!important;
+    font-size:12px!important;
+    line-height:1.48!important;
+  }
+
+  .people-public-profile-actions{
+    gap:7px!important;
+  }
+
+  .people-public-profile-actions button{
+    min-height:45px!important;
+    border-radius:14px!important;
+    font-size:12px!important;
+  }
+
+  .people-public-profile-close{
+    top:17px!important;
+    right:15px!important;
+    width:34px!important;
+    height:34px!important;
+  }
+}
+
