@@ -11413,3 +11413,36 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     box-sizing:border-box!important;
   }
 }
+
+
+/* =========================================================
+   V14.57.3 — MOBİL ÖZEL ODA REPLY X HİZALAMA
+   PC ve mobil genel sohbet görünümü korunur.
+   Sadece mobil özel sohbet yanıt önizlemesi düzeltilir.
+   ========================================================= */
+@media (max-width:720px){
+  .people-private-composer > .people-reply-preview{
+    position:relative!important;
+    box-sizing:border-box!important;
+    padding-right:46px!important;
+  }
+
+  .people-private-composer > .people-reply-preview .people-reply-cancel{
+    position:absolute!important;
+    top:50%!important;
+    right:8px!important;
+    margin:0!important;
+    transform:translateY(-50%)!important;
+
+    width:28px!important;
+    min-width:28px!important;
+    max-width:28px!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+
+    padding:0!important;
+    border-radius:8px!important;
+    box-sizing:border-box!important;
+  }
+}
