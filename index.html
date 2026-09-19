@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.61.4">
+  <link rel="stylesheet" href="./style.css?v=14.61.5">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -8075,7 +8075,7 @@ function renderPeopleActiveUsers() {
 
   peopleActiveList.innerHTML = users.map(user => `
     <button class="people-user-card ${user.role === "admin" ? "zatoi-owner-card" : "zatoi-user-card"}" type="button" data-user-id="${peopleEscape(user.userId)}">
-      <span class="people-user-avatar">${peopleEscape(peopleAvatarText(user))}<i></i></span>
+      <span class="people-user-avatar">${peopleAvatarHtml(user)}<i></i></span>
       <span class="people-user-info">
         <strong>${peopleEscape(peopleDisplayName(user))}</strong>
         <small>@${peopleEscape(user.username || "kullanici")}</small>
@@ -8106,7 +8106,7 @@ function renderPeopleRooms() {
       : "";
     return `
       <button class="people-room-card${active}${unreadClass}" type="button" data-room-id="${peopleEscape(room.roomId)}">
-        <span class="people-room-avatar">${peopleEscape(peopleAvatarText(room.partner))}${room.partner?.isActive ? "<i></i>" : ""}</span>
+        <span class="people-room-avatar">${peopleAvatarHtml(room.partner)}${room.partner?.isActive ? "<i></i>" : ""}</span>
         <span class="people-room-info">
           <strong>${peopleEscape(peopleDisplayName(room.partner))}</strong>
           <small>${preview}</small>
