@@ -11379,3 +11379,37 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
 .people-private-composer > .people-reply-preview .people-reply-cancel{
   margin-right:6px!important;
 }
+
+
+/* =========================================================
+   V14.57.2 — PC REPLY X BUTONU KESİN HİZALAMA
+   Mobilde çalışan görünüm korunur.
+   Sadece PC (>=721px) yanıt önizlemesi düzeltilir.
+   ========================================================= */
+@media (min-width:721px){
+  .people-composer > .people-reply-preview,
+  .people-private-composer > .people-reply-preview{
+    box-sizing:border-box!important;
+    padding-right:48px!important;
+  }
+
+  .people-composer > .people-reply-preview .people-reply-cancel,
+  .people-private-composer > .people-reply-preview .people-reply-cancel{
+    position:absolute!important;
+    top:50%!important;
+    right:10px!important;
+    margin:0!important;
+    transform:translateY(-50%)!important;
+
+    width:30px!important;
+    min-width:30px!important;
+    max-width:30px!important;
+    height:30px!important;
+    min-height:30px!important;
+    max-height:30px!important;
+
+    padding:0!important;
+    border-radius:8px!important;
+    box-sizing:border-box!important;
+  }
+}
