@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.57">
+  <link rel="stylesheet" href="./style.css?v=14.57.4">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -9441,3 +9441,62 @@ checkAuth();
 
 </body>
 </html>
+/* V14.57.4 — Yönetim menüsü sadece gerçek admin rolünde görünür. */
+function zatoiEnforceAdminMenuVisibility(){
+  const adminButton = document.getElementById("adminMenuButton");
+  if (!adminButton) return;
+  const allowed = String(currentUser?.role || "").trim().toLowerCase() === "admin";
+  adminButton.hidden = !allowed;
+  adminButton.setAttribute("aria-hidden", allowed ? "false" : "true");
+  adminButton.style.setProperty("display", allowed ? "" : "none", "important");
+  if (!allowed) adminButton.setAttribute("tabindex", "-1");
+  else adminButton.removeAttribute("tabindex");
+}
+
+
+<script id="zatoi-v14-57-4-account-menu-guard">
+(() => {
+  function isRealAdmin(){
+    return String(window.currentUser?.role || currentUser?.role || "").trim().toLowerCase() === "admin";
+  }
+
+  function enforce(){
+    const dropdown = document.getElementById("globalStableAccountDropdown");
+    const adminButton = document.getElementById("adminMenuButton")
+      || dropdown?.querySelector('[data-action="admin"], [data-menu="admin"], .admin-menu-button');
+
+    if (adminButton) {
+      const allowed = isRealAdmin();
+      adminButton.hidden = !allowed;
+      adminButton.setAttribute("aria-hidden", allowed ? "false" : "true");
+      adminButton.style.setProperty("display", allowed ? "" : "none", "important");
+      if (!allowed) adminButton.setAttribute("tabindex", "-1");
+      else adminButton.removeAttribute("tabindex");
+    }
+
+    // Çıkış her zaman en altta.
+    if (dropdown) {
+      const logout = Array.from(dropdown.querySelectorAll("button")).find(btn =>
+        /oturumu kapat/i.test(btn.textContent || "")
+      );
+      if (logout) dropdown.appendChild(logout);
+    }
+  }
+
+  document.addEventListener("click", event => {
+    if (event.target.closest("#peopleMobileAccountButton,.stable-bar-menu-btn")) {
+      requestAnimationFrame(enforce);
+    }
+  }, true);
+
+  const dropdown = document.getElementById("globalStableAccountDropdown");
+  if (dropdown) {
+    new MutationObserver(enforce).observe(dropdown, {
+      attributes:true,
+      attributeFilter:["hidden","class","style","aria-hidden"]
+    });
+  }
+
+  enforce();
+})();
+</script>
