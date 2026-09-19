@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.55">
+  <link rel="stylesheet" href="./style.css?v=14.56">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -8526,7 +8526,7 @@ function syncPrivateIntoMobileConversation(openPrivate) {
   setPeopleMobileView(openPrivate ? "private" : "general");
 }
 
-function renderPeoplePrivateMessages(messages) {
+function renderPeoplePrivateMessages(messages, partnerReadAt = null) {
   // V14.35.4:
   // PC: en yeni özel mesaj üstte.
   // Mobil: eski özel mesaj üstte, yeni mesaj aşağıda.
@@ -8570,6 +8570,14 @@ function renderPeoplePrivateMessages(messages) {
               <div class="people-private-message-foot">
                 <time>${peopleEscape(peopleTime(message.createdAt))}</time>
                 ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
+                ${mine ? (() => {
+                  const messageTime = Date.parse(message.createdAt || "") || 0;
+                  const readTime = Date.parse(partnerReadAt || "") || 0;
+                  const isRead = Boolean(readTime && messageTime && messageTime <= readTime);
+                  return `<span class="people-private-delivery-status ${isRead ? "read" : "delivered"}"
+                    title="${isRead ? "Okundu" : "İletildi"}"
+                    aria-label="${isRead ? "Okundu" : "İletildi"}">${isRead ? "✓✓" : "✓"}</span>`;
+                })() : ""}
                 <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"private",message.messageId)}</span>
                 <button class="people-message-reaction-action" type="button" data-reaction-picker="private" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
                 <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
@@ -8633,11 +8641,27 @@ async function loadPeoplePrivateMessages({ silent = false } = {}) {
   try {
     const data = await peopleApi("get_messages", { roomId: peopleCurrentRoomId });
     const messages = Array.isArray(data.messages) ? data.messages : [];
-    const signature = peopleReactionSignature(messages);
+    const partnerReadAt = data.partnerReadAt || null;
+    const signature = `${peopleReactionSignature(messages)}|read:${partnerReadAt || ""}`;
     const dockSignature = peoplePrivateMessages?.dataset.signature || "";
     if (!silent || signature !== dockSignature) {
       if (peoplePrivateMessages) peoplePrivateMessages.dataset.signature = signature;
-      renderPeoplePrivateMessages(messages);
+      renderPeoplePrivateMessages(messages, partnerReadAt);
+    }
+
+    // Oda gerçekten açıksa gelen mesajları okundu olarak işaretle.
+    // Genel sohbet bu sisteme dahil değildir.
+    if (peoplePrivateDock && !peoplePrivateDock.hidden && peopleCurrentRoomId) {
+      const hasUnreadIncoming = messages.some(message =>
+        String(message?.senderId || "") !== String(currentUser?.userId || "")
+      );
+      if (hasUnreadIncoming) {
+        try {
+          await peopleApi("mark_room_read", { roomId: peopleCurrentRoomId });
+          const current = peopleRooms.find(item => item.roomId === peopleCurrentRoomId);
+          if (current) current.unreadCount = 0;
+        } catch {}
+      }
     }
   } catch (error) {
     if (!silent && peoplePrivateMessages) {
@@ -8688,12 +8712,7 @@ async function selectPeopleRoom(roomId) {
   syncPrivateIntoMobileConversation(true);
   renderPeopleRooms();
   await loadPeoplePrivateMessages();
-  try {
-    await peopleApi("mark_room_read", { roomId });
-    const current = peopleRooms.find(item => item.roomId === roomId);
-    if (current) current.unreadCount = 0;
-    renderPeopleRooms();
-  } catch {}
+  renderPeopleRooms();
   peoplePrivateInput?.focus();
 }
 
