@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.61.2">
+  <link rel="stylesheet" href="./style.css?v=14.61.3">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -8864,7 +8864,20 @@ async function selectPeopleRoom(roomId) {
   const room = peopleRooms.find(item => item.roomId === roomId);
   peopleCurrentPartner = room?.partner || null;
 
-  if (peoplePrivateAvatar) peoplePrivateAvatar.textContent = peopleAvatarText(peopleCurrentPartner);
+  if (peoplePrivateAvatar) (() => {
+          const avatarKey = String(peopleCurrentPartner?.avatarKey || peopleCurrentPartner?.avatar_key || "");
+          if (ADMIN_PROFILE_AVATARS.has(avatarKey)) {
+            peoplePrivateAvatar.replaceChildren();
+            peoplePrivateAvatar.classList.add(`profile-avatar-${avatarKey}`);
+            const avatarImage = document.createElement("img");
+            avatarImage.src = PROFILE_AVATARS[avatarKey];
+            avatarImage.alt = "";
+            avatarImage.className = "profile-avatar-character-image";
+            peoplePrivateAvatar.appendChild(avatarImage);
+          } else {
+            peoplePrivateAvatar.textContent = peopleAvatarText(peopleCurrentPartner);
+          }
+        })();
   if (peoplePrivateName) peoplePrivateName.textContent = peopleDisplayName(peopleCurrentPartner);
   if (peoplePrivateStatus) {
     peoplePrivateStatus.textContent = peopleCurrentPartner?.isActive
@@ -9619,6 +9632,38 @@ checkAuth();
 
   new MutationObserver(syncFriendlyRole).observe(badge,{childList:true,characterData:true,subtree:true});
   syncFriendlyRole();
+})();
+</script>
+
+
+<script id="zatoi-v14-61-3-chat-admin-avatar-bridge">
+(() => {
+  function upgrade(root=document){
+    root.querySelectorAll?.("[data-avatar-key^='admin-']").forEach(el => {
+      const key = String(el.dataset.avatarKey || "");
+      if (!window.PROFILE_AVATARS && typeof PROFILE_AVATARS === "undefined") return;
+      if (typeof ADMIN_PROFILE_AVATARS === "undefined" || !ADMIN_PROFILE_AVATARS.has(key)) return;
+      if (el.querySelector(".profile-avatar-character-image")) return;
+      el.replaceChildren();
+      el.classList.add(`profile-avatar-${key}`);
+      const img = document.createElement("img");
+      img.src = PROFILE_AVATARS[key];
+      img.alt = "";
+      img.className = "profile-avatar-character-image";
+      el.appendChild(img);
+    });
+  }
+  const observer = new MutationObserver(records => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (node.nodeType === 1) upgrade(node);
+      }
+    }
+  });
+  if (document.body) {
+    observer.observe(document.body,{childList:true,subtree:true});
+    upgrade();
+  }
 })();
 </script>
 
