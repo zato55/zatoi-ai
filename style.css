@@ -12692,3 +12692,21 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+
+
+/* V14.59.3 — Mobile global account dropdown FOUC fix.
+   The original structural rules live in a desktop-only media block.
+   This makes the mobile state explicit and prevents raw HTML flashing. */
+@media (max-width:800px){
+  #globalStableAccountDropdown:not(.open){
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+  }
+  #globalStableAccountDropdown.open{
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+}
