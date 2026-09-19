@@ -12943,3 +12943,25 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   border-radius:inherit!important;
 }
 
+/* =========================================================
+   V14.61.5 — PRIVATE ROOM LIST ADMIN AVATAR
+   Özel Odalar listesindeki avatar da karakter görselini kullanır.
+   ========================================================= */
+.people-private-room-avatar:has(> .profile-avatar-character-image),
+.people-private-list-avatar:has(> .profile-avatar-character-image),
+.people-room-avatar:has(> .profile-avatar-character-image){
+  padding:0!important;
+  overflow:hidden!important;
+  background:#111!important;
+}
+.people-private-room-avatar > .profile-avatar-character-image,
+.people-private-list-avatar > .profile-avatar-character-image,
+.people-room-avatar > .profile-avatar-character-image{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  border-radius:inherit!important;
+}
+
