@@ -12692,3 +12692,18 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.59.2 — MOBILE ACCOUNT MENU FLASH GUARD
+   Sadece mobil hesap dropdown geçişi.
+   Profil kartı / profil editörü / PC geometrisi KİLİTLİ.
+   ========================================================= */
+@media (max-width:800px){
+  #globalStableAccountDropdown[hidden],
+  #globalStableAccountDropdown[aria-hidden="true"]{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+  }
+}
+
