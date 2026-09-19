@@ -11485,3 +11485,349 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     display:none!important;
   }
 }
+
+/* =========================================================
+   V14.58 — ZATOI PROFILE / FIRST PROTOTYPE
+   SADECE herkese açık kullanıcı profil kartı.
+   Mesajlar, reply, typing, read receipts ve hesap menüsü kilitli.
+   PC: floating glass card
+   Mobil: premium bottom sheet
+   ========================================================= */
+
+.people-public-profile-modal{
+  --profile-red:var(--zatoi-brand-red,#e50914);
+  --profile-bg:#0b0d11;
+  --profile-surface:#12151b;
+  --profile-line:rgba(255,255,255,.085);
+  --profile-muted:#8f96a3;
+  isolation:isolate!important;
+  place-items:center!important;
+  padding:22px!important;
+}
+
+.people-public-profile-backdrop{
+  background:
+    radial-gradient(circle at 50% 35%,rgba(229,9,20,.13),transparent 34%),
+    rgba(3,4,7,.76)!important;
+  -webkit-backdrop-filter:blur(15px) saturate(.82)!important;
+  backdrop-filter:blur(15px) saturate(.82)!important;
+}
+
+.people-public-profile-card{
+  position:relative!important;
+  width:min(410px,calc(100vw - 32px))!important;
+  padding:0 24px 22px!important;
+  overflow:hidden!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:28px!important;
+  background:
+    radial-gradient(circle at 14% -4%,rgba(229,9,20,.20),transparent 32%),
+    radial-gradient(circle at 92% 8%,rgba(255,255,255,.055),transparent 25%),
+    linear-gradient(155deg,rgba(19,22,29,.98),rgba(8,10,14,.99) 62%)!important;
+  box-shadow:
+    0 34px 90px rgba(0,0,0,.62),
+    0 0 0 1px rgba(229,9,20,.025),
+    inset 0 1px 0 rgba(255,255,255,.06)!important;
+  color:#f7f7f8!important;
+  text-align:left!important;
+  transform:translateZ(0);
+}
+
+.people-public-profile-card::before{
+  content:""!important;
+  position:absolute!important;
+  top:0!important;
+  left:34px!important;
+  width:92px!important;
+  height:2px!important;
+  border-radius:0 0 999px 999px!important;
+  background:linear-gradient(90deg,transparent,var(--profile-red),#ff5961,transparent)!important;
+  box-shadow:0 0 20px rgba(229,9,20,.75)!important;
+  pointer-events:none!important;
+}
+
+.people-public-profile-card::after{
+  content:""!important;
+  position:absolute!important;
+  width:150px!important;
+  height:150px!important;
+  right:-92px!important;
+  bottom:-90px!important;
+  border:1px solid rgba(229,9,20,.14)!important;
+  border-radius:38px!important;
+  transform:rotate(35deg)!important;
+  box-shadow:
+    0 0 0 22px rgba(229,9,20,.025),
+    0 0 0 44px rgba(229,9,20,.018)!important;
+  pointer-events:none!important;
+}
+
+.people-public-profile-close{
+  top:15px!important;
+  right:15px!important;
+  z-index:5!important;
+  width:36px!important;
+  height:36px!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:12px!important;
+  background:rgba(255,255,255,.045)!important;
+  color:#b7bdc8!important;
+  font-size:20px!important;
+  line-height:1!important;
+  transition:background .16s ease,color .16s ease,transform .16s ease!important;
+}
+.people-public-profile-close:hover{
+  background:rgba(229,9,20,.16)!important;
+  color:#fff!important;
+  transform:rotate(4deg)!important;
+}
+
+.people-public-profile-avatar{
+  position:relative!important;
+  width:88px!important;
+  height:88px!important;
+  margin:28px 0 15px!important;
+  border:1px solid rgba(229,9,20,.72)!important;
+  border-radius:26px!important;
+  background:
+    radial-gradient(circle at 35% 28%,rgba(255,255,255,.11),transparent 24%),
+    linear-gradient(145deg,#20242d,#11141a)!important;
+  color:#fff!important;
+  box-shadow:
+    0 0 0 6px rgba(229,9,20,.055),
+    0 14px 35px rgba(0,0,0,.36),
+    0 0 28px rgba(229,9,20,.16)!important;
+  font-size:34px!important;
+  font-weight:900!important;
+}
+
+.people-public-profile-kicker{
+  position:absolute!important;
+  top:31px!important;
+  left:128px!important;
+  right:58px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  min-width:0!important;
+  color:#7e8490!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:.16em!important;
+  white-space:nowrap!important;
+}
+.people-public-profile-live-dot{
+  width:6px!important;
+  height:6px!important;
+  flex:0 0 6px!important;
+  border-radius:50%!important;
+  background:var(--profile-red)!important;
+  box-shadow:0 0 9px rgba(229,9,20,.85)!important;
+}
+
+.people-public-profile-card>strong{
+  display:block!important;
+  max-width:100%!important;
+  margin:0!important;
+  color:#fff!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  line-height:1.12!important;
+  letter-spacing:-.025em!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.people-public-profile-card>span{
+  display:block!important;
+  margin-top:5px!important;
+  color:#8d94a0!important;
+  font-size:12px!important;
+  font-weight:650!important;
+}
+
+.people-public-profile-meta{
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  margin-top:13px!important;
+}
+.people-public-profile-role,
+.people-public-profile-state{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-height:24px!important;
+  padding:0 9px!important;
+  border:1px solid rgba(255,255,255,.075)!important;
+  border-radius:999px!important;
+  background:rgba(255,255,255,.035)!important;
+  color:#9ca3af!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  letter-spacing:.055em!important;
+}
+.people-public-profile-role{
+  border-color:rgba(229,9,20,.23)!important;
+  background:rgba(229,9,20,.075)!important;
+  color:#ff737b!important;
+}
+.people-public-profile-role.admin{
+  border-color:rgba(229,9,20,.48)!important;
+  background:rgba(229,9,20,.15)!important;
+  color:#fff!important;
+  box-shadow:0 0 16px rgba(229,9,20,.10)!important;
+}
+.people-public-profile-state{
+  color:#9aa0aa!important;
+}
+.people-public-profile-state::first-letter{
+  color:#55d98a!important;
+}
+
+.people-public-profile-card>p{
+  position:relative!important;
+  min-height:74px!important;
+  margin:18px 0 16px!important;
+  padding:15px 16px 15px 17px!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  border-radius:16px!important;
+  background:rgba(255,255,255,.025)!important;
+  color:#c8ccd3!important;
+  font-size:13px!important;
+  line-height:1.58!important;
+  text-align:left!important;
+  white-space:pre-wrap!important;
+  overflow-wrap:anywhere!important;
+}
+.people-public-profile-card>p::before{
+  content:""!important;
+  position:absolute!important;
+  left:-1px!important;
+  top:15px!important;
+  bottom:15px!important;
+  width:2px!important;
+  border-radius:99px!important;
+  background:linear-gradient(var(--profile-red),rgba(229,9,20,.12))!important;
+}
+
+.people-public-profile-actions{
+  position:relative!important;
+  z-index:2!important;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:8px!important;
+}
+.people-public-profile-actions button{
+  width:100%!important;
+  min-height:46px!important;
+  padding:0 16px!important;
+  border:1px solid rgba(229,9,20,.50)!important;
+  border-radius:14px!important;
+  background:
+    linear-gradient(180deg,rgba(229,9,20,.96),rgba(188,5,15,.96))!important;
+  color:#fff!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 10px 24px rgba(229,9,20,.13)!important;
+  font-size:13px!important;
+  font-weight:850!important;
+  transition:transform .16s ease,filter .16s ease!important;
+}
+.people-public-profile-actions button:hover{
+  filter:brightness(1.08)!important;
+  transform:translateY(-1px)!important;
+}
+.people-public-profile-actions .people-public-profile-moderate{
+  border-color:rgba(255,255,255,.09)!important;
+  background:rgba(255,255,255,.045)!important;
+  color:#d5d8de!important;
+  box-shadow:none!important;
+}
+
+/* Owner/admin kartı daha güçlü ama aynı tasarım dili. */
+.people-public-profile-modal.zatoi-owner-profile .people-public-profile-card{
+  border-color:rgba(229,9,20,.30)!important;
+  background:
+    radial-gradient(circle at 14% -4%,rgba(229,9,20,.30),transparent 34%),
+    radial-gradient(circle at 92% 8%,rgba(255,255,255,.06),transparent 25%),
+    linear-gradient(155deg,rgba(23,20,25,.99),rgba(8,9,13,.99) 62%)!important;
+}
+.people-public-profile-modal.zatoi-owner-profile .people-public-profile-avatar{
+  box-shadow:
+    0 0 0 6px rgba(229,9,20,.075),
+    0 14px 35px rgba(0,0,0,.40),
+    0 0 34px rgba(229,9,20,.25)!important;
+}
+
+/* Mobil: ortada popup değil, alttan gelen Zatoi profile sheet. */
+@media (max-width:720px){
+  .people-public-profile-modal{
+    place-items:end stretch!important;
+    padding:0!important;
+  }
+  .people-public-profile-backdrop{
+    background:rgba(3,4,7,.72)!important;
+    -webkit-backdrop-filter:blur(10px)!important;
+    backdrop-filter:blur(10px)!important;
+  }
+  .people-public-profile-card{
+    width:100%!important;
+    max-width:none!important;
+    max-height:min(86dvh,720px)!important;
+    margin:0!important;
+    padding:0 18px calc(18px + env(safe-area-inset-bottom,0px))!important;
+    border-left:0!important;
+    border-right:0!important;
+    border-bottom:0!important;
+    border-radius:28px 28px 0 0!important;
+    overflow-y:auto!important;
+    box-shadow:0 -24px 70px rgba(0,0,0,.55)!important;
+  }
+  .people-public-profile-card::before{
+    left:50%!important;
+    top:9px!important;
+    width:42px!important;
+    height:4px!important;
+    transform:translateX(-50%)!important;
+    background:rgba(255,255,255,.16)!important;
+    box-shadow:none!important;
+  }
+  .people-public-profile-card::after{
+    right:-105px!important;
+    bottom:-105px!important;
+  }
+  .people-public-profile-close{
+    top:18px!important;
+    right:16px!important;
+  }
+  .people-public-profile-avatar{
+    width:82px!important;
+    height:82px!important;
+    margin:34px 0 14px!important;
+    border-radius:24px!important;
+    font-size:31px!important;
+  }
+  .people-public-profile-kicker{
+    top:38px!important;
+    left:116px!important;
+    right:60px!important;
+  }
+  .people-public-profile-card>strong{
+    font-size:23px!important;
+  }
+  .people-public-profile-card>p{
+    margin-top:17px!important;
+  }
+  .people-public-profile-actions button{
+    min-height:50px!important;
+    border-radius:15px!important;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .people-public-profile-close,
+  .people-public-profile-actions button{
+    transition:none!important;
+  }
+}
+
