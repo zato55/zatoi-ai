@@ -12710,3 +12710,141 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     pointer-events:auto!important;
   }
 }
+
+/* =========================================================
+   V14.60 — ZATOI AVATAR / KİMLİK SEÇİCİ
+   Sadece Profilimi Düzenle > Avatar bölümü.
+   Public profile V14.58.2 + mobil menu V14.59.3 KİLİTLİ.
+   ========================================================= */
+
+#profileOverlay .profile-avatar-choices{
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin-top:10px!important;
+}
+
+#profileOverlay .profile-avatar-choice{
+  position:relative!important;
+  isolation:isolate!important;
+  display:grid!important;
+  place-items:center!important;
+  width:100%!important;
+  min-width:0!important;
+  aspect-ratio:1/1!important;
+  height:auto!important;
+  padding:0!important;
+  overflow:visible!important;
+
+  border:1px solid rgba(255,255,255,.075)!important;
+  border-radius:18px!important;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(255,255,255,.055),transparent 45%),
+    linear-gradient(180deg,#202329 0%,#17191e 100%)!important;
+  color:#aeb3bd!important;
+
+  font-size:23px!important;
+  font-weight:800!important;
+  line-height:1!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 8px 20px rgba(0,0,0,.16)!important;
+
+  transform:translateY(0)!important;
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    color .16s ease,
+    background .16s ease,
+    box-shadow .16s ease!important;
+}
+
+#profileOverlay .profile-avatar-choice::before{
+  content:""!important;
+  position:absolute!important;
+  inset:8px!important;
+  z-index:-1!important;
+  border-radius:50%!important;
+  border:1px solid rgba(255,255,255,.055)!important;
+  background:#1a1c21!important;
+  box-shadow:inset 0 0 18px rgba(0,0,0,.28)!important;
+}
+
+#profileOverlay .profile-avatar-choice:hover{
+  transform:translateY(-2px)!important;
+  color:#fff!important;
+  border-color:rgba(229,9,20,.38)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 10px 24px rgba(0,0,0,.22)!important;
+}
+
+/* Existing JS already toggles .selected on the chosen avatar. */
+#profileOverlay .profile-avatar-choice.selected{
+  color:#fff!important;
+  border-color:rgba(229,9,20,.78)!important;
+  background:
+    radial-gradient(circle at 50% 40%,rgba(229,9,20,.24),transparent 48%),
+    linear-gradient(180deg,#281c20 0%,#19191e 100%)!important;
+  box-shadow:
+    inset 0 0 0 1px rgba(229,9,20,.15),
+    0 0 0 2px rgba(229,9,20,.10),
+    0 10px 26px rgba(229,9,20,.14)!important;
+}
+
+#profileOverlay .profile-avatar-choice.selected::before{
+  border-color:rgba(229,9,20,.46)!important;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(229,9,20,.18),#1b191e 66%)!important;
+  box-shadow:
+    inset 0 0 18px rgba(229,9,20,.08),
+    0 0 18px rgba(229,9,20,.11)!important;
+}
+
+#profileOverlay .profile-avatar-choice.selected::after{
+  content:"✓"!important;
+  position:absolute!important;
+  right:-4px!important;
+  bottom:-4px!important;
+  display:grid!important;
+  place-items:center!important;
+  width:21px!important;
+  height:21px!important;
+  border:3px solid #17191e!important;
+  border-radius:50%!important;
+  background:var(--zatoi-accent,#e50914)!important;
+  color:#fff!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.36)!important;
+}
+
+/* Keyboard accessibility */
+#profileOverlay .profile-avatar-choice:focus-visible{
+  outline:2px solid rgba(255,255,255,.88)!important;
+  outline-offset:3px!important;
+}
+
+/* Mobil: daha rahat dokunulan 3x2 kimlik grid'i. */
+@media (max-width:720px){
+  #profileOverlay .profile-avatar-choices{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:11px!important;
+  }
+
+  #profileOverlay .profile-avatar-choice{
+    aspect-ratio:auto!important;
+    height:66px!important;
+    border-radius:16px!important;
+    font-size:22px!important;
+  }
+
+  #profileOverlay .profile-avatar-choice::before{
+    width:42px!important;
+    height:42px!important;
+    inset:50% auto auto 50%!important;
+    transform:translate(-50%,-50%)!important;
+  }
+}
+
