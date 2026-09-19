@@ -11446,3 +11446,42 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     box-sizing:border-box!important;
   }
 }
+
+
+/* =========================================================
+   V14.57.4 — MOBİL HESAP MENÜSÜ + YÖNETİCİ GÜVENLİĞİ
+   - Kapalı dropdown artık sayfanın altında sızmaz.
+   - Açık dropdown avatarın altında floating kalır.
+   - Yönetim düğmesi normal kullanıcıda CSS seviyesinde de gizlidir.
+   PC / sohbet / reply geometrisine dokunmaz.
+   ========================================================= */
+@media (max-width:800px){
+
+  /* hidden niteliği her eski/çakışan display kuralını yener. */
+  #globalStableAccountDropdown[hidden],
+  #globalStableAccountDropdown[aria-hidden="true"]{
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+
+  /* Menü açıkken belge akışına düşmesini engelle. */
+  #globalStableAccountDropdown:not([hidden]){
+    position:fixed!important;
+    z-index:2147483000!important;
+    width:min(260px,calc(100vw - 24px))!important;
+    max-width:calc(100vw - 24px)!important;
+    height:auto!important;
+    max-height:min(70vh,420px)!important;
+    margin:0!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Normal kullanıcıda Yönetim hiçbir mobil cascade ile geri açılamaz. */
+  #globalStableAccountDropdown #adminMenuButton[hidden],
+  #globalStableAccountDropdown #adminMenuButton[aria-hidden="true"]{
+    display:none!important;
+  }
+}
