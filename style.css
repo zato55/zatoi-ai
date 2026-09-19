@@ -12908,21 +12908,15 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
 }
 
 /* =========================================================
-   V14.61.1 — PUBLIC PROFILE CHARACTER AVATAR BRIDGE
-   V14.58.2 kart geometrisi KİLİTLİ: yalnızca avatarın içeriği.
+   V14.61.2 — REAL PUBLIC PROFILE AVATAR RENDERER
+   Kart geometrisine dokunmaz; yalnızca avatar içeriğini çizer.
    ========================================================= */
-#peoplePublicProfileAvatar.profile-avatar-admin-commander,
-#peoplePublicProfileAvatar.profile-avatar-admin-guardian,
-#peoplePublicProfileAvatar.profile-avatar-admin-operator,
-#peoplePublicProfileAvatar.profile-avatar-admin-android,
-#peoplePublicProfileAvatar.profile-avatar-admin-shadow,
-#peoplePublicProfileAvatar.profile-avatar-admin-sentinel{
+#peoplePublicProfileAvatar[class*="profile-avatar-admin-"]{
   padding:0!important;
   overflow:hidden!important;
   background:#111!important;
 }
-
-#peoplePublicProfileAvatar .profile-avatar-character-image{
+#peoplePublicProfileAvatar[class*="profile-avatar-admin-"] > .profile-avatar-character-image{
   display:block!important;
   width:100%!important;
   height:100%!important;
