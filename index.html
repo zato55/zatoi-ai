@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.56">
+  <link rel="stylesheet" href="./style.css?v=14.57">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -7852,7 +7852,7 @@ function setPeopleGeneralReply(message) {
     senderName: peopleDisplayName(message.sender),
     content: String(message.content || "")
   };
-  if (peopleReplyPreviewName) peopleReplyPreviewName.textContent = `${peopleGeneralReplyTarget.senderName} adlı kullanıcıya yanıt`;
+  if (peopleReplyPreviewName) peopleReplyPreviewName.textContent = `↩ ${peopleGeneralReplyTarget.senderName}`;
   if (peopleReplyPreviewText) peopleReplyPreviewText.textContent = peopleReplySnippet(peopleGeneralReplyTarget.content);
   if (peopleReplyPreview) peopleReplyPreview.hidden = false;
   peopleMessageInput?.focus();
@@ -7873,7 +7873,7 @@ function setPeoplePrivateReply(message) {
     senderName: mine ? "Sen" : peopleDisplayName(peopleCurrentPartner),
     content: String(message.content || "")
   };
-  if (peoplePrivateReplyPreviewName) peoplePrivateReplyPreviewName.textContent = `${peoplePrivateReplyTarget.senderName} mesajına yanıt`;
+  if (peoplePrivateReplyPreviewName) peoplePrivateReplyPreviewName.textContent = `↩ ${peoplePrivateReplyTarget.senderName}`;
   if (peoplePrivateReplyPreviewText) peoplePrivateReplyPreviewText.textContent = peopleReplySnippet(peoplePrivateReplyTarget.content);
   if (peoplePrivateReplyPreview) peoplePrivateReplyPreview.hidden = false;
   peoplePrivateInput?.focus();
@@ -8320,7 +8320,7 @@ function renderPeopleMessages(messages) {
                 ${message.pinned ? '<span class="people-pinned-badge">📌 SABİT</span>' : ''}
               </div>
               ${message.reply ? `<button class="people-replied-message" type="button" data-jump-reply="${peopleEscape(message.reply.messageId || "")}">
-                <strong>↩ ${peopleEscape(peopleDisplayName(message.reply.sender))}</strong>
+                <strong><span class="people-reply-mini-arrow">↩</span>${peopleEscape(peopleDisplayName(message.reply.sender))}</strong>
                 <span>${peopleEscape(peopleReplySnippet(message.reply.content))}</span>
               </button>` : ""}
               <div class="people-message-text">${peopleEscape(message.content)}</div>
@@ -8329,7 +8329,7 @@ function renderPeopleMessages(messages) {
                 ${message.editedAt ? '<span class="people-message-edited">düzenlendi</span>' : ""}
                 <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"general",message.messageId)}</span>
                 <button class="people-message-reaction-action" type="button" data-reaction-picker="general" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
-                <button class="people-message-reply-action" type="button" data-general-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
+                <button class="people-message-reply-action" type="button" data-general-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩</button>
                 ${mine && message.kind !== "announcement" ? `<button class="people-message-edit-action" type="button" data-general-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
                 ${peopleIsAdmin() ? `<span class="people-message-admin-actions">
                   <button type="button" data-admin-pin="${peopleEscape(message.messageId)}" data-pinned="${message.pinned ? "1" : "0"}" title="${message.pinned ? "Sabitlemeyi kaldır" : "Mesajı sabitle"}">📌</button>
@@ -8580,7 +8580,7 @@ function renderPeoplePrivateMessages(messages, partnerReadAt = null) {
                 })() : ""}
                 <span class="people-reaction-summary">${peopleReactionSummaryHtml(message.reactions,"private",message.messageId)}</span>
                 <button class="people-message-reaction-action" type="button" data-reaction-picker="private" data-reaction-message="${peopleEscape(message.messageId||"")}" title="Tepki ver">☺</button>
-                <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩️</button>
+                <button class="people-message-reply-action" type="button" data-private-reply="${peopleEscape(message.messageId || "")}" title="Yanıtla" aria-label="Mesaja yanıt ver">↩</button>
                 ${mine ? `<button class="people-message-edit-action" type="button" data-private-edit="${peopleEscape(message.messageId || "")}" title="Mesajı düzenle">✏️</button>` : ""}
               </div>
             </div>
@@ -9042,6 +9042,13 @@ peopleAdminAnnouncement?.addEventListener("click", async () => {
 peoplePublicProfileModerate?.addEventListener("click", () => peopleAdminModerateUser(peoplePublicProfileUserId));
 peoplePrivateComposer?.addEventListener("submit", sendPeoplePrivateMessage);
 peoplePrivateReplyCancel?.addEventListener("click", clearPeoplePrivateReply);
+
+// V14.57 — Aktif yanıtı Esc ile hızlıca kapat.
+document.addEventListener("keydown", event => {
+  if (event.key !== "Escape") return;
+  if (peopleGeneralReplyTarget) clearPeopleGeneralReply();
+  if (peoplePrivateReplyTarget) clearPeoplePrivateReply();
+});
 peoplePrivateSend?.addEventListener("click", (event) => {
   event.preventDefault();
   sendPeoplePrivateMessage(event);
