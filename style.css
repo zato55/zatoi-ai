@@ -12611,3 +12611,84 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.59.1 — PROFILE EDITOR SCROLL + FOOTER FIX
+   Yalnızca #profileOverlay düzenleme ekranı.
+   V14.58.2 public profile KİLİTLİ.
+   ========================================================= */
+
+/* Panel kendi içinde header / scroll-content düzenine geçer. */
+#profileOverlay .profile-panel{
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+
+#profileOverlay .profile-header{
+  flex:0 0 auto!important;
+}
+
+/* Asıl içerik kayar; alt bölümler footer arkasında kaybolmaz. */
+#profileOverlay .profile-content{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  scrollbar-gutter:stable!important;
+  padding-bottom:92px!important;
+}
+
+/* Önceki sticky footer artık içerik akışını ezmez. */
+#profileOverlay .profile-actions{
+  position:sticky!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:-92px!important;
+  z-index:8!important;
+  margin:14px -22px -92px!important;
+  padding:13px 22px 18px!important;
+}
+
+/* Kaydırma çubuğu Zatoi yüzeyine uyumlu. */
+#profileOverlay .profile-content{
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(229,9,20,.45) rgba(255,255,255,.025)!important;
+}
+#profileOverlay .profile-content::-webkit-scrollbar{
+  width:7px!important;
+}
+#profileOverlay .profile-content::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.02)!important;
+}
+#profileOverlay .profile-content::-webkit-scrollbar-thumb{
+  border-radius:99px!important;
+  background:rgba(229,9,20,.38)!important;
+}
+#profileOverlay .profile-content::-webkit-scrollbar-thumb:hover{
+  background:rgba(229,9,20,.58)!important;
+}
+
+/* Editörde ham USER/ADMIN görünümünü Zatoi diline yaklaştır. */
+#profileOverlay .profile-role-badge{
+  text-transform:uppercase!important;
+}
+
+/* MOBİL */
+@media (max-width:720px){
+  #profileOverlay .profile-panel{
+    height:min(88dvh,760px)!important;
+    max-height:88dvh!important;
+  }
+
+  #profileOverlay .profile-content{
+    padding-bottom:82px!important;
+  }
+
+  #profileOverlay .profile-actions{
+    bottom:-82px!important;
+    margin:12px -15px -82px!important;
+    padding:10px 15px calc(12px + env(safe-area-inset-bottom,0px))!important;
+  }
+}
+
