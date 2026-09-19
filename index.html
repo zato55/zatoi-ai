@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.59.1">
+  <link rel="stylesheet" href="./style.css?v=14.59.3">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -407,6 +407,75 @@
 
 @media(max-width:800px){
   .stable-bar-menu-btn{
+    display:none!important;
+  }
+}
+</style>
+
+
+<style id="zatoi-v14-59-3-mobile-account-menu-structure">
+@media (max-width:800px){
+  #globalStableAccountDropdown{
+    position:fixed!important;
+    display:none!important;
+    width:210px;
+    max-width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 16px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding:6px!important;
+    z-index:999999!important;
+    box-sizing:border-box!important;
+    border:1px solid #3a3e48!important;
+    border-radius:12px!important;
+    background:#191b20!important;
+    box-shadow:0 16px 38px rgba(0,0,0,.48)!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+  }
+
+  #globalStableAccountDropdown.open{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:2px!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+
+  #globalStableAccountDropdown button{
+    display:grid!important;
+    grid-template-columns:22px minmax(0,1fr)!important;
+    align-items:center!important;
+    width:100%!important;
+    min-width:0!important;
+    height:38px!important;
+    margin:0!important;
+    padding:0 10px!important;
+    border:0!important;
+    border-radius:8px!important;
+    background:#17191e!important;
+    color:var(--zatoi-text,#f5f5f5)!important;
+    box-shadow:none!important;
+    font:inherit!important;
+    font-size:13px!important;
+    font-weight:650!important;
+    line-height:1!important;
+    text-align:left!important;
+    cursor:pointer!important;
+  }
+
+  #globalStableAccountDropdown button:hover,
+  #globalStableAccountDropdown button:active{
+    background:#24272e!important;
+  }
+
+  #globalStableAccountDropdown .danger{
+    color:#ff8f98!important;
+  }
+
+  #globalStableAccountDropdown:not(.open){
     display:none!important;
   }
 }
