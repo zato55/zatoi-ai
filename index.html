@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.59">
+  <link rel="stylesheet" href="./style.css?v=14.59.1">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -9463,6 +9463,23 @@ checkAuth();
   const observer = new MutationObserver(syncMobileAccountAvatar);
   const accountName = document.getElementById("accountUsername");
   if (accountName) observer.observe(accountName, { childList:true, subtree:true, characterData:true });
+})();
+</script>
+
+
+<script id="zatoi-v14-59-1-profile-editor-role">
+(() => {
+  const badge = document.getElementById("profileRoleBadge");
+  if (!badge) return;
+
+  function syncFriendlyRole(){
+    const raw = String(badge.textContent || "").trim().toLowerCase();
+    if (raw === "admin" || raw === "yönetici") badge.textContent = "YÖNETİCİ";
+    else if (raw === "user" || raw === "member" || raw === "üye") badge.textContent = "ZATOI ÜYESİ";
+  }
+
+  new MutationObserver(syncFriendlyRole).observe(badge,{childList:true,characterData:true,subtree:true});
+  syncFriendlyRole();
 })();
 </script>
 
