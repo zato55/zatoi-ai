@@ -11131,3 +11131,39 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
 @media (prefers-reduced-motion:reduce){
   .people-typing-dots i{ animation:none!important; opacity:.75; }
 }
+
+
+/* =========================================================
+   V14.56 — ÖZEL ODA İLETİLDİ / OKUNDU
+   Yalnızca kullanıcının kendi özel mesajlarında görünür.
+   Genel sohbet etkilenmez.
+   ========================================================= */
+.people-private-delivery-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  margin-left:1px;
+  font-size:11px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-2px;
+  user-select:none;
+  opacity:.82;
+}
+
+.people-private-delivery-status.delivered{
+  color:var(--zatoi-muted,#9ca3af);
+  letter-spacing:0;
+}
+
+.people-private-delivery-status.read{
+  color:#60a5fa;
+  opacity:1;
+}
+
+@media (max-width:720px){
+  .people-private-delivery-status{
+    font-size:10px;
+  }
+}
