@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.58">
+  <link rel="stylesheet" href="./style.css?v=14.58.1">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -893,7 +893,7 @@
     <span id="peoplePublicProfileUsername">@kullanici</span>
     <div class="people-public-profile-meta">
       <span id="peoplePublicProfileRole" class="people-public-profile-role">ÜYE</span>
-      <span class="people-public-profile-state">● Aktif</span>
+      <span id="peoplePublicProfileState" class="people-public-profile-state">● Durum</span>
     </div>
     <p id="peoplePublicProfileBio">Henüz profil açıklaması yok.</p>
     <div class="people-public-profile-actions">
@@ -7824,6 +7824,7 @@ const peoplePublicProfileAvatar = document.getElementById("peoplePublicProfileAv
 const peoplePublicProfileName = document.getElementById("peoplePublicProfileName");
 const peoplePublicProfileUsername = document.getElementById("peoplePublicProfileUsername");
 const peoplePublicProfileRole = document.getElementById("peoplePublicProfileRole");
+const peoplePublicProfileState = document.getElementById("peoplePublicProfileState");
 const peoplePublicProfileBio = document.getElementById("peoplePublicProfileBio");
 const peoplePublicProfileChat = document.getElementById("peoplePublicProfileChat");
 const peoplePublicProfileModerate = document.getElementById("peoplePublicProfileModerate");
@@ -8478,6 +8479,14 @@ async function openPeoplePublicProfile(userId) {
   if (peoplePublicProfileModal) peoplePublicProfileModal.hidden = false;
   if (peoplePublicProfileName) peoplePublicProfileName.textContent = "Yükleniyor...";
   if (peoplePublicProfileUsername) peoplePublicProfileUsername.textContent = "";
+  if (peoplePublicProfileRole) {
+    peoplePublicProfileRole.textContent = "ZATOI ÜYESİ";
+    peoplePublicProfileRole.classList.remove("admin");
+  }
+  if (peoplePublicProfileState) {
+    peoplePublicProfileState.textContent = "● Durum";
+    peoplePublicProfileState.classList.remove("online");
+  }
   if (peoplePublicProfileBio) peoplePublicProfileBio.textContent = "Profil bilgileri alınıyor.";
   try {
     const data = await peopleApi("get_public_profile", { targetUserId: userId });
@@ -8490,13 +8499,20 @@ async function openPeoplePublicProfile(userId) {
       peoplePublicProfileRole.textContent = isAdminProfile ? "YÖNETİCİ" : "ZATOI ÜYESİ";
       peoplePublicProfileRole.classList.toggle("admin", isAdminProfile);
     }
+    if (peoplePublicProfileState) {
+      const isOnlineProfile = Array.isArray(peopleActiveUsers)
+        && peopleActiveUsers.some(user => String(user?.userId || "") === String(profile.userId || ""));
+      peoplePublicProfileState.textContent = isOnlineProfile ? "● Aktif" : "● Çevrimdışı";
+      peoplePublicProfileState.classList.toggle("online", isOnlineProfile);
+    }
     if (peoplePublicProfileBio) peoplePublicProfileBio.textContent = profile.bio || "Henüz profil açıklaması yok.";
     if (peoplePublicProfileChat) {
       const isSelf = String(profile.userId || "") === String(currentUser?.userId || "");
       peoplePublicProfileChat.hidden = isSelf;
     }
-    peoplePublicProfileModal?.classList.toggle("zatoi-owner-profile", profile.role === "admin");
-    peoplePublicProfileModal?.classList.toggle("zatoi-user-profile", profile.role !== "admin");
+    const isAdminPublicProfile = String(profile.role || "").trim().toLowerCase() === "admin";
+    peoplePublicProfileModal?.classList.toggle("zatoi-owner-profile", isAdminPublicProfile);
+    peoplePublicProfileModal?.classList.toggle("zatoi-user-profile", !isAdminPublicProfile);
     if (peoplePublicProfileModerate) {
       const isSelf = String(profile.userId || "") === String(currentUser?.userId || "");
       peoplePublicProfileModerate.hidden = !peopleIsAdmin() || isSelf;
