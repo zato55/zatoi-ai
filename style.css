@@ -12925,3 +12925,27 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   border-radius:inherit!important;
 }
 
+/* =========================================================
+   V14.61.3 — CHAT ADMIN CHARACTER AVATAR
+   Public profile V14.61.2 is unchanged.
+   ========================================================= */
+.people-avatar[class*="profile-avatar-admin-"],
+.people-message-avatar[class*="profile-avatar-admin-"],
+.people-private-avatar[class*="profile-avatar-admin-"],
+[data-avatar-key^="admin-"]{
+  padding:0!important;
+  overflow:hidden!important;
+  background:#111!important;
+}
+.people-avatar[class*="profile-avatar-admin-"] > .profile-avatar-character-image,
+.people-message-avatar[class*="profile-avatar-admin-"] > .profile-avatar-character-image,
+.people-private-avatar[class*="profile-avatar-admin-"] > .profile-avatar-character-image,
+[data-avatar-key^="admin-"] > .profile-avatar-character-image{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  border-radius:inherit!important;
+}
+
