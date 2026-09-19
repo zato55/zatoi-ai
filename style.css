@@ -12907,3 +12907,27 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   #profileOverlay .profile-admin-avatar-heading{align-items:flex-start!important;flex-direction:column!important;gap:3px!important}
 }
 
+/* =========================================================
+   V14.61.1 — PUBLIC PROFILE CHARACTER AVATAR BRIDGE
+   V14.58.2 kart geometrisi KİLİTLİ: yalnızca avatarın içeriği.
+   ========================================================= */
+#peoplePublicProfileAvatar.profile-avatar-admin-commander,
+#peoplePublicProfileAvatar.profile-avatar-admin-guardian,
+#peoplePublicProfileAvatar.profile-avatar-admin-operator,
+#peoplePublicProfileAvatar.profile-avatar-admin-android,
+#peoplePublicProfileAvatar.profile-avatar-admin-shadow,
+#peoplePublicProfileAvatar.profile-avatar-admin-sentinel{
+  padding:0!important;
+  overflow:hidden!important;
+  background:#111!important;
+}
+
+#peoplePublicProfileAvatar .profile-avatar-character-image{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  border-radius:inherit!important;
+}
+
