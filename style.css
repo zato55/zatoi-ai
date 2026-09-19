@@ -11369,3 +11369,13 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     animation:none!important;
   }
 }
+
+
+/* =========================================================
+   V14.57.1 — REPLY X BUTONU HİZALAMA
+   Sadece yanıt önizlemesindeki kapatma butonu düzeltilir.
+   ========================================================= */
+.people-composer > .people-reply-preview .people-reply-cancel,
+.people-private-composer > .people-reply-preview .people-reply-cancel{
+  margin-right:6px!important;
+}
