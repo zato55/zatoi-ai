@@ -12007,3 +12007,185 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.58.2 — ZATOI PROFILE / SIGNATURE POLISH
+   Son tasarım rötuşu:
+   - PC kart %12 civarı daha güçlü
+   - Mobil kimlik dengesi iyileştirildi
+   - Durum kapsülü sade nokta + metin oldu
+   - Üst kırmızı ışık Zatoi imzasına dönüştürüldü
+   ========================================================= */
+
+/* PC — kartı küçük popup hissinden çıkar. */
+@media (min-width:721px){
+  .people-public-profile-card{
+    width:min(478px,calc(100vw - 40px))!important;
+    grid-template-columns:94px minmax(0,1fr)!important;
+    column-gap:20px!important;
+    padding:27px!important;
+    border-radius:29px!important;
+  }
+
+  .people-public-profile-avatar{
+    width:94px!important;
+    height:94px!important;
+    border-radius:27px!important;
+    font-size:36px!important;
+  }
+
+  .people-public-profile-card>strong{
+    font-size:26px!important;
+  }
+
+  .people-public-profile-card>p{
+    min-height:66px!important;
+    margin-top:21px!important;
+    padding:14px 17px!important;
+    font-size:13px!important;
+  }
+
+  .people-public-profile-actions button{
+    min-height:47px!important;
+    font-size:13px!important;
+  }
+}
+
+/* Zatoi imzası: merkezden yayılan ince kırmızı ışık. */
+.people-public-profile-card::before{
+  left:50%!important;
+  top:0!important;
+  width:132px!important;
+  height:2px!important;
+  transform:translateX(-50%)!important;
+  border-radius:0 0 999px 999px!important;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(229,9,20,.20) 13%,
+      #e50914 38%,
+      #ff777d 50%,
+      #e50914 62%,
+      rgba(229,9,20,.20) 87%,
+      transparent 100%)!important;
+  box-shadow:
+    0 0 8px rgba(229,9,20,.58),
+    0 0 22px rgba(229,9,20,.18)!important;
+}
+
+.people-public-profile-modal.zatoi-owner-profile .people-public-profile-card::before{
+  width:168px!important;
+  height:2px!important;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(229,9,20,.25) 10%,
+      #e50914 34%,
+      #ff9a9e 50%,
+      #e50914 66%,
+      rgba(229,9,20,.25) 90%,
+      transparent 100%)!important;
+  box-shadow:
+    0 0 9px rgba(229,9,20,.78),
+    0 0 28px rgba(229,9,20,.28)!important;
+}
+
+/* Üyelik rolü rozet olarak kalır; durum artık kapsül değildir. */
+.people-public-profile-meta{
+  flex-wrap:wrap!important;
+}
+
+.people-public-profile-state{
+  min-height:auto!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#747b86!important;
+  font-size:9px!important;
+  font-weight:750!important;
+  letter-spacing:.02em!important;
+}
+
+.people-public-profile-state.online{
+  color:#969da7!important;
+}
+
+.people-public-profile-state.online::first-letter{
+  color:#55d98a!important;
+  text-shadow:0 0 7px rgba(85,217,138,.38)!important;
+}
+
+/* Rol rozeti biraz daha karakterli. */
+.people-public-profile-role{
+  min-height:23px!important;
+  padding:0 9px!important;
+  border-radius:8px!important;
+  letter-spacing:.07em!important;
+}
+
+/* Mobil — avatar daha dengeli, içerik daha sıkı. */
+@media (max-width:720px){
+  .people-public-profile-card{
+    grid-template-columns:68px minmax(0,1fr)!important;
+    column-gap:14px!important;
+    max-height:min(68dvh,550px)!important;
+    padding:28px 18px calc(14px + env(safe-area-inset-bottom,0px))!important;
+  }
+
+  .people-public-profile-card::before{
+    top:0!important;
+    width:112px!important;
+    height:2px!important;
+    transform:translateX(-50%)!important;
+  }
+
+  .people-public-profile-modal.zatoi-owner-profile .people-public-profile-card::before{
+    width:142px!important;
+  }
+
+  .people-public-profile-avatar{
+    width:68px!important;
+    height:68px!important;
+    border-radius:20px!important;
+    font-size:26px!important;
+    box-shadow:
+      0 0 0 5px rgba(229,9,20,.055),
+      0 11px 27px rgba(0,0,0,.35),
+      0 0 22px rgba(229,9,20,.15)!important;
+  }
+
+  .people-public-profile-kicker{
+    margin:0 40px 4px 0!important;
+    font-size:7.5px!important;
+  }
+
+  .people-public-profile-card>strong{
+    font-size:20px!important;
+  }
+
+  .people-public-profile-meta{
+    margin-top:7px!important;
+    gap:8px!important;
+  }
+
+  .people-public-profile-role{
+    min-height:21px!important;
+    padding:0 7px!important;
+    font-size:8px!important;
+  }
+
+  .people-public-profile-state{
+    font-size:8.5px!important;
+  }
+
+  .people-public-profile-card>p{
+    min-height:52px!important;
+    margin:14px 0 10px!important;
+    padding:11px 13px 11px 14px!important;
+  }
+
+  .people-public-profile-actions button{
+    min-height:44px!important;
+  }
+}
+
