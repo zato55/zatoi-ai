@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.58.2">
+  <link rel="stylesheet" href="./style.css?v=14.59">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -1095,8 +1095,8 @@
   <section class="profile-panel" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
     <div class="profile-header">
       <div>
-        <div id="profileTitle" class="profile-title">👤 Profilim</div>
-        <div class="profile-subtitle">Zatoi hesabını ve kişiselleştirme bilgilerini yönet.</div>
+        <div id="profileTitle" class="profile-title"><span class="profile-title-mark">✦</span> Profilimi Düzenle</div>
+        <div class="profile-subtitle">Profilinin diğer kullanıcılara nasıl görüneceğini düzenle.</div>
       </div>
       <button id="profileCloseButton" class="profile-close" type="button" aria-label="Profili kapat">×</button>
     </div>
@@ -1112,7 +1112,7 @@
       </div>
 
       <div class="profile-section">
-        <div class="profile-section-title">Profil bilgileri</div>
+        <div class="profile-section-title"><span>01</span> Kimlik</div>
         <label class="profile-field">
           <span>Görünen ad</span>
           <input id="profileDisplayName" maxlength="40" placeholder="Profilinde görünecek ad">
@@ -1129,7 +1129,7 @@
       </div>
 
       <div class="profile-section">
-        <div class="profile-section-title">Avatar</div>
+        <div class="profile-section-title"><span>02</span> Avatar</div>
         <div id="profileAvatarChoices" class="profile-avatar-choices" role="radiogroup" aria-label="Avatar seç">
           <button type="button" data-avatar="spark" class="profile-avatar-choice">✦</button>
           <button type="button" data-avatar="orbit" class="profile-avatar-choice">◉</button>
@@ -1138,18 +1138,18 @@
           <button type="button" data-avatar="nova" class="profile-avatar-choice">✺</button>
           <button type="button" data-avatar="shield" class="profile-avatar-choice">⬡</button>
         </div>
-        <div class="profile-help">İlk sürümde hafif ve ücretsiz hazır avatarlar kullanıyoruz. Fotoğraf yüklemeyi depolama altyapısını şişirmeden sonraki aşamada ekleyebiliriz.</div>
+        <div class="profile-help">Zatoi profilinde görünecek simgeyi seç.</div>
       </div>
 
       <div class="profile-section">
-        <div class="profile-section-title">Hesap</div>
+        <div class="profile-section-title"><span>03</span> Hesap</div>
         <div class="profile-meta-row"><span>Kullanıcı adı</span><strong id="profileMetaUsername">—</strong></div>
         <div class="profile-meta-row"><span>Rol</span><strong id="profileMetaRole">—</strong></div>
         <div class="profile-meta-row"><span>Profil oluşturma</span><strong id="profileMetaCreated">—</strong></div>
       </div>
 
       <div class="profile-section">
-        <div class="profile-section-title">Güvenlik</div>
+        <div class="profile-section-title"><span>04</span> Güvenlik</div>
         <div class="profile-security-grid">
           <button id="profileChangePasswordButton" class="profile-secondary-btn" type="button">🔑 Şifreyi Değiştir</button>
           <button id="profileLogoutOthersButton" class="profile-secondary-btn" type="button">↪ Diğer Oturumları Kapat</button>
