@@ -12944,69 +12944,46 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
 }
 
 /* =========================================================
-   V14.61.5 — PRIVATE ROOM LIST ADMIN AVATAR
-   Özel Odalar listesindeki avatar da karakter görselini kullanır.
+   V14.61.7 — CLEAN PRIVATE AVATAR COMPLETION
+   Base: V14.61.4.
+   General message geometry is untouched.
    ========================================================= */
+
+/* Right-side Özel Odalar */
 .people-private-room-avatar:has(> .profile-avatar-character-image),
 .people-private-list-avatar:has(> .profile-avatar-character-image),
 .people-room-avatar:has(> .profile-avatar-character-image){
   padding:0!important;
   overflow:hidden!important;
-  background:#111!important;
 }
 .people-private-room-avatar > .profile-avatar-character-image,
 .people-private-list-avatar > .profile-avatar-character-image,
 .people-room-avatar > .profile-avatar-character-image{
-  display:block!important;
   width:100%!important;
   height:100%!important;
+  display:block!important;
   object-fit:cover!important;
   object-position:center!important;
   border-radius:inherit!important;
 }
 
-/* =========================================================
-   V14.61.6 — AVATAR LAYOUT CONTAINMENT + PRIVATE HEADER
-   Character images are strictly contained inside avatar circles.
-   ========================================================= */
-
-/* Public/general/private/list avatar containers keep their original geometry. */
-.people-message-sender-avatar:has(.profile-avatar-character-image),
-.people-private-room-avatar:has(.profile-avatar-character-image),
-.people-private-list-avatar:has(.profile-avatar-character-image),
-.people-room-avatar:has(.profile-avatar-character-image),
-.people-private-avatar:has(.profile-avatar-character-image){
-  position:relative!important;
+/* Private-chat top header only */
+#peoplePrivatePartnerAvatar:has(> .profile-avatar-character-image),
+#peoplePrivateAvatar:has(> .profile-avatar-character-image),
+.people-private-header-avatar:has(> .profile-avatar-character-image),
+.people-private-top-avatar:has(> .profile-avatar-character-image){
+  padding:0!important;
   overflow:hidden!important;
-  flex:none!important;
-  padding:0!important;
 }
-
-/* Never let an admin image affect text flow or bubble sizing. */
-.people-message-sender-avatar > .profile-avatar-character-image,
-.people-private-room-avatar > .profile-avatar-character-image,
-.people-private-list-avatar > .profile-avatar-character-image,
-.people-room-avatar > .profile-avatar-character-image,
-.people-private-avatar > .profile-avatar-character-image{
-  position:absolute!important;
-  inset:0!important;
-  display:block!important;
+#peoplePrivatePartnerAvatar > .profile-avatar-character-image,
+#peoplePrivateAvatar > .profile-avatar-character-image,
+.people-private-header-avatar > .profile-avatar-character-image,
+.people-private-top-avatar > .profile-avatar-character-image{
   width:100%!important;
   height:100%!important;
-  min-width:0!important;
-  min-height:0!important;
-  max-width:none!important;
-  max-height:none!important;
-  margin:0!important;
-  padding:0!important;
+  display:block!important;
   object-fit:cover!important;
   object-position:center!important;
-  border:0!important;
   border-radius:inherit!important;
-}
-
-/* Safety: character images elsewhere never inherit global img sizing. */
-.profile-avatar-character-image{
-  box-sizing:border-box!important;
 }
 
