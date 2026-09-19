@@ -11003,3 +11003,44 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     opacity:.82!important;
   }
 }
+
+
+/* =========================================================
+   V14.54 — ZATOI AI MARKA SİMGESİ
+   Robot kaldırıldı; PC + mobil aynı kırmızı sparkle kimliği.
+   ========================================================= */
+@media (max-width:800px){
+
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton{
+    position:relative!important;
+    overflow:visible!important;
+  }
+
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton::before{
+    content:"✦"!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    height:100%!important;
+    color:var(--zatoi-brand-red,#e50914)!important;
+    font-family:Arial,sans-serif!important;
+    font-size:27px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    text-shadow:
+      0 0 5px rgba(229,9,20,.52),
+      0 0 11px rgba(229,9,20,.22)!important;
+    transform:translateY(-1px)!important;
+    transition:transform .16s ease,text-shadow .16s ease,color .16s ease!important;
+  }
+
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton:hover::before,
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton:active::before{
+    color:#ff2430!important;
+    text-shadow:
+      0 0 6px rgba(229,9,20,.72),
+      0 0 14px rgba(229,9,20,.36)!important;
+    transform:translateY(-1px) scale(1.08)!important;
+  }
+}
