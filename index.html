@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.59.1">
+  <link rel="stylesheet" href="./style.css?v=14.59.2">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -9480,6 +9480,41 @@ checkAuth();
 
   new MutationObserver(syncFriendlyRole).observe(badge,{childList:true,characterData:true,subtree:true});
   syncFriendlyRole();
+})();
+</script>
+
+
+<script id="zatoi-v14-59-2-mobile-account-flash-guard">
+(() => {
+  const dropdown = document.getElementById("globalStableAccountDropdown");
+  if (!dropdown) return;
+
+  function hardCloseMobileAccountMenu(){
+    if (!window.matchMedia("(max-width:800px)").matches) return;
+    dropdown.hidden = true;
+    dropdown.setAttribute("aria-hidden","true");
+    dropdown.style.setProperty("display","none","important");
+    dropdown.style.setProperty("visibility","hidden","important");
+    dropdown.style.setProperty("pointer-events","none","important");
+
+    const trigger = document.getElementById("peopleMobileAccountButton");
+    if (trigger) trigger.setAttribute("aria-expanded","false");
+  }
+
+  /* Capture phase: profil adı / ayarlar / yönetim aksiyonu çalışmadan ÖNCE kapat. */
+  document.addEventListener("pointerdown", event => {
+    if (!window.matchMedia("(max-width:800px)").matches) return;
+    if (!dropdown.contains(event.target)) return;
+
+    const actionable = event.target.closest("button,a,[role='button'],.stable-account-profile");
+    if (actionable) hardCloseMobileAccountMenu();
+  }, true);
+
+  /* Touch/click fallback. */
+  document.addEventListener("click", event => {
+    if (!window.matchMedia("(max-width:800px)").matches) return;
+    if (dropdown.contains(event.target)) hardCloseMobileAccountMenu();
+  }, true);
 })();
 </script>
 
