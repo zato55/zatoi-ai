@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.54">
+  <link rel="stylesheet" href="./style.css?v=14.55">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -8712,6 +8712,8 @@ async function sendPeoplePrivateMessage(event) {
       replyToMessageId: peoplePrivateReplyTarget?.messageId || ""
     });
     peoplePrivateInput.value = "";
+    peopleTypingPrivateLastPing = 0;
+    peopleSetTyping("private", false);
     clearPeoplePrivateReply();
     await Promise.all([loadPeoplePrivateMessages(), refreshPeopleRooms()]);
   } catch (error) {
@@ -8737,6 +8739,8 @@ async function sendPeopleMessage(event) {
       replyToMessageId: peopleGeneralReplyTarget?.messageId || ""
     });
     peopleMessageInput.value = "";
+    peopleTypingGeneralLastPing = 0;
+    peopleSetTyping("general", false);
     clearPeopleGeneralReply();
     await loadPeopleGeneralMessages();
   } catch (error) {
@@ -8747,6 +8751,151 @@ async function sendPeopleMessage(event) {
     peopleMessageInput?.focus();
   }
 }
+
+
+/* ==========================================
+   V14.55 — SOHBET "YAZIYOR..." SİSTEMİ
+   Genel sohbet + özel oda / PC + mobil
+========================================== */
+let peopleTypingPollTimer = null;
+let peopleTypingGeneralIdleTimer = null;
+let peopleTypingPrivateIdleTimer = null;
+let peopleTypingGeneralLastPing = 0;
+let peopleTypingPrivateLastPing = 0;
+
+function peopleEnsureTypingIndicator(scope) {
+  const privateScope = scope === "private";
+  const composer = privateScope ? peoplePrivateComposer : peopleComposer;
+  if (!composer) return null;
+
+  const className = privateScope
+    ? "people-typing-indicator people-private-typing-indicator"
+    : "people-typing-indicator people-general-typing-indicator";
+
+  let indicator = composer.querySelector(".people-typing-indicator");
+  if (!indicator) {
+    indicator = document.createElement("div");
+    indicator.className = className;
+    indicator.hidden = true;
+    indicator.setAttribute("aria-live", "polite");
+    indicator.innerHTML = `
+      <span class="people-typing-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="people-typing-text"></span>
+    `;
+    composer.appendChild(indicator);
+  }
+  return indicator;
+}
+
+function peopleTypingLabel(users) {
+  const names = (Array.isArray(users) ? users : [])
+    .map(user => String(user?.displayName || user?.username || "").trim())
+    .filter(Boolean);
+
+  if (!names.length) return "";
+  if (names.length === 1) return `${names[0]} yazıyor...`;
+  if (names.length === 2) return `${names[0]} ve ${names[1]} yazıyor...`;
+  return `${names[0]}, ${names[1]} ve ${names.length - 2} kişi daha yazıyor...`;
+}
+
+function peopleRenderTyping(scope, users) {
+  const indicator = peopleEnsureTypingIndicator(scope);
+  if (!indicator) return;
+  const text = peopleTypingLabel(users);
+  const textNode = indicator.querySelector(".people-typing-text");
+  if (textNode) textNode.textContent = text;
+  indicator.hidden = !text;
+}
+
+async function peopleSetTyping(scope, isTyping) {
+  if (!peopleChatActive || !authToken) return;
+  const payload = { scope, isTyping:Boolean(isTyping) };
+  if (scope === "private") {
+    if (!peopleCurrentRoomId) return;
+    payload.roomId = peopleCurrentRoomId;
+  }
+  try { await peopleApi("set_typing", payload); } catch {}
+}
+
+function peopleTypingInput(scope) {
+  const privateScope = scope === "private";
+  const input = privateScope ? peoplePrivateInput : peopleMessageInput;
+  if (!input) return;
+
+  const hasText = Boolean(String(input.value || "").trim());
+  const now = Date.now();
+  const lastPing = privateScope ? peopleTypingPrivateLastPing : peopleTypingGeneralLastPing;
+
+  const clearIdle = () => {
+    if (privateScope && peopleTypingPrivateIdleTimer) clearTimeout(peopleTypingPrivateIdleTimer);
+    if (!privateScope && peopleTypingGeneralIdleTimer) clearTimeout(peopleTypingGeneralIdleTimer);
+  };
+  clearIdle();
+
+  if (!hasText) {
+    peopleSetTyping(scope, false);
+    if (privateScope) peopleTypingPrivateLastPing = 0;
+    else peopleTypingGeneralLastPing = 0;
+    return;
+  }
+
+  // Her tuşta Worker'a istek atma: en fazla 2 saniyede bir yenile.
+  if (!lastPing || now - lastPing >= 2000) {
+    peopleSetTyping(scope, true);
+    if (privateScope) peopleTypingPrivateLastPing = now;
+    else peopleTypingGeneralLastPing = now;
+  }
+
+  const timer = setTimeout(() => {
+    peopleSetTyping(scope, false);
+    if (privateScope) peopleTypingPrivateLastPing = 0;
+    else peopleTypingGeneralLastPing = 0;
+  }, 2800);
+
+  if (privateScope) peopleTypingPrivateIdleTimer = timer;
+  else peopleTypingGeneralIdleTimer = timer;
+}
+
+async function peopleRefreshTyping() {
+  if (!peopleChatActive || !authToken || document.hidden) return;
+
+  try {
+    if (peopleConversationMode === "general") {
+      const data = await peopleApi("get_typing", { scope:"general" });
+      peopleRenderTyping("general", data.users || []);
+    } else {
+      peopleRenderTyping("general", []);
+    }
+
+    if (peopleCurrentRoomId && peoplePrivateDock && !peoplePrivateDock.hidden) {
+      const roomIdAtRequest = peopleCurrentRoomId;
+      const data = await peopleApi("get_typing", { scope:"private", roomId:roomIdAtRequest });
+      if (roomIdAtRequest === peopleCurrentRoomId) {
+        peopleRenderTyping("private", data.users || []);
+      }
+    } else {
+      peopleRenderTyping("private", []);
+    }
+  } catch {}
+}
+
+function startPeopleTypingPolling() {
+  stopPeopleTypingPolling();
+  peopleRefreshTyping();
+  peopleTypingPollTimer = setInterval(peopleRefreshTyping, 1500);
+}
+
+function stopPeopleTypingPolling() {
+  if (peopleTypingPollTimer) clearInterval(peopleTypingPollTimer);
+  peopleTypingPollTimer = null;
+  peopleRenderTyping("general", []);
+  peopleRenderTyping("private", []);
+}
+
+peopleMessageInput?.addEventListener("input", () => peopleTypingInput("general"));
+peoplePrivateInput?.addEventListener("input", () => peopleTypingInput("private"));
+peopleMessageInput?.addEventListener("blur", () => peopleSetTyping("general", false));
+peoplePrivateInput?.addEventListener("blur", () => peopleSetTyping("private", false));
 
 async function peopleHeartbeat() {
   if (!peopleChatActive || !authToken) return;
@@ -8786,11 +8935,15 @@ async function enterPeopleChat() {
     await loadPeoplePrivateMessages();
   }
   startPeoplePolling();
+  startPeopleTypingPolling();
 }
 
 function leavePeopleChat() {
+  peopleSetTyping("general", false);
+  if (peopleCurrentRoomId) peopleSetTyping("private", false);
   peopleChatActive = false;
   stopPeoplePolling();
+  stopPeopleTypingPolling();
 }
 
 function setZatoiMode(mode) {
