@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.57.5">
+  <link rel="stylesheet" href="./style.css?v=14.58">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -888,8 +888,13 @@
   <section class="people-public-profile-card" role="dialog" aria-modal="true" aria-labelledby="peoplePublicProfileName">
     <button id="peoplePublicProfileClose" class="people-public-profile-close" type="button" aria-label="Profili kapat">×</button>
     <div id="peoplePublicProfileAvatar" class="people-public-profile-avatar">✦</div>
+    <div class="people-public-profile-kicker"><span class="people-public-profile-live-dot"></span><span>ZATOI PROFILE</span></div>
     <strong id="peoplePublicProfileName">Kullanıcı</strong>
     <span id="peoplePublicProfileUsername">@kullanici</span>
+    <div class="people-public-profile-meta">
+      <span id="peoplePublicProfileRole" class="people-public-profile-role">ÜYE</span>
+      <span class="people-public-profile-state">● Aktif</span>
+    </div>
     <p id="peoplePublicProfileBio">Henüz profil açıklaması yok.</p>
     <div class="people-public-profile-actions">
       <button id="peoplePublicProfileChat" type="button">💬 Özel Sohbet</button>
@@ -7818,6 +7823,7 @@ const peoplePublicProfileClose = document.getElementById("peoplePublicProfileClo
 const peoplePublicProfileAvatar = document.getElementById("peoplePublicProfileAvatar");
 const peoplePublicProfileName = document.getElementById("peoplePublicProfileName");
 const peoplePublicProfileUsername = document.getElementById("peoplePublicProfileUsername");
+const peoplePublicProfileRole = document.getElementById("peoplePublicProfileRole");
 const peoplePublicProfileBio = document.getElementById("peoplePublicProfileBio");
 const peoplePublicProfileChat = document.getElementById("peoplePublicProfileChat");
 const peoplePublicProfileModerate = document.getElementById("peoplePublicProfileModerate");
@@ -8479,6 +8485,11 @@ async function openPeoplePublicProfile(userId) {
     if (peoplePublicProfileAvatar) peoplePublicProfileAvatar.textContent = peopleAvatarText(profile);
     if (peoplePublicProfileName) peoplePublicProfileName.textContent = peopleDisplayName(profile);
     if (peoplePublicProfileUsername) peoplePublicProfileUsername.textContent = `@${profile.username || "kullanici"}`;
+    if (peoplePublicProfileRole) {
+      const isAdminProfile = String(profile.role || "").toLowerCase() === "admin";
+      peoplePublicProfileRole.textContent = isAdminProfile ? "YÖNETİCİ" : "ZATOI ÜYESİ";
+      peoplePublicProfileRole.classList.toggle("admin", isAdminProfile);
+    }
     if (peoplePublicProfileBio) peoplePublicProfileBio.textContent = profile.bio || "Henüz profil açıklaması yok.";
     if (peoplePublicProfileChat) {
       const isSelf = String(profile.userId || "") === String(currentUser?.userId || "");
