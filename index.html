@@ -108,7 +108,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Zatoi AI">
-  <link rel="stylesheet" href="./style.css?v=14.61.1">
+  <link rel="stylesheet" href="./style.css?v=14.61.2">
 
 <style id="zatoi-pc-right-mode-switch-fix">
 /* =========================================================
@@ -8615,7 +8615,22 @@ async function openPeoplePublicProfile(userId) {
   try {
     const data = await peopleApi("get_public_profile", { targetUserId: userId });
     const profile = data.profile || {};
-    if (peoplePublicProfileAvatar) peoplePublicProfileAvatar.textContent = peopleAvatarText(profile);
+    if (peoplePublicProfileAvatar) {
+      const publicAvatarKey = String(profile.avatarKey || "spark");
+      peoplePublicProfileAvatar.replaceChildren();
+      peoplePublicProfileAvatar.className = "people-public-profile-avatar";
+      peoplePublicProfileAvatar.classList.add(`profile-avatar-${publicAvatarKey}`);
+
+      if (ADMIN_PROFILE_AVATARS.has(publicAvatarKey)) {
+        const publicAvatarImage = document.createElement("img");
+        publicAvatarImage.src = PROFILE_AVATARS[publicAvatarKey];
+        publicAvatarImage.alt = "";
+        publicAvatarImage.className = "profile-avatar-character-image";
+        peoplePublicProfileAvatar.appendChild(publicAvatarImage);
+      } else {
+        peoplePublicProfileAvatar.textContent = peopleAvatarText(profile);
+      }
+    }
     if (peoplePublicProfileName) peoplePublicProfileName.textContent = peopleDisplayName(profile);
     if (peoplePublicProfileUsername) peoplePublicProfileUsername.textContent = `@${profile.username || "kullanici"}`;
     if (peoplePublicProfileRole) {
