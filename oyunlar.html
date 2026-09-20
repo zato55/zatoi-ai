@@ -1279,7 +1279,7 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
           font-size:16px;font-weight:800;
         }
         #zmgGamesAccountMenu{
-          position:fixed;top:156px;right:14px;width:210px;display:none;
+          position:fixed;top:0;left:0;width:210px;display:none;
           flex-direction:column;gap:2px;padding:6px;z-index:999999;
           box-sizing:border-box;border:1px solid #3a3e48;border-radius:12px;
           background:#191b20;box-shadow:0 16px 38px rgba(0,0,0,.48);
@@ -1394,15 +1394,17 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
       if (page !== "games") e.preventDefault();
     });
 
-    account.addEventListener("click", () => {
+    account.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+
+      /* AI/Sohbet'te var olan gerçek hesap menüsünü kullan. */
       const source = document.getElementById("peopleMobileAccountButton");
-      if (source) {
+      if (source && page !== "games") {
         source.click();
         return;
       }
 
-      /* Oyunlar sayfasında profil için AI'ye yönlendirme YOK.
-         Kullanıcı verisinden doğrudan oyun sayfasında küçük hesap menüsü açılır. */
+      /* Oyunlar: aynı görünümlü menüyü avatarın hemen altına bağla. */
       let menu = document.getElementById("zmgGamesAccountMenu");
       if (!menu) {
         menu = document.createElement("div");
@@ -1414,10 +1416,12 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
         `;
         document.body.appendChild(menu);
 
+        menu.addEventListener("click", e => e.stopPropagation());
+
         menu.querySelector('[data-action="profile"]').addEventListener("click", () => {
           menu.classList.remove("open");
-          const profile = document.querySelector("[data-profile],#profileButton,#accountUsername");
-          if (profile) profile.click();
+          try { sessionStorage.setItem("zatoi_mobile_open_account", "profile"); } catch {}
+          location.href = "./";
         });
         menu.querySelector('[data-action="settings"]').addEventListener("click", () => {
           menu.classList.remove("open");
@@ -1429,7 +1433,21 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
           localStorage.removeItem("zatoi_auth_user_v1");
           location.href = "./";
         });
+
+        document.addEventListener("click", () => menu.classList.remove("open"));
+        window.addEventListener("resize", () => menu.classList.remove("open"));
+        window.addEventListener("scroll", () => menu.classList.remove("open"), {passive:true});
       }
+
+      const rect = account.getBoundingClientRect();
+      const menuWidth = 210;
+      const gap = 8;
+      const left = Math.min(
+        window.innerWidth - menuWidth - 8,
+        Math.max(8, rect.right - menuWidth)
+      );
+      menu.style.left = left + "px";
+      menu.style.top = (rect.bottom + gap) + "px";
       menu.classList.toggle("open");
     });
 
@@ -1458,6 +1476,29 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
     target.prepend(header);
   }
 
+
+  function bridgeSharedAccountMenu() {
+    if (innerWidth > MOBILE_MAX) return;
+    document.querySelectorAll("." + HEADER_CLASS + ' .zmg-btn[data-page="account"]').forEach(accountBtn => {
+      if (accountBtn.dataset.menuBridge === "1") return;
+      accountBtn.dataset.menuBridge = "1";
+      accountBtn.addEventListener("click", () => {
+        if (currentPage() === "games") return;
+        setTimeout(() => {
+          const dd = document.getElementById("globalStableAccountDropdown");
+          if (!dd || !dd.classList.contains("open")) return;
+          const r = accountBtn.getBoundingClientRect();
+          const w = Math.min(210, innerWidth - 16);
+          dd.style.width = w + "px";
+          dd.style.left = Math.min(innerWidth - w - 8, Math.max(8, r.right - w)) + "px";
+          dd.style.right = "auto";
+          dd.style.top = (r.bottom + 8) + "px";
+          dd.style.bottom = "auto";
+        }, 0);
+      }, true);
+    });
+  }
+
   function mount() {
     if (innerWidth > MOBILE_MAX) return;
 
@@ -1472,6 +1513,7 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
     const chatTop = app.querySelector(".people-mode-top");
     if (aiTop) renderHeader(aiTop, "ai");
     if (chatTop) renderHeader(chatTop, "chat");
+    bridgeSharedAccountMenu();
 
     /* Oyunlardan dönüşte istenen modu aç. */
     try {
