@@ -1290,6 +1290,100 @@
  }
 }
 </style>
+
+<style id="eskici-mobile-landscape-final-v3-7-4">
+/* Evrenin Eskicisi: yatay telefonda yalnız oyun kalsın. */
+@media (orientation:landscape) and (max-height:700px){
+  html,body.eskici-active{
+    margin:0!important;
+    padding:0!important;
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+    background:#04060a!important;
+  }
+
+  body.eskici-active > header,
+  body.eskici-active .zatoi-mobile-global-header-component,
+  body.eskici-active .game-library,
+  body.eskici-active .game-right-rail,
+  body.eskici-active .scoreboard,
+  body.eskici-active footer{
+    display:none!important;
+  }
+
+  body.eskici-active main{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  body.eskici-active main > .eyebrow,
+  body.eskici-active main > h1,
+  body.eskici-active main > .intro,
+  body.eskici-active main > .tabs{
+    display:none!important;
+  }
+
+  body.eskici-active .games-shell{
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  body.eskici-active .game-center,
+  body.eskici-active .game-center > .card,
+  body.eskici-active #eskici,
+  body.eskici-active .eskici-stage{
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:#04060a!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+
+  body.eskici-active #eskici > .row,
+  body.eskici-active #eskici > .muted{
+    display:none!important;
+  }
+
+  body.eskici-active #eskiciFrame{
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+  }
+}
+</style>
 </head><body class="zatoi-games-page"><header class="zatoi-global-header">
 <a class="brand" href="./" aria-label="Zatoi ana sayfa">Zatoi<span> ✦</span></a>
 <a class="desktop-back-link" href="./">← Sohbete dön</a>
