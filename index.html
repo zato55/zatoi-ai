@@ -535,6 +535,20 @@
 html.zatoi-return-session #authScreen{display:none!important;}
 </style>
 
+
+<style id="zatoi-mobile-account-menu-no-flash-v14-63-6">
+@media (max-width:800px){
+  #globalStableAccountDropdown.open:not(.zmg-position-ready){
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+  }
+  #globalStableAccountDropdown.open.zmg-position-ready{
+    visibility:visible!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -10004,9 +10018,18 @@ checkAuth();
       accountBtn.dataset.menuBridge = "1";
       accountBtn.addEventListener("click", () => {
         if (currentPage() === "games") return;
+
+        /* Önce görünürlüğü kilitle: eski sol-üst konum bir kare bile çizilmesin. */
+        const earlyDd = document.getElementById("globalStableAccountDropdown");
+        earlyDd?.classList.remove("zmg-position-ready");
+
         setTimeout(() => {
           const dd = document.getElementById("globalStableAccountDropdown");
-          if (!dd || !dd.classList.contains("open")) return;
+          if (!dd || !dd.classList.contains("open")) {
+            dd?.classList.remove("zmg-position-ready");
+            return;
+          }
+
           const r = accountBtn.getBoundingClientRect();
           const w = Math.min(210, innerWidth - 16);
           dd.style.width = w + "px";
@@ -10014,6 +10037,9 @@ checkAuth();
           dd.style.right = "auto";
           dd.style.top = (r.bottom + 8) + "px";
           dd.style.bottom = "auto";
+
+          /* Doğru konum hazır; şimdi göster. */
+          dd.classList.add("zmg-position-ready");
         }, 0);
       }, true);
     });
@@ -10092,6 +10118,20 @@ checkAuth();
 })();
 
 </script>
+
+<script id="zatoi-mobile-account-menu-ready-reset-v14-63-6">
+(() => {
+  const resetIfClosed = () => {
+    const dd = document.getElementById("globalStableAccountDropdown");
+    if (dd && !dd.classList.contains("open")) dd.classList.remove("zmg-position-ready");
+  };
+  document.addEventListener("click", () => setTimeout(resetIfClosed, 0));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") setTimeout(resetIfClosed, 0);
+  });
+})();
+</script>
+
 </body>
 </html>
 
