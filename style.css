@@ -12254,3 +12254,39 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   object-position:center!important;
   border-radius:inherit!important;
 }
+
+/* =========================================================
+   V14.62.1 — SOHBET Z ARKA PLAN SINIRI
+   Çalışan V14.62 mesaj geometrisine DOKUNMAZ.
+   Sadece eski V14.37 büyük Z dekorunu kendi paneline hapseder.
+   ========================================================= */
+@media (min-width:801px){
+  #app.people-chat-mode .people-conversation{
+    position:relative!important;
+    isolation:isolate!important;
+    overflow:hidden!important;
+  }
+
+  #app.people-chat-mode .people-conversation::before{
+    content:"Z"!important;
+    position:absolute!important;
+    left:50%!important;
+    top:58%!important;
+    transform:translate(-50%,-50%)!important;
+    z-index:0!important;
+    font-size:clamp(120px,15vw,250px)!important;
+    line-height:1!important;
+    font-weight:900!important;
+    letter-spacing:-.08em!important;
+    color:rgba(255,255,255,.025)!important;
+    opacity:1!important;
+    pointer-events:none!important;
+    user-select:none!important;
+  }
+
+  #app.people-chat-mode .people-conversation > *{
+    position:relative!important;
+    z-index:1!important;
+  }
+}
+
