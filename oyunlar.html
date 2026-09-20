@@ -794,7 +794,7 @@
   .zatoi-global-header .desktop-back-link{display:inline!important}
 }
 
-</style></head><body><header class="zatoi-global-header">
+</style></head><body class="zatoi-games-page"><header class="zatoi-global-header">
 <a class="brand" href="./" aria-label="Zatoi ana sayfa">Zatoi<span> ✦</span></a>
 <a class="desktop-back-link" href="./">← Sohbete dön</a>
 <nav class="zatoi-mobile-global-actions" aria-label="Zatoi hızlı geçiş">
@@ -1217,37 +1217,241 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
 })();
 </script>
 
+<script id="zatoi-mobile-global-header-component">
+/* ZATOI MOBILE GLOBAL HEADER V1
+   Tek mobil header bileşeni: AI + Sohbet + Oyunlar + gelecekteki sayfalar.
+   PC'ye dokunmaz.
+*/
+(() => {
+  "use strict";
 
-<script>
-/* V2.9 — Mobil global header geçişleri. Ana Zatoi mevcut sessionStorage modunu kullanır. */
-(()=>{
- const chat=document.getElementById('zatoiGlobalChat');
- const ai=document.getElementById('zatoiGlobalAi');
- const account=document.getElementById('zatoiGlobalAccount');
- const avatar=document.getElementById('zatoiGlobalAccountAvatar');
+  const MOBILE_MAX = 800;
+  const STYLE_ID = "zatoi-mobile-global-header-component-style";
+  const HEADER_CLASS = "zatoi-mobile-global-header-component";
 
- function goMain(mode){
-   try{sessionStorage.setItem('zatoi_active_mode_v1',mode)}catch{}
-   location.href='./';
- }
- chat?.addEventListener('click',()=>goMain('chat'));
- ai?.addEventListener('click',()=>goMain('ai'));
+  if (!document.getElementById(STYLE_ID)) {
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = `
+      @media (min-width:801px){.${HEADER_CLASS}{display:none!important}}
+      @media (max-width:800px){
+        .${HEADER_CLASS}{
+          width:100%;height:84px;min-height:84px;padding:0 22px;
+          box-sizing:border-box;display:flex;align-items:center;
+          justify-content:space-between;gap:12px;
+          background:linear-gradient(90deg,#111116 0%,#211014 100%);
+          border-bottom:1px solid rgba(255,255,255,.10);
+          position:relative;z-index:50;
+        }
+        .zmg-brand{
+          display:inline-flex;align-items:center;gap:6px;min-width:0;
+          color:#f5f5f5;text-decoration:none;white-space:nowrap;
+          font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+          font-size:25px;font-weight:850;line-height:1;letter-spacing:-1px;
+        }
+        .zmg-brand-mark{
+          color:#ef233c;font-size:25px;font-weight:850;line-height:1;
+          transform:translateY(1px);
+        }
+        .zmg-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto}
+        .zmg-btn{
+          width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;
+          padding:0;margin:0;border:1px solid rgba(255,255,255,.11);
+          border-radius:50%;background:#191b20;color:#fff;text-decoration:none;
+          box-sizing:border-box;box-shadow:none;display:grid;place-items:center;
+          font:700 18px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+          cursor:pointer;-webkit-tap-highlight-color:transparent;
+        }
+        .zmg-btn:active{transform:scale(.95)}
+        .zmg-btn[data-page="ai"]{color:#ef233c}
+        .zmg-btn[data-page="ai"] .zmg-ai-mark{
+          display:grid;place-items:center;width:100%;height:100%;
+          font-size:24px;line-height:1;color:#ef233c;
+        }
+        .zmg-btn.is-active{
+          border-color:rgba(239,35,60,.48);
+          background:#24161a;
+          box-shadow:inset 0 0 0 1px rgba(239,35,60,.10);
+        }
+        .zmg-avatar{
+          width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+          overflow:hidden;background:#24272e center/cover no-repeat;color:#fff;
+          font-size:16px;font-weight:800;
+        }
 
- /* Oyun sayfasında hesabı temsil eden avatar/baş harf. */
- try{
-   const raw=localStorage.getItem('zatoi_auth_user_v1');
-   const u=raw?JSON.parse(raw):null;
-   const name=String(u?.display_name||u?.displayName||u?.username||u?.name||'Z').trim();
-   const avatarUrl=String(u?.avatar_url||u?.avatarUrl||u?.avatar||'').trim();
-   if(avatarUrl){
-     avatar.style.backgroundImage=`url("${avatarUrl.replace(/"/g,'')}")`;
-     avatar.textContent='';
-   }else avatar.textContent=(name[0]||'Z').toLocaleUpperCase('tr-TR');
- }catch{}
+        /* Eski mobil header görselleri işlev kaynağı olarak DOM'da kalır ama görünmez. */
+        #app:not(.people-chat-mode) .chat-top > :not(.${HEADER_CLASS}){display:none!important}
+        #app.people-chat-mode .people-mode-top > :not(.${HEADER_CLASS}){display:none!important}
+        #app:not(.people-chat-mode) .chat-top,
+        #app.people-chat-mode .people-mode-top{
+          height:84px!important;min-height:84px!important;padding:0!important;
+          background:transparent!important;border:0!important;
+        }
+        #app:not(.people-chat-mode) .chat-top > .${HEADER_CLASS},
+        #app.people-chat-mode .people-mode-top > .${HEADER_CLASS}{
+          display:flex!important;
+        }
 
- /* Hesap düğmesi ana Zatoi'ye götürür; mevcut hesap sistemi orada korunur. */
- account?.addEventListener('click',()=>goMain('chat'));
+        body.zatoi-games-page > header:not(.${HEADER_CLASS}){display:none!important}
+        body.zatoi-games-page > .${HEADER_CLASS}{display:flex!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function readUser() {
+    try {
+      const raw = localStorage.getItem("zatoi_auth_user_v1");
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  }
+
+  function currentPage() {
+    if (document.body.classList.contains("zatoi-games-page")) return "games";
+    const app = document.getElementById("app");
+    if (app?.classList.contains("people-chat-mode")) return "chat";
+    return "ai";
+  }
+
+  function makeButton(page, label, content) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "zmg-btn";
+    b.dataset.page = page;
+    b.setAttribute("aria-label", label);
+    b.title = label;
+    b.innerHTML = content;
+    return b;
+  }
+
+  function renderHeader(target, page) {
+    if (!target) return;
+    target.querySelectorAll("." + HEADER_CLASS).forEach(x => x.remove());
+
+    const header = document.createElement("div");
+    header.className = HEADER_CLASS;
+    header.dataset.activePage = page;
+
+    const brand = document.createElement("a");
+    brand.className = "zmg-brand";
+    brand.href = "./";
+    brand.setAttribute("aria-label", "Zatoi");
+    brand.innerHTML = `<span>Zatoi</span><span class="zmg-brand-mark">✦</span>`;
+
+    const actions = document.createElement("nav");
+    actions.className = "zmg-actions";
+    actions.setAttribute("aria-label", "Zatoi hızlı geçiş");
+
+    const games = makeButton("games", "Oyunlar", "🎮");
+    const ai = makeButton("ai", "Zatoi AI", `<span class="zmg-ai-mark">✦</span>`);
+    const account = makeButton("account", "Hesap", `<span class="zmg-avatar">Z</span>`);
+
+    if (page === "games") games.classList.add("is-active");
+    if (page === "ai") ai.classList.add("is-active");
+
+    games.addEventListener("click", () => {
+      if (page !== "games") location.href = "./oyunlar.html";
+    });
+
+    ai.addEventListener("click", () => {
+      if (page === "games") {
+        try { sessionStorage.setItem("zatoi_mobile_open_mode", "ai"); } catch {}
+        location.href = "./";
+        return;
+      }
+      document.getElementById("peopleAiModeButton")?.click();
+      document.getElementById("zatoiAiModeButton")?.click();
+    });
+
+    /* Markaya dokunmak sohbet/ana geçişi olarak kullanılır. */
+    brand.addEventListener("click", (e) => {
+      if (page === "games") {
+        e.preventDefault();
+        try { sessionStorage.setItem("zatoi_mobile_open_mode", "chat"); } catch {}
+        location.href = "./";
+      }
+    });
+
+    account.addEventListener("click", () => {
+      const source = document.getElementById("peopleMobileAccountButton");
+      if (source) source.click();
+      else {
+        try { sessionStorage.setItem("zatoi_mobile_open_account", "1"); } catch {}
+        if (page === "games") location.href = "./";
+      }
+    });
+
+    const user = readUser();
+    const avatar = account.querySelector(".zmg-avatar");
+    const name = String(
+      user?.display_name || user?.displayName || user?.username ||
+      user?.name || user?.user?.username || "Z"
+    ).trim();
+    const avatarUrl = String(
+      user?.avatar_url || user?.avatarUrl || user?.avatar ||
+      user?.profile?.avatar_url || ""
+    ).trim();
+
+    if (avatarUrl) {
+      avatar.style.backgroundImage = `url("${avatarUrl.replace(/"/g,"")}")`;
+      avatar.textContent = "";
+    } else {
+      avatar.textContent = (name[0] || "Z").toLocaleUpperCase("tr-TR");
+    }
+
+    actions.append(games, ai, account);
+    header.append(brand, actions);
+    target.prepend(header);
+  }
+
+  function mount() {
+    if (innerWidth > MOBILE_MAX) return;
+
+    const app = document.getElementById("app");
+    if (document.body.classList.contains("zatoi-games-page")) {
+      renderHeader(document.body, "games");
+      return;
+    }
+    if (!app) return;
+
+    const aiTop = app.querySelector(".chat-top");
+    const chatTop = app.querySelector(".people-mode-top");
+    if (aiTop) renderHeader(aiTop, "ai");
+    if (chatTop) renderHeader(chatTop, "chat");
+
+    /* Oyunlardan dönüşte istenen modu aç. */
+    try {
+      const requested = sessionStorage.getItem("zatoi_mobile_open_mode");
+      if (requested === "chat") {
+        sessionStorage.removeItem("zatoi_mobile_open_mode");
+        requestAnimationFrame(() => document.getElementById("zatoiChatModeButton")?.click());
+      } else if (requested === "ai") {
+        sessionStorage.removeItem("zatoi_mobile_open_mode");
+        requestAnimationFrame(() => document.getElementById("peopleAiModeButton")?.click());
+      }
+      if (sessionStorage.getItem("zatoi_mobile_open_account") === "1") {
+        sessionStorage.removeItem("zatoi_mobile_open_account");
+        setTimeout(() => document.getElementById("peopleMobileAccountButton")?.click(), 250);
+      }
+    } catch {}
+  }
+
+  const app = document.getElementById("app");
+  if (app) {
+    new MutationObserver(() => {
+      if (innerWidth > MOBILE_MAX) return;
+      const page = currentPage();
+      document.querySelectorAll("." + HEADER_CLASS).forEach(h => {
+        h.dataset.activePage = page;
+        h.querySelectorAll(".zmg-btn").forEach(b => b.classList.remove("is-active"));
+        h.querySelector(`.zmg-btn[data-page="${page}"]`)?.classList.add("is-active");
+      });
+    }).observe(app, {attributes:true, attributeFilter:["class"]});
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount, {once:true});
+  else mount();
 })();
-</script>
 
+</script>
 </body></html>
