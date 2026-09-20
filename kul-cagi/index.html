@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>KÜL ÇAĞI — v0.4</title>
+<title>KÜL ÇAĞI — v0.5</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#080a0a;color:#e9e0cb;font-family:system-ui,Segoe UI,sans-serif}
 canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshair}
@@ -30,7 +30,7 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
 <body>
 <canvas id="g"></canvas>
 <div id="hud" class="panel">
- <div class="title">KÜL ÇAĞI · v0.4</div>
+ <div class="title">KÜL ÇAĞI · v0.5</div>
  <div class="row"><span id="lv"></span><span id="gold"></span></div>
  <div class="bar"><div id="hp" class="fill"></div></div>
  <div class="row"><span id="ht"></span><span id="wep"></span></div>
@@ -45,6 +45,10 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
 <div id="tips" class="panel">WASD/Oklar: hareket · E: konuş/loot · Sol tık: saldırı · SPACE: sıyrıl · Q: silah yeteneği · I: envanter · 1/2/3: silah</div>
 <div id="inv" class="panel"></div><div id="toast"></div><div id="cross"></div>
 <div id="zone"></div>
+<div id="weaponSlots" class="panel" style="left:14px;bottom:14px;width:330px;padding:10px;font-size:12px">
+ <div class="title">SİLAH SETİ</div>
+ <div id="slot1"></div><div id="slot2"></div><div id="slot3"></div>
+</div>
 <div id="riftHud" class="panel" style="display:none;right:14px;top:145px;width:300px">
 <div class="title">DÜNYA YARASI</div>
 <div style="height:8px;background:#231d2b;border:1px solid #51425f;margin:7px 0"><div id="riftBar" style="height:100%;width:100%;background:#9d70cf"></div></div>
@@ -95,6 +99,41 @@ const TYPES=[
 const P={x:WORLD.w/2,y:WORLD.h/2,hp:125,max:125,lv:1,xp:0,next:90,gold:0,kills:0,weapon:0,atk:0,dash:0,dashCd:0,power:0,speed:225,bag:[],eq:null,ifr:0,face:0};
 let enemies=[],drops=[],fx=[],texts=[],cam={x:0,y:0},toast=0,shake=0;
 let zone="town", quest=0, questKills=0, dialogNpc=null;
+let equippedWeapons={
+  0:{name:"Eski Yarma Kılıcı",q:RAR[0],w:WEAP[0],bonus:0,lv:1},
+  1:{name:"Aşınmış İkiz Keskiler",q:RAR[0],w:WEAP[1],bonus:0,lv:1},
+  2:{name:"Çatlak Damar Odağı",q:RAR[0],w:WEAP[2],bonus:0,lv:1}
+};
+function weaponIndex(w){
+ if(!w)return 0;
+ let n=(w.name||"").toLowerCase();
+ if(n.includes("ikiz"))return 1;
+ if(n.includes("damar"))return 2;
+ return 0;
+}
+function weaponPower(i=P.weapon){
+ let it=equippedWeapons[i];
+ return it ? (it.bonus||0) : 0;
+}
+function equipWeapon(it){
+ if(!it||!it.w)return;
+ let i=weaponIndex(it.w);
+ let old=equippedWeapons[i];
+ equippedWeapons[i]=it;
+ let bi=P.bag.indexOf(it);
+ if(bi>=0)P.bag.splice(bi,1);
+ if(old && !/^Eski Yarma|^Aşınmış İkiz|^Çatlak Damar/.test(old.name))P.bag.push(old);
+ say((i+1)+". SLOTA KUŞANILDI · "+it.name);
+ renderInv();renderWeaponSlots();
+}
+function renderWeaponSlots(){
+ for(let i=0;i<3;i++){
+   let it=equippedWeapons[i],el=$("#slot"+(i+1));
+   if(!el)continue;
+   let active=P.weapon===i;
+   el.innerHTML='<div style="margin:5px 0;padding:6px;border:1px solid '+(active?'#d7c17d':'#403b31')+';background:'+(active?'#29261d':'#171713')+'"><b>'+(i+1)+' · '+WEAP[i].name+'</b><br><span style="color:'+(it.q?.col||'#aaa')+'">'+it.name+'</span> · Güç +'+(it.bonus||0)+(active?' · AKTİF':'')+'</div>';
+ }
+}
 let rift={state:0,stability:100,x:1300,y:760,timer:0,boss:null,chest:null,claimed:false};
 const NPCS=[
  {id:"varek",name:"Varek · Gözcü",x:1260,y:760,col:"#b88b58"},
@@ -174,7 +213,7 @@ function itemDrop(e){
 function gain(v){P.xp+=v;while(P.xp>=P.next){P.xp-=P.next;P.lv++;P.next=Math.round(P.next*1.32);P.max+=18;P.hp=P.max;say("SEVİYE "+P.lv+" · DAMAR GÜÇLENİYOR");burst(P.x,P.y,"#e6c76d",25)}}
 function damageEnemy(e,d,a,knock=35){e.hp-=d;e.hit=.14;e.kx+=Math.cos(a)*knock;e.ky+=Math.sin(a)*knock;texts.push({x:e.x,y:e.y-20,t:.7,s:Math.round(d),col:"#f0ddad"});burst(e.x,e.y,WEAP[P.weapon].col,5);shake=Math.max(shake,3)}
 function burst(px,py,col,n){for(let i=0;i<n;i++){let a=Math.random()*6.28,s=25+Math.random()*120;fx.push({x:px,y:py,vx:Math.cos(a)*s,vy:Math.sin(a)*s,t:.25+Math.random()*.35,col})}}
-function basic(){
+function basic(){let gear=weaponPower();
  if(P.atk>0)return;let w=WEAP[P.weapon],a=P.face;P.atk=w.cd;
  if(P.weapon===2){
    fx.push({beam:true,x:P.x,y:P.y,a,t:.13,len:w.range,col:w.col});
@@ -202,9 +241,15 @@ function special(){
 }
 function pickup(){let bi=-1,bd=85;drops.forEach((o,i)=>{let d=Math.hypot(o.x-P.x,o.y-P.y);if(d<bd){bd=d;bi=i}});if(bi>=0){let o=drops.splice(bi,1)[0];P.bag.push(o.it);say(o.it.name+" alındı");renderInv()}}
 function renderInv(){
- let h='<div class="title">ENVANTER</div><small>Eşyaya tıklayarak kuşan.</small><p><b>Kuşanılan:</b><br>'+(P.eq?'<span class="'+P.eq.q[1]+'">'+P.eq.name+'</span> · +'+P.eq.bonus+' hasar':'Başlangıç ekipmanı')+'</p>';
- P.bag.forEach((o,i)=>h+='<div class="item" data-i="'+i+'"><b class="'+o.q[1]+'">'+o.name+'</b><br><small>Seviye '+o.lv+' · +'+o.bonus+' hasar</small></div>');
- $("#inv").innerHTML=h;document.querySelectorAll(".item").forEach(el=>el.onclick=()=>{P.eq=P.bag[+el.dataset.i];P.weapon=WEAP.indexOf(P.eq.w);say(P.eq.name+" kuşanıldı");renderInv()});
+ let box=$("#inv");if(!box)return;
+ let rows=P.bag.map((it,i)=>{
+   let wi=it.w?weaponIndex(it.w):-1;
+   let target=wi>=0?(wi+1)+". slot":"";
+   return '<div class="item" style="border-left:3px solid '+(it.q?.col||"#888")+'"><b style="color:'+(it.q?.col||"#ddd")+'">'+it.name+'</b><br><span>Güç +'+(it.bonus||0)+(target?' · '+target:'')+'</span>'+(it.w?'<button data-eq="'+i+'" style="float:right">KUŞAN</button>':'')+'</div>';
+ }).join("");
+ box.innerHTML='<div class="title">ENVANTER · '+P.bag.length+'</div><div style="font-size:11px;color:#a99f88;margin-bottom:8px">Silahlar kendi slotuna kuşanılır. Yarma → 1, İkiz → 2, Damar → 3.</div>'+ (rows||'<div class="muted">Çanta boş.</div>');
+ box.querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>equipWeapon(P.bag[+b.dataset.eq]));
+ renderWeaponSlots();
 }renderInv();
 
 function update(dt){
@@ -299,7 +344,7 @@ function draw(){
  $("#atkShade").style.height=(P.atk/WEAP[P.weapon].cd*100)+"%";$("#dashShade").style.height=(P.dashCd/1.15*100)+"%";$("#powShade").style.height=(P.power/WEAP[P.weapon].pCd*100)+"%";
 }
 let last=performance.now();function loop(t){let dt=Math.min(.033,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(loop)}
-setZone("town");questUI();say("KÜL LİMANI · v0.4");requestAnimationFrame(loop);
+setZone("town");questUI();renderWeaponSlots();say("KÜL LİMANI · v0.5");requestAnimationFrame(loop);
 })();
 </script>
 </body></html>
