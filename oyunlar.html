@@ -1278,6 +1278,21 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
           overflow:hidden;background:#24272e center/cover no-repeat;color:#fff;
           font-size:16px;font-weight:800;
         }
+        #zmgGamesAccountMenu{
+          position:fixed;top:156px;right:14px;width:210px;display:none;
+          flex-direction:column;gap:2px;padding:6px;z-index:999999;
+          box-sizing:border-box;border:1px solid #3a3e48;border-radius:12px;
+          background:#191b20;box-shadow:0 16px 38px rgba(0,0,0,.48);
+        }
+        #zmgGamesAccountMenu.open{display:flex}
+        #zmgGamesAccountMenu button{
+          display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;
+          width:100%;height:38px;padding:0 10px;border:0;border-radius:8px;
+          background:#17191e;color:#f5f5f5;font:650 13px/1 system-ui,sans-serif;
+          text-align:left;cursor:pointer;
+        }
+        #zmgGamesAccountMenu button:active{background:#24272e}
+        #zmgGamesAccountMenu .danger{color:#ff8f98}
 
         /* Eski mobil header görselleri işlev kaynağı olarak DOM'da kalır ama görünmez. */
         #app:not(.people-chat-mode) .chat-top > :not(.${HEADER_CLASS}){display:none!important}
@@ -1342,12 +1357,23 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
     actions.className = "zmg-actions";
     actions.setAttribute("aria-label", "Zatoi hızlı geçiş");
 
+    /* Aktif sayfa üst barda tekrar gösterilmez.
+       AI'de: Sohbet + Oyunlar + Hesap
+       Sohbet'te: AI + Oyunlar + Hesap
+       Oyunlar'da: Sohbet + AI + Hesap */
+    const chat = makeButton("chat", "Sohbet", "💬");
     const games = makeButton("games", "Oyunlar", "🎮");
     const ai = makeButton("ai", "Zatoi AI", `<span class="zmg-ai-mark">✦</span>`);
     const account = makeButton("account", "Hesap", `<span class="zmg-avatar">Z</span>`);
 
-    if (page === "games") games.classList.add("is-active");
-    if (page === "ai") ai.classList.add("is-active");
+    chat.addEventListener("click", () => {
+      if (page === "games") {
+        try { sessionStorage.setItem("zatoi_mobile_open_mode", "chat"); } catch {}
+        location.href = "./";
+        return;
+      }
+      document.getElementById("zatoiChatModeButton")?.click();
+    });
 
     games.addEventListener("click", () => {
       if (page !== "games") location.href = "./oyunlar.html";
@@ -1363,22 +1389,48 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
       document.getElementById("zatoiAiModeButton")?.click();
     });
 
-    /* Markaya dokunmak sohbet/ana geçişi olarak kullanılır. */
+    /* Logo yalnızca marka/ana bağlantısıdır; mod değiştirmez. */
     brand.addEventListener("click", (e) => {
-      if (page === "games") {
-        e.preventDefault();
-        try { sessionStorage.setItem("zatoi_mobile_open_mode", "chat"); } catch {}
-        location.href = "./";
-      }
+      if (page !== "games") e.preventDefault();
     });
 
     account.addEventListener("click", () => {
       const source = document.getElementById("peopleMobileAccountButton");
-      if (source) source.click();
-      else {
-        try { sessionStorage.setItem("zatoi_mobile_open_account", "1"); } catch {}
-        if (page === "games") location.href = "./";
+      if (source) {
+        source.click();
+        return;
       }
+
+      /* Oyunlar sayfasında profil için AI'ye yönlendirme YOK.
+         Kullanıcı verisinden doğrudan oyun sayfasında küçük hesap menüsü açılır. */
+      let menu = document.getElementById("zmgGamesAccountMenu");
+      if (!menu) {
+        menu = document.createElement("div");
+        menu.id = "zmgGamesAccountMenu";
+        menu.innerHTML = `
+          <button type="button" data-action="profile">👤 <span>Profilim</span></button>
+          <button type="button" data-action="settings">⚙️ <span>Ayarlar</span></button>
+          <button type="button" data-action="logout" class="danger">↪ <span>Oturumu Kapat</span></button>
+        `;
+        document.body.appendChild(menu);
+
+        menu.querySelector('[data-action="profile"]').addEventListener("click", () => {
+          menu.classList.remove("open");
+          const profile = document.querySelector("[data-profile],#profileButton,#accountUsername");
+          if (profile) profile.click();
+        });
+        menu.querySelector('[data-action="settings"]').addEventListener("click", () => {
+          menu.classList.remove("open");
+          try { sessionStorage.setItem("zatoi_mobile_open_account", "settings"); } catch {}
+          location.href = "./";
+        });
+        menu.querySelector('[data-action="logout"]').addEventListener("click", () => {
+          localStorage.removeItem("zatoi_auth_token_v1");
+          localStorage.removeItem("zatoi_auth_user_v1");
+          location.href = "./";
+        });
+      }
+      menu.classList.toggle("open");
     });
 
     const user = readUser();
@@ -1399,7 +1451,9 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
       avatar.textContent = (name[0] || "Z").toLocaleUpperCase("tr-TR");
     }
 
-    actions.append(games, ai, account);
+    if (page === "ai") actions.append(chat, games, account);
+    else if (page === "chat") actions.append(games, ai, account);
+    else actions.append(chat, ai, account);
     header.append(brand, actions);
     target.prepend(header);
   }
