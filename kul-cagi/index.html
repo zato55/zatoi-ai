@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>KÜL ÇAĞI — v0.6</title>
+<title>KÜL ÇAĞI — v0.6.1</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#080a0a;color:#e9e0cb;font-family:system-ui,Segoe UI,sans-serif}
 canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshair}
@@ -31,7 +31,7 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
 <body>
 <canvas id="g"></canvas>
 <div id="hud" class="panel">
- <div class="title">KÜL ÇAĞI · v0.6</div>
+ <div class="title">KÜL ÇAĞI · v0.6.1</div>
  <div class="row"><span id="lv"></span><span id="gold"></span></div>
  <div class="bar"><div id="hp" class="fill"></div></div>
  <div class="row"><span id="ht"></span><span id="wep"></span></div>
@@ -71,7 +71,12 @@ addEventListener("resize",resize);resize();
 const K={},M={x:W/2,y:H/2,down:false};
 addEventListener("keydown",e=>{
  K[e.code]=true;
- if(e.code==="KeyE"&&!e.repeat){e.preventDefault();interact();}
+ if(e.code==="KeyE"&&!e.repeat){
+ e.preventDefault();
+ if(zone==="field"&&guardian.reward&&Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)<=145){claimGuardianReward();return;}
+ if(zone==="field"&&rift.chest&&Math.hypot(P.x-rift.chest.x,P.y-rift.chest.y)<=130){claimRiftChest();return;}
+ interact();
+}
  if(e.code==="KeyI"&&!e.repeat){$("#inv").classList.toggle("on");renderInv();}
  if(/^Digit[123]$/.test(e.code)&&!e.repeat){P.weapon=+e.code.slice(-1)-1;renderWeaponSlots();say(WEAP[P.weapon].name);}
 });
@@ -177,12 +182,21 @@ function interact(){
    let near=NPCS.map(n=>({n,d:Math.hypot(n.x-P.x,n.y-P.y)}))
      .filter(o=>o.d<=130).sort((a,b)=>a.d-b.d)[0];
    if(near){openDialog(near.n);return;}
-   pickup();
- }else{
-   if(!claimRiftChest())pickup();
+   pickup();return;
  }
+ if(guardian.reward&&Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)<=145){
+   claimGuardianReward();return;
+ }
+ if(rift.chest&&Math.hypot(P.x-rift.chest.x,P.y-rift.chest.y)<=130){
+   claimRiftChest();return;
+ }
+ pickup();
 }
-$("#interactBtn").onclick=()=>interact();
+$("#interactBtn").onclick=()=>{
+ if(zone==="field"&&guardian.reward&&Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)<=145){claimGuardianReward();return;}
+ if(zone==="field"&&rift.chest&&Math.hypot(P.x-rift.chest.x,P.y-rift.chest.y)<=130){claimRiftChest();return;}
+ interact();
+};
 function closeDialog(){$("#dialog").classList.remove("on");dialogNpc=null}
 $("#dialogClose").onclick=closeDialog;
 $("#dialogAction").onclick=()=>{
@@ -251,7 +265,7 @@ function finishGuardian(){
  say("KIRIK MUHAFIZ YIKILDI · YENİ YOL AÇILDI");shake=28;
 }
 function claimGuardianReward(){
- if(!guardian.reward||Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)>100)return false;
+ if(!guardian.reward||Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)>145)return false;
  let wi=Math.random()*3|0,q=RAR[4],w=WEAP[wi];
  let it={name:"Muhafız Yadigârı · "+w.name,q,w,bonus:Math.round(28+P.lv*4.2),lv:P.lv};
  P.bag.push(it);P.gold+=140;gain(220);guardian.reward=null;renderInv();
@@ -445,7 +459,7 @@ function draw(){
  $("#atkShade").style.height=(P.atk/WEAP[P.weapon].cd*100)+"%";$("#dashShade").style.height=(P.dashCd/1.15*100)+"%";$("#powShade").style.height=(P.power/WEAP[P.weapon].pCd*100)+"%";
 }
 let last=performance.now();function loop(t){let dt=Math.min(.033,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(loop)}
-setZone("town");questUI();renderWeaponSlots();say("KÜL LİMANI · v0.6");requestAnimationFrame(loop);
+setZone("town");questUI();renderWeaponSlots();say("KÜL LİMANI · v0.6.1");requestAnimationFrame(loop);
 })();
 </script>
 </body></html>
