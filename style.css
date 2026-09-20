@@ -12351,3 +12351,14 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.62.4 — Z FİLİGRANI KAPALI
+   Mesaj yönü / avatar / geometriye dokunmaz.
+   ========================================================= */
+@media (min-width:801px){
+  #app.people-chat-mode .people-conversation::before{
+    content:none!important;
+    display:none!important;
+  }
+}
+
