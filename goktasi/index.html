@@ -640,7 +640,9 @@ function makeSkillIcons(){
 // ---------- varlıklar ----------
 let mobs=[],bots=[],drops=[],parts=[],floats=[],fxs=[],stones=[],statics=[],npcs=[];
 let uid=1;
-const P={x:7500,y:7800,tx:0,ty:0,walkT:0,mv:false,dir:1,name:'',soy:'kurt',lvl:1,exp:0,
+const P={x:7500,y:7800,tx:7500,ty:7800,walkT:0,mv:false,dir:1,name:'',soy:'kurt',lvl:1,exp:0,
+  pal:{skin:'#c9a074',hair:'#2e2418',cloth:'#465f35',cloth2:'#344828',boot:'#2e2620',belt:'#8a6a2f'},
+  w:'sword',wc:'#9a8f7d',
   hp:100,sp:50,stat:{g:5,b:5,c:5},pts:0,money:0,inv:new Array(24).fill(null),
   eq:{w:null,a:null,t:null},atkCD:0,swingT:0,pendT:0,target:null,stoneT:null,
   cds:[0,0,0,0,0],potCD:0,buffDef:0,buffAtk:0,buffSpd:0,lastHit:-9,dead:false,deadT:0,
@@ -1500,7 +1502,7 @@ function drawHuman(g,o){
   g.save();g.translate(o.x,o.y);
   g.fillStyle='rgba(0,0,0,.32)';g.beginPath();g.ellipse(0,2,12,4.5,0,0,TAU);g.fill();
   if(o.dir<0)g.scale(-1,1);
-  const Pl=o.pal,step=Math.sin(o.wt||0)*(o.mv?1:0);
+  const Pl=o.pal||P.pal,step=Math.sin(o.wt!==undefined?o.wt:(o.walkT||0))*(o.mv?1:0);
   g.fillStyle=Pl.boot||'#2e2620';
   g.beginPath();g.ellipse(-4+step*4,0,3.2,2.4,0,0,TAU);g.ellipse(4-step*4,0,3.2,2.4,0,0,TAU);g.fill();
   g.fillStyle=Pl.cloth;rr(g,-7,-19,14,15,4);g.fill();
@@ -1845,6 +1847,13 @@ function begin(fresh){
     addChat('Kam Bilge','Geri döndün '+P.name+'. Yol uzun, çan sağlam.','sys');
   }
   P.inv=P.inv.map(s=>s||null);
+  // Oyuncuyu başlangıçta kendi konumuna kilitle; (0,0)'a yürümeye çalışmasın.
+  P.tx=P.x;P.ty=P.y;P.target=null;P.stoneT=null;P.mv=false;
+  // Oyuncu görünümü ve eldeki silahı ekipmandan eşleştir.
+  const visW=P.eq.w&&ITEMS[P.eq.w.id];
+  P.w=visW?(visW.ic==='great'?'great':visW.ic==='saber'?'saber':'sword'):'none';
+  P.wc=visW?(visW.c||'#c8cdd2'):'#c8cdd2';
+  cam.x=P.x;cam.y=P.y-14;
   $('intro').classList.add('off');
   $('hud').style.display='block';
   started=true;lastZone=regionAt(P.x,P.y);
