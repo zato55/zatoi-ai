@@ -344,8 +344,40 @@
   .mobile-drawer-backdrop{display:none!important}
 }
 
+
+/* V2.4 — SADECE MOBİL: tek elle Arena touchpad */
+.arena-mobile-touchpad{display:none}
+@media(max-width:760px){
+  #arena .directions{display:none!important}
+  #arena .note{display:none!important}
+  .arena-mobile-touchpad{
+    display:block;position:relative;height:116px;margin-top:14px;overflow:hidden;
+    border:1px solid var(--line);border-radius:18px;background:#111218;
+    touch-action:none;user-select:none;-webkit-user-select:none;
+    transition:opacity .18s ease,border-color .18s ease
+  }
+  .arena-mobile-touchpad::before{
+    content:"";position:absolute;left:50%;top:14px;bottom:14px;width:1px;background:rgba(255,255,255,.08)
+  }
+  .arena-mobile-touchpad::after{
+    content:"Parmağını sola / sağa kaydır";position:absolute;left:0;right:0;bottom:11px;
+    text-align:center;color:var(--muted);font-size:12px;pointer-events:none
+  }
+  .arena-mobile-touchpad.is-disabled{opacity:.38;pointer-events:none}
+  .arena-mobile-touchpad.is-disabled::after{content:"Oyunu başlatınca kontrol açılır"}
+  .arena-mobile-touchpad.is-active{border-color:rgba(255,59,86,.48)}
+  .touchpad-knob{
+    position:absolute;left:50%;top:43%;width:48px;height:48px;border-radius:50%;
+    transform:translate(-50%,-50%);background:#292b34;border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 8px 22px rgba(0,0,0,.28);pointer-events:none
+  }
+  .touchpad-side{position:absolute;top:17px;color:rgba(255,255,255,.38);font-size:22px;pointer-events:none}
+  .touchpad-left{left:20px}.touchpad-right{right:20px}
+}
+@media(min-width:761px){.arena-mobile-touchpad{display:none!important}}
+
 </style></head><body><header><a class="brand" href="./">Zatoi<span> ✦</span></a><a href="./">← Sohbete dön</a></header><main><div class="eyebrow">ZATOI PLAY / 01</div><h1>Sohbete küçük<br>bir oyun molası.</h1><p class="intro">Reflekslerini dene, kelimeleri çöz veya üç taşı yan yana getir. Bir oyun seç ve başla.</p><nav class="tabs" role="tablist" aria-label="Oyun seç"><button class="tab" id="tab-arena" role="tab" aria-controls="arena" aria-selected="true" data-game="arena"><span class="symbol">✦</span><b>Zatoi Arena</b><small>Enerjiyi topla · Tek kişi</small></button><button class="tab" id="tab-word" role="tab" aria-controls="word" aria-selected="false" data-game="word"><span class="symbol">Aa</span><b>Kelime Düellosu</b><small>Harfleri çöz · İki kişi</small></button><button class="tab" id="tab-xox" role="tab" aria-controls="xox" aria-selected="false" data-game="xox"><span class="symbol">×○</span><b>XOX</b><small>Üçünü birleştir · 1–2 kişi</small></button></nav><div class="workspace"><div class="card">
-<section id="arena" role="tabpanel" aria-labelledby="tab-arena"><div class="row between"><h2>Zatoi Arena</h2><span class="tag">REFLEKS</span></div><p class="muted">Kırmızı engellerden kaç. Turkuaz enerjileri topla.</p><div class="stats"><div class="stat"><strong id="arenaScore">0</strong><span>PUAN</span></div><div class="stat"><strong id="arenaBest">0</strong><span>BU CİHAZDA REKOR</span></div><div class="stat"><strong id="arenaLives">3</strong><span>CAN</span></div></div><div class="stage"><canvas id="canvas" width="640" height="390" aria-label="Engellerden kaçış oyunu. Yön tuşları veya A ve D ile hareket et."></canvas><div id="arenaEndOverlay" class="arena-end-overlay" hidden><div class="arena-end-box"><button id="arenaEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button><h3>Tur tamamlandı!</h3><p id="arenaEndScore">Puanın: 0</p><button id="arenaEndNew" class="primary" type="button">Yeni Oyun</button></div></div></div><div class="controls"><button id="start" class="primary">Başlat</button><button id="pause" disabled>Duraklat</button><div class="directions"><button id="left" aria-label="Sola hareket">←</button><button id="right" aria-label="Sağa hareket">→</button></div></div><p class="note">Bilgisayar: ← → veya A / D. Telefon: ekranda sürükle ya da okları kullan.</p></section>
+<section id="arena" role="tabpanel" aria-labelledby="tab-arena"><div class="row between"><h2>Zatoi Arena</h2><span class="tag">REFLEKS</span></div><p class="muted">Kırmızı engellerden kaç. Turkuaz enerjileri topla.</p><div class="stats"><div class="stat"><strong id="arenaScore">0</strong><span>PUAN</span></div><div class="stat"><strong id="arenaBest">0</strong><span>BU CİHAZDA REKOR</span></div><div class="stat"><strong id="arenaLives">3</strong><span>CAN</span></div></div><div class="stage"><canvas id="canvas" width="640" height="390" aria-label="Engellerden kaçış oyunu. Yön tuşları veya A ve D ile hareket et."></canvas><div id="arenaEndOverlay" class="arena-end-overlay" hidden><div class="arena-end-box"><button id="arenaEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button><h3>Tur tamamlandı!</h3><p id="arenaEndScore">Puanın: 0</p><button id="arenaEndNew" class="primary" type="button">Yeni Oyun</button></div></div></div><div class="controls"><button id="start" class="primary">Başlat</button><button id="pause" disabled>Duraklat</button><div class="directions"><button id="left" aria-label="Sola hareket">←</button><button id="right" aria-label="Sağa hareket">→</button></div></div><p class="note">Bilgisayar: ← → veya A / D. Telefon: ekranda sürükle ya da okları kullan.</p><div id="arenaMobileTouchpad" class="arena-mobile-touchpad is-disabled" aria-label="Mobil hareket alanı"><span class="touchpad-side touchpad-left">←</span><span class="touchpad-side touchpad-right">→</span><span id="arenaTouchKnob" class="touchpad-knob"></span></div></section>
 <section id="word" role="tabpanel" aria-labelledby="tab-word" hidden><div class="row between"><h2>Kelime Düellosu</h2><span class="tag">10 TUR</span></div><p class="muted">Her oyuncuya 5 kelime. Her doğru cevap 10 puan; yanlış cevap veya pas sırasını bitirir.</p><div class="stats"><div class="stat"><strong id="wordScoreA">0</strong><span>OYUNCU 1</span></div><div class="stat"><strong id="wordScoreB">0</strong><span>OYUNCU 2</span></div><div class="stat"><strong id="wordRound">1 / 10</strong><span>TUR</span></div></div><div id="wordStatus" class="status" aria-live="polite"></div><div id="letters" class="letters"></div><p class="center muted" id="hint"></p><form id="wordForm" class="wordform"><label for="answer">Kelimeyi yaz</label><div class="row"><input id="answer" maxlength="40" autocomplete="off" autocapitalize="characters"><button id="answerButton" class="primary">Gönder</button></div><button id="skip" type="button" style="margin-top:10px">Pas geç</button></form><p id="wordLast" class="center note" aria-live="polite"></p></section>
 <section id="xox" role="tabpanel" aria-labelledby="tab-xox" hidden><div class="row between"><h2>XOX</h2><span class="tag">STRATEJİ</span></div><p class="muted">Yatay, dikey ya da çapraz üç işareti birleştir.</p><div id="xoxStatus" class="status" aria-live="polite"></div><div id="board" class="board" aria-label="XOX oyun tahtası"></div></section>
 </div><aside class="card"><div class="eyebrow">OYUN MASASI</div><h2 style="margin-top:10px">Nasıl oynayalım?</h2><div id="arenaInfo"><p>Tek kişilik, gittikçe hızlanan bir kaçış oyunu. Her enerji 25 puan verir.</p><p>Sekme değiştirirsen oyun duraklar. Rekor yalnızca bu tarayıcıda saklanır.</p></div><div id="multiplayer" hidden><label for="mode">Oyun modu</label><select id="mode"><option value="local">Aynı cihazda iki kişi</option><option value="bot">Bilgisayara karşı · XOX</option><option value="online">Oda koduyla çevrim içi</option></select><button id="newLocal" class="primary">Yeni oyun</button><div id="onlineControls" hidden><p>Oda oluştur, kodu sohbette arkadaşına gönder. Oda 2 saat geçerlidir.</p><button id="create" class="primary">Oda oluştur</button><label for="roomInput">Oda kodu</label><input id="roomInput" maxlength="10" placeholder="10 karakterli kod" autocomplete="off" spellcheck="false"><button id="join">Odaya katıl</button><div id="roomInfo" hidden><div class="divider"></div><div class="note">ODA KODU</div><div id="roomCode" class="roomcode"></div><p id="seatInfo"></p><button id="copy">Kodu kopyala</button><button id="leave">Odadan ayrıl</button></div></div></div><div id="notice" role="status" aria-live="polite"></div><div class="divider"></div><p>✦ AI kullanmaz.<br>✦ Mobil ve bilgisayarda oynanır.<br>✦ Reklam ve uygulama indirme yok.</p></aside></div><section class="card scoreboard" aria-label="Oyuncu skor tablosu"><div class="row between"><div><div class="eyebrow">SKORBORD</div><h2>Oyuncu sıralaması</h2></div><button id="refreshScores" type="button">Yenile</button></div><p id="scoreIdentity" class="muted"></p><p id="myStats">Kendi puanın ve sıralaman burada görünür.</p><p id="scoreStatus" class="note" role="status" aria-live="polite"></p><div class="table-scroll"><table><thead><tr><th>Sıra</th><th>Oyuncu</th><th id="scoreMetric">Puan</th><th>Oyun</th><th>G / B / M</th></tr></thead><tbody id="scoreRows"></tbody></table></div><p id="scoreRules" class="note"></p><button id="retryScore" type="button" hidden>Puanı kaydetmeyi tekrar dene</button></section>
@@ -571,6 +603,54 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
   document.querySelectorAll('[data-close-mobile-drawer]').forEach(b=>b.addEventListener('click',closeMobileDrawers));
   window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileDrawers()});
   window.addEventListener('resize',()=>{if(innerWidth>760)closeMobileDrawers()});
+})();
+</script>
+
+
+<script>
+/* V2.4 mobil Arena touchpad — PC'ye dokunmaz */
+(()=>{
+ const pad=document.getElementById('arenaMobileTouchpad');
+ const knob=document.getElementById('arenaTouchKnob');
+ if(!pad||!knob)return;
+ let pointer=null;
+
+ function active(){
+   return window.innerWidth<=760 &&
+          typeof selected!=='undefined' && selected==='arena' &&
+          typeof arena!=='undefined' && arena.running && !arena.paused && !arena.over;
+ }
+ function sync(){
+   const on=active();
+   pad.classList.toggle('is-disabled',!on);
+   pad.classList.toggle('is-active',on);
+   if(!on){pointer=null;knob.style.left='50%'}
+ }
+ function move(x){
+   if(!active())return;
+   const r=pad.getBoundingClientRect();
+   const px=Math.max(0,Math.min(r.width,x-r.left));
+   const ratio=px/r.width;
+   knob.style.left=(ratio*100)+'%';
+   /* Arena mantığı 640px koordinat kullanıyor. */
+   arena.x=Math.max(18,Math.min(622,ratio*640));
+ }
+ pad.addEventListener('pointerdown',e=>{
+   if(!active())return;
+   pointer=e.pointerId;pad.setPointerCapture?.(e.pointerId);move(e.clientX);e.preventDefault();
+ });
+ pad.addEventListener('pointermove',e=>{
+   if(pointer!==e.pointerId)return;move(e.clientX);e.preventDefault();
+ });
+ function end(e){
+   if(pointer!==e.pointerId)return;
+   pointer=null;knob.style.left='50%';
+ }
+ pad.addEventListener('pointerup',end);
+ pad.addEventListener('pointercancel',end);
+ pad.addEventListener('lostpointercapture',()=>{pointer=null;knob.style.left='50%'});
+ setInterval(sync,120);
+ sync();
 })();
 </script>
 
