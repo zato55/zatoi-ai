@@ -12285,3 +12285,69 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
   }
 }
 
+/* =========================================================
+   V14.62.3 — MESAJ YÖNÜ KİLİDİ
+   Kendi mesajım = sağ / karşı taraf = sol.
+   Avatar ve mesaj iç geometrisine dokunmaz.
+   ========================================================= */
+@media (min-width:801px){
+
+  /* GENEL SOHBET */
+  #app.people-chat-mode #peopleMessages > .people-message-group.mine{
+    align-items:flex-end!important;
+  }
+  #app.people-chat-mode #peopleMessages > .people-message-group.mine > .people-message-group-stack{
+    align-items:flex-end!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+  }
+  #app.people-chat-mode #peopleMessages > .people-message-group.mine > .people-message-group-stack > .people-message-bubble{
+    align-self:flex-end!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+  }
+
+  #app.people-chat-mode #peopleMessages > .people-message-group.theirs{
+    align-items:flex-start!important;
+  }
+  #app.people-chat-mode #peopleMessages > .people-message-group.theirs > .people-message-group-stack{
+    align-items:flex-start!important;
+    margin-left:0!important;
+    margin-right:auto!important;
+  }
+  #app.people-chat-mode #peopleMessages > .people-message-group.theirs > .people-message-group-stack > .people-message-bubble{
+    align-self:flex-start!important;
+    margin-left:0!important;
+    margin-right:auto!important;
+  }
+
+  /* ÖZEL SOHBET */
+  #app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.mine{
+    align-items:flex-end!important;
+  }
+  #app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.mine > .people-private-message-group-stack{
+    align-items:flex-end!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+  }
+  #app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.mine > .people-private-message-group-stack > .people-private-bubble{
+    align-self:flex-end!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+  }
+
+  #app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.theirs{
+    align-items:flex-start!important;
+  }
+  #app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-message-group-stack{
+    align-items:flex-start!important;
+    margin-left:0!important;
+    margin-right:auto!important;
+  }
+  #app.people-chat-mode #peoplePrivateMessages > .people-private-message-group.theirs > .people-private-message-group-stack > .people-private-bubble{
+    align-self:flex-start!important;
+    margin-left:0!important;
+    margin-right:auto!important;
+  }
+}
+
