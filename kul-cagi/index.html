@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>KÜL ÇAĞI — v0.5.5</title>
+<title>KÜL ÇAĞI — v0.6</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#080a0a;color:#e9e0cb;font-family:system-ui,Segoe UI,sans-serif}
 canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshair}
@@ -31,7 +31,7 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
 <body>
 <canvas id="g"></canvas>
 <div id="hud" class="panel">
- <div class="title">KÜL ÇAĞI · v0.5.5</div>
+ <div class="title">KÜL ÇAĞI · v0.6</div>
  <div class="row"><span id="lv"></span><span id="gold"></span></div>
  <div class="bar"><div id="hp" class="fill"></div></div>
  <div class="row"><span id="ht"></span><span id="wep"></span></div>
@@ -49,6 +49,10 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
 <div id="weaponSlots" class="panel" style="left:14px;bottom:14px;width:330px;padding:10px;font-size:12px">
  <div class="title">SİLAH SETİ</div>
  <div id="slot1"></div><div id="slot2"></div><div id="slot3"></div>
+</div>
+<div id="bossHud" class="panel" style="display:none;position:fixed;z-index:12;left:50%;top:58px;transform:translateX(-50%);width:min(620px,calc(100vw - 40px));padding:10px">
+<div style="display:flex;justify-content:space-between;font-weight:900"><span>KIRIK MUHAFIZ</span><span id="bossPhase">FAZ I</span></div>
+<div style="height:12px;background:#201c18;border:1px solid #675846;margin-top:7px"><div id="bossBar" style="height:100%;width:100%;background:#b58b57"></div></div>
 </div>
 <div id="riftHud" class="panel" style="display:none;right:14px;top:145px;width:300px">
 <div class="title">DÜNYA YARASI</div>
@@ -140,6 +144,8 @@ function renderWeaponSlots(){
  }
 }
 let rift={state:0,stability:100,x:1300,y:760,timer:0,boss:null,chest:null,claimed:false};
+let guardian={unlocked:false,state:0,boss:null,phase:1,telegraph:null,cool:0,reward:null,won:false};
+const ARENA={x:1300,y:330,r:285};
 const NPCS=[
  {id:"varek",name:"Varek · Gözcü",x:1260,y:760,col:"#b88b58"},
  {id:"sera",name:"Sera · Demirci",x:1415,y:885,col:"#8e6d55"},
@@ -212,8 +218,44 @@ function claimRiftChest(){
  rift.claimed=true;
  let q=RAR[4],w=WEAP[Math.random()*3|0];
  let it={name:"Yadigâr "+w.name+" · Yara İzi",q,w,bonus:Math.round(16+P.lv*3.2),lv:P.lv};
- P.bag.push(it);P.gold+=75;gain(110);renderInv();say("YADİGÂR BULUNDU · +75 Kül · +110 EXP");
+ P.bag.push(it);P.gold+=75;gain(110);guardian.unlocked=true;renderInv();
+ say("YADİGÂR BULUNDU · KUZEYDEKİ MÜHÜR KIRILDI");
  rift.chest=null;rift.state=4;return true;
+}
+
+
+function startGuardian(){
+ if(zone!=="field"||!guardian.unlocked||guardian.state!==0||guardian.won)return;
+ guardian.state=1;guardian.phase=1;guardian.cool=1.6;
+ let hp=1500+P.lv*160;
+ guardian.boss={name:"KIRIK MUHAFIZ",x:ARENA.x,y:ARENA.y,hp,max:hp,spd:42,dmg:30+P.lv*2.5,xp:300,col:"#80684f",r:48,elite:true,rift:false,boss:true,guardian:true,atk:0,hit:0,kx:0,ky:0};
+ enemies.push(guardian.boss);say("KIRIK MUHAFIZ UYANDI");shake=24;
+}
+function guardianTelegraph(type){
+ let b=guardian.boss;if(!b)return;
+ guardian.telegraph={type,t:type==="slam"?.85:1.05,x:type==="slam"?b.x:P.x,y:type==="slam"?b.y:P.y,r:type==="slam"?(guardian.phase===2?185:145):(guardian.phase===2?105:82)};
+}
+function resolveGuardianAttack(){
+ let g=guardian.telegraph,b=guardian.boss;if(!g||!b)return;
+ let d=Math.hypot(P.x-g.x,P.y-g.y);
+ if(d<g.r && P.inv<=0){
+   let dmg=(guardian.phase===2?38:27)+P.lv*2;
+   P.hp-=dmg;P.inv=.55;shake=18;text(P.x,P.y-28,"-"+Math.round(dmg),"#ff8275");
+ }
+ burst(g.x,g.y,guardian.phase===2?"#d06a4f":"#b38a59",guardian.phase===2?34:24);
+ guardian.telegraph=null;
+}
+function finishGuardian(){
+ guardian.state=2;guardian.won=true;guardian.telegraph=null;guardian.boss=null;
+ guardian.reward={x:ARENA.x,y:ARENA.y};enemies=enemies.filter(e=>!e.guardian);
+ say("KIRIK MUHAFIZ YIKILDI · YENİ YOL AÇILDI");shake=28;
+}
+function claimGuardianReward(){
+ if(!guardian.reward||Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)>100)return false;
+ let wi=Math.random()*3|0,q=RAR[4],w=WEAP[wi];
+ let it={name:"Muhafız Yadigârı · "+w.name,q,w,bonus:Math.round(28+P.lv*4.2),lv:P.lv};
+ P.bag.push(it);P.gold+=140;gain(220);guardian.reward=null;renderInv();
+ say("MUHAFIZ YADİGÂRI · +140 Kül · +220 EXP");return true;
 }
 
 function say(s){$("#toast").textContent=s;toast=2}
@@ -279,6 +321,8 @@ function update(dt){
    let near=NPCS.some(n=>Math.hypot(n.x-P.x,n.y-P.y)<=130);
    ib.style.display=near?"block":"none";
    ib.textContent=near?"E · KONUŞ":"E · ETKİLEŞ";
+ }else if(zone==="field"&&guardian.reward&&Math.hypot(guardian.reward.x-P.x,guardian.reward.y-P.y)<=110){
+   ib.style.display="block";ib.textContent="E · MUHAFIZ SANDIĞI";
  }else if(zone==="field"&&rift.chest&&Math.hypot(rift.chest.x-P.x,rift.chest.y-P.y)<=100){
    ib.style.display="block";ib.textContent="E · SANDIĞI AÇ";
  }else ib.style.display="none";
@@ -294,9 +338,21 @@ function update(dt){
  if(zone==="field"&&M.down)basic();
  if(K.KeyQ){K.KeyQ=false;if(zone==="field")special();}
  if(zone==="field"&&quest>=3&&rift.state===0&&rift.timer>0){rift.timer-=dt;if(rift.timer<=0)startRift();}
+ if(zone==="field"&&guardian.unlocked&&!guardian.won&&guardian.state===0&&P.y<610){startGuardian();}
+ if(guardian.state===1&&guardian.boss){
+   let b=guardian.boss;
+   if(guardian.phase===1&&b.hp<=b.max*.5){guardian.phase=2;b.spd=66;b.dmg*=1.18;guardian.cool=.7;say("ZIRHI PARÇALANDI · FAZ II");shake=22;burst(b.x,b.y,"#d06a4f",55);}
+   guardian.cool-=dt;
+   if(!guardian.telegraph&&guardian.cool<=0){
+     guardianTelegraph(Math.random()<.58?"slam":"mark");
+     guardian.cool=guardian.phase===2?1.45:2.05;
+   }
+   if(guardian.telegraph){guardian.telegraph.t-=dt;if(guardian.telegraph.t<=0)resolveGuardianAttack();}
+ }
  for(let i=enemies.length-1;i>=0;i--){
    let e=enemies[i];e.atk=Math.max(0,e.atk-dt);e.hit=Math.max(0,e.hit-dt);
    if(e.hp<=0){
+   if(e.guardian){gain(e.xp);P.kills++;enemies.splice(i,1);finishGuardian();continue}
    if(e.boss){gain(e.xp);P.kills++;enemies.splice(i,1);closeRift();continue}
    itemDrop(e);gain(Math.round(e.xp*(e.elite?2.5:1)));P.kills++;
    if(e.rift&&rift.state===1){rift.stability=Math.max(0,rift.stability-13);if(rift.stability<=0){enemies.splice(i,1);spawnRiftBoss();continue}else setTimeout(()=>{if(zone==="field"&&rift.state===1)spawnRiftEnemy()},350);}
@@ -341,6 +397,20 @@ function draw(){
  } else {
    X.fillStyle="#bca878";X.font="bold 13px system-ui";X.textAlign="center";X.fillText("↓ KÜL LİMANI",1300,WORLD.h-55);
  }
+ 
+ if(zone==="field"&&guardian.unlocked){
+   X.save();X.strokeStyle=guardian.won?"#6f8062":"#67513f";X.lineWidth=8;X.beginPath();X.arc(ARENA.x,ARENA.y,ARENA.r,0,7);X.stroke();
+   X.strokeStyle="#3b3027";X.lineWidth=2;for(let a=0;a<6.28;a+=.52){X.beginPath();X.moveTo(ARENA.x+Math.cos(a)*(ARENA.r-18),ARENA.y+Math.sin(a)*(ARENA.r-18));X.lineTo(ARENA.x+Math.cos(a)*ARENA.r,ARENA.y+Math.sin(a)*ARENA.r);X.stroke()}X.restore();
+   if(guardian.state===0&&!guardian.won){X.fillStyle="#d6b987";X.font="bold 13px system-ui";X.textAlign="center";X.fillText("KIRIK MUHAFIZ MÜHRÜ",ARENA.x,ARENA.y-80);}
+ }
+ if(guardian.telegraph){
+   let g=guardian.telegraph;X.save();X.globalAlpha=.38;X.fillStyle=guardian.phase===2?"#e05e45":"#d9a45f";X.beginPath();X.arc(g.x,g.y,g.r,0,7);X.fill();X.globalAlpha=.9;X.strokeStyle="#ffd49a";X.lineWidth=4;X.stroke();X.restore();
+ }
+ if(guardian.reward){
+   X.fillStyle="#5f4930";X.fillRect(guardian.reward.x-27,guardian.reward.y-18,54,36);X.strokeStyle="#f0c873";X.lineWidth=3;X.strokeRect(guardian.reward.x-27,guardian.reward.y-18,54,36);
+   X.fillStyle="#f0d98a";X.font="bold 12px system-ui";X.textAlign="center";X.fillText(Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)<100?"[E] MUHAFIZ SANDIĞINI AÇ":"MUHAFIZ SANDIĞI",guardian.reward.x,guardian.reward.y-28);
+ }
+ 
  if(zone==="field"&&rift.state>0&&rift.state<3){
    let pulse=18+Math.sin(performance.now()/160)*7;
    X.save();X.translate(rift.x,rift.y);
@@ -354,7 +424,7 @@ function draw(){
    X.fillStyle="#f0d98a";X.font="bold 12px system-ui";X.textAlign="center";X.fillText(Math.hypot(P.x-rift.chest.x,P.y-rift.chest.y)<90?"[E] Yara Sandığını Aç":"YARA SANDIĞI",rift.chest.x,rift.chest.y-25);
  }
  drops.forEach(o=>{X.save();X.translate(o.x,o.y);X.rotate(o.t);X.strokeStyle=o.it.q[1]==="y"?"#e8b65a":"#c7b47f";X.strokeRect(-7,-7,14,14);X.restore()});
- enemies.forEach(e=>{X.save();X.translate(e.x,e.y);X.fillStyle=e.hit?"#f0e2c8":e.col;X.beginPath();X.arc(0,0,e.r,0,7);X.fill();X.fillStyle="#28231f";X.beginPath();X.arc(5,-3,Math.max(4,e.r*.32),0,7);X.fill();if(e.boss){X.strokeStyle="#c586ed";X.lineWidth=5;X.beginPath();X.arc(0,0,e.r+8,0,7);X.stroke();X.fillStyle="#e5b9ff";X.font="bold 13px sans-serif";X.textAlign="center";X.fillText("YARA MUHAFIZI",0,-e.r-15)}
+ enemies.forEach(e=>{X.save();X.translate(e.x,e.y);X.fillStyle=e.hit?"#f0e2c8":e.col;X.beginPath();X.arc(0,0,e.r,0,7);X.fill();X.fillStyle="#28231f";X.beginPath();X.arc(5,-3,Math.max(4,e.r*.32),0,7);X.fill();if(e.boss){X.strokeStyle=e.guardian?"#d5a25f":"#c586ed";X.lineWidth=5;X.beginPath();X.arc(0,0,e.r+8,0,7);X.stroke();X.fillStyle=e.guardian?"#f0c98b":"#e5b9ff";X.font="bold 13px sans-serif";X.textAlign="center";X.fillText(e.guardian?"KIRIK MUHAFIZ":"YARA MUHAFIZI",0,-e.r-15)}
  if(e.elite&&!e.boss){X.strokeStyle="#d5a54b";X.lineWidth=3;X.beginPath();X.arc(0,0,e.r+5,0,7);X.stroke();X.fillStyle="#e7bd62";X.font="11px sans-serif";X.textAlign="center";X.fillText("ELİT",0,-e.r-11)}X.fillStyle="#241b1a";X.fillRect(-18,e.r+8,36,4);X.fillStyle="#a64c42";X.fillRect(-18,e.r+8,36*e.hp/e.max,4);X.restore()});
  fx.forEach(f=>{X.save();X.globalAlpha=Math.min(1,f.t*5);X.strokeStyle=f.col;
    if(f.arc){X.translate(f.x,f.y);X.rotate(f.a);X.lineWidth=7;X.beginPath();X.arc(0,0,f.r,-.75,.75);X.stroke()}
@@ -367,13 +437,15 @@ function draw(){
  texts.forEach(t=>{X.globalAlpha=Math.min(1,t.t*2);X.fillStyle=t.col;X.font="bold 14px system-ui";X.textAlign="center";X.fillText(t.s,t.x,t.y)});X.globalAlpha=1;X.restore();
 
  $("#zone").textContent=zone==="town"?"KÜL LİMANI":"SOLMUŞ OVA";
+ let bh=$("#bossHud");
+ if(guardian.state===1&&guardian.boss){bh.style.display="block";$("#bossBar").style.width=Math.max(0,guardian.boss.hp/guardian.boss.max*100)+"%";$("#bossPhase").textContent=guardian.phase===1?"FAZ I":"FAZ II · ZIRH KIRILDI";}else bh.style.display="none";
  let rh=$("#riftHud");
  if(zone==="field"&&rift.state>=1&&rift.state<=3){rh.style.display="block";$("#riftBar").style.width=(rift.state===1?rift.stability:0)+"%";$("#riftText").textContent=rift.state===1?"Yara Kararlılığı %"+rift.stability:rift.state===2?"YARA MUHAFIZI · Yarayı koruyor":"Yara kapandı · Sandığı bul ve [E] ile aç";}else rh.style.display="none";
  $("#hp").style.width=P.hp/P.max*100+"%";$("#xp").style.width=P.xp/P.next*100+"%";$("#lv").textContent="Seviye "+P.lv;$("#gold").textContent=P.gold+" Kül";$("#ht").textContent=Math.ceil(P.hp)+" / "+P.max+" HP";$("#xt").textContent=P.xp+" / "+P.next+" EXP";$("#wep").textContent=WEAP[P.weapon].name;$("#kill").textContent=P.kills+" av";$("#basicTxt").textContent="Saldırı";$("#powerTxt").textContent=WEAP[P.weapon].power;
  $("#atkShade").style.height=(P.atk/WEAP[P.weapon].cd*100)+"%";$("#dashShade").style.height=(P.dashCd/1.15*100)+"%";$("#powShade").style.height=(P.power/WEAP[P.weapon].pCd*100)+"%";
 }
 let last=performance.now();function loop(t){let dt=Math.min(.033,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(loop)}
-setZone("town");questUI();renderWeaponSlots();say("KÜL LİMANI · v0.5.5");requestAnimationFrame(loop);
+setZone("town");questUI();renderWeaponSlots();say("KÜL LİMANI · v0.6");requestAnimationFrame(loop);
 })();
 </script>
 </body></html>
