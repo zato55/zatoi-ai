@@ -1044,16 +1044,20 @@
   .zararli-touchpad{
     position:relative;
     display:flex;
-    height:122px;
-    min-height:122px;
+    height:142px;
+    min-height:142px;
     align-items:center;
     justify-content:center;
     flex-direction:column;
     gap:7px;
     background:
-      radial-gradient(circle at 50% 45%,rgba(239,35,60,.10),transparent 48%),
-      #111217;
-    border-top:1px solid rgba(255,255,255,.10);
+      radial-gradient(circle at 50% 50%,rgba(239,35,60,.20),transparent 52%),
+      #15161c;
+    border:2px solid rgba(239,35,60,.55);
+    border-radius:18px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),inset 0 0 30px rgba(239,35,60,.08);
+    margin:10px 12px 12px;
+    width:calc(100% - 24px);
     touch-action:none;
     user-select:none;
     -webkit-user-select:none;
@@ -1063,26 +1067,43 @@
     content:"";
     position:absolute;
     left:50%;
-    top:16px;
-    bottom:16px;
-    width:1px;
-    background:rgba(255,255,255,.08);
+    top:14px;
+    width:46px;
+    height:46px;
+    transform:translateX(-50%);
+    border:2px solid rgba(255,255,255,.32);
+    border-radius:50%;
+    box-shadow:0 0 0 9px rgba(239,35,60,.10);
+    pointer-events:none;
+  }
+  .zararli-touchpad::after{
+    content:"☝";
+    position:absolute;
+    left:50%;
+    top:22px;
+    transform:translateX(-50%);
+    font-size:25px;
+    line-height:1;
+    opacity:.92;
+    pointer-events:none;
   }
   .zararli-touchpad-label{
     position:relative;
     z-index:1;
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:.16em;
-    color:rgba(255,255,255,.76);
+    margin-top:43px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.14em;
+    color:#fff;
     pointer-events:none;
   }
   .zararli-touchpad-hint{
     position:relative;
     z-index:1;
     font-size:10px;
-    letter-spacing:.08em;
-    color:rgba(255,255,255,.40);
+    font-weight:800;
+    letter-spacing:.07em;
+    color:rgba(255,255,255,.72);
     pointer-events:none;
   }
   .zararli-phase-btn{
@@ -1101,7 +1122,11 @@
   }
   .zararli-start-btn{background:#24262d}
   .zararli-start-btn[hidden]{display:none!important}
-  .zararli-touchpad.dragging{background:#17181e}
+  .zararli-touchpad.dragging{
+    background:#1d171c;
+    border-color:#ef233c;
+    box-shadow:inset 0 0 38px rgba(239,35,60,.18),0 0 0 2px rgba(239,35,60,.10);
+  }
 }
 </style>
 </head><body class="zatoi-games-page"><header class="zatoi-global-header">
@@ -1170,8 +1195,8 @@
   <p class="muted">Parmağınla hareket et. Kısa dokunuşla siyah/beyaz fazı değiştir ve aktif renkten kaç.</p>
   <div class="tavan-stage zararli-stage"><iframe id="zararliFrame" title="Zararlı oyunu" loading="eager"></iframe></div>
   <div id="zararliTouchpad" class="zararli-touchpad" aria-label="Zararlı mobil kontrol alanı">
-    <div class="zararli-touchpad-label">HAREKET ALANI</div>
-    <div class="zararli-touchpad-hint">← KAYDIR · ÇİFT DOKUN: FAZ →</div>
+    <div class="zararli-touchpad-label">BURAYA DOKUN VE KAYDIR</div>
+    <div class="zararli-touchpad-hint">← HAREKET · ÇİFT DOKUN = FAZ →</div>
     <button id="zararliStartBtn" class="zararli-phase-btn zararli-start-btn" type="button">OYUNA BAŞLA</button>
   </div>
 </section>
