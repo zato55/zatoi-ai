@@ -1044,8 +1044,8 @@
   .zararli-touchpad{
     position:relative;
     display:flex;
-    height:150px;
-    min-height:150px;
+    height:122px;
+    min-height:122px;
     align-items:center;
     justify-content:center;
     flex-direction:column;
@@ -1171,9 +1171,8 @@
   <div class="tavan-stage zararli-stage"><iframe id="zararliFrame" title="Zararlı oyunu" loading="eager"></iframe></div>
   <div id="zararliTouchpad" class="zararli-touchpad" aria-label="Zararlı mobil kontrol alanı">
     <div class="zararli-touchpad-label">HAREKET ALANI</div>
-    <div class="zararli-touchpad-hint">← PARMAĞINI KAYDIR →</div>
+    <div class="zararli-touchpad-hint">← KAYDIR · ÇİFT DOKUN: FAZ →</div>
     <button id="zararliStartBtn" class="zararli-phase-btn zararli-start-btn" type="button">OYUNA BAŞLA</button>
-    <button id="zararliPhaseBtn" class="zararli-phase-btn" type="button">FAZ DEĞİŞTİR</button>
   </div>
 </section>
 </div><aside class="card"><div class="eyebrow">OYUN MASASI</div><h2 style="margin-top:10px">Nasıl oynayalım?</h2><div id="arenaInfo"><p>Tek kişilik, gittikçe hızlanan bir kaçış oyunu. Her enerji 25 puan verir.</p><p>Sekme değiştirirsen oyun duraklar. Rekor yalnızca bu tarayıcıda saklanır.</p></div><div id="tavanInfo" hidden><p>Basılı tutarak kanca at, bırakarak uç. A / D ile sallanabilirsin.</p><p>Hedefin mümkün olduğunca yükseğe çıkmak. Rekor metre cinsinden bu cihazda saklanır.</p></div><div id="zararliInfo" hidden><p>Parmağını sağa-sola sürükleyerek hareket et. Kısa dokunuşla siyah/beyaz fazı değiştir.</p><p>Aktif renkteki engellere dokunma; pasif renklerin içinden geçerek puan topla.</p></div><div id="multiplayer" hidden><label for="mode">Oyun modu</label><select id="mode"><option value="local">Aynı cihazda iki kişi</option><option value="bot">Bilgisayara karşı · XOX</option><option value="online">Oda koduyla çevrim içi</option></select><button id="newLocal" class="primary">Yeni oyun</button><div id="onlineControls" hidden><p>Oda oluştur, kodu sohbette arkadaşına gönder. Oda 2 saat geçerlidir.</p><button id="create" class="primary">Oda oluştur</button><label for="roomInput">Oda kodu</label><input id="roomInput" maxlength="10" placeholder="10 karakterli kod" autocomplete="off" spellcheck="false"><button id="join">Odaya katıl</button><div id="roomInfo" hidden><div class="divider"></div><div class="note">ODA KODU</div><div id="roomCode" class="roomcode"></div><p id="seatInfo"></p><button id="copy">Kodu kopyala</button><button id="leave">Odadan ayrıl</button></div></div></div><div id="notice" role="status" aria-live="polite"></div><div class="divider"></div><p>✦ AI kullanmaz.<br>✦ Mobil ve bilgisayarda oynanır.<br>✦ Reklam ve uygulama indirme yok.</p></aside></div><section class="card scoreboard" aria-label="Oyuncu skor tablosu"><div class="row between"><div><div class="eyebrow">SKORBORD</div><h2>Oyuncu sıralaması</h2></div><button id="refreshScores" type="button">Yenile</button></div><p id="scoreIdentity" class="muted"></p><p id="myStats">Kendi puanın ve sıralaman burada görünür.</p><p id="scoreStatus" class="note" role="status" aria-live="polite"></p><div class="table-scroll"><table><thead><tr><th>Sıra</th><th>Oyuncu</th><th id="scoreMetric">Puan</th><th>Oyun</th><th>G / B / M</th></tr></thead><tbody id="scoreRows"></tbody></table></div><p id="scoreRules" class="note"></p><button id="retryScore" type="button" hidden>Puanı kaydetmeyi tekrar dene</button></section>
@@ -1209,15 +1208,16 @@ let zararliLoaded=false;
 function ensureZararliLoaded(){if(zararliLoaded)return;const f=$('zararliFrame');if(!f)return;f.addEventListener('load',()=>{try{f.contentWindow?.dispatchEvent(new Event('resize'))}catch(e){}},{once:true});f.srcdoc=ZARARLI_HTML;zararliLoaded=true;}
 function zararliSend(data){const f=$('zararliFrame');try{f?.contentWindow?.postMessage({type:'zatoi-zararli-control',...data},'*')}catch(e){}}
 (()=>{
-  const pad=$('zararliTouchpad'),phaseBtn=$('zararliPhaseBtn'),startBtn=$('zararliStartBtn');
-  if(!pad||!phaseBtn||!startBtn)return;
-  let active=false,pid=null,lastX=0;
+  const pad=$('zararliTouchpad'),startBtn=$('zararliStartBtn');
+  if(!pad||!startBtn)return;
+  let active=false,pid=null,lastX=0,downX=0,downY=0,lastTap=0;
   pad.addEventListener('pointerdown',e=>{
-    if(e.target===phaseBtn||e.target===startBtn)return;
-    active=true;pid=e.pointerId;lastX=e.clientX;
+    if(e.target===startBtn)return;
+    active=true;pid=e.pointerId;lastX=e.clientX;downX=e.clientX;downY=e.clientY;
     try{pad.setPointerCapture(pid)}catch(_){}
     pad.classList.add('dragging');
   });
+
   pad.addEventListener('pointermove',e=>{
     if(!active||e.pointerId!==pid)return;
     const dx=e.clientX-lastX;lastX=e.clientX;
@@ -1225,12 +1225,17 @@ function zararliSend(data){const f=$('zararliFrame');try{f?.contentWindow?.postM
   });
   const end=e=>{
     if(!active||(e&&e.pointerId!==pid))return;
+    const wasTap=e && Math.hypot(e.clientX-downX,e.clientY-downY)<14;
     active=false;pid=null;pad.classList.remove('dragging');
+    if(wasTap){
+      const now=performance.now();
+      if(now-lastTap<330){lastTap=0;zararliSend({action:'phase'});}
+      else lastTap=now;
+    }
   };
   pad.addEventListener('pointerup',end);
-  pad.addEventListener('pointercancel',end);
+  pad.addEventListener('pointercancel',e=>{active=false;pid=null;pad.classList.remove('dragging')});
   startBtn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();zararliSend({action:'start'});startBtn.hidden=true;});
-  phaseBtn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();zararliSend({action:'phase'})});
 })();
 
 const notice=message=>{$('notice').textContent=message};
