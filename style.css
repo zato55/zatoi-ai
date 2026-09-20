@@ -12283,10 +12283,5 @@ body .chat-column > :is(.desktop-input-area,.mobile-input-area) .send-btn:hover:
     pointer-events:none!important;
     user-select:none!important;
   }
-
-  #app.people-chat-mode .people-conversation > *{
-    position:relative!important;
-    z-index:1!important;
-  }
 }
 
