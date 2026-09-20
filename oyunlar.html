@@ -1170,7 +1170,7 @@
 <style id="eskici-landscape-focus-v3-7-2">
 /* Dokunmatik cihaz yataydayken ekran genişliği 760px'i aşabildiği için
    yalnız max-width kullanmıyoruz. */
-@media (pointer:coarse) and (orientation:landscape){
+@media (orientation:landscape) and (max-height:700px){
   body.eskici-active{
     overflow:hidden!important;
     background:#04060a!important;
@@ -1242,6 +1242,52 @@
     max-width:none!important;
     border:0!important;
   }
+}
+</style>
+
+<style id="eskici-real-fullscreen-v3-7-3">
+@media (orientation:landscape) and (max-height:700px){
+ html:has(body.eskici-active),body.eskici-active{
+   width:100%!important;height:100%!important;min-height:0!important;
+   margin:0!important;padding:0!important;overflow:hidden!important;
+ }
+ body.eskici-active .zatoi-mobile-global-header-component,
+ body.eskici-active header,
+ body.eskici-active nav.tabs,
+ body.eskici-active .library,
+ body.eskici-active aside,
+ body.eskici-active .scoreboard,
+ body.eskici-active footer,
+ body.eskici-active main>.eyebrow,
+ body.eskici-active main>h1,
+ body.eskici-active main>.intro{
+   display:none!important;
+ }
+ body.eskici-active main,
+ body.eskici-active .workspace,
+ body.eskici-active .workspace>.card,
+ body.eskici-active #eskici,
+ body.eskici-active .eskici-stage{
+   position:relative!important;
+   display:block!important;
+   width:100vw!important;
+   max-width:none!important;
+   height:100dvh!important;
+   min-height:0!important;
+   max-height:none!important;
+   margin:0!important;
+   padding:0!important;
+   border:0!important;
+   border-radius:0!important;
+   inset:auto!important;
+ }
+ body.eskici-active .workspace{grid-template-columns:1fr!important;gap:0!important}
+ body.eskici-active #eskici>.row,
+ body.eskici-active #eskici>.muted{display:none!important}
+ body.eskici-active .eskici-stage iframe{
+   display:block!important;width:100%!important;height:100%!important;
+   min-width:0!important;max-width:none!important;border:0!important;
+ }
 }
 </style>
 </head><body class="zatoi-games-page"><header class="zatoi-global-header">
@@ -2199,6 +2245,19 @@ loadScores();
   else if(d.type==='zatoi-eskici-started')begin('eskici');
   else if(d.type==='zatoi-eskici-finished')finish('eskici',d.score);
  });
+})();
+</script>
+
+
+<script id="eskici-fullscreen-sync-v3-7-3">
+(()=>{
+ const sync=()=>{
+   if(!document.body.classList.contains('eskici-active'))return;
+   const f=document.getElementById('eskiciFrame');
+   try{f?.contentWindow?.dispatchEvent(new Event('resize'))}catch(_){}
+ };
+ addEventListener('orientationchange',()=>setTimeout(sync,200));
+ addEventListener('resize',()=>setTimeout(sync,50));
 })();
 </script>
 
