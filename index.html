@@ -481,6 +481,45 @@
 }
 </style>
 
+
+<style id="zatoi-games-fourth-option">
+/* Oyunlar: AI ve Sohbet üst barlarında hesap menüsünden sonra. */
+#app .zatoi-games-bar > .zatoi-games-link {
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-width:0!important;max-width:100%!important;padding:0 5px!important;
+  height:42px!important;border:0!important;border-radius:11px!important;
+  color:var(--zatoi-text,#f5f5f5)!important;background:transparent!important;
+  text-decoration:none!important;font:750 12px/1 Arial,sans-serif!important;
+  white-space:nowrap!important;box-sizing:border-box!important;
+}
+#app .zatoi-games-bar > .zatoi-games-link:hover {
+  background:var(--zatoi-accent,#e50914)!important;color:#fff!important;
+}
+#app .zatoi-games-bar > .zatoi-games-link:focus-visible {
+  outline:2px solid var(--zatoi-text,#fff)!important;outline-offset:-3px!important;
+}
+@media(min-width:801px){
+  #app:not(.people-chat-mode) .desktop-side-mode-switch-wrap > .desktop-side-mode-switch.stable-global-mode-bar.zatoi-games-bar,
+  #app.people-chat-mode .people-mode-top > .people-mode-switch.stable-global-mode-bar.zatoi-games-bar {
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:3px!important;
+  }
+  #app .stable-global-mode-bar.zatoi-games-bar > .zatoi-mode-btn,
+  #app .stable-global-mode-bar.zatoi-games-bar > .stable-bar-menu-btn {
+    min-width:0!important;padding:0 3px!important;gap:3px!important;
+    font-size:11px!important;
+  }
+}
+@media(max-width:800px){
+  #app .people-mode-switch.stable-global-mode-bar.zatoi-games-bar {
+    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    min-width:0!important;max-width:100%!important;gap:2px!important;
+  }
+  #app .people-mode-switch.zatoi-games-bar > .zatoi-games-link {
+    font-size:10px!important;padding:0 2px!important;height:100%!important;min-height:36px!important;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -984,10 +1023,11 @@
       <button id="peopleMobileAccountButton" class="people-mobile-account-btn" type="button" aria-label="Hesap menüsünü aç" aria-expanded="false">
         <span id="peopleMobileAccountAvatar" class="people-mobile-account-avatar">👤</span>
       </button>
-      <div class="zatoi-mode-switch people-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
+      <div class="zatoi-mode-switch people-mode-switch stable-global-mode-bar zatoi-games-bar" role="tablist" aria-label="Zatoi modu">
         <button id="peopleAiModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">✦ Zatoi AI</button>
         <button id="peopleChatModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">💬 Sohbet</button>
         <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 <span class="stable-bar-username">Kullanıcı</span> ▾</button>
+        <a class="zatoi-games-link" href="./oyunlar.html" aria-label="Oyunlar sayfasını aç">🎮 Oyunlar</a>
       </div>
     </div>
     <aside class="people-active-panel">
@@ -1078,10 +1118,11 @@
   <aside class="side-panel">
 
     <div class="desktop-side-mode-switch-wrap">
-      <div class="zatoi-mode-switch desktop-side-mode-switch stable-global-mode-bar" role="tablist" aria-label="Zatoi modu">
+      <div class="zatoi-mode-switch desktop-side-mode-switch stable-global-mode-bar zatoi-games-bar" role="tablist" aria-label="Zatoi modu">
         <button id="desktopSideAiModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">✦ Zatoi AI</button>
         <button id="desktopSideChatModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">💬 Sohbet</button>
         <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 <span class="stable-bar-username">Kullanıcı</span> ▾</button>
+        <a class="zatoi-games-link" href="./oyunlar.html" aria-label="Oyunlar sayfasını aç">🎮 Oyunlar</a>
       </div>
     </div>
 
@@ -9155,15 +9196,7 @@ function leavePeopleChat() {
 
 function setZatoiMode(mode) {
   const chatMode = mode === "chat";
-  const app = document.getElementById("app");
-
-  // V14.62.5 — Aynı moda tekrar basılırsa hiçbir şeyi yeniden kurma.
-  // Özellikle Sohbet açıkken Sohbet'e tekrar basılması enterPeopleChat()
-  // çağrısını tekrarlayıp özel sohbet görünümünü bozmasın.
-  const alreadyChat = !!app?.classList.contains("people-chat-mode");
-  if ((chatMode && alreadyChat) || (!chatMode && !alreadyChat)) return;
-
-  app?.classList.toggle("people-chat-mode", chatMode);
+  document.getElementById("app")?.classList.toggle("people-chat-mode", chatMode);
   zatoiAiModeButton?.classList.toggle("active", !chatMode);
   zatoiChatModeButton?.classList.toggle("active", chatMode);
   desktopSideAiModeButton?.classList.toggle("active", !chatMode);
