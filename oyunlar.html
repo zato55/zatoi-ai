@@ -131,6 +131,36 @@
   .game-right-rail aside{order:1}
 }
 
+
+/* V2 — Oyun bittiğinde oyun alanının ortasında Yeni Oyun */
+.game-center .card{position:relative}
+.game-end-overlay{
+  position:absolute;
+  inset:0;
+  z-index:40;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(8,8,12,.72);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+  border-radius:20px;
+}
+.game-end-overlay[hidden]{display:none!important}
+.game-end-box{
+  width:min(360px,92%);
+  padding:26px 22px;
+  text-align:center;
+  background:#17171d;
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:0 18px 60px rgba(0,0,0,.35);
+}
+.game-end-box h3{margin:0 0 7px;font-size:27px}
+.game-end-box p{margin:0 0 18px;color:var(--muted);font-size:14px}
+.game-end-box button{width:100%;padding:13px 18px;font-weight:800}
+
 </style></head><body><header><a class="brand" href="./">Zatoi<span> ✦</span></a><a href="./">← Sohbete dön</a></header><main><div class="eyebrow">ZATOI PLAY / 01</div><h1>Sohbete küçük<br>bir oyun molası.</h1><p class="intro">Reflekslerini dene, kelimeleri çöz veya üç taşı yan yana getir. Bir oyun seç ve başla.</p><nav class="tabs" role="tablist" aria-label="Oyun seç"><button class="tab" id="tab-arena" role="tab" aria-controls="arena" aria-selected="true" data-game="arena"><span class="symbol">✦</span><b>Zatoi Arena</b><small>Enerjiyi topla · Tek kişi</small></button><button class="tab" id="tab-word" role="tab" aria-controls="word" aria-selected="false" data-game="word"><span class="symbol">Aa</span><b>Kelime Düellosu</b><small>Harfleri çöz · İki kişi</small></button><button class="tab" id="tab-xox" role="tab" aria-controls="xox" aria-selected="false" data-game="xox"><span class="symbol">×○</span><b>XOX</b><small>Üçünü birleştir · 1–2 kişi</small></button></nav><div class="workspace"><div class="card">
 <section id="arena" role="tabpanel" aria-labelledby="tab-arena"><div class="row between"><h2>Zatoi Arena</h2><span class="tag">REFLEKS</span></div><p class="muted">Kırmızı engellerden kaç. Turkuaz enerjileri topla.</p><div class="stats"><div class="stat"><strong id="arenaScore">0</strong><span>PUAN</span></div><div class="stat"><strong id="arenaBest">0</strong><span>BU CİHAZDA REKOR</span></div><div class="stat"><strong id="arenaLives">3</strong><span>CAN</span></div></div><div class="stage"><canvas id="canvas" width="640" height="390" aria-label="Engellerden kaçış oyunu. Yön tuşları veya A ve D ile hareket et."></canvas></div><div class="controls"><button id="start" class="primary">Başlat</button><button id="pause" disabled>Duraklat</button><div class="directions"><button id="left" aria-label="Sola hareket">←</button><button id="right" aria-label="Sağa hareket">→</button></div></div><p class="note">Bilgisayar: ← → veya A / D. Telefon: ekranda sürükle ya da okları kullan.</p></section>
 <section id="word" role="tabpanel" aria-labelledby="tab-word" hidden><div class="row between"><h2>Kelime Düellosu</h2><span class="tag">10 TUR</span></div><p class="muted">Her oyuncuya 5 kelime. Her doğru cevap 10 puan; yanlış cevap veya pas sırasını bitirir.</p><div class="stats"><div class="stat"><strong id="wordScoreA">0</strong><span>OYUNCU 1</span></div><div class="stat"><strong id="wordScoreB">0</strong><span>OYUNCU 2</span></div><div class="stat"><strong id="wordRound">1 / 10</strong><span>TUR</span></div></div><div id="wordStatus" class="status" aria-live="polite"></div><div id="letters" class="letters"></div><p class="center muted" id="hint"></p><form id="wordForm" class="wordform"><label for="answer">Kelimeyi yaz</label><div class="row"><input id="answer" maxlength="40" autocomplete="off" autocapitalize="characters"><button id="answerButton" class="primary">Gönder</button></div><button id="skip" type="button" style="margin-top:10px">Pas geç</button></form><p id="wordLast" class="center note" aria-live="polite"></p></section>
@@ -237,6 +267,19 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
   center.className = 'game-center';
   center.appendChild(gameCard);
 
+  const endOverlay = document.createElement('div');
+  endOverlay.id = 'gameEndOverlay';
+  endOverlay.className = 'game-end-overlay';
+  endOverlay.hidden = true;
+  endOverlay.innerHTML = `
+    <div class="game-end-box">
+      <h3 id="gameEndTitle">Oyun bitti!</h3>
+      <p id="gameEndText"></p>
+      <button id="gameEndNew" class="primary" type="button">Yeni Oyun</button>
+    </div>
+  `;
+  gameCard.appendChild(endOverlay);
+
   const right = document.createElement('div');
   right.className = 'game-right-rail';
   right.appendChild(scoreboard);
@@ -270,6 +313,70 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
   }
   search.addEventListener('input', filterGames);
   filterGames();
+
+  const endOverlay = document.getElementById('gameEndOverlay');
+  const endTitle = document.getElementById('gameEndTitle');
+  const endText = document.getElementById('gameEndText');
+  const endNew = document.getElementById('gameEndNew');
+  let lastEndedKey = '';
+
+  function hideGameEnd(){
+    if (endOverlay) endOverlay.hidden = true;
+    lastEndedKey = '';
+  }
+  function showGameEnd(title,text,key){
+    if (!endOverlay || lastEndedKey === key) return;
+    lastEndedKey = key;
+    endTitle.textContent = title;
+    endText.textContent = text;
+    endOverlay.hidden = false;
+  }
+  function syncGameEnd(){
+    if (!endOverlay) return;
+    if (selected === 'arena'){
+      if (arena?.over){
+        const score = Math.floor(arena.score || 0);
+        showGameEnd('Tur tamamlandı!', `Puanın: ${score}`, `arena:${score}:${arena.time}`);
+      } else if (!arena?.over) hideGameEnd();
+      return;
+    }
+    let g;
+    try { g = current(); } catch { return; }
+    if (!g?.done){ hideGameEnd(); return; }
+    if (selected === 'xox'){
+      const result = g.winner === null ? 'Berabere.' : `Oyuncu ${g.winner + 1} kazandı.`;
+      showGameEnd('Oyun bitti!', result, `xox:${JSON.stringify(g.board)}`);
+    } else if (selected === 'word'){
+      const result = g.winner === null ? `Berabere · ${g.scores[0]} - ${g.scores[1]}` : `Oyuncu ${g.winner + 1} kazandı · ${g.scores[0]} - ${g.scores[1]}`;
+      showGameEnd('Düello bitti!', result, `word:${g.scores.join(':')}:${g.round}`);
+    }
+  }
+
+  endNew?.addEventListener('click', async () => {
+    endOverlay.hidden = true;
+    lastEndedKey = '';
+    if (selected === 'arena'){
+      $('start')?.click();
+    } else if (mode === 'online'){
+      /* Online maçta yeni oda/maç mevcut oda akışına göre başlatılır. */
+      if (room) { clearRoom(); reset(); }
+      else reset();
+    } else {
+      reset();
+    }
+  });
+
+  /* Var olan render akışına dokunmadan oyun bitişini izler. */
+  const endObserver = new MutationObserver(() => syncGameEnd());
+  endObserver.observe(gameCard,{subtree:true,childList:true,characterData:true,attributes:true});
+  const endTimer = setInterval(syncGameEnd,250);
+
+  /* Oyun değiştirildiğinde eski bitiş katmanını kapat. */
+  buttons.forEach(button => button.addEventListener('click', hideGameEnd));
+
+  /* Arena skoru kaydedildiğinde mevcut saveArenaScore zaten loadScores() çağırır.
+     Diğer sunuculu oyunlarda mevcut play()/poll() akışı maç bitince loadScores() çağırır. */
+  syncGameEnd();
 })();
 </script>
 
