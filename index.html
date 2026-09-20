@@ -595,6 +595,22 @@
     display:none!important;
   }
 
+  /* Oyunlar sayfasındaki marka görünümü: Zatoi + kırmızı parıltı */
+  #app.people-chat-mode .people-mode-brand::before,
+  #app.people-chat-mode .people-mode-brand::after{
+    content:none!important;
+    display:none!important;
+  }
+  #app.people-chat-mode .people-mode-brand strong::after{
+    content:"✦"!important;
+    display:inline-block!important;
+    margin-left:8px!important;
+    color:#ff2345!important;
+    font-size:27px!important;
+    line-height:1!important;
+    vertical-align:-2px!important;
+  }
+
   /* Sohbette mevcut AI butonunun davranışı aynen korunur */
   #app.people-chat-mode .people-mode-switch{
     position:absolute!important;
