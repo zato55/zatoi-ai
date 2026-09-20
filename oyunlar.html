@@ -794,6 +794,63 @@
   .zatoi-global-header .desktop-back-link{display:inline!important}
 }
 
+
+
+/* =========================================================
+   V3.1 — XOX OYUN SONU BİLDİRİMİ
+   Arena sonuç kutusuyla aynı tasarım dili.
+   ========================================================= */
+.xox-end-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(7,8,12,.76);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+.xox-end-overlay[hidden]{display:none!important}
+.xox-end-box{
+  position:relative;
+  width:min(340px,92vw);
+  padding:27px 20px 20px;
+  text-align:center;
+  background:#17171d;
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:0 18px 55px rgba(0,0,0,.42);
+}
+.xox-end-icon{
+  margin:2px 0 8px;
+  font-size:38px;
+  line-height:1;
+}
+.xox-end-box h3{
+  margin:0 0 7px;
+  font-size:27px;
+}
+.xox-end-box p{
+  margin:0 0 18px;
+  color:var(--muted);
+}
+.xox-end-box > .primary{
+  width:100%;
+  min-height:48px;
+  padding:13px 18px;
+  font-weight:800;
+}
+@media(max-width:760px){
+  .xox-end-overlay{padding:14px}
+  .xox-end-box{
+    width:min(320px,92%);
+    padding:24px 18px 18px;
+  }
+  .xox-end-box h3{font-size:24px}
+}
+
 </style></head><body class="zatoi-games-page"><header class="zatoi-global-header">
 <a class="brand" href="./" aria-label="Zatoi ana sayfa">Zatoi<span> ✦</span></a>
 <a class="desktop-back-link" href="./">← Sohbete dön</a>
@@ -825,7 +882,16 @@
     <div class="mobile-xox-room-state" id="mobileXoxRoomState">Arkadaşınla oynamak için oda oluştur veya oda kodunu gir.</div>
   </div>
 </div>
-<div id="xoxStatus" class="status" aria-live="polite"></div><div id="board" class="board" aria-label="XOX oyun tahtası"></div></section>
+<div id="xoxStatus" class="status" aria-live="polite"></div><div id="board" class="board" aria-label="XOX oyun tahtası"></div>
+<div id="xoxEndOverlay" class="xox-end-overlay" hidden aria-hidden="true">
+  <div class="xox-end-box" role="dialog" aria-modal="true" aria-labelledby="xoxEndTitle">
+    <button id="xoxEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button>
+    <div id="xoxEndIcon" class="xox-end-icon">🏆</div>
+    <h3 id="xoxEndTitle">Kazandın!</h3>
+    <p id="xoxEndText">Tebrikler, üç işareti birleştirdin.</p>
+    <button id="xoxEndNew" class="primary" type="button">Yeni Oyun</button>
+  </div>
+</div></section>
 </div><aside class="card"><div class="eyebrow">OYUN MASASI</div><h2 style="margin-top:10px">Nasıl oynayalım?</h2><div id="arenaInfo"><p>Tek kişilik, gittikçe hızlanan bir kaçış oyunu. Her enerji 25 puan verir.</p><p>Sekme değiştirirsen oyun duraklar. Rekor yalnızca bu tarayıcıda saklanır.</p></div><div id="multiplayer" hidden><label for="mode">Oyun modu</label><select id="mode"><option value="local">Aynı cihazda iki kişi</option><option value="bot">Bilgisayara karşı · XOX</option><option value="online">Oda koduyla çevrim içi</option></select><button id="newLocal" class="primary">Yeni oyun</button><div id="onlineControls" hidden><p>Oda oluştur, kodu sohbette arkadaşına gönder. Oda 2 saat geçerlidir.</p><button id="create" class="primary">Oda oluştur</button><label for="roomInput">Oda kodu</label><input id="roomInput" maxlength="10" placeholder="10 karakterli kod" autocomplete="off" spellcheck="false"><button id="join">Odaya katıl</button><div id="roomInfo" hidden><div class="divider"></div><div class="note">ODA KODU</div><div id="roomCode" class="roomcode"></div><p id="seatInfo"></p><button id="copy">Kodu kopyala</button><button id="leave">Odadan ayrıl</button></div></div></div><div id="notice" role="status" aria-live="polite"></div><div class="divider"></div><p>✦ AI kullanmaz.<br>✦ Mobil ve bilgisayarda oynanır.<br>✦ Reklam ve uygulama indirme yok.</p></aside></div><section class="card scoreboard" aria-label="Oyuncu skor tablosu"><div class="row between"><div><div class="eyebrow">SKORBORD</div><h2>Oyuncu sıralaması</h2></div><button id="refreshScores" type="button">Yenile</button></div><p id="scoreIdentity" class="muted"></p><p id="myStats">Kendi puanın ve sıralaman burada görünür.</p><p id="scoreStatus" class="note" role="status" aria-live="polite"></p><div class="table-scroll"><table><thead><tr><th>Sıra</th><th>Oyuncu</th><th id="scoreMetric">Puan</th><th>Oyun</th><th>G / B / M</th></tr></thead><tbody id="scoreRows"></tbody></table></div><p id="scoreRules" class="note"></p><button id="retryScore" type="button" hidden>Puanı kaydetmeyi tekrar dene</button></section>
 <div id="mobileGameBackdrop" class="mobile-drawer-backdrop" hidden></div>
 <div id="mobileGamesDrawer" class="mobile-drawer" aria-hidden="true">
@@ -850,14 +916,49 @@ function newGame(kind){if(!['xox','word'].includes(kind))throw Error('Oyun seçi
 function challenge(g){if(g.kind==='word'&&!g.done&&!g.letters){let w=g.deck[g.round][0];g.letters=shuffle(w).join('');if(g.letters===w)g.letters=w.slice(1)+w[0];}}
 function move(g,seat,action){if(g.done)throw Error('Oyun bitti. Yeni oyun başlat.');if(seat!==g.turn)throw Error('Sıra diğer oyuncuda.');if(g.kind==='xox'){let i=action.cell;if(!Number.isInteger(i)||i<0||i>8||g.board[i])throw Error('Boş bir kare seç.');g.board[i]=seat===0?'X':'O';for(const line of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]){if(g.board[line[0]]&&line.every(i=>g.board[i]===g.board[line[0]])){g.done=true;g.winner=seat;g.line=line;break}}if(!g.done&&g.board.every(Boolean))g.done=true;g.turn=1-seat;}else{let answer=normalizeWord(action.answer||'');if(answer.length>40)throw Error('Yanıt çok uzun.');let correct=answer===g.deck[g.round][0];g.scores[seat]+=correct?10:0;g.last=(correct?'Doğru! +10 puan.':'Bu turun cevabı: '+g.deck[g.round][0]);g.round++;g.turn=1-seat;g.letters='';if(g.round>=g.deck.length){g.done=true;g.winner=g.scores[0]===g.scores[1]?null:(g.scores[0]>g.scores[1]?0:1)}challenge(g)}return g}
 function publicGame(g){challenge(g);if(g.kind==='xox')return structuredClone(g);const {deck,...view}=g;return {...view,total:deck.length,hint:g.done?'':deck[g.round][1]}}
-const $=id=>document.getElementById(id);let selected='arena',mode='local',local=newGame('xox'),room=null,busy=false,pollTimer=null,botTimer=null,epoch=0;
+const $=id=>document.getElementById(id);let selected='arena',mode='local',local=newGame('xox'),room=null,busy=false,pollTimer=null,botTimer=null,epoch=0,xoxEndShownKey='';
 const notice=message=>{$('notice').textContent=message};
 function current(){return room?room.game:publicGame(local)}
 function canPlay(g){return !g.done&&!busy&&(mode!=='online'||!!room&&room.ready&&room.seat===g.turn)&&(mode!=='bot'||g.turn===0)}
-function reset(){clearTimeout(botTimer);local=newGame(selected==='word'?'word':'xox');challenge(local);render()}
+function hideXoxEnd(){const o=$('xoxEndOverlay');if(o){o.hidden=true;o.setAttribute('aria-hidden','true')}}
+function reset(){clearTimeout(botTimer);xoxEndShownKey='';hideXoxEnd();local=newGame(selected==='word'?'word':'xox');challenge(local);render()}
 function clearRoom(){epoch++;clearTimeout(pollTimer);room=null;busy=false;$('roomInfo').hidden=true;notice('')}
+function showXoxEnd(g){
+ if(selected!=='xox'||!g?.done)return;
+ const key=(mode==='online'?(room?.code||'online'):'local')+'|'+g.board.join('')+'|'+String(g.winner);
+ if(xoxEndShownKey===key)return;
+ xoxEndShownKey=key;
+
+ let title='',text='',icon='🤝';
+ if(g.winner===null){
+   title='Berabere!';
+   text='Tahta doldu, bu turda kazanan çıkmadı.';
+ }else if(mode==='bot'){
+   const won=g.winner===0;
+   title=won?'Kazandın!':'Kaybettin!';
+   text=won?'Tebrikler, bilgisayarı yendin.':'Bilgisayar bu turu kazandı. Yeni oyunda tekrar dene.';
+   icon=won?'🏆':'😕';
+ }else if(mode==='online' && room){
+   const won=g.winner===room.seat;
+   title=won?'Kazandın!':'Kaybettin!';
+   text=won?'Tebrikler, bu tur senin!':'Rakibin bu turu kazandı.';
+   icon=won?'🏆':'😕';
+ }else{
+   title=`Oyuncu ${g.winner+1} kazandı!`;
+   text=`${g.winner===0?'X':'O'} üç işareti birleştirdi.`;
+   icon='🏆';
+ }
+
+ $('xoxEndIcon').textContent=icon;
+ $('xoxEndTitle').textContent=title;
+ $('xoxEndText').textContent=text;
+ $('xoxEndNew').textContent=mode==='online'?'Kapat':'Yeni Oyun';
+ const overlay=$('xoxEndOverlay');
+ overlay.hidden=false;
+ overlay.setAttribute('aria-hidden','false');
+}
 function render(){if(selected==='arena')return;let g=current();if(g.kind!==selected)return;let label=g.done?(g.winner===null?'Berabere!':`Oyuncu ${g.winner+1} kazandı!`):(mode==='online'&&!room?'Oda oluştur veya bir odaya katıl.':room&&!room.ready?'İkinci oyuncu bekleniyor…':`Sıra: Oyuncu ${g.turn+1}${g.kind==='xox'?(g.turn===0?' · X':' · O'):''}`);let playable=canPlay(g);
- if(selected==='xox'){$('xoxStatus').textContent=label;$('board').replaceChildren(...g.board.map((v,i)=>{let b=document.createElement('button');b.className='cell '+v.toLowerCase()+(g.line.includes(i)?' win':'');b.textContent=v;b.disabled=!!v||!playable;b.setAttribute('aria-label',`${Math.floor(i/3)+1}. satır, ${i%3+1}. sütun: ${v||'boş'}`);b.onclick=()=>play({cell:i});return b}))}
+ if(selected==='xox'){$('xoxStatus').textContent=label;$('board').replaceChildren(...g.board.map((v,i)=>{let b=document.createElement('button');b.className='cell '+v.toLowerCase()+(g.line.includes(i)?' win':'');b.textContent=v;b.disabled=!!v||!playable;b.setAttribute('aria-label',`${Math.floor(i/3)+1}. satır, ${i%3+1}. sütun: ${v||'boş'}`);b.onclick=()=>play({cell:i});return b}));if(g.done)showXoxEnd(g)}
  else{$('wordStatus').textContent=label;$('wordScoreA').textContent=g.scores[0];$('wordScoreB').textContent=g.scores[1];$('wordRound').textContent=Math.min(g.round+1,g.total)+' / '+g.total;$('letters').replaceChildren(...[...(g.done?'':g.letters)].map(x=>{let span=document.createElement('span');span.className='letter';span.textContent=x;return span}));$('hint').textContent=g.hint;$('wordLast').textContent=g.last;$('answer').disabled=!playable;$('answerButton').disabled=!playable;$('skip').disabled=!playable;}
  $('create').disabled=busy||!!room;$('join').disabled=busy||!!room;
 }
@@ -871,6 +972,13 @@ async function play(action){let g=current();if(!canPlay(g))return;notice('');if(
 function showTab(name,leave=true){if(leave){clearRoom();clearTimeout(botTimer)}selected=name;if(name!=='arena')pauseArena();for(const el of document.querySelectorAll('[data-game]'))el.setAttribute('aria-selected',String(el.dataset.game===name));for(const id of ['arena','word','xox'])$(id).hidden=id!==name;$('arenaInfo').hidden=name!=='arena';$('multiplayer').hidden=name==='arena';$('mode').querySelector('[value="bot"]').disabled=name!=='xox';if(name==='word'&&mode==='bot'){mode='local';$('mode').value=mode}if(leave)reset();$('onlineControls').hidden=mode!=='online';$('newLocal').hidden=mode==='online';render();if(typeof loadScores==='function')loadScores()}
 for(const button of document.querySelectorAll('[data-game]'))button.onclick=()=>showTab(button.dataset.game);
 $('mode').onchange=()=>{clearRoom();mode=$('mode').value;$('onlineControls').hidden=mode!=='online';$('newLocal').hidden=mode==='online';reset()};$('newLocal').onclick=()=>{notice('');reset()};$('create').onclick=()=>connect('/create');$('join').onclick=()=>connect('/join');$('leave').onclick=()=>{clearRoom();reset()};$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(room.code);notice('Kod kopyalandı. Sohbete yapıştırabilirsin.')}catch{notice('Kodu seçerek kopyalayabilirsin: '+room.code)}};$('wordForm').onsubmit=e=>{e.preventDefault();if(!$('answer').value.trim())return;play({answer:$('answer').value})};$('skip').onclick=()=>play({answer:''});
+$('xoxEndClose').onclick=()=>hideXoxEnd();
+$('xoxEndOverlay').onclick=e=>{if(e.target===$('xoxEndOverlay'))hideXoxEnd()};
+$('xoxEndNew').onclick=()=>{
+  if(mode==='online'){hideXoxEnd();return}
+  notice('');
+  reset();
+};
 // Arena uses logical coordinates and delta time; no external assets or libraries.
 const canvas=$('canvas'),ctx=canvas.getContext('2d');let arena={running:false,paused:false,started:false,over:false,x:320,items:[],time:0,spawn:0,score:0,lives:3,inv:0},lastFrame=0,raf=0;let keys={left:false,right:false},best=0;
 try{best=Number(localStorage.getItem(arenaBestKey()))||0}catch{}$('arenaBest').textContent=best;
