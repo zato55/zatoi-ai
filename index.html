@@ -521,15 +521,30 @@
 }
 </style>
 
-<style id="zatoi-auth-boot-no-flash-v14-63-3">
-/* Açılışta auth kontrolü bitene kadar login/app parlamasını engeller. */
-html.zatoi-auth-boot #authScreen,
-html.zatoi-auth-boot #app{
-  visibility:hidden!important;
+<style id="zatoi-auth-first-paint-v14-63-4">
+/* JS daha çalışmadan önce iki ekran da kapalıdır; aşağıdaki erken script doğru olanı açar. */
+html:not(.zatoi-auth-first-paint-ready) #authScreen,
+html:not(.zatoi-auth-first-paint-ready) #app{
+  display:none!important;
+}
+html.zatoi-session-present #authScreen{
+  display:none!important;
 }
 </style>
-<script id="zatoi-auth-boot-start-v14-63-3">
-document.documentElement.classList.add("zatoi-auth-boot");
+<script id="zatoi-auth-first-paint-v14-63-4">
+(() => {
+  try {
+    const token = String(localStorage.getItem("zatoi_auth_token_v1") || "").trim();
+    const rawUser = localStorage.getItem("zatoi_auth_user_v1");
+    let hasUser = false;
+    if (rawUser) {
+      try { hasUser = !!JSON.parse(rawUser); }
+      catch { hasUser = rawUser.trim().length > 0; }
+    }
+    if (token && hasUser) document.documentElement.classList.add("zatoi-session-present");
+  } catch {}
+  document.documentElement.classList.add("zatoi-auth-first-paint-ready");
+})();
 </script>
 
 </head>
@@ -10081,23 +10096,12 @@ checkAuth();
 
 </script>
 
-<script id="zatoi-auth-boot-release-v14-63-3">
-(() => {
-  const reveal = () => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.documentElement.classList.remove("zatoi-auth-boot");
-      });
-    });
-  };
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", reveal, {once:true});
-  } else {
-    reveal();
-  }
-  /* Emniyet: herhangi bir başlangıç hatasında ekran sonsuza kadar gizli kalmasın. */
-  setTimeout(() => document.documentElement.classList.remove("zatoi-auth-boot"), 1200);
-})();
+<script id="zatoi-auth-first-paint-cleanup-v14-63-4">
+window.addEventListener("load", () => {
+  requestAnimationFrame(() => {
+    document.documentElement.classList.remove("zatoi-session-present");
+  });
+}, {once:true});
 </script>
 
 </body>
