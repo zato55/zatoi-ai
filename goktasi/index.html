@@ -183,7 +183,7 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
     <div id="xpThin"><i id="xpF2"></i></div>
     <div id="slots"></div>
   </div>
-  <div id="hints">Boş yere tıkla: yürü &nbsp;•&nbsp; Canavara tıkla: saldır &nbsp;•&nbsp; Tab: hedef &nbsp;•&nbsp; 1-5: beceri &nbsp;•&nbsp; Q/E: iksir &nbsp;•&nbsp; I: çanta &nbsp;•&nbsp; C: karakter &nbsp;•&nbsp; M: harita &nbsp;•&nbsp; Space: topla</div>
+  <div id="hints">Sol tık: yürü / hedef seç &nbsp;•&nbsp; WASD: manuel hareket &nbsp;•&nbsp; Space: kılıç salla &nbsp;•&nbsp; Tab: en yakın hedef &nbsp;•&nbsp; 1-5: beceri &nbsp;•&nbsp; Q/E: iksir &nbsp;•&nbsp; I: çanta &nbsp;•&nbsp; C: karakter &nbsp;•&nbsp; M: harita</div>
 </div>
 
 <div class="panel" id="invPanel"><h3>ÇANTA</h3><button class="x" data-close="invPanel">✕</button>
@@ -446,6 +446,18 @@ function objBlock(x,y,r){
 function moveEnt(e,dx,dy,r){
   if(dx){const nx=e.x+dx;if(!solid(nx,e.y)&&!objBlock(nx,e.y,r))e.x=nx;}
   if(dy){const ny=e.y+dy;if(!solid(e.x,ny)&&!objBlock(e.x,ny,r))e.y=ny;}
+}
+function smartMove(e,ang,step,r){
+  const ox=e.x,oy=e.y;
+  moveEnt(e,Math.cos(ang)*step,Math.sin(ang)*step,r);
+  if(Math.hypot(e.x-ox,e.y-oy)>step*.18)return true;
+  // Engel varsa sağ/sol açıları deneyerek etrafından ak.
+  const tries=[.45,-.45,.8,-.8,1.15,-1.15,1.55,-1.55];
+  for(const off of tries){
+    e.x=ox;e.y=oy;moveEnt(e,Math.cos(ang+off)*step,Math.sin(ang+off)*step,r);
+    if(Math.hypot(e.x-ox,e.y-oy)>step*.18)return true;
+  }
+  e.x=ox;e.y=oy;return false;
 }
 
 // ---------- sprite üretimi ----------
@@ -1028,25 +1040,29 @@ addEventListener('keydown',e=>{
   if(e.code==='KeyC'){togglePanel('charPanel');renderChar();}
   if(e.code==='KeyM'){togglePanel('mapPanel');drawBigMap();}
   if(e.code==='Tab'){e.preventDefault();nearestTarget();}
-  if(e.code==='Space'){e.preventDefault();sweep();}
+  if(e.code==='Space'){e.preventDefault();manualSword();}
   if(e.code==='Escape')closePanels();
 });
 addEventListener('keyup',e=>keys[e.code]=false);
 addEventListener('mousemove',e=>mouse={x:e.clientX,y:e.clientY});
 cv.addEventListener('mousedown',e=>{
   initAudio();if(!started||P.dead)return;
-  const wx=cam.x+(e.clientX-vw/2)/zoom,wy=cam.y+(e.clientY-vh/2)/zoom;
-  if(e.button===2){e.preventDefault();}
-  // npc?
-  for(const n of npcs){if(dst(wx,wy,n.x,n.y-14)<26){openDialog(n);return;}}
-  // taş?
-  for(const s of stones){if(s.alive&&dst(wx,wy,s.x,s.y-16)<46){P.stoneT=s;P.target=null;P.tx=s.x;P.ty=s.y;return;}}
-  // mob?
-  let best=null,bd=34;
-  mobs.forEach(m=>{if(m.hp>0){const d=dst(wx,wy,m.x,m.y-8);if(d<bd+m.r){bd=d;best=m;}}});
+  lastInput=performance.now();
+  const rect=cv.getBoundingClientRect();
+  const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
+  const wx=cam.x+(sx-rect.width/2)/zoom,wy=cam.y+(sy-rect.height/2)/zoom;
+  if(e.button===2){e.preventDefault();return;}
+  // NPC: yalnızca gerçekten NPC'nin üstüne tıklanınca konuş.
+  for(const n of npcs){if(dst(wx,wy,n.x,n.y-14)<30){P.target=null;P.stoneT=null;P.tx=P.x;P.ty=P.y;openDialog(n);return;}}
+  // Göktaşı: tıklanınca hedefle, yanına git ve otomatik vur.
+  for(const s of stones){if(s.alive&&dst(wx,wy,s.x,s.y-16)<52){P.stoneT=s;P.target=null;P.tx=s.x;P.ty=s.y;return;}}
+  // Canavar: imlece en yakın canavarı seç.
+  let best=null,bd=Infinity;
+  mobs.forEach(m=>{if(m.hp>0&&!m.dead){const d=dst(wx,wy,m.x,m.y-8);const hit=46+(m.r||0);if(d<hit&&d<bd){bd=d;best=m;}}});
   if(best){P.target=best;P.stoneT=null;$('targetBar').style.display='block';P.tx=best.x;P.ty=best.y;return;}
+  // Boş zemin: savaş hedefini bırak ve TAM tıklanan noktaya yürü.
   P.target=null;P.stoneT=null;$('targetBar').style.display='none';
-  P.tx=clamp(wx,10,WORLD-10);P.ty=clamp(wy,10,WORLD-10);
+  P.tx=clamp(wx,16,WORLD-16);P.ty=clamp(wy,16,WORLD-16);
 });
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 addEventListener('wheel',e=>{if(!started)return;zoom=clamp(zoom-e.deltaY*.0009,.7,1.6);},{passive:true});
@@ -1055,9 +1071,24 @@ function nearestTarget(){
   mobs.forEach(m=>{if(m.hp>0){const d=dst(P.x,P.y,m.x,m.y);if(d<bd){bd=d;best=m;}}});
   if(best){P.target=best;P.stoneT=null;$('targetBar').style.display='block';P.tx=best.x;P.ty=best.y;SFX.click();}
 }
+function manualSword(){
+  if(!started||P.dead||P.atkCD>0)return;
+  lastInput=performance.now();
+  // Space her zaman kılıcı sallar. Yakında hedef varsa hasar verir.
+  let m=P.target&&P.target.hp>0?P.target:null;
+  if(!m||dst(P.x,P.y,m.x,m.y)>64+(m.r||0)){
+    m=null;let bd=72;
+    mobs.forEach(mm=>{if(mm.hp>0&&!mm.dead){const d=dst(P.x,P.y,mm.x,mm.y);if(d<bd+(mm.r||0)){bd=d;m=mm;}}});
+  }
+  P.atkCD=1/(1.05+P.stat.c*.012);P.swingT=.28;SFX.swing();
+  if(m){P.target=m;P.stoneT=null;P.dir=m.x>=P.x?1:-1;$('targetBar').style.display='block';dealToMob(m,plDmg());return;}
+  // Yakındaki göktaşına da kılıçla vurulabilir.
+  const st=stones.find(ss=>ss.alive&&dst(P.x,P.y,ss.x,ss.y)<78);
+  if(st){P.stoneT=st;P.target=null;P.dir=st.x>=P.x?1:-1;st.hp-=plDmg(1);}
+}
 function sweep(){
   let got=false;
-  drops.forEach((d,i)=>{if(dst(P.x,P.y,d.x,d.y)<90){pickup(d,i);got=true;}});
+  for(let i=drops.length-1;i>=0;i--){const d=drops[i];if(dst(P.x,P.y,d.x,d.y)<90){pickup(d,i);got=true;}}
   if(got)SFX.coin();
 }
 function pickup(d,i){
@@ -1291,12 +1322,16 @@ function updPlayer(dt){
   let dx=0,dy=0;
   const spd=(150+(P.buffSpd>0?45:0))*dt;
   if(keys.KeyW)dy-=1;if(keys.KeyS)dy+=1;if(keys.KeyA)dx-=1;if(keys.KeyD)dx+=1;
-  if(dx||dy){P.tx=P.x+dx*100;P.ty=P.y+dy*100;}
+  if(dx||dy){
+    // Manuel hareket her şeyden öncelikli: eski hedef karakteri geri çekmesin.
+    P.target=null;P.stoneT=null;$('targetBar').style.display='none';
+    P.tx=P.x+dx*100;P.ty=P.y+dy*100;lastInput=performance.now();
+  }
   const dT=dst(P.x,P.y,P.tx,P.ty);
   P.mv=dT>4;
   if(P.mv){
     const a=Math.atan2(P.ty-P.y,P.tx-P.x);
-    moveEnt(P,Math.cos(a)*spd,Math.sin(a)*spd,10);
+    smartMove(P,a,spd,10);
     if(Math.abs(Math.cos(a))>.15)P.dir=Math.cos(a)>0?1:-1;
     P.walkT+=dt*(P.buffSpd>0?13:9);
     if(dT<6){P.tx=P.x;P.ty=P.y;}
@@ -1305,7 +1340,7 @@ function updPlayer(dt){
   if(P.target&&P.target.hp>0){
     const m=P.target,d=dst(P.x,P.y,m.x,m.y),range=38+m.r*.8;
     if(d>range){const a=Math.atan2(m.y-P.y,m.x-P.x);
-      moveEnt(P,Math.cos(a)*spd,Math.sin(a)*spd,10);
+      smartMove(P,a,spd,10);
       P.dir=m.x>=P.x?1:-1;P.mv=true;P.walkT+=dt*9;}
     else playerAttack();
   }
@@ -1313,7 +1348,7 @@ function updPlayer(dt){
     const s=P.stoneT;
     if(!s.alive){P.stoneT=null;}
     else{const d=dst(P.x,P.y,s.x,s.y);
-      if(d>62){const a=Math.atan2(s.y-P.y,s.x-P.x);moveEnt(P,Math.cos(a)*spd,Math.sin(a)*spd,10);P.dir=s.x>=P.x?1:-1;P.mv=true;P.walkT+=dt*9;}
+      if(d>62){const a=Math.atan2(s.y-P.y,s.x-P.x);smartMove(P,a,spd,10);P.dir=s.x>=P.x?1:-1;P.mv=true;P.walkT+=dt*9;}
       else if(P.atkCD<=0){P.atkCD=.7;P.swingT=.28;P.dir=s.x>=P.x?1:-1;
         SFX.swing();s.hp-=plDmg(1);
         floats.push({x:s.x+rnd(-14,14),y:s.y-40,txt:Math.round(plDmg(1)),c:'#9fd8e8',t:0,dur:.7});
