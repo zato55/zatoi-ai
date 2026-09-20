@@ -376,6 +376,114 @@
 }
 @media(min-width:761px){.arena-mobile-touchpad{display:none!important}}
 
+
+/* =========================================================
+   V2.5 — MOBİL ARENA KONFOR DÜZENİ
+   SADECE max-width:760px. PC DEĞİŞMEZ.
+   Sarı alan: daha kompakt oyun bilgisi + daha güçlü oyun odağı
+   Mavi alan: butonlar touchpad ile tek kontrol bölgesinde
+   ========================================================= */
+@media(max-width:760px){
+  /* Arena kartında dikey alan tasarrufu */
+  #arena{padding:16px!important}
+  #arena > .row.between:first-child{margin-bottom:8px!important}
+  #arena h2{font-size:25px!important;line-height:1.1!important}
+  #arena .game-description,
+  #arena > p:not(.note){
+    margin:8px 0 12px!important;
+    line-height:1.45!important;
+    font-size:14px!important;
+  }
+
+  /* Puan / rekor / can daha sıkı */
+  #arena .stats{
+    margin:8px 0 12px!important;
+    gap:8px!important;
+  }
+  #arena .stat{min-width:0!important}
+  #arena .stat strong{
+    font-size:27px!important;
+    line-height:1!important;
+  }
+  #arena .stat span{
+    margin-top:6px!important;
+    font-size:10px!important;
+    letter-spacing:.08em!important;
+  }
+
+  /* Oyun ekranı ana odak */
+  #arena .stage{
+    margin-top:8px!important;
+    border-radius:16px!important;
+  }
+  #arena canvas{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+  }
+
+  /* Eski kontrol satırı touchpad alanına taşınacağı için burada görünmesin */
+  #arena .controls{display:none!important}
+
+  /* Touchpad + ana butonlar tek ergonomik blok */
+  .arena-mobile-control-zone{
+    display:block;
+    margin-top:12px;
+    padding:10px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:#14151b;
+  }
+  .arena-mobile-actions{
+    display:grid;
+    grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
+    gap:9px;
+    margin-bottom:9px;
+  }
+  .arena-mobile-actions button{
+    width:100%;
+    min-height:48px;
+    padding:10px 12px;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:800;
+  }
+  .arena-mobile-actions .primary{
+    box-shadow:none!important;
+  }
+
+  .arena-mobile-control-zone .arena-mobile-touchpad{
+    margin-top:0!important;
+    height:102px!important;
+    border-radius:15px!important;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px),
+      linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+      #101117!important;
+    background-size:28px 28px!important;
+  }
+  .arena-mobile-control-zone .touchpad-knob{
+    width:44px!important;
+    height:44px!important;
+  }
+
+  /* Oyun bitiş penceresi mobilde biraz daha kompakt */
+  #arena .arena-end-overlay{padding:14px!important}
+  #arena .arena-end-box{
+    width:min(320px,92%)!important;
+    padding:22px 18px 18px!important;
+  }
+  #arena .arena-end-box h3{
+    font-size:24px!important;
+    margin-bottom:5px!important;
+  }
+  #arena .arena-end-box p{margin-bottom:14px!important}
+  #arena .arena-end-box > .primary{min-height:48px!important}
+}
+@media(min-width:761px){
+  .arena-mobile-control-zone{display:none!important}
+}
+
 </style></head><body><header><a class="brand" href="./">Zatoi<span> ✦</span></a><a href="./">← Sohbete dön</a></header><main><div class="eyebrow">ZATOI PLAY / 01</div><h1>Sohbete küçük<br>bir oyun molası.</h1><p class="intro">Reflekslerini dene, kelimeleri çöz veya üç taşı yan yana getir. Bir oyun seç ve başla.</p><nav class="tabs" role="tablist" aria-label="Oyun seç"><button class="tab" id="tab-arena" role="tab" aria-controls="arena" aria-selected="true" data-game="arena"><span class="symbol">✦</span><b>Zatoi Arena</b><small>Enerjiyi topla · Tek kişi</small></button><button class="tab" id="tab-word" role="tab" aria-controls="word" aria-selected="false" data-game="word"><span class="symbol">Aa</span><b>Kelime Düellosu</b><small>Harfleri çöz · İki kişi</small></button><button class="tab" id="tab-xox" role="tab" aria-controls="xox" aria-selected="false" data-game="xox"><span class="symbol">×○</span><b>XOX</b><small>Üçünü birleştir · 1–2 kişi</small></button></nav><div class="workspace"><div class="card">
 <section id="arena" role="tabpanel" aria-labelledby="tab-arena"><div class="row between"><h2>Zatoi Arena</h2><span class="tag">REFLEKS</span></div><p class="muted">Kırmızı engellerden kaç. Turkuaz enerjileri topla.</p><div class="stats"><div class="stat"><strong id="arenaScore">0</strong><span>PUAN</span></div><div class="stat"><strong id="arenaBest">0</strong><span>BU CİHAZDA REKOR</span></div><div class="stat"><strong id="arenaLives">3</strong><span>CAN</span></div></div><div class="stage"><canvas id="canvas" width="640" height="390" aria-label="Engellerden kaçış oyunu. Yön tuşları veya A ve D ile hareket et."></canvas><div id="arenaEndOverlay" class="arena-end-overlay" hidden><div class="arena-end-box"><button id="arenaEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button><h3>Tur tamamlandı!</h3><p id="arenaEndScore">Puanın: 0</p><button id="arenaEndNew" class="primary" type="button">Yeni Oyun</button></div></div></div><div class="controls"><button id="start" class="primary">Başlat</button><button id="pause" disabled>Duraklat</button><div class="directions"><button id="left" aria-label="Sola hareket">←</button><button id="right" aria-label="Sağa hareket">→</button></div></div><p class="note">Bilgisayar: ← → veya A / D. Telefon: ekranda sürükle ya da okları kullan.</p><div id="arenaMobileTouchpad" class="arena-mobile-touchpad is-disabled" aria-label="Mobil hareket alanı"><span class="touchpad-side touchpad-left">←</span><span class="touchpad-side touchpad-right">→</span><span id="arenaTouchKnob" class="touchpad-knob"></span></div></section>
 <section id="word" role="tabpanel" aria-labelledby="tab-word" hidden><div class="row between"><h2>Kelime Düellosu</h2><span class="tag">10 TUR</span></div><p class="muted">Her oyuncuya 5 kelime. Her doğru cevap 10 puan; yanlış cevap veya pas sırasını bitirir.</p><div class="stats"><div class="stat"><strong id="wordScoreA">0</strong><span>OYUNCU 1</span></div><div class="stat"><strong id="wordScoreB">0</strong><span>OYUNCU 2</span></div><div class="stat"><strong id="wordRound">1 / 10</strong><span>TUR</span></div></div><div id="wordStatus" class="status" aria-live="polite"></div><div id="letters" class="letters"></div><p class="center muted" id="hint"></p><form id="wordForm" class="wordform"><label for="answer">Kelimeyi yaz</label><div class="row"><input id="answer" maxlength="40" autocomplete="off" autocapitalize="characters"><button id="answerButton" class="primary">Gönder</button></div><button id="skip" type="button" style="margin-top:10px">Pas geç</button></form><p id="wordLast" class="center note" aria-live="polite"></p></section>
@@ -651,6 +759,56 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
  pad.addEventListener('lostpointercapture',()=>{pointer=null;knob.style.left='50%'});
  setInterval(sync,120);
  sync();
+})();
+</script>
+
+
+<script>
+/* V2.5 — mobil Arena kontrol bölgesi. Mevcut oyun fonksiyonlarını yeniden yazmaz. */
+(()=>{
+  const arenaEl=document.getElementById('arena');
+  const pad=document.getElementById('arenaMobileTouchpad');
+  if(!arenaEl||!pad)return;
+
+  const controls=arenaEl.querySelector('.controls');
+  if(!controls)return;
+
+  const realButtons=[...controls.querySelectorAll('button')];
+  const startBtn=realButtons.find(b=>/başlat|tekrar|yeniden/i.test(b.textContent||'')) || realButtons[0];
+  const pauseBtn=realButtons.find(b=>/duraklat|devam/i.test(b.textContent||'')) || realButtons[1];
+  if(!startBtn||!pauseBtn)return;
+
+  const zone=document.createElement('div');
+  zone.className='arena-mobile-control-zone';
+
+  const actions=document.createElement('div');
+  actions.className='arena-mobile-actions';
+
+  /* Kopya değil: mobil butonlar mevcut gerçek butonların click akışını kullanır. */
+  const mobileStart=document.createElement('button');
+  mobileStart.type='button';
+  mobileStart.className='primary';
+  const mobilePause=document.createElement('button');
+  mobilePause.type='button';
+
+  function syncLabels(){
+    mobileStart.textContent=startBtn.textContent.trim();
+    mobilePause.textContent=pauseBtn.textContent.trim();
+    mobileStart.disabled=startBtn.disabled;
+    mobilePause.disabled=pauseBtn.disabled;
+  }
+  mobileStart.addEventListener('click',()=>{startBtn.click();setTimeout(syncLabels,0)});
+  mobilePause.addEventListener('click',()=>{pauseBtn.click();setTimeout(syncLabels,0)});
+
+  actions.append(mobileStart,mobilePause);
+  zone.append(actions,pad);
+  controls.insertAdjacentElement('afterend',zone);
+
+  const obs=new MutationObserver(syncLabels);
+  obs.observe(startBtn,{subtree:true,childList:true,characterData:true,attributes:true});
+  obs.observe(pauseBtn,{subtree:true,childList:true,characterData:true,attributes:true});
+  setInterval(syncLabels,250);
+  syncLabels();
 })();
 </script>
 
