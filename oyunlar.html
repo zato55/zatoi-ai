@@ -722,7 +722,87 @@
 }
 @media(min-width:761px){.mobile-xox-opponent{display:none!important}}
 
-</style></head><body><header><a class="brand" href="./">Zatoi<span> ✦</span></a><a href="./">← Sohbete dön</a></header><main><div class="eyebrow">ZATOI PLAY / 01</div><h1>Sohbete küçük<br>bir oyun molası.</h1><p class="intro">Reflekslerini dene, kelimeleri çöz veya üç taşı yan yana getir. Bir oyun seç ve başla.</p><nav class="tabs" role="tablist" aria-label="Oyun seç"><button class="tab" id="tab-arena" role="tab" aria-controls="arena" aria-selected="true" data-game="arena"><span class="symbol">✦</span><b>Zatoi Arena</b><small>Enerjiyi topla · Tek kişi</small></button><button class="tab" id="tab-word" role="tab" aria-controls="word" aria-selected="false" data-game="word"><span class="symbol">Aa</span><b>Kelime Düellosu</b><small>Harfleri çöz · İki kişi</small></button><button class="tab" id="tab-xox" role="tab" aria-controls="xox" aria-selected="false" data-game="xox"><span class="symbol">×○</span><b>XOX</b><small>Üçünü birleştir · 1–2 kişi</small></button></nav><div class="workspace"><div class="card">
+
+/* =========================================================
+   V2.9 — ZATOI MOBİL GLOBAL HEADER STANDARDI
+   SADECE MOBİL. PC mevcut header'ı kullanmaya devam eder.
+   ========================================================= */
+.zatoi-mobile-global-actions{display:none}
+@media(max-width:760px){
+  .zatoi-global-header{
+    max-width:none!important;
+    width:100%!important;
+    height:84px!important;
+    padding:0 22px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    background:linear-gradient(90deg,#111116 0%,#211014 100%)!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+  .zatoi-global-header .brand{
+    flex:0 0 auto;
+    font-size:25px!important;
+    line-height:1!important;
+    letter-spacing:-1px!important;
+    white-space:nowrap;
+  }
+  .zatoi-global-header .desktop-back-link{display:none!important}
+  .zatoi-mobile-global-actions{
+    display:flex!important;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    margin-left:auto;
+  }
+  .zatoi-global-round{
+    width:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    height:44px!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    border:1px solid rgba(255,255,255,.11)!important;
+    border-radius:50%!important;
+    background:#191b20!important;
+    color:#fff!important;
+    box-shadow:none!important;
+    font-size:18px!important;
+    line-height:1!important;
+  }
+  .zatoi-global-round:active{transform:scale(.95)}
+  .zatoi-global-ai{
+    color:#ff4056!important;
+    font-size:24px!important;
+  }
+  .zatoi-global-account{
+    overflow:hidden;
+    font-weight:800!important;
+    font-size:16px!important;
+  }
+  #zatoiGlobalAccountAvatar{
+    width:36px;height:36px;border-radius:50%;
+    display:grid;place-items:center;
+    background:#24272e center/cover no-repeat;
+    overflow:hidden;
+  }
+}
+@media(min-width:761px){
+  .zatoi-mobile-global-actions{display:none!important}
+  .zatoi-global-header .desktop-back-link{display:inline!important}
+}
+
+</style></head><body><header class="zatoi-global-header">
+<a class="brand" href="./" aria-label="Zatoi ana sayfa">Zatoi<span> ✦</span></a>
+<a class="desktop-back-link" href="./">← Sohbete dön</a>
+<nav class="zatoi-mobile-global-actions" aria-label="Zatoi hızlı geçiş">
+  <button id="zatoiGlobalChat" class="zatoi-global-round" type="button" aria-label="Sohbete geç" title="Sohbet">💬</button>
+  <button id="zatoiGlobalAi" class="zatoi-global-round zatoi-global-ai" type="button" aria-label="Zatoi AI'ye geç" title="Zatoi AI">✦</button>
+  <button id="zatoiGlobalAccount" class="zatoi-global-round zatoi-global-account" type="button" aria-label="Hesap" title="Hesap"><span id="zatoiGlobalAccountAvatar">Z</span></button>
+</nav>
+</header><main><div class="eyebrow">ZATOI PLAY / 01</div><h1>Sohbete küçük<br>bir oyun molası.</h1><p class="intro">Reflekslerini dene, kelimeleri çöz veya üç taşı yan yana getir. Bir oyun seç ve başla.</p><nav class="tabs" role="tablist" aria-label="Oyun seç"><button class="tab" id="tab-arena" role="tab" aria-controls="arena" aria-selected="true" data-game="arena"><span class="symbol">✦</span><b>Zatoi Arena</b><small>Enerjiyi topla · Tek kişi</small></button><button class="tab" id="tab-word" role="tab" aria-controls="word" aria-selected="false" data-game="word"><span class="symbol">Aa</span><b>Kelime Düellosu</b><small>Harfleri çöz · İki kişi</small></button><button class="tab" id="tab-xox" role="tab" aria-controls="xox" aria-selected="false" data-game="xox"><span class="symbol">×○</span><b>XOX</b><small>Üçünü birleştir · 1–2 kişi</small></button></nav><div class="workspace"><div class="card">
 <section id="arena" role="tabpanel" aria-labelledby="tab-arena"><div class="row between"><h2>Zatoi Arena</h2><span class="tag">REFLEKS</span></div><p class="muted">Kırmızı engellerden kaç. Turkuaz enerjileri topla.</p><div class="stats"><div class="stat"><strong id="arenaScore">0</strong><span>PUAN</span></div><div class="stat"><strong id="arenaBest">0</strong><span>BU CİHAZDA REKOR</span></div><div class="stat"><strong id="arenaLives">3</strong><span>CAN</span></div></div><div class="stage"><canvas id="canvas" width="640" height="390" aria-label="Engellerden kaçış oyunu. Yön tuşları veya A ve D ile hareket et."></canvas><div id="arenaEndOverlay" class="arena-end-overlay" hidden><div class="arena-end-box"><button id="arenaEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button><h3>Tur tamamlandı!</h3><p id="arenaEndScore">Puanın: 0</p><button id="arenaEndNew" class="primary" type="button">Yeni Oyun</button></div></div></div><div class="controls"><button id="start" class="primary">Başlat</button><button id="pause" disabled>Duraklat</button><div class="directions"><button id="left" aria-label="Sola hareket">←</button><button id="right" aria-label="Sağa hareket">→</button></div></div><p class="note">Bilgisayar: ← → veya A / D. Telefon: ekranda sürükle ya da okları kullan.</p><div id="arenaMobileTouchpad" class="arena-mobile-touchpad is-disabled" aria-label="Mobil hareket alanı"><span class="touchpad-side touchpad-left">←</span><span class="touchpad-side touchpad-right">→</span><span id="arenaTouchKnob" class="touchpad-knob"></span></div></section>
 <section id="word" role="tabpanel" aria-labelledby="tab-word" hidden><div class="row between"><h2>Kelime Düellosu</h2><span class="tag">10 TUR</span></div><p class="muted">Her oyuncuya 5 kelime. Her doğru cevap 10 puan; yanlış cevap veya pas sırasını bitirir.</p><div class="stats"><div class="stat"><strong id="wordScoreA">0</strong><span>OYUNCU 1</span></div><div class="stat"><strong id="wordScoreB">0</strong><span>OYUNCU 2</span></div><div class="stat"><strong id="wordRound">1 / 10</strong><span>TUR</span></div></div><div id="wordStatus" class="status" aria-live="polite"></div><div id="letters" class="letters"></div><p class="center muted" id="hint"></p><form id="wordForm" class="wordform"><label for="answer">Kelimeyi yaz</label><div class="row"><input id="answer" maxlength="40" autocomplete="off" autocapitalize="characters"><button id="answerButton" class="primary">Gönder</button></div><button id="skip" type="button" style="margin-top:10px">Pas geç</button></form><p id="wordLast" class="center note" aria-live="polite"></p></section>
 <section id="xox" role="tabpanel" aria-labelledby="tab-xox" hidden><div class="row between"><h2>XOX</h2><span class="tag">STRATEJİ</span></div><p class="muted">Yatay, dikey ya da çapraz üç işareti birleştir.</p>
@@ -1134,6 +1214,39 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
  modeSelect?.addEventListener('change',sync);
  setInterval(sync,500);
  sync();
+})();
+</script>
+
+
+<script>
+/* V2.9 — Mobil global header geçişleri. Ana Zatoi mevcut sessionStorage modunu kullanır. */
+(()=>{
+ const chat=document.getElementById('zatoiGlobalChat');
+ const ai=document.getElementById('zatoiGlobalAi');
+ const account=document.getElementById('zatoiGlobalAccount');
+ const avatar=document.getElementById('zatoiGlobalAccountAvatar');
+
+ function goMain(mode){
+   try{sessionStorage.setItem('zatoi_active_mode_v1',mode)}catch{}
+   location.href='./';
+ }
+ chat?.addEventListener('click',()=>goMain('chat'));
+ ai?.addEventListener('click',()=>goMain('ai'));
+
+ /* Oyun sayfasında hesabı temsil eden avatar/baş harf. */
+ try{
+   const raw=localStorage.getItem('zatoi_auth_user_v1');
+   const u=raw?JSON.parse(raw):null;
+   const name=String(u?.display_name||u?.displayName||u?.username||u?.name||'Z').trim();
+   const avatarUrl=String(u?.avatar_url||u?.avatarUrl||u?.avatar||'').trim();
+   if(avatarUrl){
+     avatar.style.backgroundImage=`url("${avatarUrl.replace(/"/g,'')}")`;
+     avatar.textContent='';
+   }else avatar.textContent=(name[0]||'Z').toLocaleUpperCase('tr-TR');
+ }catch{}
+
+ /* Hesap düğmesi ana Zatoi'ye götürür; mevcut hesap sistemi orada korunur. */
+ account?.addEventListener('click',()=>goMain('chat'));
 })();
 </script>
 
