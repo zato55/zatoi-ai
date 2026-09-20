@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -877,7 +876,7 @@ function giveReward(rw){
   if(rw.exp)expGive(rw.exp);
   if(rw.mo){P.money+=rw.mo;floats.push({x:P.x,y:P.y-40,txt:'+'+fmt(rw.mo)+' akçe',c:'#e0b84b',t:0,dur:1.4});SFX.coin();}
   if(rw.pts)P.pts+=rw.pts;
-  if(rw.it)rw.it.forEach(([id,n])=>{if(!addItem(id,n))toast('Çanta dolu! '+ITEMS[id].n yerde kaldı'.replace(' yerde kaldı',' alınamadı'));else toast(ITEMS[id].n+' aldın');});
+  if(rw.it)rw.it.forEach(([id,n])=>{if(!addItem(id,n))toast('Çanta dolu! '+ITEMS[id].n+' alınamadı');else toast(ITEMS[id].n+' aldın');});
 }
 // ---- exp / seviye ----
 function expGive(n){
@@ -1894,6 +1893,5 @@ bots[0].x=VILLAGE.x-300;bots[0].y=VILLAGE.y-200;
 addChat('Kam Bilge','Çan üç kez çaldı. Göktaşları yine kıpırdandı.','sys');
 requestAnimationFrame(frame);
 </script>
-
 </body>
 </html>
