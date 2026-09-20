@@ -521,31 +521,19 @@
 }
 </style>
 
-<style id="zatoi-auth-first-paint-v14-63-4">
-/* JS daha çalışmadan önce iki ekran da kapalıdır; aşağıdaki erken script doğru olanı açar. */
-html:not(.zatoi-auth-first-paint-ready) #authScreen,
-html:not(.zatoi-auth-first-paint-ready) #app{
-  display:none!important;
-}
-html.zatoi-session-present #authScreen{
-  display:none!important;
-}
-</style>
-<script id="zatoi-auth-first-paint-v14-63-4">
+<script id="zatoi-return-session-bootstrap-v14-63-5">
 (() => {
   try {
     const token = String(localStorage.getItem("zatoi_auth_token_v1") || "").trim();
-    const rawUser = localStorage.getItem("zatoi_auth_user_v1");
-    let hasUser = false;
-    if (rawUser) {
-      try { hasUser = !!JSON.parse(rawUser); }
-      catch { hasUser = rawUser.trim().length > 0; }
-    }
-    if (token && hasUser) document.documentElement.classList.add("zatoi-session-present");
+    const user = JSON.parse(localStorage.getItem("zatoi_auth_user_v1") || "null");
+    if (token && user) document.documentElement.classList.add("zatoi-return-session");
   } catch {}
-  document.documentElement.classList.add("zatoi-auth-first-paint-ready");
 })();
 </script>
+<style id="zatoi-return-session-style-v14-63-5">
+/* Kayıtlı oturumla sayfaya dönüldüğünde login ekranını hiç boyama. */
+html.zatoi-return-session #authScreen{display:none!important;}
+</style>
 
 </head>
 
@@ -685,6 +673,13 @@ html.zatoi-session-present #authScreen{
   id="app"
   class="app hidden"
 >
+<script id="zatoi-return-session-show-app-v14-63-5">
+(() => {
+  if (!document.documentElement.classList.contains("zatoi-return-session")) return;
+  const a = document.getElementById("app");
+  if (a) a.classList.remove("hidden");
+})();
+</script>
 
 
   <section class="chat-column">
@@ -2580,6 +2575,7 @@ async function checkAuth() {
     await openFreshChatForSession();
 
     showApp();
+    document.documentElement.classList.remove("zatoi-return-session");
 
 
     return true;
@@ -2606,6 +2602,7 @@ async function checkAuth() {
     );
 
 
+    document.documentElement.classList.remove("zatoi-return-session");
     showAuthScreen();
 
 
@@ -10095,15 +10092,6 @@ checkAuth();
 })();
 
 </script>
-
-<script id="zatoi-auth-first-paint-cleanup-v14-63-4">
-window.addEventListener("load", () => {
-  requestAnimationFrame(() => {
-    document.documentElement.classList.remove("zatoi-session-present");
-  });
-}, {once:true});
-</script>
-
 </body>
 </html>
 
