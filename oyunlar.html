@@ -969,6 +969,21 @@
   .word-end-box h3{font-size:24px}
 }
 
+
+
+/* V3.4 — Sonuç penceresi kapatıldıktan sonra oyun kartında kalıcı Yeni Oyun */
+.finished-game-actions{
+  width:min(390px,100%);
+  margin:16px auto 2px;
+}
+.finished-game-actions[hidden]{display:none!important}
+.finished-game-actions .primary{
+  width:100%;
+  min-height:50px;
+  font-weight:850;
+  border-radius:14px;
+}
+
 </style></head><body class="zatoi-games-page"><header class="zatoi-global-header">
 <a class="brand" href="./" aria-label="Zatoi ana sayfa">Zatoi<span> ✦</span></a>
 <a class="desktop-back-link" href="./">← Sohbete dön</a>
@@ -980,6 +995,9 @@
 </header><main><div class="eyebrow">ZATOI PLAY / 01</div><h1>Sohbete küçük<br>bir oyun molası.</h1><p class="intro">Reflekslerini dene, kelimeleri çöz veya üç taşı yan yana getir. Bir oyun seç ve başla.</p><nav class="tabs" role="tablist" aria-label="Oyun seç"><button class="tab" id="tab-arena" role="tab" aria-controls="arena" aria-selected="true" data-game="arena"><span class="symbol">✦</span><b>Zatoi Arena</b><small>Enerjiyi topla · Tek kişi</small></button><button class="tab" id="tab-word" role="tab" aria-controls="word" aria-selected="false" data-game="word"><span class="symbol">Aa</span><b>Kelime Düellosu</b><small>Harfleri çöz · İki kişi</small></button><button class="tab" id="tab-xox" role="tab" aria-controls="xox" aria-selected="false" data-game="xox"><span class="symbol">×○</span><b>XOX</b><small>Üçünü birleştir · 1–2 kişi</small></button></nav><div class="workspace"><div class="card">
 <section id="arena" role="tabpanel" aria-labelledby="tab-arena"><div class="row between"><h2>Zatoi Arena</h2><span class="tag">REFLEKS</span></div><p class="muted">Kırmızı engellerden kaç. Turkuaz enerjileri topla.</p><div class="stats"><div class="stat"><strong id="arenaScore">0</strong><span>PUAN</span></div><div class="stat"><strong id="arenaBest">0</strong><span>BU CİHAZDA REKOR</span></div><div class="stat"><strong id="arenaLives">3</strong><span>CAN</span></div></div><div class="stage"><canvas id="canvas" width="640" height="390" aria-label="Engellerden kaçış oyunu. Yön tuşları veya A ve D ile hareket et."></canvas><div id="arenaEndOverlay" class="arena-end-overlay" hidden><div class="arena-end-box"><button id="arenaEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button><h3>Tur tamamlandı!</h3><p id="arenaEndScore">Puanın: 0</p><button id="arenaEndNew" class="primary" type="button">Yeni Oyun</button></div></div></div><div class="controls"><button id="start" class="primary">Başlat</button><button id="pause" disabled>Duraklat</button><div class="directions"><button id="left" aria-label="Sola hareket">←</button><button id="right" aria-label="Sağa hareket">→</button></div></div><p class="note">Bilgisayar: ← → veya A / D. Telefon: ekranda sürükle ya da okları kullan.</p><div id="arenaMobileTouchpad" class="arena-mobile-touchpad is-disabled" aria-label="Mobil hareket alanı"><span class="touchpad-side touchpad-left">←</span><span class="touchpad-side touchpad-right">→</span><span id="arenaTouchKnob" class="touchpad-knob"></span></div></section>
 <section id="word" role="tabpanel" aria-labelledby="tab-word" hidden><div class="row between"><h2>Kelime Düellosu</h2><span class="tag">10 TUR</span></div><p class="muted">Her oyuncuya 5 kelime. Her doğru cevap 10 puan; yanlış cevap veya pas sırasını bitirir.</p><div class="stats"><div class="stat"><strong id="wordScoreA">0</strong><span>OYUNCU 1</span></div><div class="stat"><strong id="wordScoreB">0</strong><span>OYUNCU 2</span></div><div class="stat"><strong id="wordRound">1 / 10</strong><span>TUR</span></div></div><div id="wordStatus" class="status" aria-live="polite"></div><div id="letters" class="letters"></div><p class="center muted" id="hint"></p><form id="wordForm" class="wordform"><label for="answer">Kelimeyi yaz</label><div class="row"><input id="answer" maxlength="40" autocomplete="off" autocapitalize="characters"><button id="answerButton" class="primary">Gönder</button></div><button id="skip" type="button" style="margin-top:10px">Pas geç</button></form><p id="wordLast" class="center note" aria-live="polite"></p>
+<div id="wordFinishedActions" class="finished-game-actions" hidden>
+  <button id="wordRestart" class="primary" type="button">Yeni Oyun</button>
+</div>
 <div id="wordEndOverlay" class="word-end-overlay" hidden aria-hidden="true">
   <div class="word-end-box" role="dialog" aria-modal="true" aria-labelledby="wordEndTitle">
     <button id="wordEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button>
@@ -1010,6 +1028,9 @@
   </div>
 </div>
 <div id="xoxStatus" class="status" aria-live="polite"></div><div id="board" class="board" aria-label="XOX oyun tahtası"></div>
+<div id="xoxFinishedActions" class="finished-game-actions" hidden>
+  <button id="xoxRestart" class="primary" type="button">Yeni Oyun</button>
+</div>
 <div id="xoxEndOverlay" class="xox-end-overlay" hidden aria-hidden="true">
   <div class="xox-end-box" role="dialog" aria-modal="true" aria-labelledby="xoxEndTitle">
     <button id="xoxEndClose" class="arena-end-close" type="button" aria-label="Kapat">×</button>
@@ -1113,8 +1134,8 @@ function showXoxEnd(g){
  overlay.setAttribute('aria-hidden','false');
 }
 function render(){if(selected==='arena')return;let g=current();if(g.kind!==selected)return;let label=g.done?(g.winner===null?'Berabere!':`Oyuncu ${g.winner+1} kazandı!`):(mode==='online'&&!room?'Oda oluştur veya bir odaya katıl.':room&&!room.ready?'İkinci oyuncu bekleniyor…':`Sıra: Oyuncu ${g.turn+1}${g.kind==='xox'?(g.turn===0?' · X':' · O'):''}`);let playable=canPlay(g);
- if(selected==='xox'){$('xoxStatus').textContent=label;$('board').replaceChildren(...g.board.map((v,i)=>{let b=document.createElement('button');b.className='cell '+v.toLowerCase()+(g.line.includes(i)?' win':'');b.textContent=v;b.disabled=!!v||!playable;b.setAttribute('aria-label',`${Math.floor(i/3)+1}. satır, ${i%3+1}. sütun: ${v||'boş'}`);b.onclick=()=>play({cell:i});return b}));if(g.done)showXoxEnd(g)}
- else{$('wordStatus').textContent=label;$('wordScoreA').textContent=g.scores[0];$('wordScoreB').textContent=g.scores[1];$('wordRound').textContent=Math.min(g.round+1,g.total)+' / '+g.total;$('letters').replaceChildren(...[...(g.done?'':g.letters)].map(x=>{let span=document.createElement('span');span.className='letter';span.textContent=x;return span}));$('hint').textContent=g.hint;$('wordLast').textContent=g.last;$('answer').disabled=!playable;$('answerButton').disabled=!playable;$('skip').disabled=!playable;if(g.done)showWordEnd(g)}
+ if(selected==='xox'){$('xoxFinishedActions').hidden=!g.done;$('xoxStatus').textContent=label;$('board').replaceChildren(...g.board.map((v,i)=>{let b=document.createElement('button');b.className='cell '+v.toLowerCase()+(g.line.includes(i)?' win':'');b.textContent=v;b.disabled=!!v||!playable;b.setAttribute('aria-label',`${Math.floor(i/3)+1}. satır, ${i%3+1}. sütun: ${v||'boş'}`);b.onclick=()=>play({cell:i});return b}));if(g.done)showXoxEnd(g)}
+ else{$('wordFinishedActions').hidden=!g.done;$('wordStatus').textContent=label;$('wordScoreA').textContent=g.scores[0];$('wordScoreB').textContent=g.scores[1];$('wordRound').textContent=Math.min(g.round+1,g.total)+' / '+g.total;$('letters').replaceChildren(...[...(g.done?'':g.letters)].map(x=>{let span=document.createElement('span');span.className='letter';span.textContent=x;return span}));$('hint').textContent=g.hint;$('wordLast').textContent=g.last;$('answer').disabled=!playable;$('answerButton').disabled=!playable;$('skip').disabled=!playable;if(g.done)showWordEnd(g)}
  $('create').disabled=busy||!!room;$('join').disabled=busy||!!room;
 }
 function minimax(g,seat){if(g.done)return g.winner===null?0:g.winner===1?10:-10;let scores=[];g.board.forEach((v,i)=>{if(!v){let next=structuredClone(g);move(next,seat,{cell:i});scores.push(minimax(next,1-seat))}});return seat===1?Math.max(...scores):Math.min(...scores)}
@@ -1141,6 +1162,8 @@ $('wordEndNew').onclick=()=>{
   notice('');
   reset();
 };
+$('wordRestart').onclick=()=>{notice('');reset()};
+$('xoxRestart').onclick=()=>{notice('');reset()};
 // Arena uses logical coordinates and delta time; no external assets or libraries.
 const canvas=$('canvas'),ctx=canvas.getContext('2d');let arena={running:false,paused:false,started:false,over:false,x:320,items:[],time:0,spawn:0,score:0,lives:3,inv:0},lastFrame=0,raf=0;let keys={left:false,right:false},best=0;
 try{best=Number(localStorage.getItem(arenaBestKey()))||0}catch{}$('arenaBest').textContent=best;
