@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>KÜL ÇAĞI — v0.5.3</title>
+<title>KÜL ÇAĞI — v0.5.4</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#080a0a;color:#e9e0cb;font-family:system-ui,Segoe UI,sans-serif}
 canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshair}
@@ -30,7 +30,7 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
 <body>
 <canvas id="g"></canvas>
 <div id="hud" class="panel">
- <div class="title">KÜL ÇAĞI · v0.5.3</div>
+ <div class="title">KÜL ÇAĞI · v0.5.4</div>
  <div class="row"><span id="lv"></span><span id="gold"></span></div>
  <div class="bar"><div id="hp" class="fill"></div></div>
  <div class="row"><span id="ht"></span><span id="wep"></span></div>
@@ -65,25 +65,21 @@ addEventListener("resize",resize);resize();
 const K={},M={x:W/2,y:H/2,down:false};
 addEventListener("keydown",e=>{
  K[e.code]=true;
- if(e.code==="KeyI"){ $("#inv").classList.toggle("on"); renderInv(); }
- if(e.code==="KeyE"&&!e.repeat){
-   e.preventDefault();
-   if(zone==="town"){
-     let near=NPCS
-       .map(n=>({n,d:Math.hypot(n.x-P.x,n.y-P.y)}))
-       .filter(o=>o.d<120)
-       .sort((a,b)=>a.d-b.d)[0];
-     if(near){openDialog(near.n);return;}
-     pickup();
-   }else{
-     if(!claimRiftChest())pickup();
-   }
- }
- if(/^Digit[123]$/.test(e.code)){P.weapon=+e.code.slice(-1)-1; say(WEAP[P.weapon].name);}
+ if(e.code==="KeyI"&&!e.repeat){ $("#inv").classList.toggle("on"); renderInv(); }
+ if(/^Digit[123]$/.test(e.code)&&!e.repeat){P.weapon=+e.code.slice(-1)-1;renderWeaponSlots();say(WEAP[P.weapon].name);}
 });
 addEventListener("keyup",e=>K[e.code]=false);
 C.addEventListener("mousemove",e=>{M.x=e.clientX;M.y=e.clientY;$("#cross").style.left=M.x+"px";$("#cross").style.top=M.y+"px"});
-C.addEventListener("mousedown",e=>{if(e.button===0)M.down=true});
+C.addEventListener("mousedown",e=>{
+ if(e.button===0){
+   if(zone==="town"){
+     let wx=e.clientX+cam.x,wy=e.clientY+cam.y;
+     let n=NPCS.find(n=>Math.hypot(n.x-wx,n.y-wy)<38);
+     if(n){openDialog(n);return;}
+   }
+   M.down=true;
+ }
+});
 addEventListener("mouseup",()=>M.down=false);C.oncontextmenu=e=>e.preventDefault();
 
 const WORLD={w:2600,h:1800};
@@ -165,6 +161,18 @@ function openDialog(n){
  } else if(n.id==="sera"){text="Silahın hâlâ iş görür. Ama Ova derinleştikçe ham çelik yetmeyecek. Yakında ocağımı sana açacağım.";act="ANLADIM";}
  else{text="Kül, burada paradan daha değerlidir. Ova'dan sağ dönersen alışveriş yaparız.";act="ANLADIM";}
  $("#dialogName").textContent=n.name;$("#dialogText").textContent=text;$("#dialogAction").textContent=act;$("#dialog").classList.add("on");
+}
+let eLatch=false;
+function interact(){
+ if($("#dialog").classList.contains("on"))return;
+ if(zone==="town"){
+   let near=NPCS.map(n=>({n,d:Math.hypot(n.x-P.x,n.y-P.y)}))
+     .filter(o=>o.d<=130).sort((a,b)=>a.d-b.d)[0];
+   if(near){openDialog(near.n);return;}
+   pickup();
+ }else{
+   if(!claimRiftChest())pickup();
+ }
 }
 function closeDialog(){$("#dialog").classList.remove("on");dialogNpc=null}
 $("#dialogClose").onclick=closeDialog;
@@ -263,6 +271,8 @@ function renderInv(){
 }renderInv();
 
 function update(dt){
+ if(K.KeyE&&!eLatch){eLatch=true;interact();}
+ if(!K.KeyE)eLatch=false;
  P.face=Math.atan2(M.y+cam.y-P.y,M.x+cam.x-P.x);
  P.atk=Math.max(0,P.atk-dt);P.power=Math.max(0,P.power-dt);P.dashCd=Math.max(0,P.dashCd-dt);P.ifr=Math.max(0,P.ifr-dt);
  let dx=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),dy=(K.KeyS||K.ArrowDown?1:0)-(K.KeyW||K.ArrowUp?1:0),l=Math.hypot(dx,dy)||1;
@@ -354,7 +364,7 @@ function draw(){
  $("#atkShade").style.height=(P.atk/WEAP[P.weapon].cd*100)+"%";$("#dashShade").style.height=(P.dashCd/1.15*100)+"%";$("#powShade").style.height=(P.power/WEAP[P.weapon].pCd*100)+"%";
 }
 let last=performance.now();function loop(t){let dt=Math.min(.033,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(loop)}
-setZone("town");questUI();renderWeaponSlots();say("KÜL LİMANI · v0.5.3");requestAnimationFrame(loop);
+setZone("town");questUI();renderWeaponSlots();say("KÜL LİMANI · v0.5.4");requestAnimationFrame(loop);
 })();
 </script>
 </body></html>
