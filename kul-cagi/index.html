@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>KÜL ÇAĞI — v0.6.2 TEST</title>
+<title>KÜL ÇAĞI — ALPHA 0.1</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#080a0a;color:#e9e0cb;font-family:system-ui,Segoe UI,sans-serif}
 canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshair}
@@ -31,7 +31,7 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
 <body>
 <canvas id="g"></canvas>
 <div id="hud" class="panel">
- <div class="title">KÜL ÇAĞI · v0.6.2 TEST</div>
+ <div class="title">KÜL ÇAĞI · ALPHA 0.1</div>
  <div class="row"><span id="lv"></span><span id="gold"></span></div>
  <div class="bar"><div id="hp" class="fill"></div></div>
  <div class="row"><span id="ht"></span><span id="wep"></span></div>
@@ -43,7 +43,7 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
    <div class="skill"><b>Q</b><span id="powerTxt">Özel</span><i id="powShade" class="shade"></i></div>
  </div>
 </div>
-<div id="tips" class="panel">WASD/Oklar: hareket · E: konuş/loot · Sol tık: saldırı · SPACE: sıyrıl · Q: silah yeteneği · I: envanter · 1/2/3: silah</div>
+<div id="tips" class="panel">WASD/Oklar: hareket · E: konuş/loot · Sol tık: saldırı · SPACE: sıyrıl · Q: silah yeteneği · I: envanter · C: karakter · 1/2/3: silah</div>
 <div id="inv" class="panel"></div><div id="toast"></div><div id="cross"></div>
 <div id="zone"></div>
 <div id="weaponSlots" class="panel" style="left:14px;bottom:14px;width:330px;padding:10px;font-size:12px">
@@ -59,9 +59,25 @@ canvas{display:block;width:100vw;height:100vh;background:#111714;cursor:crosshai
  <button data-test="boss">Kırık Muhafız</button>
  <button data-test="reward">Boss Sandığı</button>
  <button data-test="heal">Can / EXP Doldur</button>
+ <button data-test="alpha">Alpha Güç Paketi</button>
  <button data-test="reset">Testi Sıfırla</button>
  <div style="font-size:10px;color:#a99f88;margin-top:8px">Bu panel sadece geliştirme içindir. Oyuncu sürümünde kaldırılacak.</div>
 </div>
+
+<div id="alphaInfo" class="panel" style="position:fixed;z-index:8;left:14px;top:270px;width:300px;padding:10px;font-size:11px;display:none"></div>
+<div id="merchant" class="panel" style="display:none;position:fixed;z-index:110;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 30px));padding:14px">
+ <div class="title">KÜL PAZARI</div><div id="merchantBody"></div>
+ <button id="merchantClose">KAPAT</button>
+</div>
+<div id="forge" class="panel" style="display:none;position:fixed;z-index:110;left:50%;top:50%;transform:translate(-50%,-50%);width:min(540px,calc(100vw - 30px));padding:14px">
+ <div class="title">SERA'NIN OCAĞI</div><div id="forgeBody"></div>
+ <button id="forgeClose">KAPAT</button>
+</div>
+<div id="charPanel" class="panel" style="display:none;position:fixed;z-index:105;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 30px));padding:14px">
+ <div class="title">TOPLAYICI · KARAKTER</div><div id="charBody"></div>
+ <button id="charClose">KAPAT</button>
+</div>
+
 <div id="bossHud" class="panel" style="display:none;position:fixed;z-index:12;left:50%;top:58px;transform:translateX(-50%);width:min(620px,calc(100vw - 40px));padding:10px">
 <div style="display:flex;justify-content:space-between;font-weight:900"><span>KIRIK MUHAFIZ</span><span id="bossPhase">FAZ I</span></div>
 <div style="height:12px;background:#201c18;border:1px solid #675846;margin-top:7px"><div id="bossBar" style="height:100%;width:100%;background:#b58b57"></div></div>
@@ -90,6 +106,8 @@ addEventListener("keydown",e=>{
  interact();
 }
  if(e.code==="KeyI"&&!e.repeat){$("#inv").classList.toggle("on");renderInv();}
+ if(e.code==="KeyC"&&!e.repeat){renderCharacter();$("#charPanel").style.display=$("#charPanel").style.display==="none"?"block":"none";}
+ if(e.code==="KeyH"&&!e.repeat){usePotion();}
  if(/^Digit[123]$/.test(e.code)&&!e.repeat){P.weapon=+e.code.slice(-1)-1;renderWeaponSlots();say(WEAP[P.weapon].name);}
 });
 addEventListener("keyup",e=>{K[e.code]=false});
@@ -163,6 +181,45 @@ function renderWeaponSlots(){
 let rift={state:0,stability:100,x:1300,y:760,timer:0,boss:null,chest:null,claimed:false};
 let guardian={unlocked:false,state:0,boss:null,phase:1,telegraph:null,cool:0,reward:null,won:false};
 const ARENA={x:1300,y:330,r:285};
+
+let alpha={
+ chapter:0, sideKills:0, mini1:false, mini2:false, relics:0,
+ armor:{name:"Yıpranmış Toplayıcı Zırhı",rar:"Sıradan",def:2},
+ charm:{name:"Boş Tılsım",rar:"Sıradan",power:0},
+ stats:{kuvvet:1,ceviklik:1,direnc:1,damar:1},
+ statPoints:0, potions:2, fieldDiscovered:false
+};
+const ALPHA_ENEMIES=[
+ ["Kül Kemireni",38,74,7,10,"#766958",13],
+ ["Solgun Avcı",52,88,10,15,"#596c61",14],
+ ["Kül Tazısı",46,112,9,14,"#75604f",13],
+ ["Köklenmiş",82,48,13,21,"#59624a",18],
+ ["Damar Böceği",35,96,8,13,"#665878",12],
+ ["Toplayıcı Artığı",68,66,12,20,"#6e5e54",16],
+ ["Çatlak",96,55,15,25,"#72534c",19],
+ ["Yara Doğmuş",120,62,18,31,"#745080",21]
+];
+function alphaDamageBonus(){
+ let w=P.weapon;
+ return w===0?alpha.stats.kuvvet*2:w===1?Math.round(alpha.stats.ceviklik*1.8):alpha.stats.damar*2;
+}
+function alphaDefense(){return (alpha.armor?.def||0)+alpha.stats.direnc*1.4}
+function usePotion(){
+ if(alpha.potions<=0||P.hp>=P.max){say(alpha.potions<=0?"İKSİR YOK":"CANIN ZATEN DOLU");return}
+ alpha.potions--;P.hp=Math.min(P.max,P.hp+Math.round(P.max*.45));say("KÜL İKSİRİ KULLANILDI");renderCharacter();saveDev();
+}
+function renderCharacter(){
+ let b=$("#charBody");if(!b)return;
+ b.innerHTML='<div style="line-height:1.8"><b>Seviye '+P.lv+'</b> · Kullanılabilir Stat: <b>'+alpha.statPoints+'</b><br>'+
+ ['kuvvet','ceviklik','direnc','damar'].map(k=>'<button data-stat="'+k+'" '+(alpha.statPoints<=0?'disabled':'')+'>'+k.toUpperCase()+' '+alpha.stats[k]+' +</button>').join(' ')+
+ '<hr><b>Zırh:</b> '+alpha.armor.name+' · Savunma +'+alpha.armor.def+
+ '<br><b>Tılsım:</b> '+alpha.charm.name+' · Güç +'+alpha.charm.power+
+ '<br><b>Kül İksiri:</b> '+alpha.potions+' <button id="drinkPot">KULLAN</button>'+
+ '<hr><b>Silah Ustalığı</b><br>Yarma: '+(equippedWeapons[0].bonus||0)+' · İkiz: '+(equippedWeapons[1].bonus||0)+' · Damar: '+(equippedWeapons[2].bonus||0)+'</div>';
+ b.querySelectorAll("[data-stat]").forEach(x=>x.onclick=()=>{let k=x.dataset.stat;if(alpha.statPoints>0){alpha.statPoints--;alpha.stats[k]++;if(k==="direnc"){P.max+=7;P.hp+=7}renderCharacter();saveDev()}});
+ let p=$("#drinkPot");if(p)p.onclick=usePotion;
+}
+
 const NPCS=[
  {id:"varek",name:"Varek · Gözcü",x:1260,y:760,col:"#b88b58"},
  {id:"sera",name:"Sera · Demirci",x:1415,y:885,col:"#8e6d55"},
@@ -177,6 +234,31 @@ function questUI(){
  let s=quest===0?"Kül Limanı'nda Varek ile konuş.":quest===1?"Solmuş Ova'ya çık ve 5 Kül Kemireni/yaratık avla. ("+questKills+"/5)":quest===2?"Varek'e dön ve keşfini bildir.":"İlk görev tamamlandı. Solmuş Ova'da garip Damar hareketliliğini araştır.";
  $("#questText").textContent=s;
 }
+
+function openMerchant(){
+ let b=$("#merchantBody");
+ b.innerHTML='<p>Orin: “Külün varsa, hayatta kalacak bir şeyler de vardır.”</p>'+
+ '<button data-buy="pot">Kül İksiri · 35 Kül</button> '+
+ '<button data-buy="charm">Damar Tılsımı · 120 Kül</button><p>Külün: <b>'+P.gold+'</b></p>';
+ $("#merchant").style.display="block";
+ b.querySelectorAll("[data-buy]").forEach(x=>x.onclick=()=>{
+   if(x.dataset.buy==="pot"){if(P.gold<35)return say("YETERLİ KÜL YOK");P.gold-=35;alpha.potions++;say("KÜL İKSİRİ ALINDI")}
+   else{if(P.gold<120)return say("YETERLİ KÜL YOK");P.gold-=120;alpha.charm={name:"Damar Tılsımı",rar:"İşlenmiş",power:6};say("DAMAR TILSIMI KUŞANILDI")}
+   openMerchant();renderCharacter();saveDev();
+ });
+}
+function openForge(){
+ let b=$("#forgeBody");
+ b.innerHTML='<p>Sera: “İyi silah bulunur. Büyük silah dövülür.”</p>'+
+ [0,1,2].map(i=>{let it=equippedWeapons[i],cost=45+Math.max(0,it.bonus)*3;return '<button data-forge="'+i+'">'+(i+1)+' · '+WEAP[i].name+' +3 Güç · '+cost+' Kül</button>'}).join('<br><br>')+
+ '<p>Külün: <b>'+P.gold+'</b></p>';
+ $("#forge").style.display="block";
+ b.querySelectorAll("[data-forge]").forEach(x=>x.onclick=()=>{let i=+x.dataset.forge,it=equippedWeapons[i],cost=45+Math.max(0,it.bonus)*3;if(P.gold<cost)return say("YETERLİ KÜL YOK");P.gold-=cost;it.bonus=(it.bonus||0)+3;say(WEAP[i].name+" GÜÇLENDİRİLDİ");renderWeaponSlots();openForge();saveDev()});
+}
+$("#merchantClose").onclick=()=>$("#merchant").style.display="none";
+$("#forgeClose").onclick=()=>$("#forge").style.display="none";
+$("#charClose").onclick=()=>$("#charPanel").style.display="none";
+
 function openDialog(n){
  dialogNpc=n;let text="",act="DEVAM";
  if(n.id==="varek"){
@@ -184,8 +266,8 @@ function openDialog(n){
    else if(quest===1){text="Henüz işin bitmedi Toplayıcı. Ovadaki hareketliliği azalt. ("+questKills+"/5)";act="ANLADIM";}
    else if(quest===2){text="Demek doğruymuş... Yaratıkların damarlarında alışılmadık enerji var. Bu sıradan bir göç değil. Birileri Yaraları uyandırıyor.";act="GÖREVİ TAMAMLA";}
    else{text="Solmuş Ova'yı gözlemlemeye devam et. Kül Limanı'nın sana ihtiyacı olacak.";act="KAPAT";}
- } else if(n.id==="sera"){text="Silahın hâlâ iş görür. Ama Ova derinleştikçe ham çelik yetmeyecek. Yakında ocağımı sana açacağım.";act="ANLADIM";}
- else{text="Kül, burada paradan daha değerlidir. Ova'dan sağ dönersen alışveriş yaparız.";act="ANLADIM";}
+ } else if(n.id==="sera"){text="Ova seni parçalamadan önce silahını ben parçalar, yeniden döverim. Kuşandığın üç silahı burada güçlendirebilirsin.";act="OCAĞI AÇ";}
+ else{text="Kül burada paradan daha değerlidir. İksir ve Damar tılsımı satıyorum.";act="PAZARI AÇ";}
  $("#dialogName").textContent=n.name;$("#dialogText").textContent=text;$("#dialogAction").textContent=act;$("#interactBtn").style.display="none";$("#dialog").classList.add("on");
 }
 function interact(){
@@ -212,9 +294,12 @@ $("#interactBtn").onclick=()=>{
 function closeDialog(){$("#dialog").classList.remove("on");dialogNpc=null}
 $("#dialogClose").onclick=closeDialog;
 $("#dialogAction").onclick=()=>{
- if(dialogNpc?.id==="varek"&&quest===0){quest=1;say("GÖREV ALINDI · OVANIN SESİ");}
- else if(dialogNpc?.id==="varek"&&quest===2){quest=3;P.gold+=40;gain(55);say("GÖREV TAMAMLANDI · OVA'DA BİR ŞEY UYANIYOR");}
- questUI();closeDialog();
+ let id=dialogNpc?.id;
+ if(id==="varek"&&quest===0){quest=1;alpha.chapter=Math.max(alpha.chapter,1);say("GÖREV ALINDI · OVANIN SESİ");}
+ else if(id==="varek"&&quest===2){quest=3;alpha.chapter=Math.max(alpha.chapter,2);P.gold+=40;gain(55);say("GÖREV TAMAMLANDI · OVA'DA BİR ŞEY UYANIYOR");}
+ else if(id==="sera"){closeDialog();openForge();return;}
+ else if(id==="orin"){closeDialog();openMerchant();return;}
+ questUI();closeDialog();saveDev();
 };
 
 
@@ -244,7 +329,7 @@ function claimRiftChest(){
  rift.claimed=true;
  let q=RAR[4],w=WEAP[Math.random()*3|0];
  let it={name:"Yadigâr "+w.name+" · Yara İzi",q,w,bonus:Math.round(16+P.lv*3.2),lv:P.lv};
- P.bag.push(it);P.gold+=75;gain(110);guardian.unlocked=true;renderInv();
+ P.bag.push(it);P.gold+=75;gain(110);guardian.unlocked=true;alpha.chapter=Math.max(alpha.chapter,3);alpha.statPoints++;renderInv();
  say("YADİGÂR BULUNDU · KUZEYDEKİ MÜHÜR KIRILDI");
  rift.chest=null;rift.state=4;return true;
 }
@@ -252,7 +337,7 @@ function claimRiftChest(){
 
 function startGuardian(){
  if(zone!=="field"||!guardian.unlocked||guardian.state!==0||guardian.won)return;
- guardian.state=1;guardian.phase=1;guardian.cool=1.6;
+ guardian.state=1;guardian.phase=1;guardian.cool=1.6;alpha.chapter=Math.max(alpha.chapter,4);
  let hp=1500+P.lv*160;
  guardian.boss={name:"KIRIK MUHAFIZ",x:ARENA.x,y:ARENA.y,hp,max:hp,spd:42,dmg:30+P.lv*2.5,xp:300,col:"#80684f",r:48,elite:true,rift:false,boss:true,guardian:true,atk:0,hit:0,kx:0,ky:0};
  enemies.push(guardian.boss);say("KIRIK MUHAFIZ UYANDI");shake=24;
@@ -266,7 +351,7 @@ function resolveGuardianAttack(){
  let d=Math.hypot(P.x-g.x,P.y-g.y);
  if(d<g.r && P.inv<=0){
    let dmg=(guardian.phase===2?38:27)+P.lv*2;
-   P.hp-=dmg;P.inv=.55;shake=18;text(P.x,P.y-28,"-"+Math.round(dmg),"#ff8275");
+   P.hp-=Math.max(1,dmg-alphaDefense());P.inv=.55;shake=18;text(P.x,P.y-28,"-"+Math.round(dmg),"#ff8275");
  }
  burst(g.x,g.y,guardian.phase===2?"#d06a4f":"#b38a59",guardian.phase===2?34:24);
  guardian.telegraph=null;
@@ -280,8 +365,10 @@ function claimGuardianReward(){
  if(!guardian.reward||Math.hypot(P.x-guardian.reward.x,P.y-guardian.reward.y)>145)return false;
  let wi=Math.random()*3|0,q=RAR[4],w=WEAP[wi];
  let it={name:"Muhafız Yadigârı · "+w.name,q,w,bonus:Math.round(28+P.lv*4.2),lv:P.lv};
- P.bag.push(it);P.gold+=140;gain(220);guardian.reward=null;renderInv();
- say("MUHAFIZ YADİGÂRI · +140 Kül · +220 EXP");return true;
+ P.bag.push(it);P.gold+=140;gain(220);guardian.reward=null;
+ alpha.armor={name:"Kırık Muhafız Zırhı",rar:"Yadigâr",def:18};alpha.statPoints+=3;alpha.chapter=5;
+ renderInv();renderCharacter();saveDev();
+ say("MUHAFIZ YADİGÂRI · YENİ ZIRH · +3 STAT");return true;
 }
 
 function say(s){$("#toast").textContent=s;toast=2}
@@ -299,7 +386,7 @@ function itemDrop(e){
  if(Math.random()<.63){let q=rarity(),w=WEAP[Math.random()*3|0];drops.push({x:e.x,y:e.y,t:0,it:{name:q[0]+" "+w.name,q,w,bonus:Math.round((4+P.lv*2)*q[2]),lv:P.lv}})}
  P.gold+=Math.floor(2+Math.random()*(e.elite?21:8));
 }
-function gain(v){P.xp+=v;while(P.xp>=P.next){P.xp-=P.next;P.lv++;P.next=Math.round(P.next*1.32);P.max+=18;P.hp=P.max;say("SEVİYE "+P.lv+" · DAMAR GÜÇLENİYOR");burst(P.x,P.y,"#e6c76d",25)}}
+function gain(v){P.xp+=v;while(P.xp>=P.next){P.xp-=P.next;P.lv++;alpha.statPoints+=2;P.next=Math.round(P.next*1.32);P.max+=18;P.hp=P.max;say("SEVİYE "+P.lv+" · DAMAR GÜÇLENİYOR");burst(P.x,P.y,"#e6c76d",25)}}
 function damageEnemy(e,d,a,knock=35){e.hp-=d;e.hit=.14;e.kx+=Math.cos(a)*knock;e.ky+=Math.sin(a)*knock;texts.push({x:e.x,y:e.y-20,t:.7,s:Math.round(d),col:"#f0ddad"});burst(e.x,e.y,WEAP[P.weapon].col,5);shake=Math.max(shake,3)}
 function burst(px,py,col,n){for(let i=0;i<n;i++){let a=Math.random()*6.28,s=25+Math.random()*120;fx.push({x:px,y:py,vx:Math.cos(a)*s,vy:Math.sin(a)*s,t:.25+Math.random()*.35,col})}}
 function basic(){let gear=weaponPower();
@@ -308,24 +395,24 @@ function basic(){let gear=weaponPower();
    fx.push({beam:true,x:P.x,y:P.y,a,t:.13,len:w.range,col:w.col});
    let best=null,bd=w.range;
    for(const e of enemies){let dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),da=Math.abs(Math.atan2(Math.sin(Math.atan2(dy,dx)-a),Math.cos(Math.atan2(dy,dx)-a)));if(d<bd&&da<.16){best=e;bd=d}}
-   if(best)damageEnemy(best,w.dmg+P.lv*2+weaponPower(),a,18);
+   if(best)damageEnemy(best,w.dmg+P.lv*2+weaponPower()+alphaDamageBonus()+(alpha.charm?.power||0),a,18);
  }else{
    fx.push({arc:true,x:P.x,y:P.y,a,t:.18,r:w.range,col:w.col});
-   for(const e of enemies){let dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),da=Math.abs(Math.atan2(Math.sin(Math.atan2(dy,dx)-a),Math.cos(Math.atan2(dy,dx)-a)));if(d<w.range+e.r&&da<(P.weapon===0?.72:.55))damageEnemy(e,w.dmg+P.lv*2+weaponPower(),a,P.weapon===0?58:25)}
+   for(const e of enemies){let dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),da=Math.abs(Math.atan2(Math.sin(Math.atan2(dy,dx)-a),Math.cos(Math.atan2(dy,dx)-a)));if(d<w.range+e.r&&da<(P.weapon===0?.72:.55))damageEnemy(e,w.dmg+P.lv*2+weaponPower()+alphaDamageBonus()+(alpha.charm?.power||0),a,P.weapon===0?58:25)}
  }
 }
 function special(){
  if(P.power>0)return;let w=WEAP[P.weapon];P.power=w.pCd;
  if(P.weapon===0){
    say("YER YARAN");fx.push({ring:true,x:P.x,y:P.y,t:.45,r:150,col:w.col});
-   for(const e of enemies){let d=Math.hypot(e.x-P.x,e.y-P.y);if(d<155)damageEnemy(e,w.dmg*1.75+P.lv*3+weaponPower(),Math.atan2(e.y-P.y,e.x-P.x),100)}
+   for(const e of enemies){let d=Math.hypot(e.x-P.x,e.y-P.y);if(d<155)damageEnemy(e,w.dmg*1.75+P.lv*3+weaponPower()+alphaDamageBonus()+(alpha.charm?.power||0),Math.atan2(e.y-P.y,e.x-P.x),100)}
  }else if(P.weapon===1){
    say("GÖLGE ATILIMI");P.ifr=.45;P.x=clamp(P.x+Math.cos(P.face)*175,20,WORLD.w-20);P.y=clamp(P.y+Math.sin(P.face)*175,20,WORLD.h-20);
    fx.push({ring:true,x:P.x,y:P.y,t:.35,r:90,col:w.col});
-   for(const e of enemies){if(Math.hypot(e.x-P.x,e.y-P.y)<95)damageEnemy(e,w.dmg*2.2+P.lv*2+weaponPower(),P.face,60)}
+   for(const e of enemies){if(Math.hypot(e.x-P.x,e.y-P.y)<95)damageEnemy(e,w.dmg*2.2+P.lv*2+weaponPower()+alphaDamageBonus()+(alpha.charm?.power||0),P.face,60)}
  }else{
    say("DAMAR PATLAMASI");let tx=M.x+cam.x,ty=M.y+cam.y;fx.push({ring:true,x:tx,y:ty,t:.5,r:125,col:w.col});
-   for(const e of enemies){if(Math.hypot(e.x-tx,e.y-ty)<130)damageEnemy(e,w.dmg*2+P.lv*3+weaponPower(),Math.atan2(e.y-ty,e.x-tx),70)}
+   for(const e of enemies){if(Math.hypot(e.x-tx,e.y-ty)<130)damageEnemy(e,w.dmg*2+P.lv*3+weaponPower()+alphaDamageBonus()+(alpha.charm?.power||0),Math.atan2(e.y-ty,e.x-tx),70)}
  }
 }
 function pickup(){let bi=-1,bd=85;drops.forEach((o,i)=>{let d=Math.hypot(o.x-P.x,o.y-P.y);if(d<bd){bd=d;bi=i}});if(bi>=0){let o=drops.splice(bi,1)[0];P.bag.push(o.it);say(o.it.name+" alındı");renderInv()}}
@@ -424,6 +511,19 @@ function draw(){
    X.fillStyle="#bca878";X.font="bold 13px system-ui";X.textAlign="center";X.fillText("↓ KÜL LİMANI",1300,WORLD.h-55);
  }
  
+ 
+ if(zone==="field"){
+   X.save();
+   X.fillStyle="#25261f";
+   [[420,430,90,130],[2050,620,120,80],[530,1320,150,70],[1940,1380,95,120],[920,900,70,55],[1680,1020,100,65]].forEach(a=>X.fillRect(a[0],a[1],a[2],a[3]));
+   X.strokeStyle="#51483a";X.lineWidth=5;
+   X.beginPath();X.moveTo(650,250);X.lineTo(720,190);X.lineTo(790,250);X.stroke();
+   X.beginPath();X.moveTo(1850,1180);X.lineTo(1910,1110);X.lineTo(1970,1180);X.stroke();
+   X.fillStyle="#82704c";X.font="bold 12px system-ui";X.textAlign="center";
+   X.fillText("ESKİ TOPLAYICI KAMPI",570,1290);X.fillText("ÇÖKMÜŞ DAMAR TAŞI",1900,1080);
+   X.restore();
+ }
+
  if(zone==="field"&&guardian.unlocked){
    X.save();X.strokeStyle=guardian.won?"#6f8062":"#67513f";X.lineWidth=8;X.beginPath();X.arc(ARENA.x,ARENA.y,ARENA.r,0,7);X.stroke();
    X.strokeStyle="#3b3027";X.lineWidth=2;for(let a=0;a<6.28;a+=.52){X.beginPath();X.moveTo(ARENA.x+Math.cos(a)*(ARENA.r-18),ARENA.y+Math.sin(a)*(ARENA.r-18));X.lineTo(ARENA.x+Math.cos(a)*ARENA.r,ARENA.y+Math.sin(a)*ARENA.r);X.stroke()}X.restore();
@@ -463,6 +563,18 @@ function draw(){
  texts.forEach(t=>{X.globalAlpha=Math.min(1,t.t*2);X.fillStyle=t.col;X.font="bold 14px system-ui";X.textAlign="center";X.fillText(t.s,t.x,t.y)});X.globalAlpha=1;X.restore();
 
  $("#zone").textContent=zone==="town"?"KÜL LİMANI":"SOLMUŞ OVA";
+ 
+ let ai=$("#alphaInfo");
+ if(ai){
+   ai.style.display="block";
+   let obj=alpha.chapter<=1?"Varek'in görevini tamamla."
+    :alpha.chapter===2?"Solmuş Ova'daki Dünya Yarası'nı bul ve kapat."
+    :alpha.chapter===3?"Kuzeyde açılan Kırık Muhafız mührüne git."
+    :alpha.chapter===4?"Kırık Muhafız'ı yen."
+    :"ALPHA BÖLÜMÜ TAMAMLANDI · Kül Limanı'nda ekipmanını geliştir.";
+   ai.innerHTML='<b>ALPHA 0.1 · BÖLÜM '+alpha.chapter+'</b><br>'+obj+'<br><span style="color:#aaa">C: Karakter · H: İksir · TEST: hızlı geçiş</span>';
+ }
+
  let bh=$("#bossHud");
  if(guardian.state===1&&guardian.boss){bh.style.display="block";$("#bossBar").style.width=Math.max(0,guardian.boss.hp/guardian.boss.max*100)+"%";$("#bossPhase").textContent=guardian.phase===1?"FAZ I":"FAZ II · ZIRH KIRILDI";}else bh.style.display="none";
  let rh=$("#riftHud");
@@ -478,7 +590,8 @@ function saveDev(){
      lv:P.lv,xp:P.xp,gold:P.gold,hp:P.hp,max:P.max,quest,questKills,
      bag:P.bag.map(it=>({name:it.name,qi:RAR.indexOf(it.q),wi:WEAP.indexOf(it.w),bonus:it.bonus,lv:it.lv})),
      eq:Object.values(equippedWeapons).map(it=>({name:it.name,qi:RAR.indexOf(it.q),wi:WEAP.indexOf(it.w),bonus:it.bonus,lv:it.lv})),
-     guardianWon:guardian.won,guardianUnlocked:guardian.unlocked
+     guardianWon:guardian.won,guardianUnlocked:guardian.unlocked,
+     alpha:alpha
    }));
  }catch(e){}
 }
@@ -491,6 +604,7 @@ function loadDev(){
    if(Array.isArray(d.bag))P.bag=d.bag.map(revive);
    if(Array.isArray(d.eq)&&d.eq.length===3)d.eq.forEach((o,i)=>equippedWeapons[i]=revive(o));
    guardian.won=!!d.guardianWon;guardian.unlocked=!!d.guardianUnlocked;
+   if(d.alpha){alpha={...alpha,...d.alpha,stats:{...alpha.stats,...(d.alpha.stats||{})}};}
    return true;
  }catch(e){return false}
 }
@@ -511,6 +625,7 @@ function testJump(mode){
    enemies=[];setZone("field");enemies=[];guardian.reward={x:1300,y:520};P.x=1300;P.y=610;say("TEST · MUHAFIZ SANDIĞI");
  }
  if(mode==="heal"){P.hp=P.max;P.xp=Math.max(P.xp,0);P.gold+=100;say("TEST · CAN DOLDU · +100 Kül");}
+ if(mode==="alpha"){P.gold+=500;alpha.potions+=5;alpha.statPoints+=6;P.hp=P.max;say("TEST · ALPHA GÜÇ PAKETİ");}
  if(mode==="reset"){localStorage.removeItem("kulCagiDevSave");location.reload();return;}
  questUI();renderInv();renderWeaponSlots();saveDev();
 }
@@ -520,8 +635,8 @@ $("#testPanel").querySelectorAll("[data-test]").forEach(b=>b.onclick=()=>testJum
 // Autosave development progress every few seconds and on page close.
 setInterval(saveDev,3000);addEventListener("beforeunload",saveDev);
 let hadSave=loadDev();
-setZone("town");questUI();renderWeaponSlots();renderInv();
-say(hadSave?"KAYIT YÜKLENDİ · v0.6.2 TEST":"KÜL LİMANI · v0.6.2 TEST");
+setZone("town");questUI();renderWeaponSlots();renderInv();renderCharacter();
+say(hadSave?"KAYIT YÜKLENDİ · ALPHA 0.1":"KÜL LİMANI · ALPHA 0.1");
 requestAnimationFrame(loop);
 
 })();
