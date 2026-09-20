@@ -520,341 +520,7 @@
   }
 }
 </style>
-
-<style id="zatoi-mobile-global-header-v14-62">
-/* =========================================================
-   V14.62 — MOBİL GLOBAL ZATOI HEADER
-   Oyunlar sayfasındaki standardı AI + Sohbet'e taşır.
-   PC davranışı değiştirilmez.
-   ========================================================= */
-.people-mobile-games-btn{display:none}
-
-@media(max-width:800px){
-  /* Ortak üst bant */
-  #app:not(.people-chat-mode) .chat-top,
-  #app.people-chat-mode .people-mode-top{
-    min-height:84px!important;
-    height:84px!important;
-    box-sizing:border-box!important;
-    background:linear-gradient(90deg,#111116 0%,#211014 100%)!important;
-    border-bottom:1px solid rgba(255,255,255,.10)!important;
-  }
-
-  /* ---------- AI ---------- */
-  #app:not(.people-chat-mode) .chat-top{
-    position:relative!important;
-    padding:0 22px!important;
-    display:flex!important;
-    align-items:center!important;
-  }
-  #app:not(.people-chat-mode) .chat-title{
-    display:block!important;
-    max-width:190px!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-    white-space:nowrap!important;
-    font-weight:800!important;
-  }
-  #app:not(.people-chat-mode) .mobile-history-quick-btn{
-    display:none!important;
-  }
-  #app:not(.people-chat-mode) .ai-mobile-mode-switch.zatoi-mobile-global-actions{
-    position:absolute!important;
-    top:20px!important;
-    right:14px!important;
-    width:auto!important;
-    height:44px!important;
-    display:flex!important;
-    align-items:center!important;
-    gap:8px!important;
-    padding:0!important;
-    margin:0!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-  }
-
-  /* ---------- Sohbet ---------- */
-  #app.people-chat-mode .people-mode-top{
-    position:relative!important;
-    padding:0 166px 0 22px!important;
-    display:flex!important;
-    align-items:center!important;
-  }
-  #app.people-chat-mode .people-mode-brand{
-    display:flex!important;
-    align-items:center!important;
-    min-width:0!important;
-  }
-  #app.people-chat-mode .people-mode-brand strong{
-    font-size:25px!important;
-    line-height:1!important;
-    letter-spacing:-1px!important;
-  }
-  #app.people-chat-mode .people-mode-brand span{
-    display:none!important;
-  }
-
-  /* Oyunlar sayfasındaki marka görünümü: Zatoi + kırmızı parıltı */
-  #app.people-chat-mode .people-mode-brand::before,
-  #app.people-chat-mode .people-mode-brand::after{
-    content:none!important;
-    display:none!important;
-  }
-  #app.people-chat-mode .people-mode-brand strong::after{
-    content:"✦"!important;
-    display:inline-block!important;
-    margin-left:8px!important;
-    color:#ff2345!important;
-    font-size:27px!important;
-    line-height:1!important;
-    vertical-align:-2px!important;
-  }
-
-  /* Sohbette mevcut AI butonunun davranışı aynen korunur */
-  #app.people-chat-mode .people-mode-switch{
-    position:absolute!important;
-    top:20px!important;
-    right:62px!important;
-    width:44px!important;
-    min-width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-    display:block!important;
-    padding:0!important;
-    margin:0!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    overflow:visible!important;
-  }
-  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton{
-    width:44px!important;
-    min-width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-    padding:0!important;
-    border:1px solid rgba(255,255,255,.11)!important;
-    border-radius:50%!important;
-    background:#191b20!important;
-    color:#ff2345!important;
-    -webkit-text-fill-color:#ff2345!important;
-    font-size:0!important;
-    display:grid!important;
-    place-items:center!important;
-  }
-  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton::before{
-    content:"✦"!important;
-    color:#ff2345!important;
-    -webkit-text-fill-color:#ff2345!important;
-    font-size:24px!important;
-    line-height:1!important;
-    opacity:1!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    width:100%!important;
-    height:100%!important;
-    margin:0!important;
-    padding:0!important;
-    position:static!important;
-    transform:none!important;
-  }
-  #app.people-chat-mode .people-mode-switch > #peopleChatModeButton,
-  #app.people-chat-mode .people-mode-switch > .stable-bar-menu-btn,
-  #app.people-chat-mode .people-mode-switch > .zatoi-games-link{
-    display:none!important;
-  }
-
-  /* Oyunlar, AI, hesap: oyun sayfasındaki 44px daire standardı */
-  .zatoi-global-round{
-    width:44px!important;
-    min-width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-    padding:0!important;
-    display:grid!important;
-    place-items:center!important;
-    border:1px solid rgba(255,255,255,.11)!important;
-    border-radius:50%!important;
-    background:#191b20!important;
-    color:#fff!important;
-    text-decoration:none!important;
-    box-sizing:border-box!important;
-    box-shadow:none!important;
-    font-size:18px!important;
-    line-height:1!important;
-  }
-  .zatoi-global-ai{
-    color:#ff4056!important;
-    font-size:24px!important;
-  }
-  .zatoi-global-round:active{transform:scale(.95)}
-
-  #app.people-chat-mode .people-mobile-games-btn{
-    display:grid!important;
-    position:absolute!important;
-    top:20px!important;
-    right:110px!important;
-    z-index:41!important;
-  }
-  #app.people-chat-mode .people-mobile-account-btn{
-    top:20px!important;
-    right:14px!important;
-    width:44px!important;
-    height:44px!important;
-    border:1px solid rgba(255,255,255,.11)!important;
-    border-radius:50%!important;
-    background:#191b20!important;
-  }
-  #app.people-chat-mode .people-mobile-account-avatar{
-    width:36px!important;
-    height:36px!important;
-  }
-
-  /* AI tarafında eski buton metinleri ikon standardına dönüşür */
-  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiChatModeButton,
-  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiAiModeButton,
-  #app:not(.people-chat-mode) .ai-mobile-mode-switch > .zatoi-games-link{
-    font-size:0!important;
-  }
-  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiChatModeButton::before{
-    content:"💬";font-size:18px;
-  }
-  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiAiModeButton::before{
-    content:"✦";font-size:24px;
-  }
-  #app:not(.people-chat-mode) .ai-mobile-mode-switch > .zatoi-games-link::before{
-    content:"🎮";font-size:17px;
-  }
-}
-@media(min-width:801px){
-  .people-mobile-games-btn{display:none!important}
-}
-</style>
-
-
-<style id="zatoi-mobile-chat-header-games-exact-v14-62-1">
-/* Mobil SOHBET üst barı: Oyunlar sayfası geometrisi + AI simgesi tam merkez */
-@media(max-width:800px){
-  #app.people-chat-mode .people-mode-top{
-    height:84px!important;
-    min-height:84px!important;
-    padding:0 166px 0 22px!important;
-    display:flex!important;
-    align-items:center!important;
-    box-sizing:border-box!important;
-    background:linear-gradient(90deg,#111116 0%,#211014 100%)!important;
-    border-bottom:1px solid rgba(255,255,255,.10)!important;
-  }
-
-  #app.people-chat-mode .people-mode-brand strong{
-    font-size:25px!important;
-    line-height:1!important;
-    letter-spacing:-1px!important;
-  }
-
-  #app.people-chat-mode .people-mode-switch{
-    position:absolute!important;
-    top:20px!important;
-    right:62px!important;
-    width:44px!important;
-    min-width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-    min-height:44px!important;
-    max-height:44px!important;
-    margin:0!important;
-    padding:0!important;
-    border:0!important;
-    background:transparent!important;
-    overflow:visible!important;
-  }
-
-  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton{
-    position:relative!important;
-    width:44px!important;
-    min-width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-    min-height:44px!important;
-    max-height:44px!important;
-    margin:0!important;
-    padding:0!important;
-    border:1px solid rgba(255,255,255,.11)!important;
-    border-radius:50%!important;
-    background:#191b20!important;
-    font-size:0!important;
-    line-height:0!important;
-    overflow:hidden!important;
-    box-sizing:border-box!important;
-  }
-
-  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton::before{
-    content:"✦"!important;
-    position:absolute!important;
-    inset:0!important;
-    width:auto!important;
-    height:auto!important;
-    margin:0!important;
-    padding:0!important;
-    display:grid!important;
-    place-items:center!important;
-    transform:none!important;
-    color:#ff2345!important;
-    -webkit-text-fill-color:#ff2345!important;
-    font-size:24px!important;
-    line-height:1!important;
-    text-align:center!important;
-  }
-
-  #app.people-chat-mode .people-mobile-games-btn{
-    top:20px!important;
-    right:110px!important;
-    width:44px!important;
-    min-width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-  }
-
-  #app.people-chat-mode .people-mobile-account-btn{
-    top:20px!important;
-    right:14px!important;
-    width:44px!important;
-    min-width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-  }
-}
-</style>
-
-</he
-<style id="zatoi-mobile-chat-brand-games-exact-v14-62-2">
-/* Mobil Sohbet: soldaki Zatoi markası Oyunlar sayfasındaki .brand ile birebir */
-@media(max-width:800px){
-  #app.people-chat-mode .people-mode-brand strong{
-    font-family:system-ui,sans-serif!important;
-    font-size:25px!important;
-    font-weight:850!important;
-    line-height:1!important;
-    letter-spacing:-1px!important;
-    white-space:nowrap!important;
-  }
-  #app.people-chat-mode .people-mode-brand strong::after{
-    content:"✦"!important;
-    display:inline!important;
-    margin-left:6px!important;
-    color:#ef233c!important;
-    -webkit-text-fill-color:#ef233c!important;
-    font-family:system-ui,sans-serif!important;
-    font-size:25px!important;
-    font-weight:850!important;
-    line-height:1!important;
-    vertical-align:baseline!important;
-  }
-}
-</style>
-ad>
+</head>
 
 <body>
 <a href="#app" class="skip-link" style="position:absolute;left:-9999px;top:0;z-index:99999;padding:12px 20px;background:#60a5fa;color:#fff;border-radius:0 0 8px 0;font-weight:600;">Ana içeriğe geç</a>
@@ -10046,6 +9712,244 @@ checkAuth();
 })();
 </script>
 
+
+<script id="zatoi-mobile-global-header-component">
+/* ZATOI MOBILE GLOBAL HEADER V1
+   Tek mobil header bileşeni: AI + Sohbet + Oyunlar + gelecekteki sayfalar.
+   PC'ye dokunmaz.
+*/
+(() => {
+  "use strict";
+
+  const MOBILE_MAX = 800;
+  const STYLE_ID = "zatoi-mobile-global-header-component-style";
+  const HEADER_CLASS = "zatoi-mobile-global-header-component";
+
+  if (!document.getElementById(STYLE_ID)) {
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = `
+      @media (min-width:801px){.${HEADER_CLASS}{display:none!important}}
+      @media (max-width:800px){
+        .${HEADER_CLASS}{
+          width:100%;height:84px;min-height:84px;padding:0 22px;
+          box-sizing:border-box;display:flex;align-items:center;
+          justify-content:space-between;gap:12px;
+          background:linear-gradient(90deg,#111116 0%,#211014 100%);
+          border-bottom:1px solid rgba(255,255,255,.10);
+          position:relative;z-index:50;
+        }
+        .zmg-brand{
+          display:inline-flex;align-items:center;gap:6px;min-width:0;
+          color:#f5f5f5;text-decoration:none;white-space:nowrap;
+          font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+          font-size:25px;font-weight:850;line-height:1;letter-spacing:-1px;
+        }
+        .zmg-brand-mark{
+          color:#ef233c;font-size:25px;font-weight:850;line-height:1;
+          transform:translateY(1px);
+        }
+        .zmg-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto}
+        .zmg-btn{
+          width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;
+          padding:0;margin:0;border:1px solid rgba(255,255,255,.11);
+          border-radius:50%;background:#191b20;color:#fff;text-decoration:none;
+          box-sizing:border-box;box-shadow:none;display:grid;place-items:center;
+          font:700 18px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+          cursor:pointer;-webkit-tap-highlight-color:transparent;
+        }
+        .zmg-btn:active{transform:scale(.95)}
+        .zmg-btn[data-page="ai"]{color:#ef233c}
+        .zmg-btn[data-page="ai"] .zmg-ai-mark{
+          display:grid;place-items:center;width:100%;height:100%;
+          font-size:24px;line-height:1;color:#ef233c;
+        }
+        .zmg-btn.is-active{
+          border-color:rgba(239,35,60,.48);
+          background:#24161a;
+          box-shadow:inset 0 0 0 1px rgba(239,35,60,.10);
+        }
+        .zmg-avatar{
+          width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+          overflow:hidden;background:#24272e center/cover no-repeat;color:#fff;
+          font-size:16px;font-weight:800;
+        }
+
+        /* Eski mobil header görselleri işlev kaynağı olarak DOM'da kalır ama görünmez. */
+        #app:not(.people-chat-mode) .chat-top > :not(.${HEADER_CLASS}){display:none!important}
+        #app.people-chat-mode .people-mode-top > :not(.${HEADER_CLASS}){display:none!important}
+        #app:not(.people-chat-mode) .chat-top,
+        #app.people-chat-mode .people-mode-top{
+          height:84px!important;min-height:84px!important;padding:0!important;
+          background:transparent!important;border:0!important;
+        }
+        #app:not(.people-chat-mode) .chat-top > .${HEADER_CLASS},
+        #app.people-chat-mode .people-mode-top > .${HEADER_CLASS}{
+          display:flex!important;
+        }
+
+        body.zatoi-games-page > header:not(.${HEADER_CLASS}){display:none!important}
+        body.zatoi-games-page > .${HEADER_CLASS}{display:flex!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function readUser() {
+    try {
+      const raw = localStorage.getItem("zatoi_auth_user_v1");
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  }
+
+  function currentPage() {
+    if (document.body.classList.contains("zatoi-games-page")) return "games";
+    const app = document.getElementById("app");
+    if (app?.classList.contains("people-chat-mode")) return "chat";
+    return "ai";
+  }
+
+  function makeButton(page, label, content) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "zmg-btn";
+    b.dataset.page = page;
+    b.setAttribute("aria-label", label);
+    b.title = label;
+    b.innerHTML = content;
+    return b;
+  }
+
+  function renderHeader(target, page) {
+    if (!target) return;
+    target.querySelectorAll("." + HEADER_CLASS).forEach(x => x.remove());
+
+    const header = document.createElement("div");
+    header.className = HEADER_CLASS;
+    header.dataset.activePage = page;
+
+    const brand = document.createElement("a");
+    brand.className = "zmg-brand";
+    brand.href = "./";
+    brand.setAttribute("aria-label", "Zatoi");
+    brand.innerHTML = `<span>Zatoi</span><span class="zmg-brand-mark">✦</span>`;
+
+    const actions = document.createElement("nav");
+    actions.className = "zmg-actions";
+    actions.setAttribute("aria-label", "Zatoi hızlı geçiş");
+
+    const games = makeButton("games", "Oyunlar", "🎮");
+    const ai = makeButton("ai", "Zatoi AI", `<span class="zmg-ai-mark">✦</span>`);
+    const account = makeButton("account", "Hesap", `<span class="zmg-avatar">Z</span>`);
+
+    if (page === "games") games.classList.add("is-active");
+    if (page === "ai") ai.classList.add("is-active");
+
+    games.addEventListener("click", () => {
+      if (page !== "games") location.href = "./oyunlar.html";
+    });
+
+    ai.addEventListener("click", () => {
+      if (page === "games") {
+        try { sessionStorage.setItem("zatoi_mobile_open_mode", "ai"); } catch {}
+        location.href = "./";
+        return;
+      }
+      document.getElementById("peopleAiModeButton")?.click();
+      document.getElementById("zatoiAiModeButton")?.click();
+    });
+
+    /* Markaya dokunmak sohbet/ana geçişi olarak kullanılır. */
+    brand.addEventListener("click", (e) => {
+      if (page === "games") {
+        e.preventDefault();
+        try { sessionStorage.setItem("zatoi_mobile_open_mode", "chat"); } catch {}
+        location.href = "./";
+      }
+    });
+
+    account.addEventListener("click", () => {
+      const source = document.getElementById("peopleMobileAccountButton");
+      if (source) source.click();
+      else {
+        try { sessionStorage.setItem("zatoi_mobile_open_account", "1"); } catch {}
+        if (page === "games") location.href = "./";
+      }
+    });
+
+    const user = readUser();
+    const avatar = account.querySelector(".zmg-avatar");
+    const name = String(
+      user?.display_name || user?.displayName || user?.username ||
+      user?.name || user?.user?.username || "Z"
+    ).trim();
+    const avatarUrl = String(
+      user?.avatar_url || user?.avatarUrl || user?.avatar ||
+      user?.profile?.avatar_url || ""
+    ).trim();
+
+    if (avatarUrl) {
+      avatar.style.backgroundImage = `url("${avatarUrl.replace(/"/g,"")}")`;
+      avatar.textContent = "";
+    } else {
+      avatar.textContent = (name[0] || "Z").toLocaleUpperCase("tr-TR");
+    }
+
+    actions.append(games, ai, account);
+    header.append(brand, actions);
+    target.prepend(header);
+  }
+
+  function mount() {
+    if (innerWidth > MOBILE_MAX) return;
+
+    const app = document.getElementById("app");
+    if (document.body.classList.contains("zatoi-games-page")) {
+      renderHeader(document.body, "games");
+      return;
+    }
+    if (!app) return;
+
+    const aiTop = app.querySelector(".chat-top");
+    const chatTop = app.querySelector(".people-mode-top");
+    if (aiTop) renderHeader(aiTop, "ai");
+    if (chatTop) renderHeader(chatTop, "chat");
+
+    /* Oyunlardan dönüşte istenen modu aç. */
+    try {
+      const requested = sessionStorage.getItem("zatoi_mobile_open_mode");
+      if (requested === "chat") {
+        sessionStorage.removeItem("zatoi_mobile_open_mode");
+        requestAnimationFrame(() => document.getElementById("zatoiChatModeButton")?.click());
+      } else if (requested === "ai") {
+        sessionStorage.removeItem("zatoi_mobile_open_mode");
+        requestAnimationFrame(() => document.getElementById("peopleAiModeButton")?.click());
+      }
+      if (sessionStorage.getItem("zatoi_mobile_open_account") === "1") {
+        sessionStorage.removeItem("zatoi_mobile_open_account");
+        setTimeout(() => document.getElementById("peopleMobileAccountButton")?.click(), 250);
+      }
+    } catch {}
+  }
+
+  const app = document.getElementById("app");
+  if (app) {
+    new MutationObserver(() => {
+      if (innerWidth > MOBILE_MAX) return;
+      const page = currentPage();
+      document.querySelectorAll("." + HEADER_CLASS).forEach(h => {
+        h.dataset.activePage = page;
+        h.querySelectorAll(".zmg-btn").forEach(b => b.classList.remove("is-active"));
+        h.querySelector(`.zmg-btn[data-page="${page}"]`)?.classList.add("is-active");
+      });
+    }).observe(app, {attributes:true, attributeFilter:["class"]});
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount, {once:true});
+  else mount();
+})();
+
+</script>
 </body>
 </html>
 
