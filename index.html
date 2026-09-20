@@ -549,6 +549,23 @@ html.zatoi-return-session #authScreen{display:none!important;}
 }
 </style>
 
+
+<style id="zatoi-v14-63-7-mobile-ai-header-top-fix">
+@media (max-width:800px){
+  /* AI tarafında eski mobil üst-bar için ayrılmış boşluğu kaldır.
+     Sohbet, Oyunlar ve PC geometrisine dokunmaz. */
+  #app:not(.people-chat-mode) > .chat-column{
+    padding-top:0!important;
+    margin-top:0!important;
+  }
+
+  #app:not(.people-chat-mode) > .chat-column > .chat-top{
+    margin-top:0!important;
+    top:0!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
