@@ -1901,3 +1901,69 @@ loadScores();
 
 </script>
 </body></html>
+<script>
+/* V3.5.3 — MOBİL OYUNLAR MENÜSÜ GÜVENLİK DÜZELTMESİ
+   Tavan Yok kodundan bağımsız çalışır. Mevcut PC düzenine dokunmaz. */
+(()=>{
+  "use strict";
+  function byId(id){return document.getElementById(id)}
+  function isMobile(){return window.matchMedia("(max-width:760px)").matches}
+
+  function closeGames(){
+    const d=byId("mobileGamesDrawer"), b=byId("mobileGameBackdrop");
+    if(d){d.classList.remove("open");d.setAttribute("aria-hidden","true")}
+    if(b){b.classList.remove("open");b.hidden=true}
+  }
+
+  function buildGames(){
+    const list=byId("mobileGameList");
+    if(!list)return;
+    const source=[...document.querySelectorAll('nav.tabs [data-game]')];
+    list.replaceChildren(...source.map(btn=>{
+      const c=document.createElement("button");
+      c.type="button";
+      c.className="mobile-game-choice"+(btn.getAttribute("aria-selected")==="true"?" active":"");
+      c.dataset.game=btn.dataset.game||"";
+      c.innerHTML=btn.innerHTML;
+      c.addEventListener("click",()=>{
+        btn.click();
+        closeGames();
+      });
+      return c;
+    }));
+  }
+
+  function openGames(){
+    if(!isMobile())return;
+    const d=byId("mobileGamesDrawer"), b=byId("mobileGameBackdrop"), q=byId("mobileGameSearch");
+    if(!d||!b)return;
+    buildGames();
+    if(q){q.value="";q.blur()}
+    b.hidden=false;
+    b.classList.add("open");
+    d.classList.add("open");
+    d.setAttribute("aria-hidden","false");
+  }
+
+  /* Capture kullanıyoruz: eski handler bozulsa bile buton kesin açılır. */
+  document.addEventListener("click",e=>{
+    const open=e.target.closest?.("#mobileGamesOpen");
+    if(open){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      openGames();
+      return;
+    }
+    if(e.target.closest?.("#mobileGameBackdrop,[data-close-mobile-drawer]")){
+      closeGames();
+    }
+  },true);
+
+  byId("mobileGameSearch")?.addEventListener("input",e=>{
+    const q=(e.target.value||"").toLocaleLowerCase("tr-TR").trim();
+    document.querySelectorAll("#mobileGameList .mobile-game-choice").forEach(btn=>{
+      btn.hidden=!!q && !(btn.textContent||"").toLocaleLowerCase("tr-TR").includes(q);
+    });
+  });
+})();
+</script>
