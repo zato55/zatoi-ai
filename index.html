@@ -520,6 +520,18 @@
   }
 }
 </style>
+
+<style id="zatoi-auth-boot-no-flash-v14-63-3">
+/* Açılışta auth kontrolü bitene kadar login/app parlamasını engeller. */
+html.zatoi-auth-boot #authScreen,
+html.zatoi-auth-boot #app{
+  visibility:hidden!important;
+}
+</style>
+<script id="zatoi-auth-boot-start-v14-63-3">
+document.documentElement.classList.add("zatoi-auth-boot");
+</script>
+
 </head>
 
 <body>
@@ -10068,6 +10080,26 @@ checkAuth();
 })();
 
 </script>
+
+<script id="zatoi-auth-boot-release-v14-63-3">
+(() => {
+  const reveal = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.documentElement.classList.remove("zatoi-auth-boot");
+      });
+    });
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", reveal, {once:true});
+  } else {
+    reveal();
+  }
+  /* Emniyet: herhangi bir başlangıç hatasında ekran sonsuza kadar gizli kalmasın. */
+  setTimeout(() => document.documentElement.classList.remove("zatoi-auth-boot"), 1200);
+})();
+</script>
+
 </body>
 </html>
 
