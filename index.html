@@ -520,6 +520,190 @@
   }
 }
 </style>
+
+<style id="zatoi-mobile-global-header-v14-62">
+/* =========================================================
+   V14.62 — MOBİL GLOBAL ZATOI HEADER
+   Oyunlar sayfasındaki standardı AI + Sohbet'e taşır.
+   PC davranışı değiştirilmez.
+   ========================================================= */
+.people-mobile-games-btn{display:none}
+
+@media(max-width:800px){
+  /* Ortak üst bant */
+  #app:not(.people-chat-mode) .chat-top,
+  #app.people-chat-mode .people-mode-top{
+    min-height:84px!important;
+    height:84px!important;
+    box-sizing:border-box!important;
+    background:linear-gradient(90deg,#111116 0%,#211014 100%)!important;
+    border-bottom:1px solid rgba(255,255,255,.10)!important;
+  }
+
+  /* ---------- AI ---------- */
+  #app:not(.people-chat-mode) .chat-top{
+    position:relative!important;
+    padding:0 22px!important;
+    display:flex!important;
+    align-items:center!important;
+  }
+  #app:not(.people-chat-mode) .chat-title{
+    display:block!important;
+    max-width:190px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-weight:800!important;
+  }
+  #app:not(.people-chat-mode) .mobile-history-quick-btn{
+    display:none!important;
+  }
+  #app:not(.people-chat-mode) .ai-mobile-mode-switch.zatoi-mobile-global-actions{
+    position:absolute!important;
+    top:20px!important;
+    right:14px!important;
+    width:auto!important;
+    height:44px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  /* ---------- Sohbet ---------- */
+  #app.people-chat-mode .people-mode-top{
+    position:relative!important;
+    padding:0 166px 0 22px!important;
+    display:flex!important;
+    align-items:center!important;
+  }
+  #app.people-chat-mode .people-mode-brand{
+    display:flex!important;
+    align-items:center!important;
+    min-width:0!important;
+  }
+  #app.people-chat-mode .people-mode-brand strong{
+    font-size:25px!important;
+    line-height:1!important;
+    letter-spacing:-1px!important;
+  }
+  #app.people-chat-mode .people-mode-brand span{
+    display:none!important;
+  }
+
+  /* Sohbette mevcut AI butonunun davranışı aynen korunur */
+  #app.people-chat-mode .people-mode-switch{
+    position:absolute!important;
+    top:20px!important;
+    right:62px!important;
+    width:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    height:44px!important;
+    display:block!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton{
+    width:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    height:44px!important;
+    padding:0!important;
+    border:1px solid rgba(255,255,255,.11)!important;
+    border-radius:50%!important;
+    background:#191b20!important;
+    color:#ff4056!important;
+    font-size:0!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+  #app.people-chat-mode .people-mode-switch > #peopleAiModeButton::before{
+    content:"✦"!important;
+    font-size:24px!important;
+    line-height:1!important;
+  }
+  #app.people-chat-mode .people-mode-switch > #peopleChatModeButton,
+  #app.people-chat-mode .people-mode-switch > .stable-bar-menu-btn,
+  #app.people-chat-mode .people-mode-switch > .zatoi-games-link{
+    display:none!important;
+  }
+
+  /* Oyunlar, AI, hesap: oyun sayfasındaki 44px daire standardı */
+  .zatoi-global-round{
+    width:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    height:44px!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    border:1px solid rgba(255,255,255,.11)!important;
+    border-radius:50%!important;
+    background:#191b20!important;
+    color:#fff!important;
+    text-decoration:none!important;
+    box-sizing:border-box!important;
+    box-shadow:none!important;
+    font-size:18px!important;
+    line-height:1!important;
+  }
+  .zatoi-global-ai{
+    color:#ff4056!important;
+    font-size:24px!important;
+  }
+  .zatoi-global-round:active{transform:scale(.95)}
+
+  #app.people-chat-mode .people-mobile-games-btn{
+    display:grid!important;
+    position:absolute!important;
+    top:20px!important;
+    right:110px!important;
+    z-index:41!important;
+  }
+  #app.people-chat-mode .people-mobile-account-btn{
+    top:20px!important;
+    right:14px!important;
+    width:44px!important;
+    height:44px!important;
+    border:1px solid rgba(255,255,255,.11)!important;
+    border-radius:50%!important;
+    background:#191b20!important;
+  }
+  #app.people-chat-mode .people-mobile-account-avatar{
+    width:36px!important;
+    height:36px!important;
+  }
+
+  /* AI tarafında eski buton metinleri ikon standardına dönüşür */
+  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiChatModeButton,
+  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiAiModeButton,
+  #app:not(.people-chat-mode) .ai-mobile-mode-switch > .zatoi-games-link{
+    font-size:0!important;
+  }
+  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiChatModeButton::before{
+    content:"💬";font-size:18px;
+  }
+  #app:not(.people-chat-mode) .ai-mobile-mode-switch > #zatoiAiModeButton::before{
+    content:"✦";font-size:24px;
+  }
+  #app:not(.people-chat-mode) .ai-mobile-mode-switch > .zatoi-games-link::before{
+    content:"🎮";font-size:17px;
+  }
+}
+@media(min-width:801px){
+  .people-mobile-games-btn{display:none!important}
+}
+</style>
+
 </head>
 
 <body>
@@ -682,9 +866,10 @@
         Yeni Sohbet
       </div>
 
-      <div class="zatoi-mode-switch ai-mobile-mode-switch" role="tablist" aria-label="Zatoi modu">
-        <button id="zatoiAiModeButton" class="zatoi-mode-btn active" type="button" role="tab" aria-selected="true">✦ Zatoi AI</button>
-        <button id="zatoiChatModeButton" class="zatoi-mode-btn" type="button" role="tab" aria-selected="false">💬 Sohbet</button>
+      <div class="zatoi-mode-switch ai-mobile-mode-switch zatoi-mobile-global-actions" role="tablist" aria-label="Zatoi hızlı geçiş">
+        <button id="zatoiChatModeButton" class="zatoi-mode-btn zatoi-global-round" type="button" role="tab" aria-selected="false" aria-label="Sohbet" title="Sohbet">💬</button>
+        <button id="zatoiAiModeButton" class="zatoi-mode-btn active zatoi-global-round zatoi-global-ai" type="button" role="tab" aria-selected="true" aria-label="Zatoi AI" title="Zatoi AI">✦</button>
+        <a class="zatoi-games-link zatoi-global-round" href="./oyunlar.html" aria-label="Oyunlar" title="Oyunlar">🎮</a>
       </div>
 
 
@@ -1029,6 +1214,7 @@
         <button class="stable-bar-menu-btn" type="button" aria-expanded="false">👤 <span class="stable-bar-username">Kullanıcı</span> ▾</button>
         <a class="zatoi-games-link" href="./oyunlar.html" aria-label="Oyunlar sayfasını aç">🎮 Oyunlar</a>
       </div>
+      <a class="people-mobile-games-btn zatoi-global-round" href="./oyunlar.html" aria-label="Oyunlara geç" title="Oyunlar">🎮</a>
     </div>
     <aside class="people-active-panel">
       <div class="people-panel-heading">
