@@ -799,9 +799,11 @@ window.addEventListener('storage',checkAccountChange);window.addEventListener('f
     setTimeout(()=>mobileSearch.focus(),180);
   });
   document.getElementById('mobileScoresOpen')?.addEventListener('click',()=>{
+    /* Önce drawer'ı aç: openDrawer() içindeki temizlik skorbordu PC rayına geri koyuyor.
+       Sonra skorbordu mobil gövdeye taşı ve veriyi yenile. */
+    openDrawer(scoresDrawer);
     if(scoreboard && scoresBody) scoresBody.appendChild(scoreboard);
     if(typeof loadScores==='function') loadScores();
-    openDrawer(scoresDrawer);
   });
   mobileSearch?.addEventListener('input',filterMobileGames);
   mobileBackdrop?.addEventListener('click',closeMobileDrawers);
