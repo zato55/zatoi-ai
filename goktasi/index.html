@@ -270,6 +270,23 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
   </div>
 </div>
 
+
+<div class="panel" id="accountPanel">
+  <h3>GÖKTAŞI HESABI</h3><button class="x" data-close="accountPanel">✕</button>
+  <div class="bd">
+    <div id="accountState" style="margin-bottom:12px;line-height:1.45">Hesap durumu kontrol ediliyor…</div>
+    <input id="accountUser" maxlength="24" autocomplete="username" placeholder="KULLANICI ADI"
+      style="width:100%;box-sizing:border-box;margin:5px 0;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
+    <input id="accountPass" type="password" maxlength="128" autocomplete="current-password" placeholder="ŞİFRE (EN AZ 8 KARAKTER)"
+      style="width:100%;box-sizing:border-box;margin:5px 0 10px;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
+    <button class="abtn" id="accountLoginBtn">GİRİŞ YAP</button>
+    <button class="abtn" id="accountRegisterBtn">HESAP OLUŞTUR</button>
+    <button class="abtn" id="accountLogoutBtn" style="display:none">ÇIKIŞ YAP</button>
+    <div style="font-size:11px;opacity:.72;margin-top:10px;line-height:1.45">
+      Mevcut eski bulut karakterin varsa hesap oluştururken önce kopyalanır ve yeni hesapta doğrulanır. Eski kayıt silinmez.
+    </div>
+  </div>
+</div>
 <div id="death"><h2>RUHUN KIRILDI</h2><p id="deathTxt"></p></div>
 <div id="toasts"></div>
 <div id="tip"></div>
@@ -283,7 +300,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
     <div class="soys" id="soys"></div>
     <button id="startBtn">YOLCULUĞA BAŞLA</button>
     <button id="installBtn" type="button">TELEFONA YÜKLE</button>
-    <button id="cloudBtn" type="button">BULUT HESABI / CİHAZ AKTAR</button>
+    <button id="cloudBtn" type="button">HESAP / BULUT KAYIT</button>
     <button id="contBtn" style="display:none"></button>
     <div id="introKeys">Tarayıcında çalışır • otomatik kayıt • ses için bir kez tıkla</div>
   </div>
@@ -293,7 +310,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG
+   Tek dosyalık açık dünya aksiyon-RPG — V4.8 hesap + bulut kayıt
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2041,11 +2058,13 @@ function placeObjects(){
     if(spr)objMap.set(ty*MW+tx,{spr,x,y,cr});
   }
 }
-// ---------- kayıt: yerel + GÖKTAŞI Cloud Save V4.7 / cihaz aktarımı ----------
+// ---------- kayıt: yerel + GÖKTAŞI Cloud Save V4.8 / kullanıcı adı + şifre ----------
 const SAVE_KEY='goktasi_kayit1';
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
-const CLOUD_AUTH_KEY='goktasi_cloud_auth_v1';
+const LEGACY_AUTH_KEY='goktasi_cloud_auth_v1';
+const USER_SESSION_KEY='goktasi_user_session_v3';
 let cloudAuth=null,cloudReady=false,cloudBusy=false,cloudDirty=false,cloudTimer=0;
+let accountUser=null;
 
 function makeSaveData(){
   return {
@@ -2060,173 +2079,204 @@ function applySaveData(d){
   Object.assign(P,{name:d.name,soy:d.soy,lvl:d.lvl,exp:d.exp,stat:d.stat,pts:d.pts,money:d.money,
     inv:d.inv,eq:d.eq,x:d.x,y:d.y,qStep:d.qStep,qRep:d.qRep||0,kills:d.kills,playT:d.playT||0,
     stoneN:d.stoneN||0,talkedB:d.talkedB,qActive:d.qActive||null,qN:d.qN||0});
-  P.tx=P.x;P.ty=P.y;
-  return true;
+  P.tx=P.x;P.ty=P.y; return true;
 }
 function saveLocal(data){
   try{localStorage.setItem(SAVE_KEY,JSON.stringify(data||makeSaveData()));return true;}catch(e){return false;}
 }
 function save(){
   if(!started)return;
-  const data=makeSaveData();
-  saveLocal(data);
-  cloudDirty=true;
-  scheduleCloudSave();
+  const data=makeSaveData(); saveLocal(data);
+  if(cloudReady){cloudDirty=true;scheduleCloudSave();}
 }
 function load(){
   try{return applySaveData(JSON.parse(localStorage.getItem(SAVE_KEY)));}catch(e){return false;}
 }
 function scheduleCloudSave(){
   if(!cloudReady||cloudBusy||!cloudDirty)return;
-  clearTimeout(cloudTimer);
-  cloudTimer=setTimeout(()=>cloudSave(false),1200);
+  clearTimeout(cloudTimer); cloudTimer=setTimeout(()=>cloudSave(false),1200);
 }
-async function cloudFetch(path,opt={}){
+async function apiFetch(path,opt={},tokenOverride){
   const headers={...(opt.headers||{})};
-  if(cloudAuth?.token)headers.Authorization='Bearer '+cloudAuth.token;
+  const tok=tokenOverride||cloudAuth?.token;
+  if(tok)headers.Authorization='Bearer '+tok;
   if(opt.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
   const r=await fetch(CLOUD_API+path,{...opt,headers});
   let j=null;try{j=await r.json();}catch(e){}
   if(!r.ok||!j?.ok)throw new Error(j?.error||('HTTP '+r.status));
   return j;
 }
-async function ensureCloudAccount(){
-  try{cloudAuth=JSON.parse(localStorage.getItem(CLOUD_AUTH_KEY)||'null');}catch(e){cloudAuth=null;}
-  if(cloudAuth?.token&&cloudAuth?.user_id)return true;
-  const j=await cloudFetch('/register',{method:'POST',body:'{}'});
-  cloudAuth={user_id:j.user_id,token:j.token};
-  localStorage.setItem(CLOUD_AUTH_KEY,JSON.stringify(cloudAuth));
-  return true;
+function readSession(){
+  try{
+    const s=JSON.parse(localStorage.getItem(USER_SESSION_KEY)||'null');
+    return s?.token?s:null;
+  }catch(e){return null;}
+}
+function storeSession(j){
+  cloudAuth={token:j.session.token,user_id:j.user.id,username:j.user.username,expires_at:j.session.expires_at};
+  accountUser={id:j.user.id,username:j.user.username};
+  localStorage.setItem(USER_SESSION_KEY,JSON.stringify(cloudAuth));
+}
+function clearSession(){
+  localStorage.removeItem(USER_SESSION_KEY); cloudAuth=null;accountUser=null;cloudReady=false;
+}
+function readLegacyAuth(){
+  try{
+    const a=JSON.parse(localStorage.getItem(LEGACY_AUTH_KEY)||'null');
+    return a?.token&&a?.user_id?a:null;
+  }catch(e){return null;}
 }
 async function cloudSave(showMessage=false){
   if(!started||!cloudReady||cloudBusy||!cloudAuth?.token)return false;
   cloudBusy=true;
   try{
-    const data=makeSaveData();
-    saveLocal(data);
-    const j=await cloudFetch('/save',{method:'POST',body:JSON.stringify({character_name:P.name||'',level:P.lvl||1,save_data:data})});
+    const data=makeSaveData(); saveLocal(data);
+    const j=await apiFetch('/save',{method:'POST',body:JSON.stringify({
+      character_name:P.name||'',level:P.lvl||1,save_data:data
+    })});
     cloudDirty=false;
-    if(showMessage&&typeof toast==='function')toast('Bulut kayıt tamamlandı');
+    if(showMessage)toast('Bulut kayıt tamamlandı');
     return j;
   }catch(e){
-    cloudDirty=true;
-    if(showMessage&&typeof toast==='function')toast('Bulut kayıt başarısız — yerel kayıt güvende');
-    console.warn('GÖKTAŞI cloud save:',e);
-    return false;
+    cloudDirty=true;if(showMessage)toast('Bulut kayıt başarısız — cihaz kaydı güvende');
+    console.warn('GÖKTAŞI cloud save:',e);return false;
   }finally{cloudBusy=false;}
 }
-async function initCloudSave(){
-  try{
-    await ensureCloudAccount();
-    cloudReady=true;
-    const localRaw=localStorage.getItem(SAVE_KEY);
-    let local=null;try{local=localRaw?JSON.parse(localRaw):null;}catch(e){}
-    const remote=await cloudFetch('/load');
-    if(local&&local.v===1){
-      // Mevcut oyuncunun cihaz kaydı ilk bağlantıda asla ezilmez; önce buluta yedeklenir.
-      cloudDirty=true;
-      await cloudSave(false);
-    }else if(remote.found&&remote.save?.data?.v===1){
-      saveLocal(remote.save.data);
-      // Intro henüz açıksa devam butonunu yenilemek için sayfa yenilenmeden de yerel kayıt hazır olur.
+function saveTime(d,fallback=0){return Number(d?.savedAt)||Number(fallback)||0;}
+async function syncAccountCloud(){
+  const remote=await apiFetch('/load');
+  let local=null;try{local=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch(e){}
+  if(remote.found&&remote.save?.data?.v===1){
+    const rd=remote.save.data;
+    if(!local||local.v!==1||saveTime(rd,remote.save.updated_at)>saveTime(local)){
+      saveLocal(rd);
+      return {source:'cloud',data:rd};
     }
+  }
+  if(local?.v===1){
+    // Yerel kayıt daha yeniyse veya bulutta kayıt yoksa hesabın bulutuna kopyala.
+    const j=await apiFetch('/save',{method:'POST',body:JSON.stringify({
+      character_name:local.name||'',level:local.lvl||1,save_data:local
+    })});
+    return {source:'local',data:local,saved:j};
+  }
+  return {source:'none',data:null};
+}
+async function initCloudSave(){
+  const s=readSession();
+  if(!s){cloudReady=false;updateAccountUI();return;}
+  cloudAuth=s;
+  try{
+    const me=await apiFetch('/auth/me');
+    accountUser=me.user;cloudReady=true;
+    await syncAccountCloud();
   }catch(e){
-    cloudReady=false;
-    console.warn('GÖKTAŞI cloud init:',e);
+    console.warn('GÖKTAŞI V4.8 session:',e);
+    clearSession();
+  }
+  updateAccountUI();
+}
+function accountStateText(){
+  if(cloudReady&&accountUser)return 'Giriş yapıldı: '+accountUser.username+' · Bulut kayıt aktif.';
+  return 'Giriş yapılmadı. Cihaz kaydı çalışır; bulut senkronizasyonu için giriş yap.';
+}
+function updateAccountUI(){
+  const s=$('accountState');if(s)s.textContent=accountStateText();
+  const out=$('accountLogoutBtn');if(out)out.style.display=cloudReady?'block':'none';
+  const login=$('accountLoginBtn'),reg=$('accountRegisterBtn');
+  if(login)login.style.display=cloudReady?'none':'block';
+  if(reg)reg.style.display=cloudReady?'none':'block';
+  updateCloudPanel();
+}
+function openAccountPanel(){updateAccountUI();$('accountPanel').classList.add('on');}
+async function loginAccount(){
+  const username=$('accountUser').value.trim(),password=$('accountPass').value;
+  if(!username||!password){toast('Kullanıcı adı ve şifre gerekli');return;}
+  try{
+    const j=await apiFetch('/auth/login',{method:'POST',body:JSON.stringify({username,password})},'');
+    storeSession(j);cloudReady=true;
+    await syncAccountCloud();$('accountPass').value='';
+    toast('Giriş başarılı');updateAccountUI();
+    // Buluttan daha yeni kayıt geldiyse intro devam düğmesi yenilensin.
+    refreshContinueButton();
+  }catch(e){toast(e.message||'Giriş başarısız');}
+}
+async function registerAccount(){
+  const username=$('accountUser').value.trim(),password=$('accountPass').value;
+  if(!username||!password){toast('Kullanıcı adı ve şifre gerekli');return;}
+  let legacyData=null,legacyUpdated=0;
+  const legacy=readLegacyAuth();
+  // Eski Lv karakteri önce RAM'e alınır. Eski kayıt sunucudan silinmez.
+  if(legacy){
+    try{
+      const old=await apiFetch('/load',{},legacy.token);
+      if(old.found&&old.save?.data?.v===1){legacyData=old.save.data;legacyUpdated=old.save.updated_at||0;}
+    }catch(e){console.warn('Eski bulut kayıt okunamadı:',e);}
+  }
+  let local=null;try{local=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch(e){}
+  try{
+    const j=await apiFetch('/auth/register',{method:'POST',body:JSON.stringify({username,password})},'');
+    storeSession(j);cloudReady=true;
+    // Eski bulut ve cihaz kaydından daha yeni olanı seç.
+    let chosen=null;
+    if(legacyData?.v===1)chosen=legacyData;
+    if(local?.v===1&&(!chosen||saveTime(local)>=saveTime(chosen,legacyUpdated)))chosen=local;
+    if(chosen){
+      await apiFetch('/save',{method:'POST',body:JSON.stringify({
+        character_name:chosen.name||'',level:chosen.lvl||1,save_data:chosen
+      })});
+      // Yeni hesapta gerçekten okunabildiğini doğrula; eski kayıt hâlâ yerinde.
+      const verify=await apiFetch('/load');
+      if(!verify.found||verify.save?.data?.v!==1)throw new Error('Karakter aktarımı doğrulanamadı');
+      saveLocal(verify.save.data);
+    }
+    $('accountPass').value='';
+    toast(chosen?'Hesap oluşturuldu — karakter bağlandı':'Hesap oluşturuldu');
+    updateAccountUI();refreshContinueButton();
+  }catch(e){
+    // Hesap oluşturulup aktarımın sonraki adımı hata verdiyse oturumu koruyoruz;
+    // böylece kullanıcı hesabına tekrar girebilir, veri kaybı olmaz.
+    toast(e.message||'Hesap oluşturulamadı');updateAccountUI();
   }
 }
-function getCloudTransferCode(){
-  if(!cloudAuth?.user_id||!cloudAuth?.token)return '';
-  const raw=JSON.stringify({v:1,user_id:cloudAuth.user_id,token:cloudAuth.token});
-  const bytes=new TextEncoder().encode(raw);
-  let bin='';for(const b of bytes)bin+=String.fromCharCode(b);
-  return 'GOKTASI1-'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+async function logoutAccount(){
+  if(started&&cloudReady)await cloudSave(false);
+  try{if(cloudAuth?.token)await apiFetch('/auth/logout',{method:'POST'});}catch(e){}
+  clearSession();toast('Hesaptan çıkıldı');updateAccountUI();
 }
-function parseCloudTransferCode(code){
-  try{
-    code=String(code||'').trim();
-    if(!code.startsWith('GOKTASI1-'))return null;
-    let b64=code.slice(9).replace(/-/g,'+').replace(/_/g,'/');
-    while(b64.length%4)b64+='=';
-    const bin=atob(b64),bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
-    const d=JSON.parse(new TextDecoder().decode(bytes));
-    if(d?.v!==1||!d?.user_id||!d?.token)return null;
-    return {user_id:String(d.user_id),token:String(d.token)};
-  }catch(e){return null;}
+function refreshContinueButton(){
+  const cb=$('contBtn'),raw=localStorage.getItem(SAVE_KEY);
+  if(!cb||!raw)return;
+  try{const d=JSON.parse(raw);cb.style.display='block';cb.textContent='Devam et — '+d.name+' (Lv '+d.lvl+')';}catch(e){}
 }
+// Eski V4.7 panelini hesap durum paneli olarak tutuyoruz.
 function cloudStatusText(){
-  if(!cloudReady)return 'Bulut bağlantısı hazır değil. İnternet bağlantını kontrol et.';
-  const id=cloudAuth?.user_id?cloudAuth.user_id.slice(0,8)+'…':'—';
-  return 'Bulut bağlantısı aktif. Hesap: '+id+
-    (started?' · '+(P.name||'Karakter')+' Lv '+(P.lvl||1):'');
+  if(cloudReady&&accountUser)return 'Hesap: '+accountUser.username+' · Bulut kayıt aktif'+(started?' · '+(P.name||'Karakter')+' Lv '+(P.lvl||1):'');
+  return 'Bulut kayıt için kullanıcı adı ve şifreyle giriş yap.';
 }
 function updateCloudPanel(){
   const s=$('cloudStatus');if(s)s.textContent=cloudStatusText();
-}
-function openCloudPanel(){
-  updateCloudPanel();
-  $('cloudPanel').classList.add('on');
-}
-async function importCloudTransferCode(){
-  const code=prompt('Diğer cihazdaki GÖKTAŞI aktarım kodunu buraya yapıştır:');
-  if(!code)return;
-  const incoming=parseCloudTransferCode(code);
-  if(!incoming){toast('Geçersiz aktarım kodu');return;}
-  const previous=cloudAuth;
-  try{
-    cloudAuth=incoming;
-    const remote=await cloudFetch('/load');
-    if(!remote.found||remote.save?.data?.v!==1){
-      cloudAuth=previous;
-      toast('Bu hesapta geçerli karakter kaydı bulunamadı');
-      return;
-    }
-    const rd=remote.save.data;
-    const localRaw=localStorage.getItem(SAVE_KEY);
-    let local=null;try{local=localRaw?JSON.parse(localRaw):null;}catch(e){}
-    if(local?.v===1){
-      const localTime=Number(local.savedAt)||0;
-      const remoteTime=Number(rd.savedAt)||Number(remote.save.updated_at)||0;
-      const msg='Bu cihazda '+(local.name||'karakter')+' Lv '+(local.lvl||1)+
-        ' kaydı var.\n\nBuluttaki '+(rd.name||'karakter')+' Lv '+(rd.lvl||1)+
-        ' kaydı bu cihaza getirilecek.'+
-        (remoteTime<localTime?'\n\nDikkat: cihazdaki kayıt daha yeni görünüyor.':'')+
-        '\n\nDevam edilsin mi?';
-      if(!confirm(msg)){cloudAuth=previous;return;}
-    }
-    localStorage.setItem(CLOUD_AUTH_KEY,JSON.stringify(incoming));
-    cloudAuth=incoming;cloudReady=true;
-    saveLocal(rd);
-    toast('Bulut karakteri bu cihaza aktarıldı');
-    setTimeout(()=>location.reload(),650);
-  }catch(e){
-    cloudAuth=previous;
-    toast('Aktarım kodu doğrulanamadı');
-    console.warn('GÖKTAŞI transfer:',e);
-  }
+  const codeBtn=$('cloudCodeBtn'),importBtn=$('cloudImportBtn'),codeBox=$('cloudCodeBox');
+  if(codeBtn)codeBtn.style.display='none';
+  if(importBtn)importBtn.style.display='none';
+  if(codeBox)codeBox.style.display='none';
 }
 function bindCloudUI(){
-  const b=$('cloudBtn');if(b)b.onclick=openCloudPanel;
+  const b=$('cloudBtn');if(b)b.onclick=openAccountPanel;
   const sn=$('cloudSaveNowBtn');if(sn)sn.onclick=async()=>{
+    if(!cloudReady){openAccountPanel();return;}
     if(!started){toast('Önce karakteri aç');return;}
     cloudDirty=true;await cloudSave(true);updateCloudPanel();
   };
-  const cb=$('cloudCodeBtn');if(cb)cb.onclick=()=>{
-    const code=getCloudTransferCode();
-    if(!code){toast('Bulut hesabı henüz hazır değil');return;}
-    $('cloudCodeText').value=code;$('cloudCodeBox').style.display='block';
-  };
-  const cp=$('cloudCopyBtn');if(cp)cp.onclick=async()=>{
-    const code=$('cloudCodeText').value;if(!code)return;
-    try{await navigator.clipboard.writeText(code);toast('Aktarım kodu kopyalandı');}
-    catch(e){$('cloudCodeText').select();toast('Kodu seçtim — kopyalayabilirsin');}
-  };
-  const im=$('cloudImportBtn');if(im)im.onclick=importCloudTransferCode;
+  const login=$('accountLoginBtn');if(login)login.onclick=loginAccount;
+  const reg=$('accountRegisterBtn');if(reg)reg.onclick=registerAccount;
+  const out=$('accountLogoutBtn');if(out)out.onclick=logoutAccount;
 }
 addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData());});
 setInterval(save,15000);
 bindCloudUI();
-initCloudSave().finally(updateCloudPanel);
+initCloudSave();
+
 // ---------- intro / başlangıç ----------
 const SOYS=[{k:'kurt',n:'Kurt Soyu',d:'+6 Güç — sürünün dişi, savaşın kılıcı'},
   {k:'dag',n:'Dağ Soyu',d:'+6 Beden — rüzgar eğilir, dağ eğilmez'},
