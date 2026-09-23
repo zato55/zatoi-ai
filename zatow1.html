@@ -90,7 +90,7 @@ canvas{width:100%;height:100%;display:block;touch-action:none}
 <body>
 <div class="app">
 <header>
-<div class="brand">ZATO EVRENİ <b>GENESIS</b> <small>V6.73 · DEMOGRAFİK KURTARMA PENCERESİ LABORATUVARI</small></div>
+<div class="brand">ZATO EVRENİ <b>GENESIS</b> <small>V6.73.1 · DEMOGRAFİK KURTARMA PENCERESİ LABORATUVARI</small></div>
 <div class="stats">
 <span class="pill">Nüfus <strong id="pop">0</strong></span>
 <span class="pill">Nesil <strong id="gen">1</strong></span>
@@ -2717,7 +2717,6 @@ function spatialLines663(){
 // Fizik, ekoloji, davranış, üreme ve V6.70 doğal yaşlanma aynen korunur.
 // Amaç: düşük nüfustan GERİ DÖNEN ve YOK OLUŞLA biten darboğazları aynı evrende karşılaştırmak.
 let bottleneck672={armed:false,active:null,cycles:[],nextId:1,thresholds:[20,10,5,3,2,1],maxNoBirthGapSurvived:0,audit:{duplicateThreshold:0,badRecovery:0}};
-rescue673={armed:false,active:null,episodes:[],nextId:1,audit:{duplicateStart:0,badOrder:0},birthMarks:0};
 function bnSnap672(label){
  const pop=zatos.length, maturePlants=plants.filter(p=>p.alive!==false&&p.age>=p.maturity).length;
  let age=0,minAge=Infinity,maxAge=0,energy=0,lon=0,o40=0,fertile=0,allGates=0,mealOK=0,energyOK=0;
@@ -3596,7 +3595,7 @@ function researchBlackBoxReport(){
   return `${k}: episod ${g.episodes} · algı ${p(g.sensed,g.episodes)} · yeme ${p(g.ate,g.episodes)} · toparlanma ${p(g.recovered,g.episodes)} · açken ölüm ${p(g.died,g.episodes)}`;
  });
  const lines=[
-  'ZATO EVRENİ GENESIS V6.73 — ARAŞTIRMA KARA KUTUSU',
+  'ZATO EVRENİ GENESIS V6.73.1 — ARAŞTIRMA KARA KUTUSU',
   `Durum: ${extinctionRecorded?'YOK OLUŞTA DONDURULDU':'CANLI / GÜNCELLENİYOR'}`,
   `Evren: ${universeId} | Süre: ${Math.floor((officialExtinctionTick??tick)/300)} gün | Müdahale: ${interventionCount}`,
   '',
@@ -4091,7 +4090,7 @@ decision642={individuals:0,decisions:0,success:0,abandon:0,updates:0,qDeltaAbs:0
 quality641={individuals:0,targets:0,completed:0,eaten:0,abandoned:0,totalTicks:0,totalPath:0,totalStartDist:0,totalSwitches:0,earlyN:0,earlyComplete:0,earlyEat:0,earlyTicks:0,earlyPath:0,lateN:0,lateComplete:0,lateEat:0,lateTicks:0,latePath:0,byGen:Object.create(null)};
 micro640={individuals:0,samples:0,approach:0,away:0,lost:0,earlyN:0,earlyGood:0,lateN:0,lateGood:0,updates:0,qDeltaAbs:0,byGen:Object.create(null)};
 learn639={individuals:0,episodes:0,earlyN:0,earlyRecovered:0,earlyAte:0,lateN:0,lateRecovered:0,lateAte:0,outcomeUpdates:0,positiveUpdates:0,negativeUpdates:0,qDeltaAbs:0,byGen:Object.create(null)};
-for(let i=0;i<42;i++)makeZato();for(let i=0;i<95;i++)addFood();for(let i=0;i<28;i++)addWater();seedFoodPatches();eraBase=eraSnapshot();log('Genesis V6.73: demografik kurtarma penceresi laboratuvarı aktif. V6.72 darboğaz ölçümü korunur; yeni katman yalnız pasif ölçümdür. V6.70 doğal yaşlanma korunur; yeni katman yalnız ölçümdür. 40 günlük kesin ölüm duvarı kaldırıldı; yalnız yaşlanma kuralı değiştirildi.  200+ Zato için çizim ve panel güncellemeleri adaptif olarak seyreltilir; fizik/yaşam adımları eksiltilmez. Öğrenme artık gerçek ihtiyaç zinciriyle ölçülür: ihtiyaç → algı → yönelme → erişim → çözüm; ilk deneyimler sonraki deneyimlerle ve sosyal gözlem öncesi/sonrasıyla karşılaştırılır. Araştırma ölçümleri tek kara kutuda toplanır ve tek tıkla kopyalanabilir. Her Zato boş deneyim belleğiyle doğar. Bebeklikte yüksek keşif, deneyimle bağlamsal karar öğrenmesi, ödül/tahmin hatası, mekânsal hafıza ve sınırlı sosyal gözlem birlikte çalışır. Öğrenilmiş anılar kalıtılmaz; yalnızca öğrenme eğilimleri genetik olabilir. Kara kutular yok oluş anında kesin olarak donar.',true)}
+for(let i=0;i<42;i++)makeZato();for(let i=0;i<95;i++)addFood();for(let i=0;i<28;i++)addWater();seedFoodPatches();eraBase=eraSnapshot();log('Genesis V6.73.1: demografik kurtarma penceresi laboratuvarı aktif. V6.72 darboğaz ölçümü korunur; yeni katman yalnız pasif ölçümdür. V6.70 doğal yaşlanma korunur; yeni katman yalnız ölçümdür. 40 günlük kesin ölüm duvarı kaldırıldı; yalnız yaşlanma kuralı değiştirildi.  200+ Zato için çizim ve panel güncellemeleri adaptif olarak seyreltilir; fizik/yaşam adımları eksiltilmez. Öğrenme artık gerçek ihtiyaç zinciriyle ölçülür: ihtiyaç → algı → yönelme → erişim → çözüm; ilk deneyimler sonraki deneyimlerle ve sosyal gözlem öncesi/sonrasıyla karşılaştırılır. Araştırma ölçümleri tek kara kutuda toplanır ve tek tıkla kopyalanabilir. Her Zato boş deneyim belleğiyle doğar. Bebeklikte yüksek keşif, deneyimle bağlamsal karar öğrenmesi, ödül/tahmin hatası, mekânsal hafıza ve sınırlı sosyal gözlem birlikte çalışır. Öğrenilmiş anılar kalıtılmaz; yalnızca öğrenme eğilimleri genetik olabilir. Kara kutular yok oluş anında kesin olarak donar.',true)}
 
 // V6.29 — eski dağınık araştırma kartlarını gizle; verileri tek kara kutuda tut.
 const legacyResearchTitles=[
