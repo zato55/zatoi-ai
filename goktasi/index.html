@@ -361,20 +361,68 @@ const SKILLS=[
   {n:'Toprak Zırhı',key:'4',cd:30,sp:20,ic:'sk4',d:'10 saniye savunma +%45.'},
   {n:'Kurt Ruhu',key:'5',cd:36,sp:24,ic:'sk5',d:'10 saniye hız +%30, hasar +%25.'}
 ];
+const CHAPTERS=[
+  {n:'I — Çanın Sesi',from:1,to:8},{n:'II — Sarı Ormanın Gölgesi',from:9,to:16},
+  {n:'III — Tuzdaki İzler',from:17,to:24},{n:'IV — Ayazın Altındaki Kemik',from:25,to:32},
+  {n:'V — Kara Bataklığın Nefesi',from:33,to:40},{n:"VI — Erlik'in Ağzı",from:41,to:48}
+];
 const CHAIN=[
   null,
-  {n:'Kurt Hesabı',d:'Kavruk Ova\'daki kurtlar sürüleri dağıttı. Altı tanesini avla.',t:'hunt',m:'kurt',c:6,rw:{exp:150,mo:60,it:[['kavruk',1]]}},
+  {n:'Kurt Hesabı',d:'Kavruk Ova’daki kurtlar sürüleri dağıttı. Altı tanesini avla.',t:'hunt',m:'kurt',c:6,rw:{exp:150,mo:60,it:[['kavruk',1]]}},
   {n:'Azma Topla',d:'Yaban domuzlarının azması ilacıma lazım. Beş azma getir.',t:'col',m:'azma',c:5,rw:{exp:280,it:[['hpk',5]]}},
-  {n:'Çürük Çorba',d:'Çürük Toprak ova\'ya yayılıyor. On tanesini temizle.',t:'hunt',m:'toprak',c:10,rw:{exp:520,mo:140,pts:2}},
-  {n:'Örsün Dili',d:'Demirci Baturhan seni bekliyor. Giden elden gelen çelik…',t:'talk',m:'baturhan',c:1,rw:{exp:140,mo:220}},
+  {n:'Çürük Çorba',d:'Çürük Toprak ova’ya yayılıyor. On tanesini temizle.',t:'hunt',m:'toprak',c:10,rw:{exp:520,mo:140,pts:2}},
+  {n:'Örsün Dili',d:'Demirci Baturhan seni bekliyor. Önce onun sözünü dinle.',t:'talk',m:'baturhan',c:1,rw:{exp:140,mo:220}},
+  {n:'Diş ve Demir',d:'Baturhan, çeliği sınamak için sekiz Kurt Dişi istiyor.',t:'col',m:'kurtdisi_m',c:8,rw:{exp:480,mo:260}},
+  {n:'Ovanın Boynuzu',d:'Domuz sürüsü yolu kapattı. On iki Yaban Domuzu devir.',t:'hunt',m:'domuz',c:12,rw:{exp:700,mo:300}},
+  {n:'Toprağın Ateşi',d:'Çürük Toprakların içinden on Balçık çıkarıp getir.',t:'col',m:'balcik',c:10,rw:{exp:820,mo:350,it:[['hpb',2]]}},
+  {n:'Çandan Uzaklaş',d:'Ovada son kez on sekiz Kavruk Kurt avla; sonra ormana giden yol açılacak.',t:'hunt',m:'kurt',c:18,rw:{exp:1100,mo:500,pts:2}},
+
   {n:'Gölge Avı',d:'Sarı Orman kargalarla doldu. On iki gölge kes.',t:'hunt',m:'karga',c:12,rw:{exp:950,mo:320,it:[['kurtdisikolye',1]]}},
-  {n:'Kırıntı Avı',d:'Göktaşlarını kır. Üç Kırıntı getir; ateşi onlarda göreceksin.',t:'col',m:'kirinti',c:3,rw:{exp:1500,it:[['gokatesi',3]]}},
-  {n:'Akrep Sırtı',d:'Tuz Çölü\'nde on beş Kum Akrebi ez.',t:'hunt',m:'akrep',c:15,rw:{exp:2600,mo:900,it:[['tuzkirici',1]]}},
-  {n:'Ayazı Kır',d:'Ayaz Vadisi\'nde yürüyen kemikler var. Yirmi Kemik Eren devir.',t:'hunt',m:'kemik',c:20,rw:{exp:4400,it:[['ayazkaftan',1]]}},
-  {n:'Balçığın Efendisi',d:'Kara Bataklık\'ta on beş Saz Gölgesi sustur.',t:'hunt',m:'saz',c:15,rw:{exp:7200,mo:2600,pts:3}},
-  {n:'Kırık Yüzlü',d:"Erlik'in Ağzı'nın dibinde oturan şey var. Bu çağın hesabını ona sor.",t:'hunt',m:'boss',c:1,rw:{exp:15000,mo:12000,it:[['kirikyuz',1]]}}
+  {n:'Ağın İlk Düğümü',d:'Ormanın içindeki Ağ Örümceklerinden on tanesini temizle.',t:'hunt',m:'orumcek',c:10,rw:{exp:1150,mo:420}},
+  {n:'Cevher Kokusu',d:'Örümcek yuvalarında kalan altı Demir Cevheri getir.',t:'col',m:'cevher',c:6,rw:{exp:900,mo:450}},
+  {n:'Kargaların Sessizliği',d:'Ormanın derininde on sekiz Gölge Kargası daha sustur.',t:'hunt',m:'karga',c:18,rw:{exp:1450,mo:600}},
+  {n:'Örümcek Yuvası',d:'Ağların kaynağına yaklaşmak için on altı Ağ Örümceği devir.',t:'hunt',m:'orumcek',c:16,rw:{exp:1750,mo:720,it:[['spk',3]]}},
+  {n:'Kurtların Göçü',d:'Ormana inen on iki Kavruk Kurtu avla.',t:'hunt',m:'kurt',c:12,rw:{exp:1300,mo:650}},
+  {n:'Demirciye Dönüş',d:'Baturhan’a dön. Ormanda bulduklarını görmesi gerek.',t:'talk',m:'baturhan',c:1,rw:{exp:500,mo:800}},
+  {n:'Kırıntı Avı',d:'Göktaşlarını kır. Üç Kırıntı getir; ateşi onlarda göreceksin.',t:'col',m:'kirinti',c:3,rw:{exp:1900,it:[['gokatesi',3]]}},
+
+  {n:'Çölün Kabuğu',d:'Tuz Çölü’nde on beş Kum Akrebi ez.',t:'hunt',m:'akrep',c:15,rw:{exp:2600,mo:900,it:[['tuzkirici',1]]}},
+  {n:'Kristal Borcu',d:'Akreplerden sekiz Kum Kristali topla.',t:'col',m:'kumkristal',c:8,rw:{exp:2100,mo:1000}},
+  {n:'Beyaz Gölge',d:'On Tuz Hayaletini dağıt.',t:'hunt',m:'tuzhayalet',c:10,rw:{exp:2800,mo:1100}},
+  {n:'Kumda İz',d:'Yirmi Kum Akrebi avla. Çölün ortasında bir yol aranıyor.',t:'hunt',m:'akrep',c:20,rw:{exp:3300,mo:1400}},
+  {n:'Susmayan Hayaletler',d:'On altı Tuz Hayaletini sustur.',t:'hunt',m:'tuzhayalet',c:16,rw:{exp:3900,mo:1600,it:[['hpb',3]]}},
+  {n:'Kristal Yığını',d:'On iki Kum Kristali getir.',t:'col',m:'kumkristal',c:12,rw:{exp:3000,mo:1800}},
+  {n:'Gök Ateşinin Bedeli',d:'İki Gök Ateşi getir. Baturhan bunları işleyecek.',t:'col',m:'gokatesi',c:2,rw:{exp:3500,mo:2000,pts:2}},
+  {n:'Ayaza Giden Yol',d:'Çöldeki son on sekiz Tuz Hayaletini dağıt.',t:'hunt',m:'tuzhayalet',c:18,rw:{exp:4500,mo:2200}},
+
+  {n:'Ayazı Kır',d:'Ayaz Vadisi’nde yürüyen kemikler var. Yirmi Kemik Eren devir.',t:'hunt',m:'kemik',c:20,rw:{exp:4400,it:[['ayazkaftan',1]]}},
+  {n:'Beyaz Diş',d:'On sekiz Ayaz Kurtu avla.',t:'hunt',m:'ayazkurt',c:18,rw:{exp:4700,mo:2400}},
+  {n:'Donmuş Hatıra',d:'Ayaz kurtlarından on Kurt Dişi getir.',t:'col',m:'kurtdisi_m',c:10,rw:{exp:3600,mo:2500}},
+  {n:'Kemik Yolu',d:'Yirmi beş Kemik Ereni yere ser.',t:'hunt',m:'kemik',c:25,rw:{exp:5600,mo:2800}},
+  {n:'Ayaz Sürüsü',d:'Yirmi beş Ayaz Kurtunu avla.',t:'hunt',m:'ayazkurt',c:25,rw:{exp:6000,mo:3000}},
+  {n:'Soğuk Demir',d:'On Demir Cevheri getir; ayaz çeliği için gerekli.',t:'col',m:'cevher',c:10,rw:{exp:4200,mo:3200}},
+  {n:'Kırık Nöbetçiler',d:'Otuz Kemik Eren devir.',t:'hunt',m:'kemik',c:30,rw:{exp:7200,mo:3500,pts:3}},
+  {n:'Bataklığa İniş',d:'Ayazın ardında kalan yirmi Ayaz Kurtunu temizle.',t:'hunt',m:'ayazkurt',c:20,rw:{exp:6500,mo:3800}},
+
+  {n:'Balçığın Efendisi',d:'Kara Bataklık’ta on beş Saz Gölgesi sustur.',t:'hunt',m:'saz',c:15,rw:{exp:7200,mo:2600,pts:3}},
+  {n:'Koyu Balçık',d:'Bataklıktan on iki Koyu Balçık getir.',t:'col',m:'balcik',c:12,rw:{exp:5200,mo:4000}},
+  {n:'Sazların Arasında',d:'Yirmi iki Saz Gölgesi avla.',t:'hunt',m:'saz',c:22,rw:{exp:8200,mo:4500}},
+  {n:'Bataklığın Karnı',d:'Yirmi sekiz Saz Gölgesi sustur.',t:'hunt',m:'saz',c:28,rw:{exp:9600,mo:5000}},
+  {n:'Çamurdaki Ateş',d:'Dört Göktaşı Kırıntısı getir.',t:'col',m:'kirinti',c:4,rw:{exp:7000,mo:5200,it:[['gokatesi',2]]}},
+  {n:'Son Saz',d:'Otuz iki Saz Gölgesi devir.',t:'hunt',m:'saz',c:32,rw:{exp:11000,mo:5800}},
+  {n:'Kamın Uyarısı',d:'Kam Bilge ile konuş. Erlik’in Ağzı hakkında söyleyecekleri var.',t:'talk',m:'kam',c:1,rw:{exp:3500,mo:6000}},
+  {n:'Ağza Giden Yol',d:'Bataklıktaki son yirmi beş Saz Gölgesini temizle.',t:'hunt',m:'saz',c:25,rw:{exp:10500,mo:6500,pts:3}},
+
+  {n:'Ulakların Gözü',d:'Erlik Uluslarından on tanesini devir.',t:'hunt',m:'ulak',c:10,rw:{exp:12000,mo:7000}},
+  {n:'Bakan Gözler',d:'Sekiz Ulak Gözü getir.',t:'col',m:'ulakgozu',c:8,rw:{exp:10000,mo:7500}},
+  {n:'Karanlığın Habercileri',d:'On sekiz Erlik Ulusunu sustur.',t:'hunt',m:'ulak',c:18,rw:{exp:14500,mo:8000}},
+  {n:'Gökten Kalan',d:'Altı Göktaşı Kırıntısı getir.',t:'col',m:'kirinti',c:6,rw:{exp:11000,mo:8500,it:[['gokatesi',4]]}},
+  {n:'Son Haber',d:'Yirmi beş Erlik Ulusunu devir.',t:'hunt',m:'ulak',c:25,rw:{exp:17500,mo:9000}},
+  {n:'Örsün Son Sözü',d:'Baturhan ile son kez konuş.',t:'talk',m:'baturhan',c:1,rw:{exp:5000,mo:9500}},
+  {n:'Kapının Önü',d:'Otuz Erlik Ulusunu temizle. Kırık Yüzlü’ye giden yol açılsın.',t:'hunt',m:'ulak',c:30,rw:{exp:21000,mo:10500,pts:4}},
+  {n:'Kırık Yüzlü',d:"Erlik'in Ağzı'nın dibinde oturan şey var. Bu çağın hesabını ona sor.",t:'hunt',m:'boss',c:1,rw:{exp:30000,mo:20000,it:[['kirikyuz',1]],pts:5}}
 ];
-const REPQ=[{m:'ayazkurt',c:25},{m:'ulak',c:10},{m:'orumcek',c:20},{m:'tuzhayalet',c:15}];
+const REPQ=[{m:'ayazkurt',c:25},{m:'ulak',c:12},{m:'orumcek',c:25},{m:'tuzhayalet',c:20},{m:'saz',c:25},{m:'kemik',c:25},{m:'akrep',c:25}];
 const BOTNAMES=['Baybars','Tulpar','Kurtay','Alpagut','Toygarhan','Dorukay','Kırat','Batur','Akcaer','Sungur','Erdem'];
 const GUILDS=['Bozkurt','Gök Han','Kara Tül','Erenler','Ay Izı'];
 const CHAT_POOL=['selamlar erenler','tuz çölünde akrep farmı yapan var mı','wts ay yarığı +4, akçeyle takas olur',"mağara girişinde grup kuruyoruz, 2 kişi lazım",'bu gece yine göktaşı yağdı ya...',"kırık yüzlü'yü kim denedi? hp'si efsanemis",'demirci 5ten sonra hep patlatıyor yemin ederim','gg','brb çay','oyunun en iyisi sarı orman bence, sakin','kim benimla mağaraya gelir','ayaz vadisinde kemiğeVeryrık dikkat','Kam görevi bitirdim, sıradaki çok uzun ha','akçe lazım, cevher satan var mı','bu taşlar bir yere kadar, çelik konuş'];
@@ -867,13 +915,22 @@ function renderChar(){
     if(P.pts>0){P.pts--;P.stat[btn.dataset.s]++;SFX.click();renderChar();updateBars();}});
 }
 // ---- görevler ----
-function qDesc(q){return q.rep?'Kam\'ın Avı: '+MOBS[q.m].n+' x'+q.c:q.d;}
+function questTargetName(q){
+  if(q.t==='hunt'&&MOBS[q.m])return MOBS[q.m].n;
+  if(q.t==='col'&&ITEMS[q.m])return ITEMS[q.m].n;
+  if(q.t==='talk'){const n=npcs.find(x=>x.k===q.m);return n?n.n:'Konuş';}
+  return q.m||'';
+}
+function questChapter(step=P.qStep){
+  return CHAPTERS.find(c=>step>=c.from&&step<=c.to)||null;
+}
+function qDesc(q){return q.rep?"Kam'ın Avı: "+questTargetName(q)+' x'+q.c:q.d;}
 function renderQuest(){
   const w=$('questPanel');
   let h='';
-  if(P.qActive){const q=P.qActive;
-    const cur=q.t==='col'?countItem(q.m):P.qN;
-    h+=`<div class="q"><b>${q.rep?"Kam'ın Avı":q.n}</b><span>${q.t==='hunt'||q.t==='col'?MOBS[q.m].n+' ':''}<span class="prog">${Math.min(cur,q.c)}/${q.c}</span></span></div>`;}
+  if(P.qActive){const q=P.qActive,cur=q.t==='col'?countItem(q.m):P.qN,ch=!q.rep?questChapter(P.qStep):null;
+    h+=`<div class="q">${ch?`<small style="opacity:.62">${ch.n}</small>`:''}<b>${q.rep?"Kam'ın Avı":q.n}</b><span>${questTargetName(q)} <span class="prog">${Math.min(cur,q.c)}/${q.c}</span></span></div>`;
+  }
   w.innerHTML=h;
 }
 function questKill(k){
@@ -897,7 +954,7 @@ function expGive(n){
   if(isNight())n=Math.round(n*1.15);
   P.exp+=n;
   floats.push({x:P.x,y:P.y-30,txt:'+'+Math.round(n)+' tecrübe',c:'#8fae5a',t:0,dur:1});
-  while(P.exp>=expNeed(P.lvl)&&P.lvl<40){
+  while(P.exp>=expNeed(P.lvl)&&P.lvl<60){
     P.exp-=expNeed(P.lvl);P.lvl++;P.pts+=3;P.hp=maxHP();P.sp=maxSP();
     SFX.lvl();
     for(let i=0;i<26;i++)parts.push({x:P.x,y:P.y-10,vx:Math.cos(i/26*TAU)*rnd(40,110),vy:Math.sin(i/26*TAU)*rnd(40,110)-40,g:-30,t:0,dur:rnd(.6,1.1),c:'#e8cf8f',r:rnd(1.5,3)});
@@ -1128,14 +1185,15 @@ function openDialog(n){
   if(n.role==='shopW'||n.role==='shopA'||n.role==='shopP')mk('Mağaza',()=>openShop(n));
   if(n.role==='upg'){mk('Eşya Ateşle (+ basma)',()=>openUpg());mk('Gök Ateşi al (300)',()=>{if(P.money>=300){P.money-=300;addItem('gokatesi',1);SFX.coin();toast('Gök Ateşi aldın');}else toast('Akçen yetmiyor');});}
   mk('Kapat',()=>dlg.classList.remove('on'),1);
-  if(n.k==='baturhan'&&!P.talkedB&&P.qActive&&P.qActive.t==='talk'&&P.qActive.m==='baturhan'){
-    P.talkedB=true;P.qN=1;toast('Görev ilerledi');renderQuest();}
+  if(P.qActive&&P.qActive.t==='talk'&&P.qActive.m===n.k&&P.qN<1){
+    if(n.k==='baturhan')P.talkedB=true;
+    P.qN=1;toast('Görev ilerledi: '+n.n);renderQuest();}
 }
 function questUI(mk){
   if(P.qActive){
     const q=P.qActive;
     const cur=q.t==='col'?countItem(q.m):P.qN;
-    $('dlgText').textContent=q.rep?"Kam'ın avı sürüyor. "+MOBS[q.m].n+': '+Math.min(cur,q.c)+'/'+q.c:q.d+' ('+Math.min(cur,q.c)+'/'+q.c+')';
+    $('dlgText').textContent=q.rep?"Kam'ın avı sürüyor. "+questTargetName(q)+': '+Math.min(cur,q.c)+'/'+q.c:q.d+' ('+Math.min(cur,q.c)+'/'+q.c+')';
     if(cur>=q.c)mk('Teslim Et',()=>{questTurn();},0);
   }else if(P.qStep<CHAIN.length){
     const q=CHAIN[P.qStep];
