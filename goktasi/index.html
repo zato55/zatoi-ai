@@ -2026,25 +2026,107 @@ function placeObjects(){
     if(spr)objMap.set(ty*MW+tx,{spr,x,y,cr});
   }
 }
-// ---------- kayıt ----------
+// ---------- kayıt: yerel + GÖKTAŞI Cloud Save V4.6 ----------
 const SAVE_KEY='goktasi_kayit1';
-function save(){
-  if(!started)return;
-  try{localStorage.setItem(SAVE_KEY,JSON.stringify({
+const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
+const CLOUD_AUTH_KEY='goktasi_cloud_auth_v1';
+let cloudAuth=null,cloudReady=false,cloudBusy=false,cloudDirty=false,cloudTimer=0;
+
+function makeSaveData(){
+  return {
     v:1,name:P.name,soy:P.soy,lvl:P.lvl,exp:P.exp,stat:P.stat,pts:P.pts,money:P.money,
     inv:P.inv,eq:P.eq,x:P.x,y:P.y,qStep:P.qStep,qRep:P.qRep,kills:P.kills,playT:P.playT,
-    stoneN:P.stoneN||0,talkedB:!!P.talkedB,qActive:P.qActive?{...P.qActive}:null,qN:P.qN
-  }));}catch(e){}
+    stoneN:P.stoneN||0,talkedB:!!P.talkedB,qActive:P.qActive?{...P.qActive}:null,qN:P.qN,
+    savedAt:Date.now()
+  };
+}
+function applySaveData(d){
+  if(!d||d.v!==1)return false;
+  Object.assign(P,{name:d.name,soy:d.soy,lvl:d.lvl,exp:d.exp,stat:d.stat,pts:d.pts,money:d.money,
+    inv:d.inv,eq:d.eq,x:d.x,y:d.y,qStep:d.qStep,qRep:d.qRep||0,kills:d.kills,playT:d.playT||0,
+    stoneN:d.stoneN||0,talkedB:d.talkedB,qActive:d.qActive||null,qN:d.qN||0});
+  P.tx=P.x;P.ty=P.y;
+  return true;
+}
+function saveLocal(data){
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify(data||makeSaveData()));return true;}catch(e){return false;}
+}
+function save(){
+  if(!started)return;
+  const data=makeSaveData();
+  saveLocal(data);
+  cloudDirty=true;
+  scheduleCloudSave();
 }
 function load(){
-  try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(!d||d.v!==1)return false;
-    Object.assign(P,{name:d.name,soy:d.soy,lvl:d.lvl,exp:d.exp,stat:d.stat,pts:d.pts,money:d.money,
-      inv:d.inv,eq:d.eq,x:d.x,y:d.y,qStep:d.qStep,qRep:d.qRep||0,kills:d.kills,playT:d.playT||0,
-      stoneN:d.stoneN||0,talkedB:d.talkedB,qActive:d.qActive||null,qN:d.qN||0});
-    return true;}catch(e){return false;}
+  try{return applySaveData(JSON.parse(localStorage.getItem(SAVE_KEY)));}catch(e){return false;}
 }
-addEventListener('beforeunload',save);
+function scheduleCloudSave(){
+  if(!cloudReady||cloudBusy||!cloudDirty)return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(()=>cloudSave(false),1200);
+}
+async function cloudFetch(path,opt={}){
+  const headers={...(opt.headers||{})};
+  if(cloudAuth?.token)headers.Authorization='Bearer '+cloudAuth.token;
+  if(opt.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
+  const r=await fetch(CLOUD_API+path,{...opt,headers});
+  let j=null;try{j=await r.json();}catch(e){}
+  if(!r.ok||!j?.ok)throw new Error(j?.error||('HTTP '+r.status));
+  return j;
+}
+async function ensureCloudAccount(){
+  try{cloudAuth=JSON.parse(localStorage.getItem(CLOUD_AUTH_KEY)||'null');}catch(e){cloudAuth=null;}
+  if(cloudAuth?.token&&cloudAuth?.user_id)return true;
+  const j=await cloudFetch('/register',{method:'POST',body:'{}'});
+  cloudAuth={user_id:j.user_id,token:j.token};
+  localStorage.setItem(CLOUD_AUTH_KEY,JSON.stringify(cloudAuth));
+  return true;
+}
+async function cloudSave(showMessage=false){
+  if(!started||!cloudReady||cloudBusy||!cloudAuth?.token)return false;
+  cloudBusy=true;
+  try{
+    const data=makeSaveData();
+    saveLocal(data);
+    const j=await cloudFetch('/save',{method:'POST',body:JSON.stringify({character_name:P.name||'',level:P.lvl||1,save_data:data})});
+    cloudDirty=false;
+    if(showMessage&&typeof toast==='function')toast('Bulut kayıt tamamlandı');
+    return j;
+  }catch(e){
+    cloudDirty=true;
+    if(showMessage&&typeof toast==='function')toast('Bulut kayıt başarısız — yerel kayıt güvende');
+    console.warn('GÖKTAŞI cloud save:',e);
+    return false;
+  }finally{cloudBusy=false;}
+}
+async function initCloudSave(){
+  try{
+    await ensureCloudAccount();
+    cloudReady=true;
+    const localRaw=localStorage.getItem(SAVE_KEY);
+    let local=null;try{local=localRaw?JSON.parse(localRaw):null;}catch(e){}
+    const remote=await cloudFetch('/load');
+    if(local&&local.v===1){
+      // Mevcut oyuncunun cihaz kaydı ilk bağlantıda asla ezilmez; önce buluta yedeklenir.
+      cloudDirty=true;
+      await cloudSave(false);
+    }else if(remote.found&&remote.save?.data?.v===1){
+      saveLocal(remote.save.data);
+      // Intro henüz açıksa devam butonunu yenilemek için sayfa yenilenmeden de yerel kayıt hazır olur.
+    }
+  }catch(e){
+    cloudReady=false;
+    console.warn('GÖKTAŞI cloud init:',e);
+  }
+}
+function getCloudTransferCode(){
+  // Cihaz aktarımı için şimdilik kimliği kullanıcıya gösterebilecek yardımcı; otomatik UI sonraki sürümde.
+  return cloudAuth?JSON.stringify(cloudAuth):'';
+}
+addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData());});
 setInterval(save,15000);
+initCloudSave();
 // ---------- intro / başlangıç ----------
 const SOYS=[{k:'kurt',n:'Kurt Soyu',d:'+6 Güç — sürünün dişi, savaşın kılıcı'},
   {k:'dag',n:'Dağ Soyu',d:'+6 Beden — rüzgar eğilir, dağ eğilmez'},
