@@ -1004,7 +1004,15 @@ function mobHitTarget(m){
   const tgt=m.target;
   if(!tgt)return;
   if(tgt===P){
-    if(P.dead)return;
+    if(P.dead||m.dead||m.hp<=0){m.target=null;return;}
+    // V4.1: Görünmeyen/uzakta kalmış yaratık oyuncuya hasar veremez.
+    // Hasar anında gerçek konum tekrar doğrulanır; eski hedef kilidi tek başına yeterli değildir.
+    const hitRange=34+m.r;
+    const liveDist=dst(m.x,m.y,P.x,P.y);
+    if(liveDist>hitRange){
+      if(liveDist>360)m.target=null;
+      return;
+    }
     const red=armorDef()/(armorDef()+90);
     const d=Math.max(1,m.dmg*(1-red)*rnd(.85,1.15));
     P.hp-=d;P.lastHit=worldT;P.hurtT=.5;SFX.hurt();
@@ -1463,7 +1471,7 @@ function updMobs(dt){
       const tg=m.target,tgd=dst(m.x,m.y,tg.x,tg.y);
       // leash
       if(dst(m.x,m.y,m.hx,m.hy)>620){m.target=null;m.st='return';m.hp=Math.min(m.maxhp,m.hp+m.maxhp*.3);}
-      else if(tg===P&&P.dead)m.target=null;
+      else if(tg===P&&(P.dead||tgd>720)){m.target=null;m.st='return';}
       else if(tg!==P&&tg.deadT>0)m.target=null;
       else if(M.flee&&m.hp<m.maxhp*.25){ // kaç
         const a=Math.atan2(m.y-tg.y,m.x-tg.x);
@@ -1484,7 +1492,8 @@ function updMobs(dt){
           setTimeout(()=>{if(m.hp<=0)return;
             fxs.push({type:'ring',x:tg.x,y:tg.y,t:0,dur:.5,r0:20,r1:130,c:'rgba(192,86,60,'});
             shakeT=.4;
-            if(!P.dead&&dst(P.x,P.y,tg.x,tg.y)<140){const red=armorDef()/(armorDef()+90);
+            // V4.1: Boss alan saldırısı yalnızca boss hâlâ yakın/aktifse oyuncuya vurabilir.
+            if(!P.dead&&!m.dead&&m.hp>0&&dst(m.x,m.y,P.x,P.y)<520&&dst(P.x,P.y,tg.x,tg.y)<140){const red=armorDef()/(armorDef()+90);
               const d=Math.max(1,m.dmg*2.2*(1-red));P.hp-=d;P.lastHit=worldT;P.hurtT=.6;SFX.hurt();
               floats.push({x:P.x,y:P.y-36,txt:Math.round(d),c:'#e06a50',t:0,dur:.9});
               if(P.hp<=0)playerDie(m);}
