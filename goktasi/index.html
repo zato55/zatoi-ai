@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
+<!-- GOKTASI V4.5 MOBILE PLAYER RENDER FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1926,13 +1927,8 @@ function render(){
   }});
   draws.sort((a,b)=>a.y-b.y);
   draws.forEach(d=>d.f?d.f():drawObj(d.o));
-  // Mobil: oyuncuyu dünya nesnelerinden sonra ayrı ön katmanda çiz.
-  // Böylece mobil HUD/nesne sıralaması karakteri gizleyemez.
-  if(started&&IS_MOBILE_UI){
-    drawHuman(ctx,P);
-    if(P.buffDef>0){ctx.strokeStyle='rgba(169,138,86,.6)';ctx.lineWidth=2;
-      ctx.beginPath();ctx.ellipse(P.x,P.y+2,16,7,0,0,TAU);ctx.stroke();}
-  }
+  // Mobil oyuncu ayrı ekran-katmanında çizilecek (render sonunda).
+  // PC'nin dünya/y-sıralı render zincirine dokunmuyoruz.
   // fx
   fxs.forEach(f=>{
     const k=f.t/f.dur;
@@ -1988,6 +1984,25 @@ function render(){
   const vg=ctx.createRadialGradient(vw/2,vh/2,vh*.45,vw/2,vh/2,vh*.85);
   vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(10,6,2,.42)');
   ctx.fillStyle=vg;ctx.fillRect(0,0,vw,vh);
+
+  // V4.5 MOBIL KARAKTER FIX:
+  // Mobilde oyuncuyu dünya transformundan bağımsız bir ekran katmanında çiziyoruz.
+  // Böylece visualViewport / canvas CSS boyutu / kamera transformu farklılıkları
+  // karakteri görünmez yapamaz. PC render yolu tamamen aynı kalır.
+  if(started&&IS_MOBILE_UI&&!P.dead){
+    const sx=(P.x-cam.x)*zoom+vw/2;
+    const sy=(P.y-cam.y)*zoom+vh/2;
+    ctx.save();
+    ctx.translate(sx,sy);
+    ctx.scale(zoom,zoom);
+    const mp={...P,x:0,y:0};
+    drawHuman(ctx,mp);
+    if(P.buffDef>0){
+      ctx.strokeStyle='rgba(169,138,86,.72)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.ellipse(0,2,16,7,0,0,TAU);ctx.stroke();
+    }
+    ctx.restore();
+  }
 }
 const ICON_CACHE={},IM_IMG={};
 function drawObj(o){
