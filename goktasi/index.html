@@ -2178,7 +2178,7 @@ function placeObjects(){
     if(spr)objMap.set(ty*MW+tx,{spr,x,y,cr});
   }
 }
-// ---------- kayıt: GÖKTAŞI V4.9.2 / Zatoi hesap doğrulama aşaması ----------
+// ---------- kayıt: GÖKTAŞI V4.9.3 / Zatoi hesap doğrulama aşaması ----------
 const SAVE_KEY='goktasi_kayit1';
 const LOCAL_BACKUPS_KEY='goktasi_local_backups_v2';
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
@@ -2311,7 +2311,7 @@ async function initCloudSave(showMessage=false){
 }
 function accountStateText(){
   if(cloudVerified&&accountUser){
-    return 'Zatoi hesabı doğrulandı: '+(accountUser.username||'kullanıcı')+' · Kimlik bağlantısı hazır. Eski bulut kayıt aktarılana kadar buluta yazma kilitli.';
+    return 'Zatoi hesabı doğrulandı: '+(accountUser.username||accountUser.userName||'kullanıcı')+' · Kimlik bağlantısı hazır. Eski bulut kayıt aktarılana kadar buluta yazma kilitli.';
   }
   return 'Zatoi oturumu bulunamadı veya doğrulanmadı. Önce Zatoi AI ana sayfasında hesabına giriş yap.';
 }
@@ -2327,7 +2327,7 @@ function refreshContinueButton(){
   cb.style.display='block';cb.textContent='Devam et — '+d.name+' (Lv '+d.lvl+')';
 }
 function cloudStatusText(){
-  if(cloudVerified&&accountUser)return 'Zatoi hesabı: '+(accountUser.username||'kullanıcı')+' · doğrulandı · bulut yazma aktarım tamamlanana kadar kilitli';
+  if(cloudVerified&&accountUser)return 'Zatoi hesabı: '+(accountUser.username||accountUser.userName||'kullanıcı')+' · doğrulandı · bulut yazma aktarım tamamlanana kadar kilitli';
   return 'Zatoi hesabı henüz doğrulanmadı.';
 }
 function updateCloudPanel(){
@@ -2338,11 +2338,64 @@ function updateCloudPanel(){
   if(importBtn)importBtn.style.display='none';
   if(codeBox)codeBox.style.display='none';
 }
+function setAccountCheckState(text,busy=false){
+  const state=$('accountState');
+  if(state)state.textContent=text;
+  const btn=$('accountCheckBtn');
+  if(btn){
+    btn.disabled=busy;
+    btn.textContent=busy?'KONTROL EDİLİYOR…':'ZATOI HESABINI KONTROL ET';
+  }
+}
+async function runAccountCheck(){
+  setAccountCheckState('Zatoi hesabı kontrol ediliyor…',true);
+  try{
+    const ok=await initCloudSave(false);
+    if(ok&&accountUser){
+      const name=accountUser.username||accountUser.userName||'kullanıcı';
+      setAccountCheckState('Zatoi hesabı doğrulandı: '+name+' · Kimlik bağlantısı hazır. Eski bulut kayıt aktarılana kadar buluta yazma kilitli.');
+      toast('Zatoi hesabı doğrulandı: '+name);
+    }else{
+      const hasToken=!!readZatoiSession();
+      setAccountCheckState(hasToken?'Zatoi oturumu doğrulanamadı. Zatoi AI’da çıkış yapıp yeniden giriş yap.':'Zatoi oturumu bulunamadı. Önce Zatoi AI ana sayfasında hesabına giriş yap.');
+      toast(hasToken?'Zatoi hesabı doğrulanamadı':'Önce Zatoi AI hesabına giriş yap');
+    }
+    updateCloudPanel();
+    return ok;
+  }catch(e){
+    console.error('GÖKTAŞI hesap kontrolü:',e);
+    setAccountCheckState('Bağlantı hatası: '+(e?.message||'Zatoi hesabı kontrol edilemedi.'));
+    toast('Hesap kontrolü başarısız');
+    return false;
+  }finally{
+    const btn=$('accountCheckBtn');
+    if(btn){btn.disabled=false;btn.textContent='ZATOI HESABINI KONTROL ET';}
+  }
+}
 function bindCloudUI(){
   const b=$('cloudBtn');if(b)b.onclick=openAccountPanel;
-  const check=$('accountCheckBtn');if(check)check.onclick=()=>initCloudSave(true);
+  const check=$('accountCheckBtn');
+  if(check){
+    check.onclick=null;
+    check.addEventListener('click',e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      runAccountCheck();
+    });
+  }
   const sn=$('cloudSaveNowBtn');if(sn)sn.onclick=()=>toast('Bulut yazma geçici olarak kilitli — önce eski kayıt taşınacak');
 }
+// Ek güvenlik: panel sonradan yeniden çizilse bile kontrol düğmesi çalışır.
+document.addEventListener('click',e=>{
+  const btn=e.target?.closest?.('#accountCheckBtn');
+  if(!btn)return;
+  if(btn.dataset.goktasiHandled==='1')return;
+  e.preventDefault();
+  runAccountCheck();
+});
+const accountCheckBtn=$('accountCheckBtn');
+if(accountCheckBtn)accountCheckBtn.dataset.goktasiHandled='1';
+
 addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData(),'sayfa-kapanis');});
 setInterval(save,15000);
 bindCloudUI();
