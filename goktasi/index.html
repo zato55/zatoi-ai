@@ -176,13 +176,13 @@ html.mobile-ui #miniWrap{top:48px;right:max(8px,env(safe-area-inset-right))}html
 html.mobile-ui #questPanel{top:140px;right:max(8px,env(safe-area-inset-right));width:min(170px,25vw);font-size:9px}html.mobile-ui #questPanel .q{padding:4px 6px;margin-bottom:3px}html.mobile-ui #questPanel .q b{font-size:9px}
 html.mobile-ui #chatWrap{left:max(8px,env(safe-area-inset-left));bottom:112px;width:min(300px,42vw)}html.mobile-ui #chatLog{max-height:82px;font-size:9.5px}html.mobile-ui #chatIn{font-size:16px;padding:5px 7px}
 html.mobile-ui #chatTab{bottom:138px}
-html.mobile-ui #skillbar{bottom:max(5px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) scale(.70);transform-origin:bottom center}html.mobile-ui #xpThin{width:280px}html.mobile-ui #moneyTag{bottom:57px;font-size:10px}html.mobile-ui .slot{width:42px;height:42px}
+html.mobile-ui #skillbar{bottom:max(7px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);transform-origin:bottom center}html.mobile-ui #xpThin{width:min(330px,42dvw)}html.mobile-ui #moneyTag{bottom:52px;font-size:9px}html.mobile-ui #slots{gap:4px}html.mobile-ui .slot{width:46px;height:46px;touch-action:manipulation}html.mobile-ui .slot .key{display:none}html.mobile-ui .slot .sp{font-size:8px}
 html.mobile-ui .panel{max-width:calc(100dvw - 20px);max-height:calc(100dvh - 20px);overflow:auto}html.mobile-ui #invPanel,html.mobile-ui #charPanel,html.mobile-ui #shopPanel,html.mobile-ui #upgPanel,html.mobile-ui #mapPanel{top:50%;left:50%;transform:translate(-50%,-50%)}html.mobile-ui #dlgPanel{bottom:max(8px,env(safe-area-inset-bottom));width:min(520px,92dvw)}html.mobile-ui #mapCv{width:min(72dvh,72dvw);height:min(72dvh,72dvw)}html.mobile-ui #announce{top:60px}html.mobile-ui #announce div{font-size:17px}html.mobile-ui #zoneTitle h2{font-size:26px}
 /* Mobil giriş ekranı: tarayıcı çubukları açıkken bile düğme ekranda kalır. */
 html.mobile-ui #intro{align-items:flex-start;overflow:auto;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 html.mobile-ui #introBox{width:min(760px,94dvw);min-height:100dvh;box-sizing:border-box;padding:8px 18px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;margin-left:8px;line-height:1}html.mobile-ui #introBox h4{font-size:10px;letter-spacing:4px;margin:2px 0 8px}html.mobile-ui #introBox p.lore{font-size:clamp(9px,2.3dvh,12px);line-height:1.45;margin-bottom:8px}html.mobile-ui #nameIn{width:min(280px,48dvw);font-size:16px;padding:6px;margin-bottom:8px}html.mobile-ui .soys{gap:7px;margin-bottom:8px}html.mobile-ui .soy{width:min(145px,25dvw);padding:7px 6px}html.mobile-ui .soy b{font-size:11px}html.mobile-ui .soy span{font-size:9px;line-height:1.25}html.mobile-ui #startBtn{font-size:13px;padding:9px 30px}html.mobile-ui #contBtn{margin-top:6px;font-size:10px}html.mobile-ui #introKeys{display:none}html.mobile-ui #installBtn{margin:6px auto 0;background:#18251a;border:1px solid #6d9a67;color:#dcebd6;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:7px 16px}
-@media (max-height:430px){html.mobile-ui #questPanel{display:none}html.mobile-ui #miniWrap{top:44px}html.mobile-ui #mini{width:72px;height:72px}html.mobile-ui #skillbar{transform:translateX(-50%) scale(.64)}html.mobile-ui #topL{width:min(185px,31vw)}html.mobile-ui #chatWrap{width:min(270px,38vw)}html.mobile-ui #mJoy{width:104px;height:104px}html.mobile-ui #mJoyKnob{left:32px;top:32px;width:40px;height:40px}html.mobile-ui #mAttack{width:68px;height:68px}}
+@media (max-height:430px){html.mobile-ui #questPanel{display:none}html.mobile-ui #miniWrap{top:44px}html.mobile-ui #mini{width:72px;height:72px}html.mobile-ui #skillbar{transform:translateX(-50%) scale(.82)}html.mobile-ui #topL{width:min(185px,31vw)}html.mobile-ui #chatWrap{width:min(270px,38vw)}html.mobile-ui #mJoy{width:104px;height:104px}html.mobile-ui #mJoyKnob{left:32px;top:32px;width:40px;height:40px}html.mobile-ui #mAttack{width:68px;height:68px}}
 @media (orientation:portrait){html.mobile-ui #rotateNotice{display:flex}}
 
 </style>
@@ -1141,6 +1141,16 @@ function detectMobileUI(){
 const IS_MOBILE_UI=detectMobileUI();
 document.documentElement.classList.toggle('mobile-ui',IS_MOBILE_UI);
 document.documentElement.classList.toggle('desktop-ui',!IS_MOBILE_UI);
+// Mobil tarayıcı adres çubuğu açılıp kapanırken gerçek görünür alanı yeniden ölç.
+if(IS_MOBILE_UI&&window.visualViewport){
+  const syncMobileViewport=()=>{
+    const w=Math.round(window.visualViewport.width),h=Math.round(window.visualViewport.height);
+    if(w>0&&h>0&&(w!==vw||h!==vh)){vw=w;vh=h;dpr=Math.min(devicePixelRatio||1,2);cv.width=vw*dpr;cv.height=vh*dpr;}
+  };
+  window.visualViewport.addEventListener('resize',syncMobileViewport);
+  window.visualViewport.addEventListener('scroll',syncMobileViewport);
+  syncMobileViewport();
+}
 let deferredInstallPrompt=null;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;if(IS_MOBILE_UI)$('installBtn').style.display='block';});
 $('installBtn').onclick=async()=>{if(!deferredInstallPrompt){toast('Tarayıcı menüsünden Ana ekrana ekle / Uygulamayı yükle seçeneğini kullanabilirsin.');return;}deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice;}catch(e){}deferredInstallPrompt=null;$('installBtn').style.display='none';};
@@ -1908,13 +1918,21 @@ function render(){
       ctx.font='800 20px Manrope';ctx.fillStyle=ready?'#ffe082':'#c9a24b';
       ctx.fillText('!',n.x,n.y-56+bob);}
   }}));
-  if(started)draws.push({y:P.y,f:()=>{
+  // PC: mevcut y-sıralı oyuncu çizimi aynen korunur.
+  if(started&&!IS_MOBILE_UI)draws.push({y:P.y,f:()=>{
     drawHuman(ctx,P);
     if(P.buffDef>0){ctx.strokeStyle='rgba(169,138,86,.6)';ctx.lineWidth=2;
       ctx.beginPath();ctx.ellipse(P.x,P.y+2,16,7,0,0,TAU);ctx.stroke();}
   }});
   draws.sort((a,b)=>a.y-b.y);
   draws.forEach(d=>d.f?d.f():drawObj(d.o));
+  // Mobil: oyuncuyu dünya nesnelerinden sonra ayrı ön katmanda çiz.
+  // Böylece mobil HUD/nesne sıralaması karakteri gizleyemez.
+  if(started&&IS_MOBILE_UI){
+    drawHuman(ctx,P);
+    if(P.buffDef>0){ctx.strokeStyle='rgba(169,138,86,.6)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.ellipse(P.x,P.y+2,16,7,0,0,TAU);ctx.stroke();}
+  }
   // fx
   fxs.forEach(f=>{
     const k=f.t/f.dur;
@@ -2062,6 +2080,8 @@ function begin(fresh){
   $('intro').classList.add('off');
   $('hud').style.display='block';
   started=true;lastZone=regionAt(P.x,P.y);
+  // Mobilde ilk karede kamera doğrudan oyuncunun üstüne otursun. PC davranışı değişmez.
+  if(IS_MOBILE_UI){cam.x=P.x;cam.y=P.y-14;}
   updateBars();renderQuest();
 }
 // ---------- duyuru animasyonu CSS ----------
