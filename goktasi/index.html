@@ -403,7 +403,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
     <div id="accountState" style="margin-bottom:12px;line-height:1.55">Zatoi oturumu kontrol ediliyor…</div>
     <button class="abtn" id="accountCheckBtn">ZATOI HESABINI KONTROL ET</button>
     <div style="font-size:11px;opacity:.72;margin-top:10px;line-height:1.55">
-      GÖKTAŞI ayrı kullanıcı adı veya şifre istemez. Zatoi AI hesabındaki mevcut oturum kullanılır. Eski bulut kaydı taşınana kadar otomatik bulut yazma kapalıdır.
+      GÖKTAŞI ayrı kullanıcı adı veya şifre istemez. Zatoi AI hesabındaki mevcut oturum kullanılır. Bulut kayıtları sürüm kontrolü ve yerel yedeklerle korunur.
     </div>
   </div>
 </div>
@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.9.2 Zatoi hesap doğrulama
+   Tek dosyalık açık dünya aksiyon-RPG — V4.9.4 Zatoi bulut senkronizasyonu
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2178,7 +2178,7 @@ function placeObjects(){
     if(spr)objMap.set(ty*MW+tx,{spr,x,y,cr});
   }
 }
-// ---------- kayıt: GÖKTAŞI V4.9.3 / Zatoi hesap doğrulama aşaması ----------
+// ---------- kayıt: GÖKTAŞI V4.9.4 / Zatoi bulut senkronizasyonu ----------
 const SAVE_KEY='goktasi_kayit1';
 const LOCAL_BACKUPS_KEY='goktasi_local_backups_v2';
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
@@ -2186,7 +2186,7 @@ const ZATOI_AUTH_TOKEN_KEY='zatoi_auth_token_v1';
 const ZATOI_AUTH_USER_KEY='zatoi_auth_user_v1';
 const MAX_LOCAL_BACKUPS=12;
 let cloudAuth=null,cloudReady=false,cloudVerified=false,cloudBusy=false,cloudDirty=false,cloudTimer=0;
-let accountUser=null,cloudRevision=0;
+let accountUser=null,cloudRevision=0,cloudSaveVersion=0;
 
 function saveFingerprint(d){
   if(!d||d.v!==1)return '';
@@ -2233,8 +2233,6 @@ function save(){
   if(!started)return;
   const data=makeSaveData();
   saveLocal(data,'oyun-kaydi');
-  // Zatoi hesabı doğrulandıktan sonra bile eski kayıt taşınana kadar
-  // buluta otomatik yazma özellikle kapalı tutulur.
   if(cloudReady){cloudDirty=true;scheduleCloudSave();}
 }
 function load(){
@@ -2265,23 +2263,122 @@ function readZatoiSession(){
   return {token,storedUser};
 }
 function clearGameCloudState(){
-  cloudAuth=null;accountUser=null;cloudVerified=false;cloudReady=false;cloudRevision=0;cloudDirty=false;
+  cloudAuth=null;accountUser=null;cloudVerified=false;cloudReady=false;cloudRevision=0;cloudSaveVersion=0;cloudDirty=false;
 }
 function progressSummary(d){
-  return `${d?.name||'Karakter'} · Lv ${Number(d?.lvl)||1} · EXP ${Math.floor(Number(d?.exp)||0)} · kayıt #${Number(d?.syncRev)||0}`;
+  return `${d?.name||'Karakter'} · Lv ${Number(d?.lvl)||1} · EXP ${Math.floor(Number(d?.exp)||0)}`;
 }
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
-function isObviousRollback(newer,older){
-  if(!newer||!older)return false;
-  const levelDrop=(Number(newer.lvl)||1)<(Number(older.lvl)||1);
-  const questDrop=(Number(newer.qN)||0)<(Number(older.qN)||0);
-  const playDrop=(Number(newer.playT)||0)+120<(Number(older.playT)||0);
-  return levelDrop||questDrop||playDrop;
+function isClearlyAhead(a,b){
+  if(!a||!b)return false;
+  const al=Number(a.lvl)||1,bl=Number(b.lvl)||1;
+  if(al!==bl)return al>bl;
+  const aq=Number(a.qN)||0,bq=Number(b.qN)||0;
+  if(aq!==bq)return aq>bq;
+  const at=Number(a.playT)||0,bt=Number(b.playT)||0;
+  return at>bt+120;
+}
+async function fetchCloudSave(){
+  const r=await apiFetch('/load');
+  if(!r.found||!r.save?.data)return null;
+  const d=r.save.data;
+  if(!d||d.v!==1)throw new Error('Bulut kayıt biçimi geçersiz.');
+  cloudSaveVersion=Number(r.save.save_version)||0;
+  cloudRevision=Math.max(Number(d.syncRev)||0,cloudRevision||0);
+  return {data:d,meta:r.save};
+}
+async function reconcileInitialCloud(showMessage=false){
+  const remote=await fetchCloudSave();
+  const local=readLocalRaw();
+  if(!remote){
+    cloudSaveVersion=0;
+    cloudReady=true;
+    if(local&&started){cloudDirty=true;scheduleCloudSave();}
+    return true;
+  }
+  const rd=remote.data;
+  if(!local){
+    saveLocal(rd,'buluttan-ilk-yukleme');
+    refreshContinueButton();
+    if(showMessage)toast('Bulut kaydı bulundu: '+progressSummary(rd));
+    cloudReady=true;
+    return true;
+  }
+  if(isSameSave(local,rd)){
+    cloudReady=true;
+    return true;
+  }
+  // Açıkça daha ileride olan kayıt otomatik seçilir; diğeri yerel yedeğe alınır.
+  if(isClearlyAhead(rd,local)){
+    pushLocalBackup(local,'bulut-oncesi-cihaz-kaydi');
+    saveLocal(rd,'buluttan-geri-yukleme');
+    refreshContinueButton();
+    if(started)applySaveData(rd);
+    if(showMessage)toast('Daha ilerideki bulut kaydı yüklendi: '+progressSummary(rd));
+    cloudReady=true;
+    return true;
+  }
+  if(isClearlyAhead(local,rd)){
+    pushLocalBackup(rd,'bulut-kaydi-koruma');
+    // Cihaz kaydı açıkça ilerideyse bulut sürümünü biliyoruz; sonraki kayıt sürüm korumalı yazılır.
+    cloudReady=true;
+    cloudDirty=true;
+    scheduleCloudSave();
+    if(showMessage)toast('Daha ilerideki cihaz kaydı korunuyor ve bulutla eşitlenecek');
+    return true;
+  }
+  // Belirsiz durumda otomatik ezme yok.
+  pushLocalBackup(rd,'belirsiz-bulut-kaydi');
+  const useCloud=confirm('Cihaz ve bulut kayıtları farklı.\n\nBULUT: '+progressSummary(rd)+'\nCİHAZ: '+progressSummary(local)+'\n\nTamam = bulut kaydını kullan\nİptal = cihaz kaydını koru (bulut yazma kilitli kalır)');
+  if(useCloud){
+    pushLocalBackup(local,'bulut-secimi-oncesi-cihaz');
+    saveLocal(rd,'kullanici-bulut-secimi');
+    refreshContinueButton();
+    if(started)applySaveData(rd);
+    cloudReady=true;
+    return true;
+  }
+  cloudReady=false;
+  return false;
 }
 async function cloudSave(showMessage=false){
-  // MIGRATION_LOCK: eski Lv6 kayıt Zatoi userId'ye taşınmadan buluta yazma yok.
-  if(showMessage)toast('Bulut yazma geçici olarak kilitli — eski kayıt güvenle taşınacak');
-  return false;
+  if(!cloudReady||cloudBusy)return false;
+  cloudBusy=true;
+  try{
+    const data=makeSaveData();
+    const r=await apiFetch('/save',{
+      method:'POST',
+      body:JSON.stringify({
+        character_name:data.name||'',
+        level:Number(data.lvl)||1,
+        save_data:data,
+        expected_save_version:cloudSaveVersion
+      })
+    });
+    cloudSaveVersion=Number(r.save_version)||cloudSaveVersion;
+    cloudRevision=Math.max(Number(data.syncRev)||0,cloudRevision||0);
+    cloudDirty=false;
+    saveLocal(data,'bulut-kaydi');
+    if(showMessage)toast('Buluta kaydedildi · sürüm '+cloudSaveVersion);
+    updateCloudPanel();
+    return true;
+  }catch(e){
+    if(e.status===409&&e.code==='SAVE_CONFLICT'){
+      cloudReady=false;cloudDirty=false;
+      try{
+        const remote=await fetchCloudSave();
+        if(remote?.data)pushLocalBackup(remote.data,'cakisma-bulut-kaydi');
+      }catch(_e){}
+      toast('Bulut kaydı başka cihazda değişmiş. Otomatik üzerine yazma durduruldu.');
+      updateCloudPanel();
+      return false;
+    }
+    console.warn('GÖKTAŞI bulut kayıt:',e);
+    if(showMessage)toast('Bulut kaydı başarısız: '+(e?.message||'bağlantı hatası'));
+    return false;
+  }finally{
+    cloudBusy=false;
+  }
 }
 async function initCloudSave(showMessage=false){
   clearGameCloudState();
@@ -2296,22 +2393,24 @@ async function initCloudSave(showMessage=false){
     const me=await apiFetch('/auth/me');
     accountUser=me.user||null;
     cloudVerified=!!accountUser?.id;
-    // DİKKAT: doğrulama başarılı olsa da migration tamamlanana kadar cloudReady=false.
-    cloudReady=false;
-    if(showMessage&&cloudVerified)toast('Zatoi hesabı doğrulandı');
+    if(!cloudVerified)throw new Error('Zatoi kullanıcı kimliği alınamadı.');
+    await reconcileInitialCloud(showMessage);
     updateAccountUI();
-    return cloudVerified;
+    return true;
   }catch(e){
-    console.warn('GÖKTAŞI Zatoi doğrulama:',e);
+    console.warn('GÖKTAŞI Zatoi/bulut doğrulama:',e);
     clearGameCloudState();
-    if(showMessage)toast(e.status===401?'Zatoi oturumu geçersiz — Zatoi AI’da yeniden giriş yap':'Zatoi hesabı doğrulanamadı');
+    if(showMessage)toast(e.status===401?'Zatoi oturumu geçersiz — Zatoi AI’da yeniden giriş yap':'Zatoi hesabı/bulut doğrulanamadı');
     updateAccountUI();
     return false;
   }
 }
 function accountStateText(){
   if(cloudVerified&&accountUser){
-    return 'Zatoi hesabı doğrulandı: '+(accountUser.username||accountUser.userName||'kullanıcı')+' · Kimlik bağlantısı hazır. Eski bulut kayıt aktarılana kadar buluta yazma kilitli.';
+    const name=accountUser.username||accountUser.userName||'kullanıcı';
+    return cloudReady
+      ? 'Zatoi hesabı doğrulandı: '+name+' · Bulut kayıt hazır · sürüm '+cloudSaveVersion+'.'
+      : 'Zatoi hesabı doğrulandı: '+name+' · Kayıt farkı nedeniyle bulut yazma güvenlik için durduruldu.';
   }
   return 'Zatoi oturumu bulunamadı veya doğrulanmadı. Önce Zatoi AI ana sayfasında hesabına giriş yap.';
 }
@@ -2327,12 +2426,17 @@ function refreshContinueButton(){
   cb.style.display='block';cb.textContent='Devam et — '+d.name+' (Lv '+d.lvl+')';
 }
 function cloudStatusText(){
-  if(cloudVerified&&accountUser)return 'Zatoi hesabı: '+(accountUser.username||accountUser.userName||'kullanıcı')+' · doğrulandı · bulut yazma aktarım tamamlanana kadar kilitli';
+  if(cloudVerified&&accountUser){
+    const name=accountUser.username||accountUser.userName||'kullanıcı';
+    return cloudReady
+      ? 'Zatoi hesabı: '+name+' · bulut bağlı · sürüm '+cloudSaveVersion
+      : 'Zatoi hesabı: '+name+' · doğrulandı · bulut yazma güvenlik için durduruldu';
+  }
   return 'Zatoi hesabı henüz doğrulanmadı.';
 }
 function updateCloudPanel(){
   const s=$('cloudStatus');if(s)s.textContent=cloudStatusText();
-  const saveBtn=$('cloudSaveNowBtn');if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='BULUT KAYIT — AKTARIM BEKLENİYOR';}
+  const saveBtn=$('cloudSaveNowBtn');if(saveBtn){saveBtn.disabled=!cloudReady;saveBtn.textContent=cloudReady?'ŞİMDİ BULUTA KAYDET':'BULUT KAYIT — GÜVENLİK KİLİDİ';}
   const codeBtn=$('cloudCodeBtn'),importBtn=$('cloudImportBtn'),codeBox=$('cloudCodeBox');
   if(codeBtn)codeBtn.style.display='none';
   if(importBtn)importBtn.style.display='none';
@@ -2348,17 +2452,16 @@ function setAccountCheckState(text,busy=false){
   }
 }
 async function runAccountCheck(){
-  setAccountCheckState('Zatoi hesabı kontrol ediliyor…',true);
+  setAccountCheckState('Zatoi hesabı ve bulut kaydı kontrol ediliyor…',true);
   try{
-    const ok=await initCloudSave(false);
+    const ok=await initCloudSave(true);
     if(ok&&accountUser){
-      const name=accountUser.username||accountUser.userName||'kullanıcı';
-      setAccountCheckState('Zatoi hesabı doğrulandı: '+name+' · Kimlik bağlantısı hazır. Eski bulut kayıt aktarılana kadar buluta yazma kilitli.');
-      toast('Zatoi hesabı doğrulandı: '+name);
+      setAccountCheckState(accountStateText());
+      toast(cloudReady?'Zatoi bulut bağlantısı hazır':'Zatoi hesabı doğrulandı; bulut güvenlik kilidinde');
     }else{
       const hasToken=!!readZatoiSession();
-      setAccountCheckState(hasToken?'Zatoi oturumu doğrulanamadı. Zatoi AI’da çıkış yapıp yeniden giriş yap.':'Zatoi oturumu bulunamadı. Önce Zatoi AI ana sayfasında hesabına giriş yap.');
-      toast(hasToken?'Zatoi hesabı doğrulanamadı':'Önce Zatoi AI hesabına giriş yap');
+      setAccountCheckState(hasToken?'Zatoi hesabı doğrulandıysa bile bulut senkronizasyonu tamamlanamadı.':'Zatoi oturumu bulunamadı. Önce Zatoi AI ana sayfasında hesabına giriş yap.');
+      if(!hasToken)toast('Önce Zatoi AI hesabına giriş yap');
     }
     updateCloudPanel();
     return ok;
@@ -2383,7 +2486,7 @@ function bindCloudUI(){
       runAccountCheck();
     });
   }
-  const sn=$('cloudSaveNowBtn');if(sn)sn.onclick=()=>toast('Bulut yazma geçici olarak kilitli — önce eski kayıt taşınacak');
+  const sn=$('cloudSaveNowBtn');if(sn)sn.onclick=()=>cloudReady?cloudSave(true):toast('Bulut yazma güvenlik için kilitli');
 }
 // Ek güvenlik: panel sonradan yeniden çizilse bile kontrol düğmesi çalışır.
 document.addEventListener('click',e=>{
@@ -2399,7 +2502,7 @@ if(accountCheckBtn)accountCheckBtn.dataset.goktasiHandled='1';
 addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData(),'sayfa-kapanis');});
 setInterval(save,15000);
 bindCloudUI();
-initCloudSave(false);
+initCloudSave(false).then(()=>refreshContinueButton());
 
 // ---------- intro / başlangıç ----------
 const SOYS=[{k:'kurt',n:'Kurt Soyu',d:'+6 Güç — sürünün dişi, savaşın kılıcı'},
