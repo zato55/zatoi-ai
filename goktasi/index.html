@@ -255,6 +255,20 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 </div>
 
 <div class="panel" id="mapPanel"><h3>DÜNYA HARİTASI</h3><button class="x" data-close="mapPanel">✕</button><canvas id="mapCv" width="420" height="420"></canvas></div>
+<div class="panel" id="cloudPanel">
+  <h3>BULUT HESABI</h3><button class="x" data-close="cloudPanel">✕</button>
+  <div class="bd">
+    <div id="cloudStatus" style="margin-bottom:10px;line-height:1.45">Bulut hesabı hazırlanıyor…</div>
+    <button class="abtn" id="cloudSaveNowBtn">ŞİMDİ BULUTA KAYDET</button>
+    <button class="abtn" id="cloudCodeBtn">BU CİHAZIN AKTARIM KODUNU GÖSTER</button>
+    <button class="abtn" id="cloudImportBtn">BAŞKA CİHAZ KODU GİR</button>
+    <div id="cloudCodeBox" style="display:none;margin-top:10px">
+      <div style="font-size:12px;opacity:.82;margin-bottom:6px">Bu kod karakter hesabının anahtarıdır. Başkasıyla paylaşma.</div>
+      <textarea id="cloudCodeText" readonly style="width:100%;height:92px;box-sizing:border-box;resize:none"></textarea>
+      <button class="abtn" id="cloudCopyBtn">KODU KOPYALA</button>
+    </div>
+  </div>
+</div>
 
 <div id="death"><h2>RUHUN KIRILDI</h2><p id="deathTxt"></p></div>
 <div id="toasts"></div>
@@ -269,6 +283,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
     <div class="soys" id="soys"></div>
     <button id="startBtn">YOLCULUĞA BAŞLA</button>
     <button id="installBtn" type="button">TELEFONA YÜKLE</button>
+    <button id="cloudBtn" type="button">BULUT HESABI / CİHAZ AKTAR</button>
     <button id="contBtn" style="display:none"></button>
     <div id="introKeys">Tarayıcında çalışır • otomatik kayıt • ses için bir kez tıkla</div>
   </div>
@@ -2026,7 +2041,7 @@ function placeObjects(){
     if(spr)objMap.set(ty*MW+tx,{spr,x,y,cr});
   }
 }
-// ---------- kayıt: yerel + GÖKTAŞI Cloud Save V4.6 ----------
+// ---------- kayıt: yerel + GÖKTAŞI Cloud Save V4.7 / cihaz aktarımı ----------
 const SAVE_KEY='goktasi_kayit1';
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
 const CLOUD_AUTH_KEY='goktasi_cloud_auth_v1';
@@ -2121,12 +2136,97 @@ async function initCloudSave(){
   }
 }
 function getCloudTransferCode(){
-  // Cihaz aktarımı için şimdilik kimliği kullanıcıya gösterebilecek yardımcı; otomatik UI sonraki sürümde.
-  return cloudAuth?JSON.stringify(cloudAuth):'';
+  if(!cloudAuth?.user_id||!cloudAuth?.token)return '';
+  const raw=JSON.stringify({v:1,user_id:cloudAuth.user_id,token:cloudAuth.token});
+  const bytes=new TextEncoder().encode(raw);
+  let bin='';for(const b of bytes)bin+=String.fromCharCode(b);
+  return 'GOKTASI1-'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function parseCloudTransferCode(code){
+  try{
+    code=String(code||'').trim();
+    if(!code.startsWith('GOKTASI1-'))return null;
+    let b64=code.slice(9).replace(/-/g,'+').replace(/_/g,'/');
+    while(b64.length%4)b64+='=';
+    const bin=atob(b64),bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+    const d=JSON.parse(new TextDecoder().decode(bytes));
+    if(d?.v!==1||!d?.user_id||!d?.token)return null;
+    return {user_id:String(d.user_id),token:String(d.token)};
+  }catch(e){return null;}
+}
+function cloudStatusText(){
+  if(!cloudReady)return 'Bulut bağlantısı hazır değil. İnternet bağlantını kontrol et.';
+  const id=cloudAuth?.user_id?cloudAuth.user_id.slice(0,8)+'…':'—';
+  return 'Bulut bağlantısı aktif. Hesap: '+id+
+    (started?' · '+(P.name||'Karakter')+' Lv '+(P.lvl||1):'');
+}
+function updateCloudPanel(){
+  const s=$('cloudStatus');if(s)s.textContent=cloudStatusText();
+}
+function openCloudPanel(){
+  updateCloudPanel();
+  $('cloudPanel').classList.add('on');
+}
+async function importCloudTransferCode(){
+  const code=prompt('Diğer cihazdaki GÖKTAŞI aktarım kodunu buraya yapıştır:');
+  if(!code)return;
+  const incoming=parseCloudTransferCode(code);
+  if(!incoming){toast('Geçersiz aktarım kodu');return;}
+  const previous=cloudAuth;
+  try{
+    cloudAuth=incoming;
+    const remote=await cloudFetch('/load');
+    if(!remote.found||remote.save?.data?.v!==1){
+      cloudAuth=previous;
+      toast('Bu hesapta geçerli karakter kaydı bulunamadı');
+      return;
+    }
+    const rd=remote.save.data;
+    const localRaw=localStorage.getItem(SAVE_KEY);
+    let local=null;try{local=localRaw?JSON.parse(localRaw):null;}catch(e){}
+    if(local?.v===1){
+      const localTime=Number(local.savedAt)||0;
+      const remoteTime=Number(rd.savedAt)||Number(remote.save.updated_at)||0;
+      const msg='Bu cihazda '+(local.name||'karakter')+' Lv '+(local.lvl||1)+
+        ' kaydı var.\n\nBuluttaki '+(rd.name||'karakter')+' Lv '+(rd.lvl||1)+
+        ' kaydı bu cihaza getirilecek.'+
+        (remoteTime<localTime?'\n\nDikkat: cihazdaki kayıt daha yeni görünüyor.':'')+
+        '\n\nDevam edilsin mi?';
+      if(!confirm(msg)){cloudAuth=previous;return;}
+    }
+    localStorage.setItem(CLOUD_AUTH_KEY,JSON.stringify(incoming));
+    cloudAuth=incoming;cloudReady=true;
+    saveLocal(rd);
+    toast('Bulut karakteri bu cihaza aktarıldı');
+    setTimeout(()=>location.reload(),650);
+  }catch(e){
+    cloudAuth=previous;
+    toast('Aktarım kodu doğrulanamadı');
+    console.warn('GÖKTAŞI transfer:',e);
+  }
+}
+function bindCloudUI(){
+  const b=$('cloudBtn');if(b)b.onclick=openCloudPanel;
+  const sn=$('cloudSaveNowBtn');if(sn)sn.onclick=async()=>{
+    if(!started){toast('Önce karakteri aç');return;}
+    cloudDirty=true;await cloudSave(true);updateCloudPanel();
+  };
+  const cb=$('cloudCodeBtn');if(cb)cb.onclick=()=>{
+    const code=getCloudTransferCode();
+    if(!code){toast('Bulut hesabı henüz hazır değil');return;}
+    $('cloudCodeText').value=code;$('cloudCodeBox').style.display='block';
+  };
+  const cp=$('cloudCopyBtn');if(cp)cp.onclick=async()=>{
+    const code=$('cloudCodeText').value;if(!code)return;
+    try{await navigator.clipboard.writeText(code);toast('Aktarım kodu kopyalandı');}
+    catch(e){$('cloudCodeText').select();toast('Kodu seçtim — kopyalayabilirsin');}
+  };
+  const im=$('cloudImportBtn');if(im)im.onclick=importCloudTransferCode;
 }
 addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData());});
 setInterval(save,15000);
-initCloudSave();
+bindCloudUI();
+initCloudSave().finally(updateCloudPanel);
 // ---------- intro / başlangıç ----------
 const SOYS=[{k:'kurt',n:'Kurt Soyu',d:'+6 Güç — sürünün dişi, savaşın kılıcı'},
   {k:'dag',n:'Dağ Soyu',d:'+6 Beden — rüzgar eğilir, dağ eğilmez'},
