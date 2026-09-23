@@ -398,29 +398,12 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 
 
 <div class="panel" id="accountPanel">
-  <h3>GÖKTAŞI HESABI</h3><button class="x" data-close="accountPanel">✕</button>
+  <h3>ZATOI HESABI</h3><button class="x" data-close="accountPanel">✕</button>
   <div class="bd">
-    <div id="accountState" style="margin-bottom:12px;line-height:1.45">Hesap durumu kontrol ediliyor…</div>
-    <input id="accountUser" maxlength="24" autocomplete="username" placeholder="KULLANICI ADI"
-      style="width:100%;box-sizing:border-box;margin:5px 0;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
-    <input id="accountPass" type="password" maxlength="128" autocomplete="current-password" placeholder="ŞİFRE (EN AZ 8 KARAKTER)"
-      style="width:100%;box-sizing:border-box;margin:5px 0 10px;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
-    <div id="registerExtra" style="display:none">
-      <input id="accountPass2" type="password" maxlength="128" autocomplete="new-password" placeholder="ŞİFREYİ TEKRAR YAZ"
-        style="width:100%;box-sizing:border-box;margin:5px 0 10px;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
-    </div>
-    <label style="display:flex;align-items:center;gap:8px;margin:8px 0 12px;color:#d7c391;font-size:13px">
-      <input id="accountShowPass" type="checkbox" style="width:auto!important;margin:0!important"> Şifreyi göster
-    </label>
-    <div id="accountModeButtons">
-      <button class="abtn" id="accountLoginBtn">GİRİŞ YAP</button>
-      <button class="abtn" id="accountRegisterModeBtn">HESAP OLUŞTUR</button>
-    </div>
-    <button class="abtn" id="accountRegisterBtn" style="display:none">HESABI OLUŞTUR</button>
-    <button class="abtn" id="accountBackBtn" style="display:none">GERİ</button>
-    <button class="abtn" id="accountLogoutBtn" style="display:none">ÇIKIŞ YAP</button>
-    <div style="font-size:11px;opacity:.72;margin-top:10px;line-height:1.45">
-      Cihaz ve bulut kayıtları farklıysa otomatik ezilmez. Seçilmeyen kayıt yerel yedeklerde korunur.
+    <div id="accountState" style="margin-bottom:12px;line-height:1.55">Zatoi oturumu kontrol ediliyor…</div>
+    <button class="abtn" id="accountCheckBtn">ZATOI HESABINI KONTROL ET</button>
+    <div style="font-size:11px;opacity:.72;margin-top:10px;line-height:1.55">
+      GÖKTAŞI ayrı kullanıcı adı veya şifre istemez. Zatoi AI hesabındaki mevcut oturum kullanılır. Eski bulut kaydı taşınana kadar otomatik bulut yazma kapalıdır.
     </div>
   </div>
 </div>
@@ -437,7 +420,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
     <div class="soys" id="soys"></div>
     <button id="startBtn">YOLCULUĞA BAŞLA</button>
     <button id="installBtn" type="button">TELEFONA YÜKLE</button>
-    <button id="cloudBtn" type="button">HESAP / BULUT KAYIT</button>
+    <button id="cloudBtn" type="button">ZATOI HESABI / BULUT</button>
     <button id="contBtn" style="display:none"></button>
     <div id="introKeys">Tarayıcında çalışır • otomatik kayıt • ses için bir kez tıkla</div>
   </div>
@@ -447,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.8 hesap + bulut kayıt
+   Tek dosyalık açık dünya aksiyon-RPG — V4.9.2 Zatoi hesap doğrulama
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2195,14 +2178,14 @@ function placeObjects(){
     if(spr)objMap.set(ty*MW+tx,{spr,x,y,cr});
   }
 }
-// ---------- kayıt: GÖKTAŞI V4.9.1 / hesap formu + güvenli senkron ----------
+// ---------- kayıt: GÖKTAŞI V4.9.2 / Zatoi hesap doğrulama aşaması ----------
 const SAVE_KEY='goktasi_kayit1';
 const LOCAL_BACKUPS_KEY='goktasi_local_backups_v2';
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
-const LEGACY_AUTH_KEY='goktasi_cloud_auth_v1';
-const USER_SESSION_KEY='goktasi_user_session_v3';
+const ZATOI_AUTH_TOKEN_KEY='zatoi_auth_token_v1';
+const ZATOI_AUTH_USER_KEY='zatoi_auth_user_v1';
 const MAX_LOCAL_BACKUPS=12;
-let cloudAuth=null,cloudReady=false,cloudBusy=false,cloudDirty=false,cloudTimer=0;
+let cloudAuth=null,cloudReady=false,cloudVerified=false,cloudBusy=false,cloudDirty=false,cloudTimer=0;
 let accountUser=null,cloudRevision=0;
 
 function saveFingerprint(d){
@@ -2250,6 +2233,8 @@ function save(){
   if(!started)return;
   const data=makeSaveData();
   saveLocal(data,'oyun-kaydi');
+  // Zatoi hesabı doğrulandıktan sonra bile eski kayıt taşınana kadar
+  // buluta otomatik yazma özellikle kapalı tutulur.
   if(cloudReady){cloudDirty=true;scheduleCloudSave();}
 }
 function load(){
@@ -2266,22 +2251,21 @@ async function apiFetch(path,opt={},tokenOverride){
   if(opt.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
   const r=await fetch(CLOUD_API+path,{...opt,headers});
   let j=null;try{j=await r.json();}catch(e){}
-  if(!r.ok||!j?.ok)throw new Error(j?.error||('HTTP '+r.status));
+  if(!r.ok||!j?.ok){
+    const err=new Error(j?.error||('HTTP '+r.status));
+    err.status=r.status;err.code=j?.code||'';err.data=j;throw err;
+  }
   return j;
 }
-function readSession(){
-  try{const s=JSON.parse(localStorage.getItem(USER_SESSION_KEY)||'null');return s?.token?s:null;}catch(e){return null;}
+function readZatoiSession(){
+  const token=localStorage.getItem(ZATOI_AUTH_TOKEN_KEY)||'';
+  if(!token)return null;
+  let storedUser=null;
+  try{storedUser=JSON.parse(localStorage.getItem(ZATOI_AUTH_USER_KEY)||'null');}catch(e){}
+  return {token,storedUser};
 }
-function storeSession(j){
-  cloudAuth={token:j.session.token,user_id:j.user.id,username:j.user.username,expires_at:j.session.expires_at};
-  accountUser={id:j.user.id,username:j.user.username};
-  localStorage.setItem(USER_SESSION_KEY,JSON.stringify(cloudAuth));
-}
-function clearSession(){
-  localStorage.removeItem(USER_SESSION_KEY);cloudAuth=null;accountUser=null;cloudReady=false;cloudRevision=0;
-}
-function readLegacyAuth(){
-  try{const a=JSON.parse(localStorage.getItem(LEGACY_AUTH_KEY)||'null');return a?.token&&a?.user_id?a:null;}catch(e){return null;}
+function clearGameCloudState(){
+  cloudAuth=null;accountUser=null;cloudVerified=false;cloudReady=false;cloudRevision=0;cloudDirty=false;
 }
 function progressSummary(d){
   return `${d?.name||'Karakter'} · Lv ${Number(d?.lvl)||1} · EXP ${Math.floor(Number(d?.exp)||0)} · kayıt #${Number(d?.syncRev)||0}`;
@@ -2295,189 +2279,60 @@ function isObviousRollback(newer,older){
   return levelDrop||questDrop||playDrop;
 }
 async function cloudSave(showMessage=false){
-  if(!started||!cloudReady||cloudBusy||!cloudAuth?.token)return false;
-  cloudBusy=true;
-  try{
-    const local=readLocalRaw()||makeSaveData();
-    const remote=await apiFetch('/load');
-    if(remote.found&&remote.save?.data?.v===1){
-      const rd=remote.save.data;
-      cloudRevision=Math.max(cloudRevision,Number(rd.syncRev)||0,Number(remote.save.save_version)||0);
-      // Sunucuda cihazdan farklı ve daha ileri görünen kayıt varsa otomatik ezme.
-      if(!isSameSave(local,rd)){
-        const lr=Number(local.syncRev)||0,rr=Number(rd.syncRev)||0;
-        if(rr>lr || isObviousRollback(local,rd)){
-          if(showMessage)toast('Bulut kaydı farklı — otomatik üzerine yazılmadı');
-          cloudDirty=true;return false;
-        }
-      }
-    }
-    const outgoing={...local,syncRev:Math.max(Number(local.syncRev)||0,cloudRevision)+1,savedAt:Date.now()};
-    saveLocal(outgoing,'bulut-oncesi');
-    const j=await apiFetch('/save',{method:'POST',body:JSON.stringify({
-      character_name:outgoing.name||'',level:outgoing.lvl||1,save_data:outgoing
-    })});
-    cloudRevision=Math.max(cloudRevision,Number(outgoing.syncRev)||0,Number(j.save_version)||0);
-    cloudDirty=false;
-    if(showMessage)toast('Bulut kayıt tamamlandı');
-    return j;
-  }catch(e){
-    cloudDirty=true;if(showMessage)toast('Bulut kayıt başarısız — cihaz kaydı ve yedekler güvende');
-    console.warn('GÖKTAŞI cloud save:',e);return false;
-  }finally{cloudBusy=false;}
+  // MIGRATION_LOCK: eski Lv6 kayıt Zatoi userId'ye taşınmadan buluta yazma yok.
+  if(showMessage)toast('Bulut yazma geçici olarak kilitli — eski kayıt güvenle taşınacak');
+  return false;
 }
-async function resolveSyncConflict(local,remote,remoteMeta){
-  if(!local&&remote)return 'cloud';
-  if(local&&!remote)return 'local';
-  if(!local&&!remote)return 'none';
-  if(isSameSave(local,remote))return 'same';
-
-  const lr=Number(local.syncRev)||0, rr=Number(remote.syncRev)||0;
-  // Revizyon kesin biçimde tek yönlü ilerliyorsa ve geriye dönüş yoksa sessiz senkron.
-  if(lr>rr && !isObviousRollback(local,remote))return 'local';
-  if(rr>lr && !isObviousRollback(remote,local))return 'cloud';
-
-  const msg=
-    'İki farklı kayıt bulundu.\n\n'+
-    'CİHAZ: '+progressSummary(local)+'\n'+
-    'BULUT: '+progressSummary(remote)+'\n\n'+
-    'Tamam = CİHAZ kaydını kullan\n'+
-    'İptal = BULUT kaydını kullan\n\n'+
-    'Seçilmeyen kayıt yedek olarak korunur.';
-  return confirm(msg)?'local':'cloud';
-}
-async function syncAccountCloud(){
-  const remoteResp=await apiFetch('/load');
-  const local=readLocalRaw();
-  const remote=remoteResp.found&&remoteResp.save?.data?.v===1?remoteResp.save.data:null;
-  cloudRevision=Math.max(Number(remote?.syncRev)||0,Number(remoteResp.save?.save_version)||0);
-
-  const choice=await resolveSyncConflict(local,remote,remoteResp.save);
-  if(choice==='same'){return {source:'same',data:local};}
-  if(choice==='cloud'){
-    if(local)pushLocalBackup(local,'bulut-secildi');
-    saveLocal(remote,'bulut-secildi');
-    return {source:'cloud',data:remote};
+async function initCloudSave(showMessage=false){
+  clearGameCloudState();
+  const s=readZatoiSession();
+  if(!s){
+    updateAccountUI();
+    if(showMessage)toast('Önce Zatoi AI hesabına giriş yap');
+    return false;
   }
-  if(choice==='local'){
-    if(remote)pushLocalBackup(remote,'cihaz-secildi-bulut-kopyasi');
-    const outgoing={...local,syncRev:Math.max(Number(local.syncRev)||0,cloudRevision)+1,savedAt:Date.now()};
-    saveLocal(outgoing,'cihaz-secildi');
-    const j=await apiFetch('/save',{method:'POST',body:JSON.stringify({
-      character_name:outgoing.name||'',level:outgoing.lvl||1,save_data:outgoing
-    })});
-    cloudRevision=Math.max(cloudRevision,Number(outgoing.syncRev)||0,Number(j.save_version)||0);
-    return {source:'local',data:outgoing,saved:j};
-  }
-  return {source:'none',data:null};
-}
-async function initCloudSave(){
-  const s=readSession();
-  if(!s){cloudReady=false;updateAccountUI();return;}
-  cloudAuth=s;
+  cloudAuth={token:s.token};
   try{
     const me=await apiFetch('/auth/me');
-    accountUser=me.user;cloudReady=true;
-    await syncAccountCloud();
-  }catch(e){
-    console.warn('GÖKTAŞI V4.9 session:',e);
-    // Ağ hatasında oturumu silme; yalnız 401 benzeri doğrulama hatası bir sonraki girişte ele alınır.
+    accountUser=me.user||null;
+    cloudVerified=!!accountUser?.id;
+    // DİKKAT: doğrulama başarılı olsa da migration tamamlanana kadar cloudReady=false.
     cloudReady=false;
+    if(showMessage&&cloudVerified)toast('Zatoi hesabı doğrulandı');
+    updateAccountUI();
+    return cloudVerified;
+  }catch(e){
+    console.warn('GÖKTAŞI Zatoi doğrulama:',e);
+    clearGameCloudState();
+    if(showMessage)toast(e.status===401?'Zatoi oturumu geçersiz — Zatoi AI’da yeniden giriş yap':'Zatoi hesabı doğrulanamadı');
+    updateAccountUI();
+    return false;
   }
-  refreshContinueButton();updateAccountUI();
 }
 function accountStateText(){
-  if(cloudReady&&accountUser)return 'Giriş yapıldı: '+accountUser.username+' · Güvenli bulut kayıt aktif.';
-  return 'Giriş yapılmadı. Cihaz kaydı ve yerel yedekler çalışır; bulut için giriş yap.';
-}
-let accountMode='login';
-function setAccountMode(mode){
-  accountMode=mode;
-  const logged=cloudReady&&accountUser;
-  const extra=$('registerExtra'), reg=$('accountRegisterBtn'), back=$('accountBackBtn');
-  const modes=$('accountModeButtons'), out=$('accountLogoutBtn');
-  if(extra)extra.style.display=(!logged&&mode==='register')?'block':'none';
-  if(reg)reg.style.display=(!logged&&mode==='register')?'block':'none';
-  if(back)back.style.display=(!logged&&mode==='register')?'block':'none';
-  if(modes)modes.style.display=(!logged&&mode==='login')?'block':'none';
-  if(out)out.style.display=logged?'block':'none';
-  if($('accountPass2')&&mode!=='register')$('accountPass2').value='';
+  if(cloudVerified&&accountUser){
+    return 'Zatoi hesabı doğrulandı: '+(accountUser.username||'kullanıcı')+' · Kimlik bağlantısı hazır. Eski bulut kayıt aktarılana kadar buluta yazma kilitli.';
+  }
+  return 'Zatoi oturumu bulunamadı veya doğrulanmadı. Önce Zatoi AI ana sayfasında hesabına giriş yap.';
 }
 function updateAccountUI(){
   const s=$('accountState');if(s)s.textContent=accountStateText();
-  setAccountMode(accountMode);
   updateCloudPanel();
 }
 function openAccountPanel(){updateAccountUI();$('accountPanel').classList.add('on');}
-async function loginAccount(){
-  const username=$('accountUser').value.trim(),password=$('accountPass').value;
-  if(!username||!password){toast('Kullanıcı adı ve şifre gerekli');return;}
-  try{
-    const j=await apiFetch('/auth/login',{method:'POST',body:JSON.stringify({username,password})},'');
-    storeSession(j);cloudReady=true;
-    await syncAccountCloud();$('accountPass').value='';
-    toast('Giriş başarılı');updateAccountUI();refreshContinueButton();
-  }catch(e){toast(e.message||'Giriş başarısız');}
-}
-async function registerAccount(){
-  const username=$('accountUser').value.trim(),password=$('accountPass').value,password2=$('accountPass2').value;
-  if(!username||!password||!password2){toast('Kullanıcı adı ve iki şifre alanı gerekli');return;}
-  if(password!==password2){toast('Şifreler aynı değil');return;}
-  if(password.length<8){toast('Şifre en az 8 karakter olmalı');return;}
-  let legacyData=null,legacyUpdated=0;
-  const legacy=readLegacyAuth();
-  if(legacy){
-    try{
-      const old=await apiFetch('/load',{},legacy.token);
-      if(old.found&&old.save?.data?.v===1){legacyData=old.save.data;legacyUpdated=old.save.updated_at||0;}
-    }catch(e){console.warn('Eski bulut kayıt okunamadı:',e);}
-  }
-  const local=readLocalRaw();
-  try{
-    const j=await apiFetch('/auth/register',{method:'POST',body:JSON.stringify({username,password})},'');
-    storeSession(j);cloudReady=true;
-    // İlk geçişte iki eski kaydı da yedek havuzuna al.
-    if(legacyData)pushLocalBackup(legacyData,'eski-bulut-gecis');
-    if(local)pushLocalBackup(local,'hesap-gecis');
-    let chosen=local||legacyData;
-    if(local&&legacyData&&!isSameSave(local,legacyData)){
-      const msg='Eski iki kayıt bulundu.\n\nCİHAZ: '+progressSummary(local)+
-        '\nESKİ BULUT: '+progressSummary(legacyData)+
-        '\n\nTamam = CİHAZ, İptal = ESKİ BULUT';
-      chosen=confirm(msg)?local:legacyData;
-    }
-    if(chosen){
-      const outgoing={...chosen,syncRev:Math.max(Number(chosen.syncRev)||0,1),savedAt:Date.now()};
-      await apiFetch('/save',{method:'POST',body:JSON.stringify({
-        character_name:outgoing.name||'',level:outgoing.lvl||1,save_data:outgoing
-      })});
-      const verify=await apiFetch('/load');
-      if(!verify.found||verify.save?.data?.v!==1)throw new Error('Karakter aktarımı doğrulanamadı');
-      saveLocal(verify.save.data,'hesap-dogrulama');
-      cloudRevision=Math.max(Number(verify.save.data.syncRev)||0,Number(verify.save.save_version)||0);
-    }
-    $('accountPass').value='';$('accountPass2').value='';
-    accountMode='login';
-    toast(chosen?'Hesap oluşturuldu — karakter güvenle bağlandı':'Hesap oluşturuldu');
-    updateAccountUI();refreshContinueButton();
-  }catch(e){toast(e.message||'Hesap oluşturulamadı');updateAccountUI();}
-}
-async function logoutAccount(){
-  if(started&&cloudReady)await cloudSave(false);
-  try{if(cloudAuth?.token)await apiFetch('/auth/logout',{method:'POST'});}catch(e){}
-  clearSession();toast('Hesaptan çıkıldı');updateAccountUI();
-}
 function refreshContinueButton(){
   const cb=$('contBtn'),d=readLocalRaw();
-  if(!cb||!d)return;
+  if(!cb)return;
+  if(!d){cb.style.display='none';return;}
   cb.style.display='block';cb.textContent='Devam et — '+d.name+' (Lv '+d.lvl+')';
 }
 function cloudStatusText(){
-  if(cloudReady&&accountUser)return 'Hesap: '+accountUser.username+' · güvenli bulut kayıt aktif'+(started?' · '+(P.name||'Karakter')+' Lv '+(P.lvl||1):'');
-  return 'Bulut kayıt için kullanıcı adı ve şifreyle giriş yap.';
+  if(cloudVerified&&accountUser)return 'Zatoi hesabı: '+(accountUser.username||'kullanıcı')+' · doğrulandı · bulut yazma aktarım tamamlanana kadar kilitli';
+  return 'Zatoi hesabı henüz doğrulanmadı.';
 }
 function updateCloudPanel(){
   const s=$('cloudStatus');if(s)s.textContent=cloudStatusText();
+  const saveBtn=$('cloudSaveNowBtn');if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='BULUT KAYIT — AKTARIM BEKLENİYOR';}
   const codeBtn=$('cloudCodeBtn'),importBtn=$('cloudImportBtn'),codeBox=$('cloudCodeBox');
   if(codeBtn)codeBtn.style.display='none';
   if(importBtn)importBtn.style.display='none';
@@ -2485,24 +2340,13 @@ function updateCloudPanel(){
 }
 function bindCloudUI(){
   const b=$('cloudBtn');if(b)b.onclick=openAccountPanel;
-  const sn=$('cloudSaveNowBtn');if(sn)sn.onclick=async()=>{
-    if(!cloudReady){openAccountPanel();return;}
-    if(!started){toast('Önce karakteri aç');return;}
-    cloudDirty=true;await cloudSave(true);updateCloudPanel();
-  };
-  const login=$('accountLoginBtn');if(login)login.onclick=loginAccount;
-  const regMode=$('accountRegisterModeBtn');if(regMode)regMode.onclick=()=>{setAccountMode('register');$('accountPass').setAttribute('autocomplete','new-password');};
-  const reg=$('accountRegisterBtn');if(reg)reg.onclick=registerAccount;
-  const back=$('accountBackBtn');if(back)back.onclick=()=>{setAccountMode('login');$('accountPass').setAttribute('autocomplete','current-password');};
-  const show=$('accountShowPass');if(show)show.onchange=()=>{
-    const t=show.checked?'text':'password';$('accountPass').type=t;if($('accountPass2'))$('accountPass2').type=t;
-  };
-  const out=$('accountLogoutBtn');if(out)out.onclick=logoutAccount;
+  const check=$('accountCheckBtn');if(check)check.onclick=()=>initCloudSave(true);
+  const sn=$('cloudSaveNowBtn');if(sn)sn.onclick=()=>toast('Bulut yazma geçici olarak kilitli — önce eski kayıt taşınacak');
 }
 addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData(),'sayfa-kapanis');});
 setInterval(save,15000);
 bindCloudUI();
-initCloudSave();
+initCloudSave(false);
 
 // ---------- intro / başlangıç ----------
 const SOYS=[{k:'kurt',n:'Kurt Soyu',d:'+6 Güç — sürünün dişi, savaşın kılıcı'},
