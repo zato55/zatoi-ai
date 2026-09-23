@@ -405,8 +405,19 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
       style="width:100%;box-sizing:border-box;margin:5px 0;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
     <input id="accountPass" type="password" maxlength="128" autocomplete="current-password" placeholder="ŞİFRE (EN AZ 8 KARAKTER)"
       style="width:100%;box-sizing:border-box;margin:5px 0 10px;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
-    <button class="abtn" id="accountLoginBtn">GİRİŞ YAP</button>
-    <button class="abtn" id="accountRegisterBtn">HESAP OLUŞTUR</button>
+    <div id="registerExtra" style="display:none">
+      <input id="accountPass2" type="password" maxlength="128" autocomplete="new-password" placeholder="ŞİFREYİ TEKRAR YAZ"
+        style="width:100%;box-sizing:border-box;margin:5px 0 10px;padding:10px;background:#0c1010;color:#eee;border:1px solid #555">
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin:8px 0 12px;color:#d7c391;font-size:13px">
+      <input id="accountShowPass" type="checkbox" style="width:auto!important;margin:0!important"> Şifreyi göster
+    </label>
+    <div id="accountModeButtons">
+      <button class="abtn" id="accountLoginBtn">GİRİŞ YAP</button>
+      <button class="abtn" id="accountRegisterModeBtn">HESAP OLUŞTUR</button>
+    </div>
+    <button class="abtn" id="accountRegisterBtn" style="display:none">HESABI OLUŞTUR</button>
+    <button class="abtn" id="accountBackBtn" style="display:none">GERİ</button>
     <button class="abtn" id="accountLogoutBtn" style="display:none">ÇIKIŞ YAP</button>
     <div style="font-size:11px;opacity:.72;margin-top:10px;line-height:1.45">
       Cihaz ve bulut kayıtları farklıysa otomatik ezilmez. Seçilmeyen kayıt yerel yedeklerde korunur.
@@ -2184,7 +2195,7 @@ function placeObjects(){
     if(spr)objMap.set(ty*MW+tx,{spr,x,y,cr});
   }
 }
-// ---------- kayıt: GÖKTAŞI V4.9 / güvenli senkron + yerel yedek ----------
+// ---------- kayıt: GÖKTAŞI V4.9.1 / hesap formu + güvenli senkron ----------
 const SAVE_KEY='goktasi_kayit1';
 const LOCAL_BACKUPS_KEY='goktasi_local_backups_v2';
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
@@ -2379,12 +2390,22 @@ function accountStateText(){
   if(cloudReady&&accountUser)return 'Giriş yapıldı: '+accountUser.username+' · Güvenli bulut kayıt aktif.';
   return 'Giriş yapılmadı. Cihaz kaydı ve yerel yedekler çalışır; bulut için giriş yap.';
 }
+let accountMode='login';
+function setAccountMode(mode){
+  accountMode=mode;
+  const logged=cloudReady&&accountUser;
+  const extra=$('registerExtra'), reg=$('accountRegisterBtn'), back=$('accountBackBtn');
+  const modes=$('accountModeButtons'), out=$('accountLogoutBtn');
+  if(extra)extra.style.display=(!logged&&mode==='register')?'block':'none';
+  if(reg)reg.style.display=(!logged&&mode==='register')?'block':'none';
+  if(back)back.style.display=(!logged&&mode==='register')?'block':'none';
+  if(modes)modes.style.display=(!logged&&mode==='login')?'block':'none';
+  if(out)out.style.display=logged?'block':'none';
+  if($('accountPass2')&&mode!=='register')$('accountPass2').value='';
+}
 function updateAccountUI(){
   const s=$('accountState');if(s)s.textContent=accountStateText();
-  const out=$('accountLogoutBtn');if(out)out.style.display=cloudReady?'block':'none';
-  const login=$('accountLoginBtn'),reg=$('accountRegisterBtn');
-  if(login)login.style.display=cloudReady?'none':'block';
-  if(reg)reg.style.display=cloudReady?'none':'block';
+  setAccountMode(accountMode);
   updateCloudPanel();
 }
 function openAccountPanel(){updateAccountUI();$('accountPanel').classList.add('on');}
@@ -2399,8 +2420,10 @@ async function loginAccount(){
   }catch(e){toast(e.message||'Giriş başarısız');}
 }
 async function registerAccount(){
-  const username=$('accountUser').value.trim(),password=$('accountPass').value;
-  if(!username||!password){toast('Kullanıcı adı ve şifre gerekli');return;}
+  const username=$('accountUser').value.trim(),password=$('accountPass').value,password2=$('accountPass2').value;
+  if(!username||!password||!password2){toast('Kullanıcı adı ve iki şifre alanı gerekli');return;}
+  if(password!==password2){toast('Şifreler aynı değil');return;}
+  if(password.length<8){toast('Şifre en az 8 karakter olmalı');return;}
   let legacyData=null,legacyUpdated=0;
   const legacy=readLegacyAuth();
   if(legacy){
@@ -2433,7 +2456,8 @@ async function registerAccount(){
       saveLocal(verify.save.data,'hesap-dogrulama');
       cloudRevision=Math.max(Number(verify.save.data.syncRev)||0,Number(verify.save.save_version)||0);
     }
-    $('accountPass').value='';
+    $('accountPass').value='';$('accountPass2').value='';
+    accountMode='login';
     toast(chosen?'Hesap oluşturuldu — karakter güvenle bağlandı':'Hesap oluşturuldu');
     updateAccountUI();refreshContinueButton();
   }catch(e){toast(e.message||'Hesap oluşturulamadı');updateAccountUI();}
@@ -2467,7 +2491,12 @@ function bindCloudUI(){
     cloudDirty=true;await cloudSave(true);updateCloudPanel();
   };
   const login=$('accountLoginBtn');if(login)login.onclick=loginAccount;
+  const regMode=$('accountRegisterModeBtn');if(regMode)regMode.onclick=()=>{setAccountMode('register');$('accountPass').setAttribute('autocomplete','new-password');};
   const reg=$('accountRegisterBtn');if(reg)reg.onclick=registerAccount;
+  const back=$('accountBackBtn');if(back)back.onclick=()=>{setAccountMode('login');$('accountPass').setAttribute('autocomplete','current-password');};
+  const show=$('accountShowPass');if(show)show.onchange=()=>{
+    const t=show.checked?'text':'password';$('accountPass').type=t;if($('accountPass2'))$('accountPass2').type=t;
+  };
   const out=$('accountLogoutBtn');if(out)out.onclick=logoutAccount;
 }
 addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData(),'sayfa-kapanis');});
