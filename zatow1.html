@@ -2804,6 +2804,62 @@ function rescueReport673(){
  L.push('Kanıt kuralı: ekoloji yeniden üremeye yeterli hale geldiğinde doğurgan birey hâlâ varsa kapı/doğum zinciri yeniden başlayabilmelidir. Ekoloji hazırlandığı halde doğurgan=0 kalıyor ve nüfus yok oluyorsa geri dönülemezlik demografik kurtarma penceresinin kaçırılmasıyla desteklenir.');return L;
 }
 
+
+// V6.74 — SON SOY ZİNCİRİ / NESİL KÖPRÜSÜ LABORATUVARI (PASİF)
+// Amaç: düşük nüfuslu darboğazlarda tek tek hayatta kalanların gerçek üreme kapılarını,
+// yavru köprülerini ve yaşlanma maruziyetini kaydetmek. FİZİK / EKOLOJİ / ÜREME / YAŞLANMA DEĞİŞMEZ.
+let lineage674={armed:false,active:null,episodes:[],nextId:1,thresholds:[20,10,5,3,2,1],
+ ageExposure:{'30-34':0,'35-39':0,'40-44':0,'45-49':0,'50+':0},
+ ageDeaths:{'30-34':0,'35-39':0,'40-44':0,'45-49':0,'50+':0},audit:{duplicateThreshold:0,birthWithoutActive:0}};
+function ageBand674(ad){return ad<35?'30-34':ad<40?'35-39':ad<45?'40-44':ad<50?'45-49':'50+'}
+function gate674(z){
+ const mature=z.age>(560+180*(z.reproPhase??.5));
+ const cooldown=tick-(z.lastSoloBirth??-99999)>(980+(1.15-z.g.metabolism)*180+(1-z.g.curiosity)*120);
+ const energy=z.energy>78, water=z.hydration>66, meal=tick-z.lastMealTick<720;
+ const crowd=zatos.filter(o=>o!==z&&dist(z,o)<30).length<7;
+ const mp=plants.filter(p=>p.alive!==false&&p.age>=p.maturity).length;
+ const fpc=food.length/Math.max(1,zatos.length), plantsOK=mp>=8, foodPC=fpc>.72;
+ let first='OPEN';if(!mature)first='maturity';else if(!cooldown)first='cooldown';else if(!energy)first='energy';else if(!water)first='water';else if(!meal)first='meal';else if(!crowd)first='crowd';else if(!plantsOK)first='plants';else if(!foodPC)first='foodPerCapita';
+ return {mature,cooldown,energy,water,meal,crowd,plants:plantsOK,foodPerCapita:foodPC,all:first==='OPEN',first,mp,fpc};
+}
+function survivor674(z){const g=gate674(z);return {id:z.id,gen:z.generation,age:(z.age||0)/300,longevity:ensureLongevity670(z),energy:z.energy,water:z.hydration,lastMealAge:(tick-(z.lastMealTick??-99999))/300,lastBirthAge:(tick-(z.lastSoloBirth??-99999))/300,gate:g.first,all:g.all,eventualBirths:0,death:null};}
+function snap674(label){
+ const hs=foodPatches.map(p=>p.health||0),mp=plants.filter(p=>p.alive!==false&&p.age>=p.maturity).length;
+ let blockers={maturity:0,cooldown:0,energy:0,water:0,meal:0,crowd:0,plants:0,foodPerCapita:0,OPEN:0};
+ const surv=zatos.map(z=>{const q=survivor674(z);blockers[q.gate]=(blockers[q.gate]||0)+1;return q});
+ return {label,tick,day:tick/300,pop:zatos.length,food:food.length,fpc:food.length/Math.max(1,zatos.length),mp,patch:hs.length?hs.reduce((a,b)=>a+b,0)/hs.length:0,healthy:hs.filter(h=>h>.55).length,blockers,survivors:surv};
+}
+function start674(){const q=snap674('N≤20 giriş');lineage674.active={id:lineage674.nextId++,start:q,min:q,thresholds:{},events:[],births:[],deaths:[],lastMature:null,lastPhysReady:null,lastOpen:null,mp8:null,end:null,outcome:'AKTİF'};lineage674.episodes.push(lineage674.active);lineage674.armed=false;}
+function track674(){
+ const pop=zatos.length;if(pop>=50&&!lineage674.active)lineage674.armed=true;
+ if(!lineage674.active&&lineage674.armed&&pop<=20&&pop>0)start674();
+ const e=lineage674.active;if(!e)return;
+ if(pop<e.min.pop)e.min=snap674('dip');
+ for(const t of lineage674.thresholds){if(pop<=t&&!e.thresholds[t])e.thresholds[t]=snap674('N≤'+t);}
+ const mp=plants.filter(p=>p.alive!==false&&p.age>=p.maturity).length;if(mp>=8&&!e.mp8)e.mp8=snap674('olgun bitki ≥8');
+ let mature=0,phys=0,open=0;for(const z of zatos){const g=gate674(z);if(g.mature)mature++;if(g.mature&&g.energy&&g.water&&g.meal)phys++;if(g.all)open++;}
+ if(mature)e.lastMature=snap674('son olgun var');if(phys)e.lastPhysReady=snap674('son fizyolojik hazır var');if(open)e.lastOpen=snap674('son gerçek kapı açık');
+ if(pop>=50){e.end=snap674('≥50 toparlandı');e.outcome='TOPARLANDI';lineage674.active=null;lineage674.armed=true;}
+}
+function birth674(parent,child){const e=lineage674.active;if(!e)return;const rec={tick,day:tick/300,parent:parent.id,parentAge:(parent.age||0)/300,parentLongevity:ensureLongevity670(parent),child:child.id,childGen:child.generation,pop:zatos.length,food:food.length,mp:plants.filter(p=>p.alive!==false&&p.age>=p.maturity).length};e.births.push(rec);for(const s of Object.values(e.thresholds))for(const q of (s?.survivors||[]))if(q.id===parent.id)q.eventualBirths++;}
+function death674(z){
+ const ad=(z.age||0)/300;if(ad>=30&&z._ageDeath670)lineage674.ageDeaths[ageBand674(ad)]++;
+ const e=lineage674.active;if(!e)return;let cause=z._ageDeath670?'age':z.energy<=0?'hunger':z.hydration<=0?'thirst':'other';e.deaths.push({tick,day:tick/300,id:z.id,gen:z.generation,age:ad,longevity:ensureLongevity670(z),cause,energy:z.energy,water:z.hydration});
+ for(const s of Object.values(e.thresholds))for(const q of (s?.survivors||[]))if(q.id===z.id&&!q.death)q.death={day:tick/300,age:ad,cause};
+}
+function exposure674(){for(const z of zatos){const ad=(z.age||0)/300;if(ad>=30)lineage674.ageExposure[ageBand674(ad)]++;}}
+function extinct674(){const e=lineage674.active;if(e&&e.outcome==='AKTİF'){e.end=snap674('yok oluş');e.outcome='YOK OLDU';lineage674.active=null;}}
+function f674(x,d=1){return Number.isFinite(Number(x))?Number(x).toFixed(d):'—'}
+function one674(q){if(!q)return '—';let top=Object.entries(q.blockers||{}).sort((a,b)=>b[1]-a[1])[0];return `G${f674(q.day,1)} pop ${q.pop} · besin ${q.food} (${f674(q.fpc,2)}/kişi) · bitki ${q.mp} · patch ${f674(q.patch,3)} · baskın kapı ${top&&top[1]?top[0]+' '+top[1]:'—'}`}
+function survivorLine674(q){return `#${q.id} N${q.gen} yaş${f674(q.age,1)} lon${f674(q.longevity,2)} E${f674(q.energy,1)} S${f674(q.water,1)} öğün${f674(q.lastMealAge,1)}g · ${q.gate} · sonraki doğum ${q.eventualBirths}${q.death?' · ölüm '+q.death.cause+'@'+f674(q.death.age,1)+'g':''}`}
+function report674(){
+ const L=['[V6.74 SON SOY ZİNCİRİ / NESİL KÖPRÜSÜ LABORATUVARI — PASİF]','V6.73.2 fiziği aynen korunur. N≤20 darboğazlarında N20/10/5/3/2/1 anındaki HER hayatta kalan, gerçek kapı engeli, sonraki doğumu ve ölümü izlenir.'];
+ const done=lineage674.episodes.filter(e=>e.outcome!=='AKTİF');L.push(`Episod ${lineage674.episodes.length} · toparlanan ${done.filter(e=>e.outcome==='TOPARLANDI').length} · yok olan ${done.filter(e=>e.outcome==='YOK OLDU').length}`);
+ for(const e of lineage674.episodes.slice(-4)){L.push(`Zincir #${e.id} — ${e.outcome}: ${one674(e.start)} | dip ${one674(e.min)} | bitki≥8 ${one674(e.mp8)} | sonuç ${one674(e.end)}`);for(const t of [20,10,5,3,2,1]){const s=e.thresholds[t];if(!s)continue;L.push(`  N≤${t}: ${one674(s)}`);for(const q of s.survivors.slice(0,20))L.push('    '+survivorLine674(q));}L.push(`  darboğaz doğum/ölüm: ${e.births.length}/${e.deaths.length} · son olgun ${one674(e.lastMature)} · son fizyolojik hazır ${one674(e.lastPhysReady)} · son gerçek kapı ${one674(e.lastOpen)}`);}
+ L.push('Yaşlanma maruziyeti (tick-birey) / doğal yaş ölümü: '+Object.keys(lineage674.ageExposure).map(k=>`${k}: ${lineage674.ageExposure[k]}/${lineage674.ageDeaths[k]}`).join(' · '));
+ L.push('Kanıt kuralı: aynı düşük-N eşiğinde toparlanan ve yok olan episodların hayatta kalan kayıtları karşılaştırılır; özellikle bitki≥8 zamanı, son fizyolojik hazır birey, son gerçek kapı ve köprü doğumlarının sırası ayrıştırılır.');return L;
+}
+
 // V6.70 — DOĞAL YAŞLANMA KONTROLLÜ DENEYİ
 // Tek yapısal değişiklik: age>12000 kesin ölüm duvarı kaldırılır.
 // Yaşlılık ölümü 30+ günden sonra bireyin kalıtsal longevity değeriyle değişen stokastik riskten doğar.
@@ -3112,8 +3168,8 @@ function sim(){
    if(z.energy<=0||z.hydration<=0||naturalAgeDeath670(z)){
     // Son bireyin ölümünden hemen önce son canlı durumunu da aynı tickte sakla.
     if(zatos.length===1)recordCollapseSnapshot(true);
-    eDeath666(z);diagnoseDeath(z);spatialDeath663(z);closeNav651(z,'lost');deathTarget648(z);deathAB646(z);archiveMulti645(z);archivePair644(z);deathNatural643(z);deathDecision642(z);deathQuality641(z);microDeath640(z);failLearn639(z);death636(z);archiveNeedLab632(z);zatos.splice(zatos.indexOf(z),1);deaths++;
-    if(zatos.length===0){extinctBottleneck672();extinctRescue673();finalizeExtinctionV625();break simLoopV625;}
+    death674(z);eDeath666(z);diagnoseDeath(z);spatialDeath663(z);closeNav651(z,'lost');deathTarget648(z);deathAB646(z);archiveMulti645(z);archivePair644(z);deathNatural643(z);deathDecision642(z);deathQuality641(z);microDeath640(z);failLearn639(z);death636(z);archiveNeedLab632(z);zatos.splice(zatos.indexOf(z),1);deaths++;
+    if(zatos.length===0){extinctBottleneck672();extinctRescue673();extinct674();finalizeExtinctionV625();break simLoopV625;}
    }
   }
 
@@ -3159,13 +3215,13 @@ function sim(){
         reproChainV623.lastParentEnergy = Number(z.energy)||0;
         reproChainV623.lastParentId = __pid;
         reproChainV623.lastBirthTick = tick;
-      }catch(e){}reproBirth665(z);reproBirth664(z);spatialBirth663(z);births++;birthEvents.push(tick);log(`Tekil doğum: #${child.id}, soy ${child.lineageId}, N${child.generation}.`);
+      }catch(e){}reproBirth665(z);reproBirth664(z);spatialBirth663(z);births++;birth674(z,child);birthEvents.push(tick);log(`Tekil doğum: #${child.id}, soy ${child.lineageId}, N${child.generation}.`);
     }
    }
   }
-  sampleAging670();
+  sampleAging670();exposure674();
   ecology();
-  trackBottleneck672();trackRescue673();
+  trackBottleneck672();trackRescue673();track674();
   recordCollapseSnapshot();
   /* V6.8: ekoloji her simülasyon adımında akar; 500× hızda canlılar ve dünya aynı saati paylaşır. */
  }
@@ -3595,7 +3651,7 @@ function researchBlackBoxReport(){
   return `${k}: episod ${g.episodes} · algı ${p(g.sensed,g.episodes)} · yeme ${p(g.ate,g.episodes)} · toparlanma ${p(g.recovered,g.episodes)} · açken ölüm ${p(g.died,g.episodes)}`;
  });
  const lines=[
-  'ZATO EVRENİ GENESIS V6.73.2 — ARAŞTIRMA KARA KUTUSU',
+  'ZATO EVRENİ GENESIS V6.74 — ARAŞTIRMA KARA KUTUSU',
   `Durum: ${extinctionRecorded?'YOK OLUŞTA DONDURULDU':'CANLI / GÜNCELLENİYOR'}`,
   `Evren: ${universeId} | Süre: ${Math.floor((officialExtinctionTick??tick)/300)} gün | Müdahale: ${interventionCount}`,
   '',
@@ -3635,6 +3691,8 @@ function researchBlackBoxReport(){
   `Ort. ilk hedef: ${lastLive?.lab636?.startDist==null?'—':fmt(lastLive.lab636.startDist,1)+' px'} | Yol: ${lastLive?.lab636?.path==null?'—':fmt(lastLive.lab636.path,1)+' px'} | Hedefe doğru: ${lastLive?.lab636?.toward==null?'—':fmt(lastLive.lab636.toward,1)+' px'} | Hedeften uzak: ${lastLive?.lab636?.away==null?'—':fmt(lastLive.lab636.away,1)+' px'}`,
   `ÖLÇÜM ÖZ-DENETİMİ: yanlış episod başlangıcı ${lastLive?.lab636?.auditStartBad??0} | yemeden toparlanma ${lastLive?.lab636?.auditRecoveredWithoutEat??0} | yeme ama enerji kazancı yok ${lastLive?.lab636?.auditEatNoGain??0} | ≥55 iken açık episod ${lastLive?.lab636?.auditOpenAbove55??0}`,
   `${((lastLive?.lab636?.auditStartBad??0)+(lastLive?.lab636?.auditRecoveredWithoutEat??0)+(lastLive?.lab636?.auditEatNoGain??0)+(lastLive?.lab636?.auditOpenAbove55??0))===0?'Ölçüm tutarlılığı: TEMİZ':'Ölçüm tutarsızlığı: İNCELE'}`,
+  '',
+  ...report674(),
   '',
   ...rescueReport673(),
   '',
@@ -3974,18 +4032,18 @@ $$('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$$('[data-mode]'
 $$('.tool').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;$$('.tool').forEach(x=>x.classList.toggle('on',x===b));if(tool==='scarcity'){intervene('scarcity');tool='inspect'}});
 for(const s of [0,1,5,20,100,500]){let b=document.createElement('button');b.className='btn small'+(s===1?' on':'');b.textContent=s===0?'⏸':s+'×';b.onclick=()=>{speed=s;$$('#speeds .btn').forEach(x=>x.classList.toggle('on',x===b))};$('#speeds').appendChild(b)}
 function bindRange(id,key,out){let e=$(id);e.value=cfg[key];let f=()=>{$(out).textContent=e.value;cfg[key]=+e.value};e.oninput=f;f()}bindRange('#mutation','mutation','#mutV');bindRange('#regen','regen','#regV');bindRange('#learnCost','learnCost','#costV');
-function snapshot(){return JSON.stringify({zatos,food,water,events,births,deaths,tick,idSeq,cfg,socialCount,mutBirths,genSignals,discoveries,cultureCount,emergent,coopCount,peakPopulation,extinctionWarned,extinctionRecorded,foodProduced,foodConsumed,ecoDayProduced,ecoDayConsumed,lastEcoProduced,lastEcoConsumed,foodPatches,deathStats,maxGenerationEver,plants,smellFinds,memoryFinds,followLearns,plantBirths,soloBirths,delayedBirths,lineageSerial,renewalBirths,foodlessTicks,visionFinds,chanceFinds,productionEvents,consumptionEvents,reproBlocks,birthEvents,deathEvents,eraBase,collapseHistory,collapseFrozen,extinctionSnapshot,universeId,interventionCount,officialExtinctionTick,reproChainV623,learn639,micro640,quality641,decision642,natural643,paired644,multi645,ab646,abEpisode647,target648,confidence649,nav651,navLearn652,dir653,motor654,chain655,comp656,ident657,auth658,cohort659,pheno660,eco661,geo662,spatial663,repro664,repro665,energy666,ecoShock667,patch668,local669,aging670,bottleneck672,rescue673,foodUID656,foodTomb656:[...foodTomb656]})}
+function snapshot(){return JSON.stringify({zatos,food,water,events,births,deaths,tick,idSeq,cfg,socialCount,mutBirths,genSignals,discoveries,cultureCount,emergent,coopCount,peakPopulation,extinctionWarned,extinctionRecorded,foodProduced,foodConsumed,ecoDayProduced,ecoDayConsumed,lastEcoProduced,lastEcoConsumed,foodPatches,deathStats,maxGenerationEver,plants,smellFinds,memoryFinds,followLearns,plantBirths,soloBirths,delayedBirths,lineageSerial,renewalBirths,foodlessTicks,visionFinds,chanceFinds,productionEvents,consumptionEvents,reproBlocks,birthEvents,deathEvents,eraBase,collapseHistory,collapseFrozen,extinctionSnapshot,universeId,interventionCount,officialExtinctionTick,reproChainV623,learn639,micro640,quality641,decision642,natural643,paired644,multi645,ab646,abEpisode647,target648,confidence649,nav651,navLearn652,dir653,motor654,chain655,comp656,ident657,auth658,cohort659,pheno660,eco661,geo662,spatial663,repro664,repro665,energy666,ecoShock667,patch668,local669,aging670,bottleneck672,rescue673,lineage674,foodUID656,foodTomb656:[...foodTomb656]})}
 $('#rescueFood').onclick=()=>{interventionCount++;for(let i=0;i<45;i++)food.push({x:R(12,W-12),y:R(12,H-12),e:R(14,24)});log('Tanrı müdahalesi: yok oluş riski sırasında besin yağmuru.',true)};
 $('#rescueWater').onclick=()=>{interventionCount++;for(let i=0;i<25;i++)water.push({x:R(12,W-12),y:R(12,H-12)});log('Tanrı müdahalesi: yok oluş riski sırasında yeni su kaynakları.',true)};
 $('#bless').onclick=()=>{if(!selected)return;interventionCount++;selected.energy=115;selected.hydration=100;log(`Tanrı müdahalesi: #${selected.id} güçlendirildi.`);inspect(selected)};
 $('#forceMut').onclick=()=>{if(!selected)return;interventionCount++;for(const k of ['curiosity','risk','social','learn','memory','speed','vision','size','metabolism','senseWater'])selected.g[k]=mutate(selected.g[k]);selected.smell=mutate(selected.smell);selected.bang=true;log(`Tanrı müdahalesi: #${selected.id} mutasyona uğratıldı.`,true);inspect(selected)};
 $('#isolate').onclick=()=>{if(!selected)return;interventionCount++;selected.isolated=!selected.isolated;log(`Tanrı müdahalesi: #${selected.id} izolasyon ${selected.isolated?'açıldı':'kapatıldı'}.`);inspect(selected)};
 $('#lineage').onclick=()=>{if(!selected)return;let chain=[],cur=selected,guard=0;while(cur&&guard++<12){chain.push(`#${cur.id}(N${cur.generation})`);let pid=cur.parents?.[0];cur=zatos.find(x=>x.id===pid)}log(`Soy izi: ${chain.join(' ← ')}`,true)};
-$('#save').onclick=()=>{localStorage.setItem('zatoGenesisV673',snapshot());log('Evren kaydedildi.')};
-$('#load').onclick=()=>{let s=localStorage.getItem('zatoGenesisV673');if(!s)return log('Kayıt bulunamadı.',true);let a=JSON.parse(s);({zatos,food,water,events,births,deaths,tick,idSeq}=a);socialCount=a.socialCount||0;mutBirths=a.mutBirths||0;genSignals=a.genSignals||0;discoveries=a.discoveries||[];cultureCount=a.cultureCount||0;emergent=a.emergent||[];coopCount=a.coopCount||0;peakPopulation=a.peakPopulation||zatos.length;extinctionWarned=!!a.extinctionWarned;extinctionRecorded=!!a.extinctionRecorded;foodProduced=a.foodProduced||0;foodConsumed=a.foodConsumed||0;ecoDayProduced=a.ecoDayProduced||0;ecoDayConsumed=a.ecoDayConsumed||0;lastEcoProduced=a.lastEcoProduced||0;lastEcoConsumed=a.lastEcoConsumed||0;foodPatches=a.foodPatches||[];deathStats=a.deathStats||{hunger:0,thirst:0,age:0, reproPhase: Math.random(),access:0,foodDistances:[]};maxGenerationEver=a.maxGenerationEver||Math.max(1,...zatos.map(z=>z.generation));plants=a.plants||[];smellFinds=a.smellFinds||0;memoryFinds=a.memoryFinds||0;followLearns=a.followLearns||0;plantBirths=a.plantBirths||0;soloBirths=a.soloBirths||0;delayedBirths=a.delayedBirths||0;lineageSerial=a.lineageSerial||zatos.length;renewalBirths=a.renewalBirths||0;foodlessTicks=a.foodlessTicks||0;visionFinds=a.visionFinds||0;chanceFinds=a.chanceFinds||0;productionEvents=a.productionEvents||[];consumptionEvents=a.consumptionEvents||[];reproBlocks=a.reproBlocks||{resource:0,eco:0,cooldown:0};birthEvents=a.birthEvents||[];deathEvents=a.deathEvents||[];eraBase=a.eraBase||eraSnapshot();collapseHistory=a.collapseHistory||[];collapseFrozen=!!a.collapseFrozen;extinctionSnapshot=a.extinctionSnapshot||null;universeId=a.universeId||('U'+Date.now().toString(36).slice(-6).toUpperCase());interventionCount=a.interventionCount||0;officialExtinctionTick=(a.officialExtinctionTick??null);
+$('#save').onclick=()=>{localStorage.setItem('zatoGenesisV674',snapshot());log('Evren kaydedildi.')};
+$('#load').onclick=()=>{let s=localStorage.getItem('zatoGenesisV674');if(!s)return log('Kayıt bulunamadı.',true);let a=JSON.parse(s);({zatos,food,water,events,births,deaths,tick,idSeq}=a);socialCount=a.socialCount||0;mutBirths=a.mutBirths||0;genSignals=a.genSignals||0;discoveries=a.discoveries||[];cultureCount=a.cultureCount||0;emergent=a.emergent||[];coopCount=a.coopCount||0;peakPopulation=a.peakPopulation||zatos.length;extinctionWarned=!!a.extinctionWarned;extinctionRecorded=!!a.extinctionRecorded;foodProduced=a.foodProduced||0;foodConsumed=a.foodConsumed||0;ecoDayProduced=a.ecoDayProduced||0;ecoDayConsumed=a.ecoDayConsumed||0;lastEcoProduced=a.lastEcoProduced||0;lastEcoConsumed=a.lastEcoConsumed||0;foodPatches=a.foodPatches||[];deathStats=a.deathStats||{hunger:0,thirst:0,age:0, reproPhase: Math.random(),access:0,foodDistances:[]};maxGenerationEver=a.maxGenerationEver||Math.max(1,...zatos.map(z=>z.generation));plants=a.plants||[];smellFinds=a.smellFinds||0;memoryFinds=a.memoryFinds||0;followLearns=a.followLearns||0;plantBirths=a.plantBirths||0;soloBirths=a.soloBirths||0;delayedBirths=a.delayedBirths||0;lineageSerial=a.lineageSerial||zatos.length;renewalBirths=a.renewalBirths||0;foodlessTicks=a.foodlessTicks||0;visionFinds=a.visionFinds||0;chanceFinds=a.chanceFinds||0;productionEvents=a.productionEvents||[];consumptionEvents=a.consumptionEvents||[];reproBlocks=a.reproBlocks||{resource:0,eco:0,cooldown:0};birthEvents=a.birthEvents||[];deathEvents=a.deathEvents||[];eraBase=a.eraBase||eraSnapshot();collapseHistory=a.collapseHistory||[];collapseFrozen=!!a.collapseFrozen;extinctionSnapshot=a.extinctionSnapshot||null;universeId=a.universeId||('U'+Date.now().toString(36).slice(-6).toUpperCase());interventionCount=a.interventionCount||0;officialExtinctionTick=(a.officialExtinctionTick??null);
 if(a.auth658){auth658=a.auth658}
 if(a.cohort659){cohort659=a.cohort659}
-if(a.pheno660){pheno660=a.pheno660}if(a.eco661){eco661=a.eco661}if(a.geo662){geo662=a.geo662}if(a.spatial663){spatial663=a.spatial663}if(a.repro664){repro664=a.repro664}if(a.energy666){energy666=a.energy666}if(a.ecoShock667){ecoShock667=a.ecoShock667}if(a.patch668){patch668=a.patch668}if(a.local669){local669=a.local669}if(a.aging670){aging670=a.aging670}if(a.bottleneck672){bottleneck672=a.bottleneck672;bottleneck672.thresholds=bottleneck672.thresholds||[20,10,5,3,2,1];bottleneck672.audit=bottleneck672.audit||{duplicateThreshold:0,badRecovery:0}}if(a.rescue673){rescue673=a.rescue673;rescue673.audit=rescue673.audit||{duplicateStart:0,badOrder:0}}for(const z of zatos)ensureLongevity670(z);if(a.repro665){repro665=a.repro665}
+if(a.pheno660){pheno660=a.pheno660}if(a.eco661){eco661=a.eco661}if(a.geo662){geo662=a.geo662}if(a.spatial663){spatial663=a.spatial663}if(a.repro664){repro664=a.repro664}if(a.energy666){energy666=a.energy666}if(a.ecoShock667){ecoShock667=a.ecoShock667}if(a.patch668){patch668=a.patch668}if(a.local669){local669=a.local669}if(a.aging670){aging670=a.aging670}if(a.bottleneck672){bottleneck672=a.bottleneck672;bottleneck672.thresholds=bottleneck672.thresholds||[20,10,5,3,2,1];bottleneck672.audit=bottleneck672.audit||{duplicateThreshold:0,badRecovery:0}}if(a.rescue673){rescue673=a.rescue673;rescue673.audit=rescue673.audit||{duplicateStart:0,badOrder:0}}if(a.lineage674){lineage674=a.lineage674;lineage674.thresholds=lineage674.thresholds||[20,10,5,3,2,1];lineage674.ageExposure=lineage674.ageExposure||{'30-34':0,'35-39':0,'40-44':0,'45-49':0,'50+':0};lineage674.ageDeaths=lineage674.ageDeaths||{'30-34':0,'35-39':0,'40-44':0,'45-49':0,'50+':0}}for(const z of zatos)ensureLongevity670(z);if(a.repro665){repro665=a.repro665}
 if(a.ident657){ident657=a.ident657}
 if(a.comp656){comp656=a.comp656}
 if(a.foodUID656!=null)foodUID656=a.foodUID656;
@@ -4090,7 +4148,7 @@ decision642={individuals:0,decisions:0,success:0,abandon:0,updates:0,qDeltaAbs:0
 quality641={individuals:0,targets:0,completed:0,eaten:0,abandoned:0,totalTicks:0,totalPath:0,totalStartDist:0,totalSwitches:0,earlyN:0,earlyComplete:0,earlyEat:0,earlyTicks:0,earlyPath:0,lateN:0,lateComplete:0,lateEat:0,lateTicks:0,latePath:0,byGen:Object.create(null)};
 micro640={individuals:0,samples:0,approach:0,away:0,lost:0,earlyN:0,earlyGood:0,lateN:0,lateGood:0,updates:0,qDeltaAbs:0,byGen:Object.create(null)};
 learn639={individuals:0,episodes:0,earlyN:0,earlyRecovered:0,earlyAte:0,lateN:0,lateRecovered:0,lateAte:0,outcomeUpdates:0,positiveUpdates:0,negativeUpdates:0,qDeltaAbs:0,byGen:Object.create(null)};
-for(let i=0;i<42;i++)makeZato();for(let i=0;i<95;i++)addFood();for(let i=0;i<28;i++)addWater();seedFoodPatches();eraBase=eraSnapshot();log('Genesis V6.73.2: demografik kurtarma penceresi laboratuvarı aktif. V6.72 darboğaz ölçümü korunur; yeni katman yalnız pasif ölçümdür. V6.70 doğal yaşlanma korunur; yeni katman yalnız ölçümdür. 40 günlük kesin ölüm duvarı kaldırıldı; yalnız yaşlanma kuralı değiştirildi.  500× akıcı çalışma aktif: fizik/yaşam adımları eksiltilmez; yüksek hız işi zaman bütçeli sıralı paketlere bölünür, çizim ve paneller seyreltilir. Öğrenme artık gerçek ihtiyaç zinciriyle ölçülür: ihtiyaç → algı → yönelme → erişim → çözüm; ilk deneyimler sonraki deneyimlerle ve sosyal gözlem öncesi/sonrasıyla karşılaştırılır. Araştırma ölçümleri tek kara kutuda toplanır ve tek tıkla kopyalanabilir. Her Zato boş deneyim belleğiyle doğar. Bebeklikte yüksek keşif, deneyimle bağlamsal karar öğrenmesi, ödül/tahmin hatası, mekânsal hafıza ve sınırlı sosyal gözlem birlikte çalışır. Öğrenilmiş anılar kalıtılmaz; yalnızca öğrenme eğilimleri genetik olabilir. Kara kutular yok oluş anında kesin olarak donar.',true)}
+for(let i=0;i<42;i++)makeZato();for(let i=0;i<95;i++)addFood();for(let i=0;i<28;i++)addWater();seedFoodPatches();eraBase=eraSnapshot();log('Genesis V6.74: demografik kurtarma penceresi laboratuvarı aktif. V6.72 darboğaz ölçümü korunur; yeni katman yalnız pasif ölçümdür. V6.70 doğal yaşlanma korunur; yeni katman yalnız ölçümdür. 40 günlük kesin ölüm duvarı kaldırıldı; yalnız yaşlanma kuralı değiştirildi.  500× akıcı çalışma aktif: fizik/yaşam adımları eksiltilmez; yüksek hız işi zaman bütçeli sıralı paketlere bölünür, çizim ve paneller seyreltilir. Öğrenme artık gerçek ihtiyaç zinciriyle ölçülür: ihtiyaç → algı → yönelme → erişim → çözüm; ilk deneyimler sonraki deneyimlerle ve sosyal gözlem öncesi/sonrasıyla karşılaştırılır. Araştırma ölçümleri tek kara kutuda toplanır ve tek tıkla kopyalanabilir. Her Zato boş deneyim belleğiyle doğar. Bebeklikte yüksek keşif, deneyimle bağlamsal karar öğrenmesi, ödül/tahmin hatası, mekânsal hafıza ve sınırlı sosyal gözlem birlikte çalışır. Öğrenilmiş anılar kalıtılmaz; yalnızca öğrenme eğilimleri genetik olabilir. Kara kutular yok oluş anında kesin olarak donar.',true)}
 
 // V6.29 — eski dağınık araştırma kartlarını gizle; verileri tek kara kutuda tut.
 const legacyResearchTitles=[
