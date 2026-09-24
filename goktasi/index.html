@@ -56,7 +56,7 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
 #chatWrap{position:absolute;left:16px;bottom:96px;width:360px}
 #chatLog{max-height:158px;overflow-y:auto;font-size:11.5px;line-height:1.5;padding:6px 8px;background:rgba(10,8,5,.55);border:1px solid rgba(58,47,29,.6);scrollbar-width:thin}
 #chatLog::-webkit-scrollbar{width:5px}#chatLog::-webkit-scrollbar-thumb{background:var(--line2)}
-#chatLog .sys{color:#d8b24a}#chatLog .ev{color:#c96b4a}#chatLog .me{color:#e8d9a8}#chatLog .bt{color:#b3ab9c}
+#chatLog .sys{color:#d8b24a}#chatLog .ev{color:#c96b4a}#chatLog .me{color:#e8d9a8}#chatLog .bt{color:#b3ab9c}#chatLog .onl{color:#d7e8f2}#chatLog .onl b{color:#79b9df}
 #chatIn{width:100%;margin-top:4px;background:rgba(10,8,5,.85);border:1px solid var(--line2);color:var(--text);font-size:12px;padding:5px 8px;outline:none;font-family:'Manrope'}
 #chatIn:focus{border-color:var(--gold)}
 #skillbar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);text-align:center}
@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.9.4 Zatoi bulut senkronizasyonu
+   Tek dosyalık açık dünya aksiyon-RPG — V4.9.5 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -1020,13 +1020,57 @@ addEventListener('resize',resize);resize();
 
 function addChat(name,txt,cls){
   const d=document.createElement('div');d.className=cls||'bt';
-  if(name)d.innerHTML=`<b style="color:${cls==='me'?'#e8d9a8':cls==='sys'?'#d8b24a':'#a8c4d8'}">${name}:</b> ${txt}`;
-  else d.innerHTML=`<span class="ev" style="color:#c96b4a">${txt}</span>`;
+  if(name){
+    const b=document.createElement('b');
+    b.style.color=cls==='me'?'#e8d9a8':cls==='sys'?'#d8b24a':cls==='onl'?'#79b9df':'#a8c4d8';
+    b.textContent=String(name)+':';
+    d.appendChild(b);d.appendChild(document.createTextNode(' '+String(txt??'')));
+  }else{
+    const sp=document.createElement('span');sp.className='ev';sp.style.color='#c96b4a';sp.textContent=String(txt??'');d.appendChild(sp);
+  }
   chatLog.appendChild(d);
   if(chatClosed&&cls!=='me'){chatUnread++;$('chatTab').classList.add('new');}
   while(chatLog.children.length>70)chatLog.removeChild(chatLog.firstChild);
   chatLog.scrollTop=chatLog.scrollHeight;
 }
+
+// ---------- gerçek oyuncular arası online sohbet ----------
+let onlineChatLastId=0,onlineChatBusy=false,onlineChatStarted=false;
+const onlineChatSeen=new Set();
+function renderOnlineChatMessage(m){
+  const id=Number(m?.id)||0;if(id&&onlineChatSeen.has(id))return;
+  if(id){onlineChatSeen.add(id);onlineChatLastId=Math.max(onlineChatLastId,id);if(onlineChatSeen.size>300){const first=onlineChatSeen.values().next().value;onlineChatSeen.delete(first);}}
+  const mine=!!accountUser?.id&&String(m?.user_id||'')===String(accountUser.id);
+  addChat(String(m?.username||'Oyuncu'),String(m?.message||''),mine?'me':'onl');
+}
+async function pullOnlineChat(initial=false){
+  if(onlineChatBusy||!cloudVerified||!cloudAuth?.token)return;
+  onlineChatBusy=true;
+  try{
+    const q=initial||!onlineChatLastId?'?limit=30':'?after_id='+encodeURIComponent(onlineChatLastId)+'&limit=60';
+    const r=await apiFetch('/chat/messages'+q);
+    (r.messages||[]).forEach(renderOnlineChatMessage);
+  }catch(e){
+    if(e?.status===401){onlineChatStarted=false;}
+  }finally{onlineChatBusy=false;}
+}
+function startOnlineChat(){
+  if(onlineChatStarted||!cloudVerified)return;
+  onlineChatStarted=true;pullOnlineChat(true);
+}
+async function sendOnlineChat(text){
+  const message=String(text||'').trim().slice(0,300);if(!message)return false;
+  if(!cloudVerified||!cloudAuth?.token){toast('Online sohbet için Zatoi hesabı gerekli');return false;}
+  try{
+    const r=await apiFetch('/chat/send',{method:'POST',body:JSON.stringify({message})});
+    if(r?.message)renderOnlineChatMessage(r.message);
+    return true;
+  }catch(e){
+    toast(e?.code==='CHAT_RATE_LIMIT'?'Mesajları biraz daha yavaş gönder':'Sohbet mesajı gönderilemedi');
+    return false;
+  }
+}
+setInterval(()=>{if(started&&cloudVerified)pullOnlineChat(false);},2000);
 const annQ=[];let annT=0;
 function announce(t){annQ.push(t);}
 function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;
@@ -1355,7 +1399,7 @@ addEventListener('keydown',e=>{
   initAudio();
   if(document.activeElement===chatIn){
     if(e.key==='Enter'){const v=chatIn.value.trim();
-      if(v){addChat(P.name,v,'me');chatIn.value='';maybeBotReply(v);}
+      if(v){chatIn.value='';sendOnlineChat(v);}
       chatIn.blur();}
     if(e.key==='Escape')chatIn.blur();
     return;
@@ -2396,6 +2440,7 @@ async function initCloudSave(showMessage=false){
     if(!cloudVerified)throw new Error('Zatoi kullanıcı kimliği alınamadı.');
     await reconcileInitialCloud(showMessage);
     updateAccountUI();
+    startOnlineChat();
     return true;
   }catch(e){
     console.warn('GÖKTAŞI Zatoi/bulut doğrulama:',e);
