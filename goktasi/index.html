@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.11 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.12 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -1014,6 +1014,8 @@ const chatLog=$('chatLog'),chatIn=$('chatIn');
 let vw,vh,dpr=1,zoom=1.05;
 const cam={x:VILLAGE.x,y:VILLAGE.y};
 let shakeT=0,started=false,worldT=0,lastZone='';
+const introCam={x:VILLAGE.x,y:VILLAGE.y-80};
+const deathCam={x:VILLAGE.x,y:VILLAGE.y};
 function resize(){vw=innerWidth;vh=innerHeight;dpr=Math.min(devicePixelRatio||1,2);
   cv.width=vw*dpr;cv.height=vh*dpr;}
 addEventListener('resize',resize);resize();
@@ -1302,7 +1304,7 @@ function mobHitTarget(m){
   }
 }
 function playerDie(killer){
-  shakeT=0;P.dead=true;P.deadT=4;P.hp=0;SFX.die();
+  shakeT=0;deathCam.x=P.x;deathCam.y=P.y-14;cam.x=deathCam.x;cam.y=deathCam.y;P.dead=true;P.deadT=4;P.hp=0;SFX.die();
   const kexp=Math.min(P.exp,Math.floor(expNeed(P.lvl)*.02));P.exp-=kexp;
   $('death').classList.add('on');
   $('deathTxt').textContent=(killer?('« '+MOBS[killer.k].n+' » seni yere serdi. '):'')+'Ruhun Ağıt Han\'a çekiliyor… ('+fmt(kexp)+' tecrübe kaybetti)';
@@ -1310,7 +1312,7 @@ function playerDie(killer){
 }
 function respawn(){
   shakeT=0;P.dead=false;$('death').classList.remove('on');
-  P.x=7500;P.y=7760;P.tx=P.x;P.ty=P.y;
+  P.x=7500;P.y=7760;P.tx=P.x;P.ty=P.y;cam.x=P.x;cam.y=P.y-14;deathCam.x=cam.x;deathCam.y=cam.y;
   P.hp=Math.round(maxHP()*.5);P.sp=maxSP();P.target=null;P.stoneT=null;
   mobs.forEach(m=>{if(m.target===P)m.target=null;});
 }
@@ -2309,7 +2311,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.11 ONLINE OYUNCULAR ----------
+// ---------- V4.12 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2485,7 +2487,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.11 KAYIT SEÇİMİ
+  V4.12 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -2917,15 +2919,21 @@ let lastTS=0;
 function frame(ts){
   const dt=clamp((ts-lastTS)/1000,0,.05);lastTS=ts;
   worldT+=dt;
-  if(started){updPlayer(dt);updBots(dt);updStones(dt);updateOnlinePlayers(dt);sendPresence();fetchPresence();}
-  updMobs(dt);
-  updWorldFx(dt);
-  // kamera
-  let cx=cam.x,cy=cam.y;
-  if(started&&!P.dead){cx=P.x;cy=P.y-14;}
-  else if(bots.length){const b=bots[ts%2|0]||bots[0];cx=b.x;cy=b.y;}
-  cam.x+=(cx-cam.x)*Math.min(1,dt*5);
-  cam.y+=(cy-cam.y)*Math.min(1,dt*5);
+  if(started){
+    updPlayer(dt);updBots(dt);updStones(dt);updateOnlinePlayers(dt);sendPresence();fetchPresence();
+    updMobs(dt);updWorldFx(dt);
+  }else{
+    // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
+    shakeT=0;P.hurtT=0;
+  }
+  // V4.12: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  let cx,cy,snapCamera=false;
+  if(!started){cx=introCam.x;cy=introCam.y;}
+  else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
+  else{cx=P.x;cy=P.y-14;}
+  if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=cx;cam.y=cy;snapCamera=true;}
+  if(snapCamera){cam.x=cx;cam.y=cy;}
+  else{cam.x+=(cx-cam.x)*Math.min(1,dt*5);cam.y+=(cy-cam.y)*Math.min(1,dt*5);}
   // duyurular
   if(annQ.length&&annT<=0){annT=3.4;
     const el=$('announce'),d=document.createElement('div');d.textContent=annQ.shift();
@@ -2947,7 +2955,7 @@ SKILLS.forEach(s=>{});['hpk','hpb','spk'].forEach(()=>{});
 bakeWorld();placeObjects();spawnAll();spawnBots();initStones();initNPCs();bakeBigMap();
 buildSkillbar();initIntro();
 // intro arka planı canlı dünya: bot 0'ı köye çağır
-bots[0].x=VILLAGE.x-300;bots[0].y=VILLAGE.y-200;
+bots[0].x=VILLAGE.x-300;bots[0].y=VILLAGE.y-200;cam.x=introCam.x;cam.y=introCam.y;
 addChat('Kam Bilge','Çan üç kez çaldı. Göktaşları yine kıpırdandı.','sys');
 requestAnimationFrame(frame);
 </script>
