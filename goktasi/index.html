@@ -330,13 +330,58 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
   #accountPanel > .bd{padding:15px !important;}
 }
 
+
+/* V4.25 — Mağaza satırlarının panel dışına taşmasını engelle */
+#shopPanel{
+  overflow:hidden !important;
+  max-height:calc(100vh - 110px) !important;
+}
+#shopPanel.on{
+  display:flex !important;
+  flex-direction:column !important;
+}
+#shopPanel #shopList{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  overscroll-behavior:contain !important;
+  scrollbar-gutter:stable;
+  padding-right:6px;
+}
+#shopPanel .srow2{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  flex:0 0 auto;
+}
+#shopPanel .srow2 .info{
+  min-width:0;
+  overflow:hidden;
+}
+#shopPanel .srow2 .info b,
+#shopPanel .srow2 .info span,
+#shopPanel .srow2 .info small{
+  overflow-wrap:anywhere;
+}
+#shopPanel .srow2 .pr,
+#shopPanel .srow2 .abtn{
+  flex:0 0 auto;
+}
+html.mobile-ui #shopPanel{
+  max-height:calc(100dvh - 18px) !important;
+}
+
 </style>
-<!-- GOKTASI BUILD: V4.23 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.23 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
-<!-- GOKTASI BUILD: V4.23 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
-<!-- GOKTASI BUILD: V4.23 - YOL TASLARI / HIZLI SEYAHAT -->
-<!-- GOKTASI BUILD: V4.23 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
-<!-- GOKTASI BUILD: V4.23 - SATIS EKRANI TAM ESYA DETAYLARI -->
+<!-- GOKTASI BUILD: V4.25 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.25 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.25 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.25 - YOL TASLARI / HIZLI SEYAHAT -->
+<!-- GOKTASI BUILD: V4.25 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
+<!-- GOKTASI BUILD: V4.25 - SATIS EKRANI TAM ESYA DETAYLARI -->
+<!-- GOKTASI BUILD: V4.25 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
+<!-- GOKTASI BUILD: V4.25 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -471,7 +516,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.23 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.25 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -491,7 +536,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.23 ayarlar / yeniden tuş atama ----------
+// ---------- V4.25 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -645,9 +690,9 @@ const ITEMS={
   celikgogus:{n:'Çelik Göğüslük',t:'armor',lv:12,def:11,price:950,sell:280,ic:'armor',c:'#9aa3ab',rar:0,d:'Yüzükoyun durur.'},
   ayazkaftan:{n:'Ayaz Kaftanı',t:'armor',lv:19,def:17,price:2400,sell:720,ic:'armor',c:'#c9d8e4',rar:1,d:'Vadide dokundu.'},
   erlikzirh:{n:'Erlik Gömleği',t:'armor',lv:28,def:25,price:5200,sell:1800,ic:'armor',c:'#4a4a58',rar:2,d:'Aşağıdan yukarıya.'},
-  kurtdisikolye:{n:'Kurt Dişi Kolye',t:'trinket',lv:8,crit:7,price:600,sell:170,ic:'amulet',c:'#e8e0cf',rar:1,d:'Kritik şansı +%7.'},
-  aytasi:{n:'Ay Taşı Yüzüğü',t:'trinket',lv:15,spr:4,price:1400,sell:420,ic:'ring',c:'#b8d4ea',rar:1,d:'Ruh yenilenmesi +4.'},
-  dagnefesi:{n:'Dağ Nefesi',t:'trinket',lv:22,hp:220,price:3000,sell:900,ic:'amulet',c:'#c9b28a',rar:2,d:'Maksimum Can +220.'},
+  kurtdisikolye:{n:'Kurt Dişi Kolye',t:'trinket',lv:8,crit:7,price:600,sell:170,ic:'amulet',c:'#e8e0cf',rar:1,d:'Sürünün hatırası.'},
+  aytasi:{n:'Ay Taşı Yüzüğü',t:'trinket',lv:15,spr:4,price:1400,sell:420,ic:'ring',c:'#b8d4ea',rar:1,d:'Ruhunu serin tutar.'},
+  dagnefesi:{n:'Dağ Nefesi',t:'trinket',lv:22,hp:220,price:3000,sell:900,ic:'amulet',c:'#c9b28a',rar:2,d:'Yükseklerden iner.'},
   kirikyuz:{n:'Kırık Yüz Maskesi',t:'trinket',lv:30,pow:12,price:20000,sell:7000,ic:'mask',c:'#d86a3a',rar:3,d:'Onu giyen, yüzünü unutur. +%12 hasar.'},
   hpk:{n:'Küçük Can İksiri',t:'use',heal:120,price:25,sell:8,ic:'potion',c:'#c0392b',rar:0,d:'Acıyı erteler.'},
   hpb:{n:'Büyük Can İksiri',t:'use',heal:400,price:70,sell:22,ic:'potion2',c:'#e74c3c',rar:0,d:'Yarayı unutturur.'},
@@ -1899,6 +1944,22 @@ if(_shopListEl){
   _shopListEl.style.overflowY='auto';
   _shopListEl.style.overscrollBehavior='contain';
 }
+const _shopWheel=$('shopList');
+if(_shopWheel&&!_shopWheel.dataset.wheelGuard){
+  _shopWheel.dataset.wheelGuard='1';
+  _shopWheel.addEventListener('wheel',e=>e.stopPropagation(),{passive:true});
+}
+
+function shopCleanDesc(it,stat){
+  const d=String(it?.d||'').trim();
+  if(!d)return '';
+  const norm=s=>String(s||'').toLocaleLowerCase('tr-TR')
+    .replace(/maksimum/g,'maks').replace(/yenilenmesi|yenilemesi|yenilenme/g,'yenileme')
+    .replace(/şansı/g,'').replace(/[.:;+%]/g,' ').replace(/\s+/g,' ').trim();
+  const nd=norm(d),ns=norm(stat);
+  if(nd&&ns&&(nd===ns||ns.includes(nd)||nd.includes(ns)))return '';
+  return d;
+}
 function renderShop(){
   const L=$('shopList');L.innerHTML='';
   if(shopTab==='buy'){
@@ -1916,7 +1977,7 @@ function renderShop(){
       if(it.heal)bonuses.push('Can yeniler +'+it.heal);
       if(it.mana)bonuses.push('Ruh yeniler +'+it.mana);
       const stat=bonuses.join(' · ');
-      const desc=(it.d&&it.d!==stat)?it.d:'';
+      const desc=shopCleanDesc(it,stat);
       d.innerHTML=`<img src="${makeIcon(id)}"><div class="info"><b>${it.n}</b><span>${stat||desc}${stat&&desc?`<small style="display:block;color:#8e8576;margin-top:2px">${desc}</small>`:''}${it.lv?` · <strong style="color:${locked?'#e06a50':'#8fae5a'}">Lv ${needLv} gerekli</strong>`:''}</span></div><span class="pr">${fmt(it.price)}</span>`;
       const b=document.createElement('button');b.className='abtn';b.textContent=locked?'Lv '+needLv:'Al';
       b.disabled=P.money<it.price||locked;
@@ -1936,7 +1997,7 @@ function renderShop(){
       if(it.mana)bonuses.push('Ruh yeniler +'+it.mana);
       if(s.up)bonuses.push('Geliştirme +'+s.up);
       const stat=bonuses.join(' · ');
-      const desc=it.d||'';
+      const desc=shopCleanDesc(it,stat);
       const level=it.lv?`<strong style="color:#8fae5a">Lv ${it.lv}</strong>`:'';
       const detail=[RARC[it.rar||0],level,stat].filter(Boolean).join(' · ');
       d.innerHTML=`<img src="${makeIcon(s.id)}"><div class="info"><b>${it.n}${s.up?' +'+s.up:''}${s.n>1?' x'+s.n:''}</b><span>${detail}${desc?`<small style="display:block;color:#8e8576;margin-top:2px">${desc}</small>`:''}</span></div><span class="pr">${fmt(sp)}</span>`;
@@ -2028,7 +2089,7 @@ function drawMini(){
   $('miniReg').textContent=REGN[rg].n;
   $('clock').textContent=(isNight()?'Gece':'Gündüz')+' — '+(hour()<10?'0':'')+hour()+':00 • Önerilen '+REGN[rg].lv;
 }
-// ---------- V4.23 YOL TAŞLARI / HIZLI SEYAHAT ----------
+// ---------- V4.25 YOL TAŞLARI / HIZLI SEYAHAT ----------
 const FAST_TRAVEL_POINTS=[
   {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
   {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
@@ -2698,7 +2759,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.23 ONLINE OYUNCULAR ----------
+// ---------- V4.25 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2874,7 +2935,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.23 KAYIT SEÇİMİ
+  V4.25 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3313,7 +3374,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.23: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.25: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
