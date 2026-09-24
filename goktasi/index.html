@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47 FULL ERROR AUDIT + SESSION/NETWORK/HUD FIX -->
+<!-- GOKTASI V4.47.1 PANEL X + SHOP SELL TAB FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1596,6 +1596,32 @@ html:not(.mobile-ui) #skillbar .slot{
   place-items:center!important;
   pointer-events:auto!important;
   cursor:pointer!important;
+}
+
+
+/* =========================================================
+   V4.47.1 — PANEL X + MAĞAZA SEKME ETKİLEŞİM FIX
+   ========================================================= */
+.panel.on > button.x[data-close]{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  z-index:2147483646!important;
+}
+#shopPanel.on .tabs{
+  position:relative!important;
+  z-index:2147483001!important;
+  pointer-events:auto!important;
+}
+#shopPanel.on .tabs button{
+  position:relative!important;
+  z-index:2147483002!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  cursor:pointer!important;
+}
+#shopPanel.on #shopList,
+#shopPanel.on #shopList *{
+  pointer-events:auto!important;
 }
 
 </style>
@@ -3287,13 +3313,19 @@ function closePanelByButton(b,e){
   if(started){P.tx=P.x;P.ty=P.y;P.mv=false;}
   return true;
 }
-// X kapatma click eventine bağlı değil: pointerdown anında çalışır.
-// Böylece başka bir gameplay click handler'ı olayı sonradan yutsa bile panel kapanır.
-document.addEventListener('pointerdown',e=>{
-  const b=e.target.closest?.('button.x[data-close]');
-  if(!b)return;
-  closePanelByButton(b,e);
-},true);
+// V4.47.1 — PANEL X FIX
+// Kapatma işlemi standart click ile çalışır. Böylece mouse, touch ve pointer
+// davranışları arasında çakışma olmaz; gameplay input sistemi UI click'lerini zaten dışlar.
+function bindPanelCloseButtons(){
+  document.querySelectorAll('button.x[data-close]').forEach(b=>{
+    if(b.dataset.closeBound==='1')return;
+    b.dataset.closeBound='1';
+    b.addEventListener('click',e=>{
+      closePanelByButton(b,e);
+    });
+  });
+}
+bindPanelCloseButtons();
 
 $('settingsBtn').onclick=()=>{initAudio();openSettings();};
 [['setMaster','master'],['setSfx','sfx'],['setAmbient','ambient']].forEach(([id,k])=>{
@@ -3389,8 +3421,11 @@ function setShopTab(tab){
   $('tabSell').classList.toggle('on',shopTab==='sell');
   renderShop();
 }
-$('tabBuy').onpointerdown=e=>{e.preventDefault();e.stopPropagation();setShopTab('buy');};
-$('tabSell').onpointerdown=e=>{e.preventDefault();e.stopPropagation();setShopTab('sell');};
+// V4.47.1 — MAĞAZA SEKME FIX
+// pointerdown + preventDefault bazı tarayıcılarda normal click üretimini bozabiliyordu.
+// Standart click hem PC hem mobilde güvenilir şekilde çalışır.
+$('tabBuy').onclick=e=>{e.preventDefault();e.stopPropagation();setShopTab('buy');};
+$('tabSell').onclick=e=>{e.preventDefault();e.stopPropagation();setShopTab('sell');};
 const _shopListEl=$('shopList');
 if(_shopListEl){
   _shopListEl.style.maxHeight='min(62vh,560px)';
@@ -3437,7 +3472,12 @@ function renderShop(){
       b.onclick=()=>{if(locked){toast('Bu eşya için Lv '+needLv+' gerekli');return;}if(P.money>=it.price&&invFree()){P.money-=it.price;addItem(id,1);SFX.coin();toast(it.n+' aldın');renderShop();updateBars();}else if(!invFree())toast('Çanta dolu');};
       d.appendChild(b);L.appendChild(d);});
   }else{
-    P.inv.forEach((s,i)=>{if(!s)return;const it=ITEMS[s.id];const sp=Math.round((it.sell||0)*(s.n||1));
+    let sellCount=0;
+    P.inv.forEach((s,i)=>{if(!s)return;
+      const it=ITEMS[s.id];
+      if(!it)return;
+      sellCount++;
+      const sp=Math.round((it.sell||0)*(s.n||1));
       const d=document.createElement('div');d.className='srow2';
       const bonuses=[];
       if(it.dmg)bonuses.push('Hasar '+it.dmg);
@@ -3455,8 +3495,19 @@ function renderShop(){
       const detail=[RARC[it.rar||0],level,stat].filter(Boolean).join(' · ');
       d.innerHTML=`<img src="${makeIcon(s.id)}"><div class="info"><b>${it.n}${s.up?' +'+s.up:''}${s.n>1?' x'+s.n:''}</b><span>${detail}${desc?`<small style="display:block;color:#8e8576;margin-top:2px">${desc}</small>`:''}</span></div><span class="pr">${fmt(sp)}</span>`;
       const b=document.createElement('button');b.className='abtn warn';b.textContent='Sat';
-      b.onclick=()=>{P.money+=sp;P.inv[i]=null;SFX.coin();renderShop();renderInv();updateBars();};
-      d.appendChild(b);L.appendChild(d);});
+      b.onclick=e=>{
+        e.preventDefault();e.stopPropagation();
+        P.money+=sp;P.inv[i]=null;SFX.coin();
+        renderShop();renderInv();updateBars();
+      };
+      d.appendChild(b);L.appendChild(d);
+    });
+    if(!sellCount){
+      const empty=document.createElement('div');
+      empty.style.cssText='padding:28px 14px;text-align:center;color:var(--dim);font-size:12px;line-height:1.6';
+      empty.textContent='Çantanda satılabilecek eşya yok.';
+      L.appendChild(empty);
+    }
   }
 }
 let upgSel=null;
