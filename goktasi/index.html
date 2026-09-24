@@ -1160,10 +1160,10 @@ html.mobile-ui #introLoading{top:61%!important;min-height:110px!important}
 #intro #contBtn:hover{
   filter:brightness(1.08)!important;
 }
-\n/* =========================================================\n   V4.40.2 — ARKA PLANDA BASILI BUTON IZLERINI KAPAT\n   Gercek HTML butonlari artik tamamen opak. Arkadaki referans\n   gorselin buton/ikon/ok detaylari bunlarin icinden gorunmez.\n   ========================================================= */\n#intro #cloudBtn{\n  background:linear-gradient(180deg,#17130c 0%,#090908 58%,#0d0b08 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    inset 0 0 24px rgba(216,165,61,.055),\n    0 8px 22px rgba(0,0,0,.38)!important;\n}\n#intro #contBtn{\n  background:linear-gradient(180deg,#4b2d0d 0%,#34200c 44%,#171006 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    0 0 0 1px rgba(255,211,104,.18),\n    0 0 25px rgba(239,166,42,.34),\n    inset 0 0 30px rgba(235,169,54,.12)!important;\n}\n/* Pseudo ikonlar da gercek butonun ust katmaninda kalsin. */\n#intro #cloudBtn::before,#intro #cloudBtn::after,\n#intro #contBtn::before,#intro #contBtn::after{z-index:2!important}\n#intro #cloudBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n}\n#intro #contBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n  box-shadow:\n    0 0 0 1px rgba(255,221,132,.28),\n    0 0 34px rgba(255,181,49,.52),\n    inset 0 0 34px rgba(235,169,54,.18)!important;\n}\n
+\n/* =========================================================\n   V4.41 — ARKA PLANDA BASILI BUTON IZLERINI KAPAT\n   Gercek HTML butonlari artik tamamen opak. Arkadaki referans\n   gorselin buton/ikon/ok detaylari bunlarin icinden gorunmez.\n   ========================================================= */\n#intro #cloudBtn{\n  background:linear-gradient(180deg,#17130c 0%,#090908 58%,#0d0b08 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    inset 0 0 24px rgba(216,165,61,.055),\n    0 8px 22px rgba(0,0,0,.38)!important;\n}\n#intro #contBtn{\n  background:linear-gradient(180deg,#4b2d0d 0%,#34200c 44%,#171006 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    0 0 0 1px rgba(255,211,104,.18),\n    0 0 25px rgba(239,166,42,.34),\n    inset 0 0 30px rgba(235,169,54,.12)!important;\n}\n/* Pseudo ikonlar da gercek butonun ust katmaninda kalsin. */\n#intro #cloudBtn::before,#intro #cloudBtn::after,\n#intro #contBtn::before,#intro #contBtn::after{z-index:2!important}\n#intro #cloudBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n}\n#intro #contBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n  box-shadow:\n    0 0 0 1px rgba(255,221,132,.28),\n    0 0 34px rgba(255,181,49,.52),\n    inset 0 0 34px rgba(235,169,54,.18)!important;\n}\n
 
 /* =========================================================
-   V4.40.2 — TEMİZ FANTASTİK ARKA PLAN + GERÇEK HTML/CSS UI
+   V4.41 — TEMİZ FANTASTİK ARKA PLAN + GERÇEK HTML/CSS UI
    Arka planda logo/yazı/buton YOK. Tüm arayüz kodla çizilir.
    ========================================================= */
 #intro{
@@ -1379,7 +1379,7 @@ html.mobile-ui #introKeys{margin-top:8px!important;width:auto!important}
 html.mobile-ui #introKeys::before{font-size:8px!important;white-space:normal!important}
 
 
-/* V4.40.2 — ESKİ HOVER TRANSFORM KURALINI KESİN OLARAK EZ */
+/* V4.41 — ESKİ HOVER TRANSFORM KURALINI KESİN OLARAK EZ */
 html body #intro #introBox #cloudBtn:hover,
 html body #intro #introBox #contBtn:hover,
 html body #intro #introBox #startBtn:hover,
@@ -1402,7 +1402,7 @@ html body #intro #introBox #startBtn:hover{
 }
 
 
-/* V4.40.2 — PC ÇANTA KONUMU */
+/* V4.41 — PC ÇANTA KONUMU */
 html:not(.mobile-ui) #invPanel{
   top:50%!important;
   left:50%!important;
@@ -1440,10 +1440,11 @@ html:not(.mobile-ui) #invPanel{
 <!-- GOKTASI BUILD: V4.38 - REFERANS GORSELE UYUMLU GIRIS / V4.35 MOTOR KORUNDU -->
 <!-- GOKTASI BUILD: V4.38 - REFERANS GIRIS TASARIMI / SIYAH PANEL KALDIRILDI -->
 <!-- GOKTASI BUILD: V4.38 - HEDEF UI KODLA / FANTASTIK BUTONLAR -->
-<!-- GOKTASI BUILD: V4.40.2 - ARKA BUTON IZLERI OPAK KATMAN FIX -->
-<!-- GOKTASI BUILD: V4.40.2 - TEMIZ ARKAPLAN + KOD UI -->
-<!-- GOKTASI BUILD: V4.40.2 - HOVER TRANSFORM KESIN FIX -->
-<!-- GOKTASI BUILD: V4.40.2 - CANTA KONUM + KAPATMA FIX -->
+<!-- GOKTASI BUILD: V4.41 - ARKA BUTON IZLERI OPAK KATMAN FIX -->
+<!-- GOKTASI BUILD: V4.41 - TEMIZ ARKAPLAN + KOD UI -->
+<!-- GOKTASI BUILD: V4.41 - HOVER TRANSFORM KESIN FIX -->
+<!-- GOKTASI BUILD: V4.41 - CANTA KONUM + KAPATMA FIX -->
+<!-- GOKTASI BUILD: V4.41 - GOKTASI ANA SISTEM + TAM KOD AUDIT -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -1597,7 +1598,7 @@ html:not(.mobile-ui) #invPanel{
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.40.2 temiz arka plan + kod arayüzü
+   Tek dosyalık açık dünya aksiyon-RPG — V4.41 temiz arka plan + kod arayüzü
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -1788,12 +1789,12 @@ const ITEMS={
   balcik:{n:'Koyu Balçık',t:'mat',sell:22,ic:'goo',c:'#6a7d3a',rar:0,d:'Yapışır, anlatır.'},
   ulakgozu:{n:'Ulak Gözü',t:'mat',sell:32,ic:'eye',c:'#b03030',rar:1,d:'Hâlâ seni izliyor.'},
   bozpost:{n:'Boz Post',t:'mat',sell:18,ic:'tooth',c:'#9b9488',rar:1,d:'Kavruk Ova’nın sert rüzgârını taşır.'},
-  kirikcan:{n:'Kırık Çan Mührü',t:'trinket',lv:9,crit:5,price:1200,sell:360,ic:'amulet',c:'#d5b56d',rar:2,d:'Ovadaki susturulmuş çanın parçası. Kritik +%5.'},
+  kirikcan:{n:'Kırık Çan Mührü',t:'trinket',lv:9,crit:5,price:1200,sell:360,ic:'amulet',c:'#d5b56d',rar:2,d:'Ovadaki susturulmuş çanın parçası.'},
   gokcevheri:{n:'Gök Cevheri',t:'mat',sell:180,ic:'ore',c:'#72c9e8',rar:2,d:'Yalnızca göktaşlarının kalbinde oluşur.'},
   yildizozu:{n:'Yıldız Özü',t:'mat',sell:650,ic:'crystal',c:'#d9f5ff',rar:3,d:'Göğün çok nadir yoğunlaşmış özü.'},
   goktilsim:{n:'Göktaşı Tılsımı',t:'trinket',lv:10,hp:90,crit:3,price:2400,sell:850,ic:'amulet',c:'#77d7ef',rar:2,d:'Yalnızca göktaşlarından çıkar.'},
   yildizyuzuk:{n:'Yıldız Yarığı Yüzüğü',t:'trinket',lv:18,spr:5,crit:4,price:5200,sell:1900,ic:'ring',c:'#bdefff',rar:3,d:'Göğün yarıldığı anda soğumuş bir halka.'},
-  gokkalbi:{n:'Gök Kalbi',t:'trinket',lv:28,hp:280,pow:12,price:16000,sell:6000,ic:'crystal',c:'#e6fbff',rar:3,d:'Efsanevi bir göktaşının çekirdeği. Maks. Can +280 · Hasar +%12.'}
+  gokkalbi:{n:'Gök Kalbi',t:'trinket',lv:28,hp:280,pow:12,price:16000,sell:6000,ic:'crystal',c:'#e6fbff',rar:3,d:'Efsanevi bir göktaşının çekirdeği.'}
 };
 const RARC=['sıradan','işlenmiş','kadim','efsane'];
 const MOBS={
@@ -2308,18 +2309,39 @@ function rewardStone(s){
   addChat('',P.name+' '+z.n.toLocaleLowerCase('tr-TR')+' kırdı.','ev');
 }
 // ---------- göktaşları ----------
-function initStones(){ STONE_POS.forEach((s,i)=>{const st={...s,alive:i<2,hp:1,max:1,respT:0,i};prepareStone(st);stones.push(st);});
-  stones.forEach(s=>{if(s.alive)stoneFull(s);});}
-function stoneFull(s){const z=stoneTier(s);s.max=s.hp=Math.floor((700+hash2(s.i,3)*600+s.i*130)*z.hp);}
-function dropStone(s,quiet){
-  prepareStone(s);s.alive=true;stoneFull(s);s.respT=0;
-  // Nadir göktaşı = daha kalabalık ve daha güçlü muhafız baskısı.
+function clearStoneGuards(s){
+  for(let i=mobs.length-1;i>=0;i--){
+    const m=mobs[i];
+    if(m.stoneGuard&&m.stoneIndex===s.i)mobs.splice(i,1);
+  }
+}
+function spawnStoneGuards(s){
+  clearStoneGuards(s);
   const zoneMob={ova:'kurt',orman:'orumcek',tuz:'akrep',ayaz:'ayazkurt',batak:'saz',mağara:'ulak'};
   const tier=stoneTier(s),guardCount=3+tier.rar;
   for(let i=0;i<guardCount;i++){
-    const guard=spawnMob(zoneMob[s.r],s.x+rnd(-100,100),s.y+rnd(-100,100),{x:s.x,y:s.y});
-    if(guard){guard.stoneGuard=true;guard.guardX=s.x;guard.guardY=s.y;guard.guardTier=tier.rar;}
+    const a=(i/guardCount)*TAU+rnd(-.25,.25),rad=rnd(78,145);
+    const guard=spawnMob(zoneMob[s.r],s.x+Math.cos(a)*rad,s.y+Math.sin(a)*rad,{x:s.x,y:s.y});
+    if(guard){
+      guard.stoneGuard=true;guard.stoneIndex=s.i;
+      guard.guardX=s.x;guard.guardY=s.y;guard.guardTier=tier.rar;
+      guard.maxhp=Math.round(guard.maxhp*(1+tier.rar*.18));
+      guard.hp=guard.maxhp;guard.dmg*=1+tier.rar*.12;
+    }
   }
+}
+function initStones(){
+  STONE_POS.forEach((p,i)=>{
+    const s={...p,alive:false,hp:1,max:1,respT:0,i,tier:'siradan',rarity:0};
+    stones.push(s);
+    if(i<2)dropStone(s,true); // Başlangıç taşları da artık gerçekten muhafızlı.
+    else{s.respT=worldT+70+i*22+rnd(0,45);prepareStone(s);}
+  });
+}
+function stoneFull(s){const z=stoneTier(s);s.max=s.hp=Math.floor((700+hash2(s.i,3)*600+s.i*130)*z.hp);}
+function dropStone(s,quiet){
+  prepareStone(s);s.alive=true;stoneFull(s);s.respT=0;
+  spawnStoneGuards(s);
   if(!quiet){
     fxs.push({type:'meteor',x:s.x,y:s.y,t:0,dur:.9});
     announce(stoneTier(s).n+' DÜŞTÜ — '+REGN[s.r].n.toUpperCase());SFX.gong();
@@ -2947,7 +2969,7 @@ cv.addEventListener('mousedown',e=>{
   // NPC: yalnızca gerçekten NPC'nin üstüne tıklanınca konuş.
   for(const n of npcs){if(dst(wx,wy,n.x,n.y-14)<30){P.target=null;P.stoneT=null;P.tx=P.x;P.ty=P.y;openDialog(n);return;}}
   // Göktaşı: tıklanınca hedefle, yanına git ve otomatik vur.
-  for(const s of stones){if(s.alive&&dst(wx,wy,s.x,s.y-16)<52){P.stoneT=s;P.target=null;P.tx=s.x;P.ty=s.y;return;}}
+  for(const s of stones){if(s.alive&&dst(wx,wy,s.x,s.y-16)<52){P.stoneT=s;P.target=null;P.tx=s.x;P.ty=s.y;$('targetBar').style.display='block';SFX.click();return;}}
   // Canavar: imlece en yakın canavarı seç.
   let best=null,bd=Infinity;
   mobs.forEach(m=>{if(m.hp>0&&!m.dead){const d=dst(wx,wy,m.x,m.y-8);const hit=46+(m.r||0);if(d<hit&&d<bd){bd=d;best=m;}}});
@@ -2989,7 +3011,7 @@ function manualSword(){
   }
   // Yakındaki göktaşına da kılıçla vurulabilir.
   const st=stones.find(ss=>ss.alive&&dst(P.x,P.y,ss.x,ss.y)<78);
-  if(st){P.stoneT=st;P.target=null;P.dir=st.x>=P.x?1:-1;st.hp-=plDmg(1);}
+  if(st){P.stoneT=st;P.target=null;P.dir=st.x>=P.x?1:-1;$('targetBar').style.display='block';st.hp-=plDmg(1);}
 }
 function sweep(){
   let got=false;
@@ -3015,7 +3037,7 @@ function maybeBotReply(v){
 function togglePanel(id){const p=$(id);const on=!p.classList.contains('on');closePanels();if(on)p.classList.add('on');}
 function closePanels(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));}
 document.querySelectorAll('.x').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('on'));
-// V4.40.2: panel kapatma için güvenli event delegation.
+// V4.41: panel kapatma için güvenli event delegation.
 // Dinamik/yeniden çizilen panel olsa bile X kesin çalışır; tıklama oyuna düşmez.
 document.addEventListener('click',e=>{
   const b=e.target.closest?.('.x[data-close]');
@@ -3318,7 +3340,7 @@ function drawBigMap(){
   onlinePlayers.forEach(p=>{g.fillStyle='#7fd4ff';g.beginPath();g.arc(p.x*sc,p.y*sc,2.5,0,TAU);g.fill();});
   FAST_TRAVEL_POINTS.forEach(p=>{if(!fastTravelUnlocked(p))return;g.fillStyle='#d9b75d';g.beginPath();g.arc(p.x*sc,p.y*sc,3.2,0,TAU);g.fill();g.strokeStyle='#fff0a8';g.strokeRect(p.x*sc-4.5,p.y*sc-4.5,9,9);});
   if(P.qActive){const qp=questTargetPoint(P.qActive);if(qp){g.fillStyle='#ffe066';g.beginPath();g.arc(qp.x*sc,qp.y*sc,5,0,TAU);g.fill();g.strokeStyle='#fff3a0';g.strokeRect(qp.x*sc-7,qp.y*sc-7,14,14);}}
-  stones.forEach(s=>{if(s.alive){g.fillStyle='#9fd8e8';g.beginPath();g.arc(s.x*sc,s.y*sc,3,0,TAU);g.fill();}});
+  stones.forEach(s=>{if(s.alive){g.fillStyle=stoneTier(s).c;g.beginPath();g.arc(s.x*sc,s.y*sc,3+stoneTier(s).rar*.6,0,TAU);g.fill();}});
   g.fillStyle='#fff';g.beginPath();g.arc(P.x*sc,P.y*sc,4,0,TAU);g.fill();
   g.strokeStyle='#fff';g.strokeRect(P.x*sc-6,P.y*sc-6,12,12);
   g.fillStyle='#e8cf8f';g.font='700 11px Cinzel,serif';
@@ -3338,7 +3360,7 @@ function updateBars(){
   const m=P.target;
   if(m&&m.hp>0){$('tgtName').textContent=MOBS[m.k].n+' — Lv '+MOBS[m.k].lv;
     $('tgtF').style.width=clamp(m.hp/m.maxhp*100,0,100)+'%';}
-  else if(P.stoneT&&P.stoneT.alive){$('tgtName').textContent='Göktaşı';
+  else if(P.stoneT&&P.stoneT.alive){$('tgtName').textContent=stoneTier(P.stoneT).n;
     $('tgtF').style.width=clamp(P.stoneT.hp/P.stoneT.max*100,0,100)+'%';}
   else $('targetBar').style.display='none';
 }
@@ -3396,6 +3418,7 @@ function updPlayer(dt){
         floats.push({x:s.x+rnd(-14,14),y:s.y-40,txt:Math.round(plDmg(1)),c:'#9fd8e8',t:0,dur:.7});
         for(let i=0;i<5;i++)parts.push({x:s.x,y:s.y-20,vx:rnd(-70,70),vy:rnd(-90,-20),g:180,t:0,dur:.5,c:'#bfe3f2',r:rnd(1,2.6)});
         if(s.hp<=0){s.alive=false;s.respT=worldT+180+rnd(0,120);
+          clearStoneGuards(s);
           P.stoneN=(P.stoneN||0)+1;
           rewardStone(s);
           fxs.push({type:'ring',x:s.x,y:s.y-14,t:0,dur:.8,r0:10,r1:150,c:'rgba(159,216,232,'});
@@ -3428,7 +3451,13 @@ function updPlayer(dt){
 function updMobs(dt){
   const t=worldT;
   for(let i=mobs.length-1;i>=0;i--){const m=mobs[i];
-    if(m.dead){if(t>m.respT){m.dead=false;m.hp=m.maxhp;m.x=m.hx;m.y=m.hy;m.target=null;m.st='idle';}
+    if(m.stoneGuard){
+      const source=stones[m.stoneIndex];
+      if(!source||!source.alive){mobs.splice(i,1);continue;}
+    }
+    if(m.dead){
+      if(m.stoneGuard){mobs.splice(i,1);continue;} // göktaşı muhafızı öldüyse aynı taşta sonsuz respawn olmaz.
+      if(t>m.respT){m.dead=false;m.hp=m.maxhp;m.x=m.hx;m.y=m.hy;m.target=null;m.st='idle';}
       continue;}
     const dP=dst(m.x,m.y,P.x,P.y);
     if(dP>1700){m.target=null;continue;}
@@ -3453,7 +3482,7 @@ function updMobs(dt){
     if(m.target){
       const tg=m.target,tgd=dst(m.x,m.y,tg.x,tg.y);
       // leash
-      if(dst(m.x,m.y,m.hx,m.hy)>620){m.target=null;m.st='return';m.hp=Math.min(m.maxhp,m.hp+m.maxhp*.3);}
+      if(dst(m.x,m.y,m.hx,m.hy)>(m.stoneGuard?430:620)){m.target=null;m.st='return';m.hp=Math.min(m.maxhp,m.hp+m.maxhp*.3);}
       else if(tg===P&&(P.dead||tgd>(m.stoneGuard?900:820))){m.target=null;m.st='return';}
       else if(tg!==P&&tg.deadT>0)m.target=null;
       else if(M.flee&&m.hp<m.maxhp*.25){ // kaç
@@ -3516,7 +3545,7 @@ function updBots(dt){
       if(b.tT<=0){b.tT=rnd(2,5);
         // taş var mı?
         const st=stones.find(s=>s.alive&&dst(b.x,b.y,s.x,s.y)<1400);
-        if(st&&Math.random()<.4){b.targetS=st;b.st='stone';return;}
+        if(st&&Math.random()<.10){b.targetS=st;b.st='stone';return;}
         const m=mobs.find(m=>m.hp>0&&!m.dead&&!m.boss&&dst(b.x,b.y,m.x,m.y)<500&&Math.abs(MOBS[m.k].lv-b.lvl)<8);
         if(m&&Math.random()<.7){b.target=m;b.st='fight';return;}
         const a=rnd(TAU),d=rnd(200,700);
@@ -3550,7 +3579,8 @@ function updBots(dt){
           b.dir=s.x>=b.x?1:-1;b.mv=true;b.wt+=dt*8;}
         else{b.mv=false;
           if(b.atkCD<=0){b.atkCD=1.1;b.swingT=.28;s.hp-=30+b.lvl*2;
-            if(s.hp<=0){s.alive=false;s.respT=worldT+200;announce('BİR GÖKTAŞI KIRILDI');
+            if(s.hp<=0){s.alive=false;s.respT=worldT+200+rnd(0,80);clearStoneGuards(s);
+              announce('BİR GÖKTAŞI KIRILDI');
               addChat('',b.name+' bir göktaşı kırdı.','ev');}}}}
     }
     if(b.st!=='walk')b.mv=b.st==='fight'||b.st==='stone'?b.mv:false;
@@ -3558,7 +3588,7 @@ function updBots(dt){
 }
 function updStones(dt){
   stones.forEach(s=>{
-    if(!s.alive&&worldT>s.respT&&worldT>s.respT){s.respT=0;dropStone(s,false);}
+    if(!s.alive&&s.respT>0&&worldT>s.respT){s.respT=0;dropStone(s,false);}
   });
 }
 function updWorldFx(dt){
@@ -3714,17 +3744,47 @@ function drawMob(g,m){
 }
 function drawStone(g,s){
   const pulse=.5+Math.sin(worldT*3+s.i)*.5,z=stoneTier(s),zc=z.c;
+  const hpR=clamp(s.hp/s.max,0,1),near=dst(P.x,P.y,s.x,s.y)<360;
+  const guardN=mobs.reduce((n,m)=>n+(!m.dead&&m.stoneGuard&&m.stoneIndex===s.i?1:0),0);
   g.save();g.translate(s.x,s.y);
-  g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(0,4,34,12,0,0,TAU);g.fill();
-  g.strokeStyle=zc;g.globalAlpha=.3+pulse*.35;g.lineWidth=2;
-  g.beginPath();g.ellipse(0,4,40+pulse*6,14+pulse*2,0,0,TAU);g.stroke();g.globalAlpha=1;
-  g.fillStyle=zc;g.beginPath();g.moveTo(0,-58);g.lineTo(22,-24);g.lineTo(14,6);g.lineTo(-14,6);g.lineTo(-22,-24);g.fill();
-  g.fillStyle='#9fd8e8';g.beginPath();g.moveTo(0,-58);g.lineTo(10,-26);g.lineTo(2,6);g.lineTo(-8,-24);g.fill();
-  g.fillStyle='#d8f0f8';g.beginPath();g.moveTo(0,-58);g.lineTo(5,-30);g.lineTo(-2,-6);g.lineTo(-4,-26);g.fill();
-  if(z.rar>0){g.font='700 9px Cinzel,serif';g.textAlign='center';g.fillStyle=zc;g.fillText(z.n,0,-82);}
+
+  // zemindeki göktaşı etkisi
+  g.fillStyle='rgba(0,0,0,.38)';g.beginPath();g.ellipse(0,5,39,14,0,0,TAU);g.fill();
+  for(let r=0;r<2+(z.rar>1?1:0);r++){
+    g.strokeStyle=zc;g.globalAlpha=.10+pulse*(.10+r*.035);g.lineWidth=1.4;
+    g.beginPath();g.ellipse(0,5,44+r*13+pulse*5,16+r*5,0,0,TAU);g.stroke();
+  }
+  g.globalAlpha=1;
+
+  // ana kaya
+  g.fillStyle=zc;g.beginPath();g.moveTo(0,-62);g.lineTo(24,-27);g.lineTo(15,7);g.lineTo(-15,7);g.lineTo(-24,-27);g.fill();
+  const grd=g.createLinearGradient(-12,-58,13,7);
+  grd.addColorStop(0,'rgba(255,255,255,.82)');grd.addColorStop(.28,zc);grd.addColorStop(1,'rgba(20,34,40,.92)');
+  g.fillStyle=grd;g.beginPath();g.moveTo(0,-58);g.lineTo(12,-27);g.lineTo(3,5);g.lineTo(-10,-24);g.fill();
+
+  // hasar aldıkça çatlaklar görünür
+  if(hpR<.78){
+    g.strokeStyle='rgba(255,242,190,.86)';g.lineWidth=1.2;
+    g.beginPath();g.moveTo(-2,-43);g.lineTo(5,-31);g.lineTo(0,-19);g.lineTo(8,-8);g.stroke();
+  }
+  if(hpR<.42){
+    g.beginPath();g.moveTo(-12,-31);g.lineTo(-4,-22);g.lineTo(-10,-10);g.moveTo(10,-39);g.lineTo(4,-28);g.stroke();
+  }
+
+  // yakın oyuncuya bilgi: taşın önemi ve muhafız sayısı hemen anlaşılır
+  if(near||z.rar>0){
+    g.textAlign='center';g.font='700 10px Cinzel,serif';g.fillStyle=zc;
+    g.shadowColor='rgba(0,0,0,.95)';g.shadowBlur=5;g.fillText(z.n,0,-91);
+    if(near){
+      g.font='600 8px Manrope,sans-serif';g.fillStyle='#e7d8aa';
+      g.fillText(guardN?('Muhafız: '+guardN):'Muhafızlar temizlendi',0,-78);
+    }
+    g.shadowBlur=0;
+  }
   g.restore();
-  g.fillStyle='rgba(0,0,0,.6)';g.fillRect(s.x-26,s.y-74,52,5);
-  g.fillStyle='#3aa0c0';g.fillRect(s.x-26,s.y-74,52*clamp(s.hp/s.max,0,1),5);
+
+  g.fillStyle='rgba(0,0,0,.72)';g.fillRect(s.x-29,s.y-72,58,6);
+  g.fillStyle=zc;g.fillRect(s.x-29,s.y-72,58*hpR,6);
 }
 function darkness(){
   const h=hour();
