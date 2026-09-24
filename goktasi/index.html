@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.9.8 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.9.9 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2337,12 +2337,15 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.9.8 KAYIT SEÇİMİ
+  V4.9.9 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
   -> kesin oyun süresi -> kayıt zamanı.
 */
+function isRealCharacterSave(d){
+  return !!(d&&d.v===1&&String(d.name||'').trim());
+}
 function saveProgress(d){
   d=(d&&d.v===1)?d:{};
   return {
@@ -2376,9 +2379,9 @@ function bestSaveCandidate(candidates){
 function collectLocalCandidates(){
   const a=[];
   const main=readLocalRaw();
-  if(main)a.push({source:'local-current',data:main,saved_at:Number(main.savedAt)||0});
+  if(isRealCharacterSave(main))a.push({source:'local-current',data:main,saved_at:Number(main.savedAt)||0});
   for(const b of readLocalBackups()){
-    if(b?.data?.v===1)a.push({
+    if(isRealCharacterSave(b?.data))a.push({
       source:'local-backup',
       data:b.data,
       saved_at:Number(b.at)||Number(b.data.savedAt)||0
@@ -2388,11 +2391,11 @@ function collectLocalCandidates(){
 }
 async function fetchCloudCandidates(){
   const r=await apiFetch('/save-candidates');
-  const list=Array.isArray(r.candidates)?r.candidates.filter(c=>c?.data?.v===1):[];
-
-  // expected_save_version daima mevcut ana bulut satırının sürümüdür.
-  const current=list.find(c=>c.source==='cloud-current');
-  cloudSaveVersion=Number(current?.save_version)||0;
+  const raw=Array.isArray(r.candidates)?r.candidates.filter(c=>c?.data?.v===1):[];
+  const currentRaw=raw.find(c=>c.source==='cloud-current');
+  // Sunucudaki sürüm numarasını koru; fakat adı boş kayıt gerçek karakter sayılmaz.
+  cloudSaveVersion=Number(currentRaw?.save_version)||0;
+  const list=raw.filter(c=>isRealCharacterSave(c?.data));
 
   for(const c of list){
     cloudRevision=Math.max(Number(c?.data?.syncRev)||0,cloudRevision||0);
@@ -2554,7 +2557,7 @@ function refreshContinueButton(){
   const cb=$('contBtn');
   if(!cb)return;
   const d=(cloudVerified&&activeAccountId())?readLocalRaw():null;
-  if(!d||!String(d.name||'').trim()){
+  if(!isRealCharacterSave(d)){
     cb.style.display='none';
     cb.onclick=null;
     return;
@@ -2707,7 +2710,7 @@ function initIntro(){
 
     // Bu hesabın karakteri varsa yeni karakterle sessizce üzerine yazma.
     const own=readLocalRaw();
-    if(own){
+    if(isRealCharacterSave(own)){
       toast('Bu Zatoi hesabında zaten kayıtlı karakter var');
       refreshContinueButton();
       return;
