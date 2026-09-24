@@ -1160,10 +1160,10 @@ html.mobile-ui #introLoading{top:61%!important;min-height:110px!important}
 #intro #contBtn:hover{
   filter:brightness(1.08)!important;
 }
-\n/* =========================================================\n   V4.41.2 — ARKA PLANDA BASILI BUTON IZLERINI KAPAT\n   Gercek HTML butonlari artik tamamen opak. Arkadaki referans\n   gorselin buton/ikon/ok detaylari bunlarin icinden gorunmez.\n   ========================================================= */\n#intro #cloudBtn{\n  background:linear-gradient(180deg,#17130c 0%,#090908 58%,#0d0b08 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    inset 0 0 24px rgba(216,165,61,.055),\n    0 8px 22px rgba(0,0,0,.38)!important;\n}\n#intro #contBtn{\n  background:linear-gradient(180deg,#4b2d0d 0%,#34200c 44%,#171006 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    0 0 0 1px rgba(255,211,104,.18),\n    0 0 25px rgba(239,166,42,.34),\n    inset 0 0 30px rgba(235,169,54,.12)!important;\n}\n/* Pseudo ikonlar da gercek butonun ust katmaninda kalsin. */\n#intro #cloudBtn::before,#intro #cloudBtn::after,\n#intro #contBtn::before,#intro #contBtn::after{z-index:2!important}\n#intro #cloudBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n}\n#intro #contBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n  box-shadow:\n    0 0 0 1px rgba(255,221,132,.28),\n    0 0 34px rgba(255,181,49,.52),\n    inset 0 0 34px rgba(235,169,54,.18)!important;\n}\n
+\n/* =========================================================\n   V4.41.3 — ARKA PLANDA BASILI BUTON IZLERINI KAPAT\n   Gercek HTML butonlari artik tamamen opak. Arkadaki referans\n   gorselin buton/ikon/ok detaylari bunlarin icinden gorunmez.\n   ========================================================= */\n#intro #cloudBtn{\n  background:linear-gradient(180deg,#17130c 0%,#090908 58%,#0d0b08 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    inset 0 0 24px rgba(216,165,61,.055),\n    0 8px 22px rgba(0,0,0,.38)!important;\n}\n#intro #contBtn{\n  background:linear-gradient(180deg,#4b2d0d 0%,#34200c 44%,#171006 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    0 0 0 1px rgba(255,211,104,.18),\n    0 0 25px rgba(239,166,42,.34),\n    inset 0 0 30px rgba(235,169,54,.12)!important;\n}\n/* Pseudo ikonlar da gercek butonun ust katmaninda kalsin. */\n#intro #cloudBtn::before,#intro #cloudBtn::after,\n#intro #contBtn::before,#intro #contBtn::after{z-index:2!important}\n#intro #cloudBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n}\n#intro #contBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n  box-shadow:\n    0 0 0 1px rgba(255,221,132,.28),\n    0 0 34px rgba(255,181,49,.52),\n    inset 0 0 34px rgba(235,169,54,.18)!important;\n}\n
 
 /* =========================================================
-   V4.41.2 — TEMİZ FANTASTİK ARKA PLAN + GERÇEK HTML/CSS UI
+   V4.41.3 — TEMİZ FANTASTİK ARKA PLAN + GERÇEK HTML/CSS UI
    Arka planda logo/yazı/buton YOK. Tüm arayüz kodla çizilir.
    ========================================================= */
 #intro{
@@ -1379,7 +1379,7 @@ html.mobile-ui #introKeys{margin-top:8px!important;width:auto!important}
 html.mobile-ui #introKeys::before{font-size:8px!important;white-space:normal!important}
 
 
-/* V4.41.2 — ESKİ HOVER TRANSFORM KURALINI KESİN OLARAK EZ */
+/* V4.41.3 — ESKİ HOVER TRANSFORM KURALINI KESİN OLARAK EZ */
 html body #intro #introBox #cloudBtn:hover,
 html body #intro #introBox #contBtn:hover,
 html body #intro #introBox #startBtn:hover,
@@ -1402,7 +1402,7 @@ html body #intro #introBox #startBtn:hover{
 }
 
 
-/* V4.41.2 — PC ÇANTA KONUMU */
+/* V4.41.3 — PC ÇANTA KONUMU */
 html:not(.mobile-ui) #invPanel{
   top:50%!important;
   left:50%!important;
@@ -1420,7 +1420,7 @@ html:not(.mobile-ui) #invPanel{
 
 
 /* =========================================================
-   V4.41.2 — GİRİŞ EKRANI TEK-DURUM MAKİNESİ
+   V4.41.3 — GİRİŞ EKRANI TEK-DURUM MAKİNESİ
    loading / signedout / new / continue aynı anda ASLA görünmez.
    Bu blok dosyanın en sonunda olduğundan eski !important katmanlarını da ezer.
    ========================================================= */
@@ -1484,7 +1484,7 @@ html[data-intro-mode="signedout"] #contBtn{
 }
 
 
-/* V4.41.2 — MANUEL ZATOI/BULUT BUTONU YOK
+/* V4.41.3 — MANUEL ZATOI/BULUT BUTONU YOK
    Zatoi oturumu ve bulut kaydı açılışta otomatik doğrulanır. */
 html #intro #cloudBtn,
 html[data-intro-mode="new"] #cloudBtn,
@@ -1496,6 +1496,14 @@ html[data-intro-mode="continue"] #cloudBtn{
 html[data-intro-mode="continue"] #contBtn{
   margin-left:auto!important;
   margin-right:auto!important;
+}
+
+
+/* V4.41.3 — oyun başlayınca intro katmanı tamamen input dışı */
+#intro.off{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
 }
 
 </style>
@@ -1520,13 +1528,14 @@ html[data-intro-mode="continue"] #contBtn{
 <!-- GOKTASI BUILD: V4.38 - REFERANS GORSELE UYUMLU GIRIS / V4.35 MOTOR KORUNDU -->
 <!-- GOKTASI BUILD: V4.38 - REFERANS GIRIS TASARIMI / SIYAH PANEL KALDIRILDI -->
 <!-- GOKTASI BUILD: V4.38 - HEDEF UI KODLA / FANTASTIK BUTONLAR -->
-<!-- GOKTASI BUILD: V4.41.2 - ARKA BUTON IZLERI OPAK KATMAN FIX -->
-<!-- GOKTASI BUILD: V4.41.2 - TEMIZ ARKAPLAN + KOD UI -->
-<!-- GOKTASI BUILD: V4.41.2 - HOVER TRANSFORM KESIN FIX -->
-<!-- GOKTASI BUILD: V4.41.2 - CANTA KONUM + KAPATMA FIX -->
-<!-- GOKTASI BUILD: V4.41.2 - GOKTASI ANA SISTEM + TAM KOD AUDIT -->
-<!-- GOKTASI BUILD: V4.41.2 - GIRIS DURUM MAKINESI FIX -->
-<!-- GOKTASI BUILD: V4.41.2 - OTOMATIK HESAP/BULUT, MANUEL BUTON YOK -->
+<!-- GOKTASI BUILD: V4.41.3 - ARKA BUTON IZLERI OPAK KATMAN FIX -->
+<!-- GOKTASI BUILD: V4.41.3 - TEMIZ ARKAPLAN + KOD UI -->
+<!-- GOKTASI BUILD: V4.41.3 - HOVER TRANSFORM KESIN FIX -->
+<!-- GOKTASI BUILD: V4.41.3 - CANTA KONUM + KAPATMA FIX -->
+<!-- GOKTASI BUILD: V4.41.3 - GOKTASI ANA SISTEM + TAM KOD AUDIT -->
+<!-- GOKTASI BUILD: V4.41.3 - GIRIS DURUM MAKINESI FIX -->
+<!-- GOKTASI BUILD: V4.41.3 - OTOMATIK HESAP/BULUT, MANUEL BUTON YOK -->
+<!-- GOKTASI BUILD: V4.41.3 - HAREKET INPUT FIX -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -1680,7 +1689,7 @@ html[data-intro-mode="continue"] #contBtn{
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.41.2 temiz arka plan + kod arayüzü
+   Tek dosyalık açık dünya aksiyon-RPG — V4.41.3 temiz arka plan + kod arayüzü
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2975,6 +2984,14 @@ addEventListener('keydown',e=>{
     if(e.key==='Escape')chatIn.blur();
     return;
   }
+  // Oyun başladıktan sonra hareket tuşları her zaman gameplay'e aittir.
+  // Chat alanı yukarıdaki özel blokta zaten ayrılmıştır.
+  if(started&&['KeyW','KeyA','KeyS','KeyD'].includes(e.code)){
+    e.preventDefault();
+    keys[e.code]=true;
+    lastInput=performance.now();
+    return;
+  }
   keys[e.code]=true;
   if(!started)return;
   if(e.key==='Enter'){chatIn.focus();e.preventDefault();return;}
@@ -2987,6 +3004,7 @@ addEventListener('keydown',e=>{
   if(e.code==='Escape')closePanels();
 });
 addEventListener('keyup',e=>keys[e.code]=false);
+addEventListener('blur',()=>{for(const k in keys)keys[k]=false;mobileJoy.x=0;mobileJoy.y=0;});
 addEventListener('mousemove',e=>mouse={x:e.clientX,y:e.clientY});
 function mouseBindCode(button){
   return ({0:'Mouse1',2:'Mouse2',1:'Mouse3',3:'Mouse4',4:'Mouse5'})[button]||('Mouse'+(button+1));
@@ -3119,7 +3137,7 @@ function maybeBotReply(v){
 function togglePanel(id){const p=$(id);const on=!p.classList.contains('on');closePanels();if(on)p.classList.add('on');}
 function closePanels(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));}
 document.querySelectorAll('.x').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('on'));
-// V4.41.2: panel kapatma için güvenli event delegation.
+// V4.41.3: panel kapatma için güvenli event delegation.
 // Dinamik/yeniden çizilen panel olsa bile X kesin çalışır; tıklama oyuna düşmez.
 document.addEventListener('click',e=>{
   const b=e.target.closest?.('.x[data-close]');
@@ -4742,9 +4760,15 @@ function begin(fresh){
   P.w=visW?(visW.ic==='great'?'great':visW.ic==='saber'?'saber':'sword'):'none';
   P.wc=visW?(visW.c||'#c8cdd2'):'#c8cdd2';
   cam.x=P.x;cam.y=P.y-14;
+  // Giriş ekranındaki input/buton odağını oyuna taşımıyoruz.
+  // Aksi halde WASD klavye olayları giriş kontrolünde kalabiliyor.
+  try{document.activeElement&&document.activeElement.blur();}catch(_){}
+  keys={};
+  mobileJoy.x=0;mobileJoy.y=0;
   $('intro').classList.add('off');
+  $('intro').style.pointerEvents='none';
   $('hud').style.display='block';
-  started=true;lastZone=regionAt(P.x,P.y);
+  started=true;lastInput=performance.now();lastZone=regionAt(P.x,P.y);
   // Mobilde ilk karede kamera doğrudan oyuncunun üstüne otursun. PC davranışı değişmez.
   if(IS_MOBILE_UI){cam.x=P.x;cam.y=P.y-14;}
   updateBars();renderQuest();
