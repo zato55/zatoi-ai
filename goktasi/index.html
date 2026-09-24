@@ -331,7 +331,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 
-/* V4.26 — Mağaza satırlarının panel dışına taşmasını engelle */
+/* V4.28 — Mağaza satırlarının panel dışına taşmasını engelle */
 #shopPanel{
   overflow:hidden !important;
   max-height:calc(100vh - 110px) !important;
@@ -374,7 +374,7 @@ html.mobile-ui #shopPanel{
 }
 
 
-/* V4.26 — Demirci menüsü okunabilirlik */
+/* V4.28 — Demirci menüsü okunabilirlik */
 #dlgPanel #dlgBtns{
   display:flex;
   flex-wrap:wrap;
@@ -388,15 +388,17 @@ html.mobile-ui #shopPanel{
 }
 
 </style>
-<!-- GOKTASI BUILD: V4.26 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.26 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
-<!-- GOKTASI BUILD: V4.26 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
-<!-- GOKTASI BUILD: V4.26 - YOL TASLARI / HIZLI SEYAHAT -->
-<!-- GOKTASI BUILD: V4.26 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
-<!-- GOKTASI BUILD: V4.26 - SATIS EKRANI TAM ESYA DETAYLARI -->
-<!-- GOKTASI BUILD: V4.26 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
-<!-- GOKTASI BUILD: V4.26 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
-<!-- GOKTASI BUILD: V4.26 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
+<!-- GOKTASI BUILD: V4.28 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.28 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.28 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.28 - YOL TASLARI / HIZLI SEYAHAT -->
+<!-- GOKTASI BUILD: V4.28 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
+<!-- GOKTASI BUILD: V4.28 - SATIS EKRANI TAM ESYA DETAYLARI -->
+<!-- GOKTASI BUILD: V4.28 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
+<!-- GOKTASI BUILD: V4.28 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
+<!-- GOKTASI BUILD: V4.28 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
+<!-- GOKTASI BUILD: V4.28 - DUSMAN AGGRO / GOKTASI MUHAFIZ AI FIX -->
+<!-- GOKTASI BUILD: V4.28 - GOKTASI ANA SISTEMI / NADIRLIK / BOLGESEL LOOT -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -531,7 +533,7 @@ html.mobile-ui #shopPanel{
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.26 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.28 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -551,7 +553,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.26 ayarlar / yeniden tuş atama ----------
+// ---------- V4.28 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -722,13 +724,18 @@ const ITEMS={
   balcik:{n:'Koyu Balçık',t:'mat',sell:22,ic:'goo',c:'#6a7d3a',rar:0,d:'Yapışır, anlatır.'},
   ulakgozu:{n:'Ulak Gözü',t:'mat',sell:32,ic:'eye',c:'#b03030',rar:1,d:'Hâlâ seni izliyor.'},
   bozpost:{n:'Boz Post',t:'mat',sell:18,ic:'tooth',c:'#9b9488',rar:1,d:'Kavruk Ova’nın sert rüzgârını taşır.'},
-  kirikcan:{n:'Kırık Çan Mührü',t:'trinket',lv:9,crit:5,price:1200,sell:360,ic:'amulet',c:'#d5b56d',rar:2,d:'Ovadaki susturulmuş çanın parçası. Kritik +%5.'}
+  kirikcan:{n:'Kırık Çan Mührü',t:'trinket',lv:9,crit:5,price:1200,sell:360,ic:'amulet',c:'#d5b56d',rar:2,d:'Ovadaki susturulmuş çanın parçası. Kritik +%5.'},
+  gokcevheri:{n:'Gök Cevheri',t:'mat',sell:180,ic:'ore',c:'#72c9e8',rar:2,d:'Yalnızca göktaşlarının kalbinde oluşur.'},
+  yildizozu:{n:'Yıldız Özü',t:'mat',sell:650,ic:'crystal',c:'#d9f5ff',rar:3,d:'Göğün çok nadir yoğunlaşmış özü.'},
+  goktilsim:{n:'Göktaşı Tılsımı',t:'trinket',lv:10,hp:90,crit:3,price:2400,sell:850,ic:'amulet',c:'#77d7ef',rar:2,d:'Yalnızca göktaşlarından çıkar.'},
+  yildizyuzuk:{n:'Yıldız Yarığı Yüzüğü',t:'trinket',lv:18,spr:5,crit:4,price:5200,sell:1900,ic:'ring',c:'#bdefff',rar:3,d:'Göğün yarıldığı anda soğumuş bir halka.'},
+  gokkalbi:{n:'Gök Kalbi',t:'trinket',lv:28,hp:280,pow:12,price:16000,sell:6000,ic:'crystal',c:'#e6fbff',rar:3,d:'Efsanevi bir göktaşının çekirdeği. Maks. Can +280 · Hasar +%12.'}
 };
 const RARC=['sıradan','işlenmiş','kadim','efsane'];
 const MOBS={
   kurt:{n:'Kavruk Kurt',lv:2,hpm:1,dmgm:.9,sp:95,ag:0,r:13,mk:'wolf',pal:['#7d7468','#5c554c'],reg:'ova'},
   toprak:{n:'Çürük Toprak',lv:3,hpm:1.3,dmgm:.8,sp:42,ag:1,r:13,mk:'blob',pal:['#5e7030','#46551f'],reg:'ova'},
-  domuz:{n:'Yaban Domuzu',lv:4,hpm:1.6,dmgm:1.1,sp:70,ag:0,r:14,mk:'boar',pal:['#6b4a33','#4c3323'],reg:'ova'},
+  domuz:{n:'Yaban Domuzu',lv:4,hpm:1.6,dmgm:1.1,sp:70,ag:1,r:14,mk:'boar',pal:['#6b4a33','#4c3323'],reg:'ova'},
   bozkurt:{n:'Boz Yeleli',lv:6,hpm:1.75,dmgm:1.18,sp:108,ag:1,r:15,mk:'wolf',pal:['#8b857c','#514d48'],reg:'ova'},
   boynuzlu:{n:'Kırık Boynuz',lv:9,hpm:5.8,dmgm:1.55,sp:76,ag:1,r:23,mk:'boar',pal:['#7b4b32','#2f211a'],reg:'ova'},
   karga:{n:'Gölge Kargası',lv:8,hpm:.8,dmgm:1,sp:130,ag:1,r:11,mk:'crow',pal:['#26262c','#141418'],reg:'orman'},
@@ -1132,6 +1139,7 @@ function spawnMob(k,x,y,home){
   const M=MOBS[k],b=mobBase(k);
   mobs.push({id:uid++,k,x,y,hx:home?home.x:x,hy:home?home.y:y,hp:b.hp,maxhp:b.hp,dmg:b.dmg,exp:b.exp,
     st:'idle',wx:x,wy:y,dir:1,wt:0,atkCD:0,hitT:0,target:null,respT:0,leashT:0,wT:rnd(1,4),flee:false,boss:M.boss});
+  return m;
 }
 function spawnAll(){
   const zoneMob={ova:['kurt','kurt','toprak','toprak','domuz','bozkurt'],orman:['karga','karga','orumcek','orumcek','kurt'],
@@ -1180,18 +1188,76 @@ function botChat(){
   const b=pick(alive);
   addChat(b.name+(b.guild?` [${b.guild}]`:''),pick(CHAT_POOL).replace('Veryrık',''),'bt');
 }
+// ---------- V4.28 GÖKTAŞI ANA SİSTEMİ ----------
+const STONE_TIERS=[
+  {id:'siradan',n:'GÖKTAŞI',rar:0,w:66,hp:1,guard:1,exp:1,money:1,c:'#79bed5'},
+  {id:'islenmis',n:'PARLAYAN GÖKTAŞI',rar:1,w:25,hp:1.35,guard:1.35,exp:1.35,money:1.35,c:'#79d9e8'},
+  {id:'kadim',n:'KADİM GÖKTAŞI',rar:2,w:8,hp:1.9,guard:1.8,exp:1.9,money:2,c:'#d2c071'},
+  {id:'efsane',n:'YILDIZ YARIGI',rar:3,w:1,hp:2.8,guard:2.5,exp:3,money:4,c:'#e8faff'}
+];
+const STONE_REGION_LOOT={
+  ova:[['kurtdisi_m',.45,[1,3]],['azma',.35,[1,2]]],
+  orman:[['cevher',.55,[1,3]],['ayaztom',.28,[1,2]]],
+  tuz:[['kumkristal',.75,[1,3]],['cevher',.28,[1,2]]],
+  ayaz:[['ayaztom',.75,[1,3]],['kurtdisi_m',.3,[1,2]]],
+  batak:[['balcik',.8,[1,3]],['hpb',.18,[1,1]]],
+  mağara:[['ulakgozu',.55,[1,2]],['gokatesi',.22,[1,1]]]
+};
+function rollStoneTier(){
+  let r=Math.random()*100;
+  for(const z of STONE_TIERS){r-=z.w;if(r<=0)return z;}
+  return STONE_TIERS[0];
+}
+function stoneTier(s){return STONE_TIERS.find(z=>z.id===s.tier)||STONE_TIERS[0];}
+function prepareStone(s,forceTier){
+  const z=forceTier?STONE_TIERS.find(x=>x.id===forceTier):rollStoneTier();
+  s.tier=(z||STONE_TIERS[0]).id;
+  s.rarity=(z||STONE_TIERS[0]).rar;
+}
+function meteorDrop(x,y,it,n=1,spread=45){
+  drops.push({x:x+rnd(-spread,spread),y:y+rnd(-spread*.7,spread*.7),it,n,t:0});
+}
+function rewardStone(s){
+  const z=stoneTier(s);
+  const q=z.rar;
+  const shards=irnd(3+q*2,5+q*3);
+  for(let i=0;i<shards;i++)meteorDrop(s.x,s.y,'kirinti',1,55);
+  if(Math.random()<(.38+q*.17))meteorDrop(s.x,s.y,'gokatesi',irnd(1,Math.max(1,q+1)),38);
+  if(q>=1||Math.random()<.18)meteorDrop(s.x,s.y,'gokcevheri',irnd(1,1+q),42);
+  if(q>=2&&Math.random()<(.28+q*.12))meteorDrop(s.x,s.y,'yildizozu',1,34);
+
+  (STONE_REGION_LOOT[s.r]||[]).forEach(([id,ch,ab])=>{
+    if(Math.random()<Math.min(.95,ch+q*.08))meteorDrop(s.x,s.y,id,irnd(ab[0],ab[1]+Math.floor(q/2)),58);
+  });
+
+  // Sadece göktaşlarından çıkan özel ekipmanlar.
+  if(Math.random()<(.025+q*.035))meteorDrop(s.x,s.y,'goktilsim',1,30);
+  if(q>=2&&Math.random()<(.025+q*.025))meteorDrop(s.x,s.y,'yildizyuzuk',1,26);
+  if(q===3&&Math.random()<.08)meteorDrop(s.x,s.y,'gokkalbi',1,18);
+
+  drops.push({x:s.x+rnd(-22,22),y:s.y+rnd(-18,18),mo:Math.round((irnd(140,360)+P.lvl*28)*z.money),t:0});
+  expGive(Math.round((180+P.lvl*42)*z.exp));
+
+  const special=q===3?'EFSANEVİ GÖKTAŞI PARÇALANDI':q===2?'KADİM GÖKTAŞI PARÇALANDI':'GÖKTAŞI KIRILDI';
+  announce(special);SFX.gong();
+  addChat('',P.name+' '+z.n.toLocaleLowerCase('tr-TR')+' kırdı.','ev');
+}
 // ---------- göktaşları ----------
-function initStones(){ STONE_POS.forEach((s,i)=>stones.push({...s,alive:i<2,hp:1,max:1,respT:0,i}));
+function initStones(){ STONE_POS.forEach((s,i)=>{const st={...s,alive:i<2,hp:1,max:1,respT:0,i};prepareStone(st);stones.push(st);});
   stones.forEach(s=>{if(s.alive)stoneFull(s);});}
-function stoneFull(s){s.max=s.hp=Math.floor(700+hash2(s.i,3)*600+s.i*130);}
+function stoneFull(s){const z=stoneTier(s);s.max=s.hp=Math.floor((700+hash2(s.i,3)*600+s.i*130)*z.hp);}
 function dropStone(s,quiet){
-  s.alive=true;stoneFull(s);s.respT=0;
-  // koruma mobları
+  prepareStone(s);s.alive=true;stoneFull(s);s.respT=0;
+  // Nadir göktaşı = daha kalabalık ve daha güçlü muhafız baskısı.
   const zoneMob={ova:'kurt',orman:'orumcek',tuz:'akrep',ayaz:'ayazkurt',batak:'saz',mağara:'ulak'};
-  for(let i=0;i<3;i++)spawnMob(zoneMob[s.r],s.x+rnd(-90,90),s.y+rnd(-90,90),{x:s.x,y:s.y});
+  const tier=stoneTier(s),guardCount=3+tier.rar;
+  for(let i=0;i<guardCount;i++){
+    const guard=spawnMob(zoneMob[s.r],s.x+rnd(-100,100),s.y+rnd(-100,100),{x:s.x,y:s.y});
+    if(guard){guard.stoneGuard=true;guard.guardX=s.x;guard.guardY=s.y;guard.guardTier=tier.rar;}
+  }
   if(!quiet){
     fxs.push({type:'meteor',x:s.x,y:s.y,t:0,dur:.9});
-    announce('GÖKTAŞI DÜŞTÜ — '+REGN[s.r].n.toUpperCase());SFX.gong();
+    announce(stoneTier(s).n+' DÜŞTÜ — '+REGN[s.r].n.toUpperCase());SFX.gong();
     addChat('','Bir göktaşı '+REGN[s.r].n+"'a düştü!! Kalkın!",'ev');
     setTimeout(()=>{if(Math.random()<.7)addChat(pick(bots).name,pick(['göktaşı düştü, görüyorsunuz değil mi','kim taşı alıyor? koşun','taşa doğru gidiyorum, eşlik et']),'bt');},1800);
   }
@@ -2118,7 +2184,7 @@ function drawMini(){
   $('miniReg').textContent=REGN[rg].n;
   $('clock').textContent=(isNight()?'Gece':'Gündüz')+' — '+(hour()<10?'0':'')+hour()+':00 • Önerilen '+REGN[rg].lv;
 }
-// ---------- V4.26 YOL TAŞLARI / HIZLI SEYAHAT ----------
+// ---------- V4.28 YOL TAŞLARI / HIZLI SEYAHAT ----------
 const FAST_TRAVEL_POINTS=[
   {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
   {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
@@ -2255,12 +2321,7 @@ function updPlayer(dt){
         for(let i=0;i<5;i++)parts.push({x:s.x,y:s.y-20,vx:rnd(-70,70),vy:rnd(-90,-20),g:180,t:0,dur:.5,c:'#bfe3f2',r:rnd(1,2.6)});
         if(s.hp<=0){s.alive=false;s.respT=worldT+180+rnd(0,120);
           P.stoneN=(P.stoneN||0)+1;
-          announce('GÖKTAŞI KIRILDI');SFX.gong();
-          expGive(200+P.lvl*45);
-          for(let i=0;i<irnd(4,6);i++)drops.push({x:s.x+rnd(-50,50),y:s.y+rnd(-40,40),it:'kirinti',n:1,t:0});
-          if(Math.random()<.6)drops.push({x:s.x,y:s.y,it:'gokatesi',n:1,t:0});
-          drops.push({x:s.x,y:s.y,mo:irnd(150,400)+P.lvl*30,t:0});
-          for(let i=0;i<3;i++)drops.push({x:s.x+rnd(-40,40),y:s.y+rnd(-30,30),it:pick(['cevher','hpk','kumkristal']),n:1,t:0});
+          rewardStone(s);
           fxs.push({type:'ring',x:s.x,y:s.y-14,t:0,dur:.8,r0:10,r1:150,c:'rgba(159,216,232,'});
           P.stoneT=null;
         }}}}
@@ -2296,16 +2357,28 @@ function updMobs(dt){
     const dP=dst(m.x,m.y,P.x,P.y);
     if(dP>1700){m.target=null;continue;}
     const M=MOBS[m.k];
-    // aggro
+    // V4.28 aggro: düşmanlar artık oyuncunun neredeyse üstüne basmasını beklemez.
+    // Göktaşı muhafızları daha geniş bir alanı korur.
     if(!m.target){
-      if(dP<(M.ag?200:0)&&!P.dead&&regionAt(P.x,P.y)!=='köy')m.target=P;
-      else{for(const b of bots){if(b.deadT<=0&&dst(m.x,m.y,b.x,b.y)<170){m.target=b;break;}}}
+      const baseAggro=M.ag?Math.max(285,Number(M.aggro)||0):0;
+      const guardAggro=m.stoneGuard?(390+(m.guardTier||0)*45):0;
+      const aggroRange=Math.max(baseAggro,guardAggro);
+      const playerOutsideVillage=regionAt(P.x,P.y)!=='köy';
+      const guardingPlayer=m.stoneGuard&&dst(P.x,P.y,m.guardX||m.hx,m.guardY||m.hy)<460;
+      if(aggroRange>0&&dP<aggroRange&&!P.dead&&(playerOutsideVillage||guardingPlayer)){
+        m.target=P;
+        m.st='chase';
+      }else{
+        for(const b of bots){
+          if(b.deadT<=0&&dst(m.x,m.y,b.x,b.y)<190){m.target=b;break;}
+        }
+      }
     }
     if(m.target){
       const tg=m.target,tgd=dst(m.x,m.y,tg.x,tg.y);
       // leash
       if(dst(m.x,m.y,m.hx,m.hy)>620){m.target=null;m.st='return';m.hp=Math.min(m.maxhp,m.hp+m.maxhp*.3);}
-      else if(tg===P&&(P.dead||tgd>720)){m.target=null;m.st='return';}
+      else if(tg===P&&(P.dead||tgd>(m.stoneGuard?900:820))){m.target=null;m.st='return';}
       else if(tg!==P&&tg.deadT>0)m.target=null;
       else if(M.flee&&m.hp<m.maxhp*.25){ // kaç
         const a=Math.atan2(m.y-tg.y,m.x-tg.x);
@@ -2564,14 +2637,15 @@ function drawMob(g,m){
     g.fillStyle='#9e2b25';g.fillRect(m.x-bw/2,m.y-m.r-16,bw*clamp(m.hp/m.maxhp,0,1),4);}
 }
 function drawStone(g,s){
-  const pulse=.5+Math.sin(worldT*3+s.i)*.5;
+  const pulse=.5+Math.sin(worldT*3+s.i)*.5,z=stoneTier(s),zc=z.c;
   g.save();g.translate(s.x,s.y);
   g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(0,4,34,12,0,0,TAU);g.fill();
-  g.strokeStyle=`rgba(159,216,232,${.25+pulse*.3})`;g.lineWidth=2;
-  g.beginPath();g.ellipse(0,4,40+pulse*6,14+pulse*2,0,0,TAU);g.stroke();
-  g.fillStyle='#6ba8bc';g.beginPath();g.moveTo(0,-58);g.lineTo(22,-24);g.lineTo(14,6);g.lineTo(-14,6);g.lineTo(-22,-24);g.fill();
+  g.strokeStyle=zc;g.globalAlpha=.3+pulse*.35;g.lineWidth=2;
+  g.beginPath();g.ellipse(0,4,40+pulse*6,14+pulse*2,0,0,TAU);g.stroke();g.globalAlpha=1;
+  g.fillStyle=zc;g.beginPath();g.moveTo(0,-58);g.lineTo(22,-24);g.lineTo(14,6);g.lineTo(-14,6);g.lineTo(-22,-24);g.fill();
   g.fillStyle='#9fd8e8';g.beginPath();g.moveTo(0,-58);g.lineTo(10,-26);g.lineTo(2,6);g.lineTo(-8,-24);g.fill();
   g.fillStyle='#d8f0f8';g.beginPath();g.moveTo(0,-58);g.lineTo(5,-30);g.lineTo(-2,-6);g.lineTo(-4,-26);g.fill();
+  if(z.rar>0){g.font='700 9px Cinzel,serif';g.textAlign='center';g.fillStyle=zc;g.fillText(z.n,0,-82);}
   g.restore();
   g.fillStyle='rgba(0,0,0,.6)';g.fillRect(s.x-26,s.y-74,52,5);
   g.fillStyle='#3aa0c0';g.fillRect(s.x-26,s.y-74,52*clamp(s.hp/s.max,0,1),5);
@@ -2788,7 +2862,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.26 ONLINE OYUNCULAR ----------
+// ---------- V4.28 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2964,7 +3038,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.26 KAYIT SEÇİMİ
+  V4.28 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3403,7 +3477,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.26: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.28: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
