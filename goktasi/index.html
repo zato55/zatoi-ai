@@ -331,7 +331,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 
-/* V4.30 — Mağaza satırlarının panel dışına taşmasını engelle */
+/* V4.31 — Mağaza satırlarının panel dışına taşmasını engelle */
 #shopPanel{
   overflow:hidden !important;
   max-height:calc(100vh - 110px) !important;
@@ -374,7 +374,7 @@ html.mobile-ui #shopPanel{
 }
 
 
-/* V4.30 — Demirci menüsü okunabilirlik */
+/* V4.31 — Demirci menüsü okunabilirlik */
 #dlgPanel #dlgBtns{
   display:flex;
   flex-wrap:wrap;
@@ -388,7 +388,7 @@ html.mobile-ui #shopPanel{
 }
 
 
-/* V4.30 — KARAKTER SINIFI SECIMI GORUNURLUK FIX */
+/* V4.31 — KARAKTER SINIFI SECIMI GORUNURLUK FIX */
 #introBox .soys{
   display:flex !important;
   visibility:visible !important;
@@ -428,7 +428,7 @@ html.mobile-ui #introBox .soy{
 }
 
 
-/* V4.30 — giriş akışı: mevcut karakter ile yeni karakter ekranı birbirinden ayrıdır */
+/* V4.31 — giriş akışı: mevcut karakter ile yeni karakter ekranı birbirinden ayrıdır */
 #newCharBox{display:flex;flex-direction:column;align-items:center;width:100%}
 #contBtn{
   margin:18px auto 0 !important;
@@ -446,20 +446,34 @@ html.mobile-ui #introBox .soy{
 #contBtn:hover{background:#382812 !important}
 html.mobile-ui #contBtn{min-width:min(330px,72dvw);padding:10px 18px !important;font-size:11px !important}
 
+
+/* V4.31 — girişte yanlış ekranın anlık görünmesini (FOUC) engelle */
+html:not(.goktasi-intro-ready) #newCharBox,
+html:not(.goktasi-intro-ready) #contBtn,
+html:not(.goktasi-intro-ready) #cloudBtn{
+  visibility:hidden !important;
+}
+html.goktasi-intro-ready #newCharBox,
+html.goktasi-intro-ready #contBtn,
+html.goktasi-intro-ready #cloudBtn{
+  transition:opacity .16s ease;
+}
+
 </style>
-<!-- GOKTASI BUILD: V4.30 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.30 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
-<!-- GOKTASI BUILD: V4.30 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
-<!-- GOKTASI BUILD: V4.30 - YOL TASLARI / HIZLI SEYAHAT -->
-<!-- GOKTASI BUILD: V4.30 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
-<!-- GOKTASI BUILD: V4.30 - SATIS EKRANI TAM ESYA DETAYLARI -->
-<!-- GOKTASI BUILD: V4.30 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
-<!-- GOKTASI BUILD: V4.30 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
-<!-- GOKTASI BUILD: V4.30 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
-<!-- GOKTASI BUILD: V4.30 - DUSMAN AGGRO / GOKTASI MUHAFIZ AI FIX -->
-<!-- GOKTASI BUILD: V4.30 - GOKTASI ANA SISTEMI / NADIRLIK / BOLGESEL LOOT -->
-<!-- GOKTASI BUILD: V4.30 - SINIF SECIMI GORUNURLUK FIX -->
-<!-- GOKTASI BUILD: V4.30 - GIRIS AKISI / STATIK SINIF KARTLARI -->
+<!-- GOKTASI BUILD: V4.31 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.31 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.31 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.31 - YOL TASLARI / HIZLI SEYAHAT -->
+<!-- GOKTASI BUILD: V4.31 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
+<!-- GOKTASI BUILD: V4.31 - SATIS EKRANI TAM ESYA DETAYLARI -->
+<!-- GOKTASI BUILD: V4.31 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
+<!-- GOKTASI BUILD: V4.31 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
+<!-- GOKTASI BUILD: V4.31 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
+<!-- GOKTASI BUILD: V4.31 - DUSMAN AGGRO / GOKTASI MUHAFIZ AI FIX -->
+<!-- GOKTASI BUILD: V4.31 - GOKTASI ANA SISTEMI / NADIRLIK / BOLGESEL LOOT -->
+<!-- GOKTASI BUILD: V4.31 - SINIF SECIMI GORUNURLUK FIX -->
+<!-- GOKTASI BUILD: V4.31 - GIRIS AKISI / STATIK SINIF KARTLARI -->
+<!-- GOKTASI BUILD: V4.31 - INTRO FLASH / FOUC FIX -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -601,7 +615,7 @@ html.mobile-ui #contBtn{min-width:min(330px,72dvw);padding:10px 18px !important;
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.30 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.31 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -621,7 +635,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.30 ayarlar / yeniden tuş atama ----------
+// ---------- V4.31 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -1256,7 +1270,7 @@ function botChat(){
   const b=pick(alive);
   addChat(b.name+(b.guild?` [${b.guild}]`:''),pick(CHAT_POOL).replace('Veryrık',''),'bt');
 }
-// ---------- V4.30 GÖKTAŞI ANA SİSTEMİ ----------
+// ---------- V4.31 GÖKTAŞI ANA SİSTEMİ ----------
 const STONE_TIERS=[
   {id:'siradan',n:'GÖKTAŞI',rar:0,w:66,hp:1,guard:1,exp:1,money:1,c:'#79bed5'},
   {id:'islenmis',n:'PARLAYAN GÖKTAŞI',rar:1,w:25,hp:1.35,guard:1.35,exp:1.35,money:1.35,c:'#79d9e8'},
@@ -2252,7 +2266,7 @@ function drawMini(){
   $('miniReg').textContent=REGN[rg].n;
   $('clock').textContent=(isNight()?'Gece':'Gündüz')+' — '+(hour()<10?'0':'')+hour()+':00 • Önerilen '+REGN[rg].lv;
 }
-// ---------- V4.30 YOL TAŞLARI / HIZLI SEYAHAT ----------
+// ---------- V4.31 YOL TAŞLARI / HIZLI SEYAHAT ----------
 const FAST_TRAVEL_POINTS=[
   {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
   {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
@@ -2425,7 +2439,7 @@ function updMobs(dt){
     const dP=dst(m.x,m.y,P.x,P.y);
     if(dP>1700){m.target=null;continue;}
     const M=MOBS[m.k];
-    // V4.30 aggro: düşmanlar artık oyuncunun neredeyse üstüne basmasını beklemez.
+    // V4.31 aggro: düşmanlar artık oyuncunun neredeyse üstüne basmasını beklemez.
     // Göktaşı muhafızları daha geniş bir alanı korur.
     if(!m.target){
       const baseAggro=M.ag?Math.max(285,Number(M.aggro)||0):0;
@@ -2930,7 +2944,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.30 ONLINE OYUNCULAR ----------
+// ---------- V4.31 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -3106,7 +3120,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.30 KAYIT SEÇİMİ
+  V4.31 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3273,6 +3287,8 @@ async function cloudSave(showMessage=false){
       return false;
     }
     console.warn('GÖKTAŞI bulut kayıt:',e);
+    refreshContinueButton();
+    document.documentElement.classList.add('goktasi-intro-ready');
     if(showMessage)toast('Bulut kaydı başarısız: '+(e?.message||'bağlantı hatası'));
     return false;
   }finally{
@@ -3284,6 +3300,8 @@ async function initCloudSave(showMessage=false){
   const s=readZatoiSession();
   if(!s){
     updateAccountUI();
+    refreshContinueButton();
+    document.documentElement.classList.add('goktasi-intro-ready');
     if(showMessage)toast('Önce Zatoi AI hesabına giriş yap');
     return false;
   }
@@ -3330,6 +3348,7 @@ function refreshContinueButton(){
     cb.style.display='none';
     cb.onclick=null;
     if(newBox)newBox.style.display='';
+    document.documentElement.classList.add('goktasi-intro-ready');
     return;
   }
 
@@ -3338,6 +3357,7 @@ function refreshContinueButton(){
   if(newBox)newBox.style.display='none';
   cb.style.display='block';
   cb.textContent='DEVAM ET — '+d.name+' · LV '+d.lvl;
+  document.documentElement.classList.add('goktasi-intro-ready');
   cb.onclick=()=>{
     const own=readLocalRaw();
     if(!cloudVerified||!activeAccountId()||!isRealCharacterSave(own)){
@@ -3464,7 +3484,14 @@ const SOYS=[{k:'kurt',n:'Kurt Soyu',d:'+6 Güç — sürünün dişi, savaşın 
   {k:'ay',n:'Ay Soyu',d:'+6 Çeviklik — gölge kadar hızlı, ay kadar serin'}];
 let selSoy='kurt';
 function initIntro(){
-  const w=$('soys');
+  const w=$('soys'),newBox=$('newCharBox'),cb=$('contBtn');
+  // İlk karede yanlış formu göstermeyelim: doğrulama tamamlanana kadar giriş aksiyonları kapalı.
+  // Yerel kayıt yalnızca görsel ön-seçim içindir; gerçek devam yetkisi yine Zatoi doğrulamasından gelir.
+  const localSession=readZatoiSession();
+  if(localSession){
+    const hinted=readLocalRaw();
+    if(isRealCharacterSave(hinted)&&newBox)newBox.style.display='none';
+  }
   w.style.display='flex';
   w.querySelectorAll('.soy').forEach(d=>{
     d.onclick=()=>{
@@ -3555,7 +3582,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.30: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.31: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
