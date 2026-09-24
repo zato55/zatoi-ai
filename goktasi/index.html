@@ -331,7 +331,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 
-/* V4.37 — Mağaza satırlarının panel dışına taşmasını engelle */
+/* V4.38 — Mağaza satırlarının panel dışına taşmasını engelle */
 #shopPanel{
   overflow:hidden !important;
   max-height:calc(100vh - 110px) !important;
@@ -374,7 +374,7 @@ html.mobile-ui #shopPanel{
 }
 
 
-/* V4.37 — Demirci menüsü okunabilirlik */
+/* V4.38 — Demirci menüsü okunabilirlik */
 #dlgPanel #dlgBtns{
   display:flex;
   flex-wrap:wrap;
@@ -388,7 +388,7 @@ html.mobile-ui #shopPanel{
 }
 
 
-/* V4.37 — KARAKTER SINIFI SECIMI GORUNURLUK FIX */
+/* V4.38 — KARAKTER SINIFI SECIMI GORUNURLUK FIX */
 #introBox .soys{
   display:flex !important;
   visibility:visible !important;
@@ -428,7 +428,7 @@ html.mobile-ui #introBox .soy{
 }
 
 
-/* V4.37 — giriş akışı: mevcut karakter ile yeni karakter ekranı birbirinden ayrıdır */
+/* V4.38 — giriş akışı: mevcut karakter ile yeni karakter ekranı birbirinden ayrıdır */
 #newCharBox{display:flex;flex-direction:column;align-items:center;width:100%}
 #contBtn{
   margin:18px auto 0 !important;
@@ -447,7 +447,7 @@ html.mobile-ui #introBox .soy{
 html.mobile-ui #contBtn{min-width:min(330px,72dvw);padding:10px 18px !important;font-size:11px !important}
 
 
-/* V4.37 — girişte yanlış ekranın anlık görünmesini (FOUC) engelle */
+/* V4.38 — girişte yanlış ekranın anlık görünmesini (FOUC) engelle */
 html:not(.goktasi-intro-ready) #newCharBox,
 html:not(.goktasi-intro-ready) #contBtn,
 html:not(.goktasi-intro-ready) #cloudBtn{
@@ -460,7 +460,7 @@ html.goktasi-intro-ready #cloudBtn{
 }
 
 
-/* V4.37 — Zatoi oturumu olmayan oyuncu için ayrı giriş kapısı */
+/* V4.38 — Zatoi oturumu olmayan oyuncu için ayrı giriş kapısı */
 #signedOutBox{
   width:min(470px,88vw);
   margin:4px auto 2px;
@@ -505,7 +505,7 @@ html.mobile-ui .loginGateText{font-size:10px;line-height:1.4;margin-bottom:8px}
 html.mobile-ui #zatoiLoginBtn,html.mobile-ui #zatoiRecheckBtn{padding:8px 12px;font-size:10px;margin-top:5px}
 
 
-/* V4.37 — ilk kareden itibaren tek doğru giriş durumu */
+/* V4.38 — ilk kareden itibaren tek doğru giriş durumu */
 #introLoading{
   display:flex;
   min-height:150px;
@@ -532,7 +532,7 @@ html:not(.goktasi-intro-ready) #cloudBtn{
 html.goktasi-intro-ready #introLoading{display:none !important;}
 
 
-/* V4.37 — GÖKTAŞI temalı bekleme ekranı */
+/* V4.38 — GÖKTAŞI temalı bekleme ekranı */
 #introLoading{display:flex;min-height:210px;align-items:center;justify-content:center;flex-direction:column;width:100%;gap:9px}
 .meteorLoader{position:relative;width:70px;height:70px;margin-bottom:5px}
 .meteorCore{position:absolute;left:50%;top:50%;width:25px;height:25px;transform:translate(-50%,-50%) rotate(45deg);background:linear-gradient(135deg,#f0d28a,#9b6c24 48%,#35210d);border:1px solid #e2bd64;box-shadow:0 0 12px rgba(222,177,76,.45),0 0 30px rgba(139,91,27,.18);animation:meteorPulse 1.15s ease-in-out infinite alternate}
@@ -547,7 +547,7 @@ html.goktasi-intro-ready #introLoading{display:none !important;}
 html.mobile-ui #introLoading{min-height:130px;gap:5px}html.mobile-ui .meteorLoader{width:50px;height:50px;margin-bottom:2px}html.mobile-ui .meteorCore{width:19px;height:19px}html.mobile-ui .introLoadingTitle{font-size:11px;letter-spacing:2px}html.mobile-ui .introLoadingText{font-size:9px!important}
 
 
-/* V4.37 — REFERANS GÖRSELE UYUMLU FANTASTİK GİRİŞ */
+/* V4.38 — REFERANS GÖRSELE UYUMLU FANTASTİK GİRİŞ */
 #intro{
   background:#07090c!important;
   overflow:hidden!important;
@@ -636,7 +636,7 @@ html.mobile-ui #introBox h1{
 }
 
 
-/* V4.37 — REFERANS GÖRÜNTÜYE SADIK GİRİŞ */
+/* V4.38 — REFERANS GÖRÜNTÜYE SADIK GİRİŞ */
 #intro{
   background:#07090c!important;
   overflow:hidden!important;
@@ -734,27 +734,332 @@ html.mobile-ui #cloudBtn,html.mobile-ui #contBtn,html.mobile-ui #startBtn{
 }
 html.mobile-ui #introKeys{margin-top:8px!important;font-size:9px!important}
 
+
+/* =========================================================
+   V4.38 — HEDEF GİRİŞ ARAYÜZÜ / TAMAMEN HTML + CSS
+   Logo, ayraç, buton çerçeveleri, ikonlar ve alt bilgi kodla.
+   ========================================================= */
+#intro{
+  --ui-gold:#f0cf7a;
+  --ui-gold2:#c89532;
+  --ui-dark:rgba(8,9,9,.88);
+  --ui-line:rgba(230,183,77,.72);
+}
+
+/* Önceki görselde basılı UI'yi karart: sahne görünür, kod arayüzü tek katman olur. */
+#intro::after{
+  display:block!important;
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:-2!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(ellipse at 51% 49%,
+      rgba(6,8,10,.92) 0%,
+      rgba(6,8,10,.86) 17%,
+      rgba(6,8,10,.64) 29%,
+      rgba(6,8,10,.16) 48%,
+      rgba(0,0,0,0) 68%)!important;
+}
+
+/* Gerçek arayüz konteyneri */
+#introBox{
+  transform:none!important;
+  width:min(650px,94vw)!important;
+  max-width:650px!important;
+  padding:0 22px 14px!important;
+  margin:0 auto!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+/* Önceki sürüm gizliyordu: gerçek kod logosunu geri getir */
+#introBox>h1,
+#introBox>h4,
+#introBox>p.lore{
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+
+#introBox>h1{
+  position:relative!important;
+  margin:0 auto 5px!important;
+  font-size:clamp(58px,6.4vw,91px)!important;
+  line-height:.98!important;
+  letter-spacing:10px!important;
+  color:#f3d98d!important;
+  text-shadow:
+    0 2px 0 #5b3d12,
+    0 4px 10px rgba(0,0,0,.95),
+    0 0 23px rgba(242,191,75,.40)!important;
+}
+/* Logonun üstündeki fantastik yıldız/halka */
+#introBox>h1::before{
+  content:"✦"!important;
+  position:absolute!important;
+  left:50%!important;
+  top:-48px!important;
+  transform:translateX(-50%)!important;
+  width:74px!important;height:74px!important;
+  display:grid!important;place-items:center!important;
+  border:1px solid rgba(235,190,85,.56)!important;
+  border-radius:50%!important;
+  color:#ffd777!important;
+  font-size:23px!important;
+  line-height:1!important;
+  text-shadow:0 0 12px #ffbd35,0 0 28px rgba(255,183,42,.65)!important;
+  box-shadow:
+    inset 0 0 0 11px rgba(222,170,62,.04),
+    0 0 22px rgba(232,177,55,.14)!important;
+}
+/* küçük taç hissi */
+#introBox>h1::after{
+  content:"◆  ✦  ◆"!important;
+  position:absolute!important;
+  left:50%!important;
+  top:-25px!important;
+  transform:translateX(-50%)!important;
+  color:#e6bd62!important;
+  font-size:9px!important;
+  letter-spacing:5px!important;
+}
+
+#introBox>h4{
+  position:relative!important;
+  margin:11px auto 47px!important;
+  color:#e6bd62!important;
+  font-size:16px!important;
+  letter-spacing:7px!important;
+  text-shadow:0 2px 7px #000!important;
+}
+#introBox>h4::after{
+  content:"◇"!important;
+  position:absolute!important;
+  left:50%!important;
+  top:31px!important;
+  transform:translateX(-50%)!important;
+  width:440px!important;
+  color:#c99537!important;
+  font-size:13px!important;
+  line-height:1!important;
+  text-align:center!important;
+  border-top:1px solid rgba(205,157,59,.38)!important;
+  text-shadow:0 0 9px rgba(238,184,66,.55)!important;
+}
+
+#introBox>p.lore{
+  margin:0 auto 27px!important;
+  max-width:510px!important;
+  color:#e5d2a3!important;
+  font-size:15px!important;
+  line-height:1.65!important;
+  font-style:italic!important;
+  text-align:center!important;
+  text-shadow:0 2px 6px #000!important;
+}
+
+/* Hedefteki ortak fantastik buton */
+#cloudBtn,#contBtn,#startBtn,#zatoiLoginBtn,#zatoiRecheckBtn{
+  position:relative!important;
+  overflow:visible!important;
+  border-radius:0!important;
+  font-family:'Cinzel',serif!important;
+  color:#f4d992!important;
+  text-shadow:0 1px 4px #000!important;
+  transition:filter .15s ease,box-shadow .15s ease,transform .15s ease!important;
+}
+
+/* Üst hesap butonu */
+#cloudBtn,#zatoiLoginBtn{
+  width:430px!important;
+  max-width:82vw!important;
+  min-height:66px!important;
+  margin:0 auto 17px!important;
+  padding:0 58px 0 70px!important;
+  border:1px solid rgba(210,162,65,.80)!important;
+  background:
+    linear-gradient(135deg,transparent 9px,rgba(12,12,11,.96) 0) top left,
+    linear-gradient(225deg,transparent 9px,rgba(12,12,11,.96) 0) top right,
+    linear-gradient(315deg,transparent 9px,rgba(12,12,11,.96) 0) bottom right,
+    linear-gradient(45deg,transparent 9px,rgba(12,12,11,.96) 0) bottom left!important;
+  background-size:51% 51%!important;
+  background-repeat:no-repeat!important;
+  font-size:16px!important;
+  font-weight:700!important;
+  letter-spacing:.8px!important;
+  box-shadow:
+    inset 0 0 22px rgba(216,165,61,.05),
+    0 9px 25px rgba(0,0,0,.30)!important;
+}
+#cloudBtn::before,#zatoiLoginBtn::before{
+  content:"♟"!important;
+  position:absolute!important;
+  left:24px!important;top:50%!important;
+  transform:translateY(-50%) scaleX(1.15)!important;
+  color:#f2d584!important;
+  font-size:25px!important;
+  line-height:1!important;
+  text-shadow:0 0 10px rgba(240,190,75,.25)!important;
+}
+#cloudBtn::after,#zatoiLoginBtn::after{
+  content:"›"!important;
+  position:absolute!important;
+  right:24px!important;top:50%!important;
+  transform:translateY(-53%)!important;
+  color:#f4d580!important;
+  font-family:Georgia,serif!important;
+  font-size:42px!important;
+  font-weight:400!important;
+  line-height:1!important;
+}
+
+/* Ana DEVAM ET butonu — hedefteki parlak çerçeve */
+#contBtn,#startBtn{
+  width:475px!important;
+  max-width:86vw!important;
+  min-height:78px!important;
+  margin:0 auto!important;
+  padding:0 58px 0 72px!important;
+  border:1px solid #f0bd4f!important;
+  background:linear-gradient(180deg,rgba(54,34,13,.96),rgba(16,13,9,.97))!important;
+  font-size:19px!important;
+  font-weight:700!important;
+  letter-spacing:1px!important;
+  clip-path:polygon(12px 0,calc(50% - 10px) 0,50% 7px,calc(50% + 10px) 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,calc(50% + 10px) 100%,50% calc(100% - 7px),calc(50% - 10px) 100%,12px 100%,0 calc(100% - 12px),0 12px)!important;
+  box-shadow:
+    0 0 0 2px rgba(224,159,39,.30),
+    0 0 13px rgba(255,183,49,.68),
+    0 0 35px rgba(237,152,28,.28),
+    inset 0 0 27px rgba(236,166,48,.15)!important;
+}
+#contBtn::before,#startBtn::before{
+  content:"✧"!important;
+  position:absolute!important;
+  left:25px!important;top:50%!important;
+  transform:translateY(-50%)!important;
+  width:37px!important;height:37px!important;
+  display:grid!important;place-items:center!important;
+  border:1px solid #efbd4d!important;
+  border-radius:50%!important;
+  color:#ffe19a!important;
+  font-size:25px!important;
+  text-shadow:0 0 7px #ffb62e,0 0 14px #ff9f16!important;
+  box-shadow:0 0 9px rgba(255,178,42,.65),inset 0 0 8px rgba(255,188,52,.22)!important;
+}
+#contBtn::after,#startBtn::after{
+  content:"›"!important;
+  position:absolute!important;
+  right:24px!important;top:50%!important;
+  transform:translateY(-53%)!important;
+  color:#ffe094!important;
+  font-family:Georgia,serif!important;
+  font-size:43px!important;
+  font-weight:400!important;
+  line-height:1!important;
+}
+
+#cloudBtn:hover,#contBtn:hover,#startBtn:hover,#zatoiLoginBtn:hover,#zatoiRecheckBtn:hover{
+  filter:brightness(1.16)!important;
+  transform:translateY(-1px)!important;
+}
+#contBtn:hover,#startBtn:hover{
+  box-shadow:
+    0 0 0 2px rgba(245,187,69,.38),
+    0 0 18px rgba(255,192,62,.86),
+    0 0 45px rgba(240,158,29,.40),
+    inset 0 0 30px rgba(239,173,58,.19)!important;
+}
+
+/* Alt üç bilgi: gerçek kod öğeleri */
+#introKeys{
+  position:relative!important;
+  margin:130px auto 0!important;
+  width:min(620px,90vw)!important;
+  color:#f0d998!important;
+  font-size:12px!important;
+  text-align:center!important;
+  text-shadow:0 2px 5px #000!important;
+}
+#introKeys::before{
+  content:"▣   Tarayıcıda çalışır        ✦        ☁   Otomatik kayıt        ✦        ◉   Ses için bir kez tıkla"!important;
+  white-space:pre!important;
+}
+#introKeys{font-size:0!important}
+#introKeys::before{font-size:12px!important}
+
+/* Karakter oluşturma ve giriş kapısı da aynı görsel dilde */
+#newCharBox,#signedOutBox,#introLoading{
+  background:rgba(7,8,10,.72)!important;
+  border:1px solid rgba(207,159,61,.28)!important;
+  padding:18px!important;
+  box-shadow:0 18px 45px rgba(0,0,0,.28)!important;
+}
+.soy{
+  background:rgba(10,10,10,.86)!important;
+  border-color:rgba(198,149,52,.48)!important;
+}
+.soy.on{
+  border-color:#e5b54d!important;
+  box-shadow:0 0 16px rgba(224,164,46,.22)!important;
+}
+
+/* Mobil kendi yerleşimini korur; sadece görsel dil eşleşir. */
+html.mobile-ui #introBox{
+  transform:none!important;
+  width:min(690px,94dvw)!important;
+  padding:8px 14px!important;
+}
+html.mobile-ui #introBox>h1{
+  font-size:clamp(34px,8dvw,55px)!important;
+  letter-spacing:7px!important;
+}
+html.mobile-ui #introBox>h1::before{width:46px!important;height:46px!important;top:-29px!important;font-size:14px!important}
+html.mobile-ui #introBox>h1::after{display:none!important}
+html.mobile-ui #introBox>h4{font-size:10px!important;letter-spacing:4px!important;margin-bottom:18px!important}
+html.mobile-ui #introBox>h4::after{display:none!important}
+html.mobile-ui #introBox>p.lore{font-size:9px!important;line-height:1.35!important;margin-bottom:10px!important}
+html.mobile-ui #cloudBtn,
+html.mobile-ui #zatoiLoginBtn,
+html.mobile-ui #contBtn,
+html.mobile-ui #startBtn{
+  width:min(390px,72dvw)!important;
+  min-height:45px!important;
+  font-size:10px!important;
+  margin-bottom:6px!important;
+}
+html.mobile-ui #cloudBtn::before,html.mobile-ui #zatoiLoginBtn::before{font-size:17px!important;left:15px!important}
+html.mobile-ui #cloudBtn::after,html.mobile-ui #zatoiLoginBtn::after,
+html.mobile-ui #contBtn::after,html.mobile-ui #startBtn::after{font-size:27px!important;right:14px!important}
+html.mobile-ui #contBtn::before,html.mobile-ui #startBtn::before{width:25px!important;height:25px!important;left:14px!important;font-size:16px!important}
+html.mobile-ui #introKeys{margin-top:7px!important;width:auto!important}
+html.mobile-ui #introKeys::before{font-size:8px!important;white-space:normal!important}
+
 </style>
-<!-- GOKTASI BUILD: V4.37 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.37 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
-<!-- GOKTASI BUILD: V4.37 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
-<!-- GOKTASI BUILD: V4.37 - YOL TASLARI / HIZLI SEYAHAT -->
-<!-- GOKTASI BUILD: V4.37 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
-<!-- GOKTASI BUILD: V4.37 - SATIS EKRANI TAM ESYA DETAYLARI -->
-<!-- GOKTASI BUILD: V4.37 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
-<!-- GOKTASI BUILD: V4.37 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
-<!-- GOKTASI BUILD: V4.37 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
-<!-- GOKTASI BUILD: V4.37 - DUSMAN AGGRO / GOKTASI MUHAFIZ AI FIX -->
-<!-- GOKTASI BUILD: V4.37 - GOKTASI ANA SISTEMI / NADIRLIK / BOLGESEL LOOT -->
-<!-- GOKTASI BUILD: V4.37 - SINIF SECIMI GORUNURLUK FIX -->
-<!-- GOKTASI BUILD: V4.37 - GIRIS AKISI / STATIK SINIF KARTLARI -->
-<!-- GOKTASI BUILD: V4.37 - INTRO FLASH / FOUC FIX -->
-<!-- GOKTASI BUILD: V4.37 - ZATOI GIRIS KAPISI / 3 DURUMLU INTRO -->
-<!-- GOKTASI BUILD: V4.37 - ILK YUKLEME / SINIF FLASH KESIN FIX -->
-<!-- GOKTASI BUILD: V4.37 - TEMALI BEKLEME EKRANI -->
-<!-- GOKTASI BUILD: V4.37 - SPAWNMOB KRITIK RUNTIME / DUNYA RENDER FIX -->
-<!-- GOKTASI BUILD: V4.37 - REFERANS GORSELE UYUMLU GIRIS / V4.35 MOTOR KORUNDU -->
-<!-- GOKTASI BUILD: V4.37 - REFERANS GIRIS TASARIMI / SIYAH PANEL KALDIRILDI -->
+<!-- GOKTASI BUILD: V4.38 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.38 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.38 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.38 - YOL TASLARI / HIZLI SEYAHAT -->
+<!-- GOKTASI BUILD: V4.38 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
+<!-- GOKTASI BUILD: V4.38 - SATIS EKRANI TAM ESYA DETAYLARI -->
+<!-- GOKTASI BUILD: V4.38 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
+<!-- GOKTASI BUILD: V4.38 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
+<!-- GOKTASI BUILD: V4.38 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
+<!-- GOKTASI BUILD: V4.38 - DUSMAN AGGRO / GOKTASI MUHAFIZ AI FIX -->
+<!-- GOKTASI BUILD: V4.38 - GOKTASI ANA SISTEMI / NADIRLIK / BOLGESEL LOOT -->
+<!-- GOKTASI BUILD: V4.38 - SINIF SECIMI GORUNURLUK FIX -->
+<!-- GOKTASI BUILD: V4.38 - GIRIS AKISI / STATIK SINIF KARTLARI -->
+<!-- GOKTASI BUILD: V4.38 - INTRO FLASH / FOUC FIX -->
+<!-- GOKTASI BUILD: V4.38 - ZATOI GIRIS KAPISI / 3 DURUMLU INTRO -->
+<!-- GOKTASI BUILD: V4.38 - ILK YUKLEME / SINIF FLASH KESIN FIX -->
+<!-- GOKTASI BUILD: V4.38 - TEMALI BEKLEME EKRANI -->
+<!-- GOKTASI BUILD: V4.38 - SPAWNMOB KRITIK RUNTIME / DUNYA RENDER FIX -->
+<!-- GOKTASI BUILD: V4.38 - REFERANS GORSELE UYUMLU GIRIS / V4.35 MOTOR KORUNDU -->
+<!-- GOKTASI BUILD: V4.38 - REFERANS GIRIS TASARIMI / SIYAH PANEL KALDIRILDI -->
+<!-- GOKTASI BUILD: V4.38 - HEDEF UI KODLA / FANTASTIK BUTONLAR -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -908,7 +1213,7 @@ html.mobile-ui #introKeys{margin-top:8px!important;font-size:9px!important}
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.37 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.38 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -928,7 +1233,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.37 ayarlar / yeniden tuş atama ----------
+// ---------- V4.38 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -1564,7 +1869,7 @@ function botChat(){
   const b=pick(alive);
   addChat(b.name+(b.guild?` [${b.guild}]`:''),pick(CHAT_POOL).replace('Veryrık',''),'bt');
 }
-// ---------- V4.37 GÖKTAŞI ANA SİSTEMİ ----------
+// ---------- V4.38 GÖKTAŞI ANA SİSTEMİ ----------
 const STONE_TIERS=[
   {id:'siradan',n:'GÖKTAŞI',rar:0,w:66,hp:1,guard:1,exp:1,money:1,c:'#79bed5'},
   {id:'islenmis',n:'PARLAYAN GÖKTAŞI',rar:1,w:25,hp:1.35,guard:1.35,exp:1.35,money:1.35,c:'#79d9e8'},
@@ -2560,7 +2865,7 @@ function drawMini(){
   $('miniReg').textContent=REGN[rg].n;
   $('clock').textContent=(isNight()?'Gece':'Gündüz')+' — '+(hour()<10?'0':'')+hour()+':00 • Önerilen '+REGN[rg].lv;
 }
-// ---------- V4.37 YOL TAŞLARI / HIZLI SEYAHAT ----------
+// ---------- V4.38 YOL TAŞLARI / HIZLI SEYAHAT ----------
 const FAST_TRAVEL_POINTS=[
   {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
   {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
@@ -2733,7 +3038,7 @@ function updMobs(dt){
     const dP=dst(m.x,m.y,P.x,P.y);
     if(dP>1700){m.target=null;continue;}
     const M=MOBS[m.k];
-    // V4.37 aggro: düşmanlar artık oyuncunun neredeyse üstüne basmasını beklemez.
+    // V4.38 aggro: düşmanlar artık oyuncunun neredeyse üstüne basmasını beklemez.
     // Göktaşı muhafızları daha geniş bir alanı korur.
     if(!m.target){
       const baseAggro=M.ag?Math.max(285,Number(M.aggro)||0):0;
@@ -3238,7 +3543,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.37 ONLINE OYUNCULAR ----------
+// ---------- V4.38 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -3414,7 +3719,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.37 KAYIT SEÇİMİ
+  V4.38 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3913,7 +4218,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.37: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.38: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
