@@ -47,6 +47,24 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
 #miniWrap{position:absolute;top:14px;right:16px;text-align:center}
 #mini{width:150px;height:150px;border-radius:50%;border:2px solid var(--line2);box-shadow:0 2px 12px rgba(0,0,0,.7),inset 0 0 20px rgba(0,0,0,.6);background:#111}
 #miniReg{font-family:'Cinzel',serif;font-weight:600;font-size:12px;color:var(--gold2);margin-top:4px;text-shadow:0 1px 2px #000}
+#settingsBtn{position:absolute;right:0;top:158px;width:34px;height:32px;border:1px solid var(--line2);background:rgba(18,14,9,.94);color:var(--gold2);font-size:17px;border-radius:4px;cursor:pointer;box-shadow:0 2px 8px #0008}
+#settingsBtn:hover{border-color:var(--gold);background:#2a2013}
+#settingsPanel{top:54px;right:18px;width:430px;max-height:calc(100vh - 90px);overflow:auto}
+.settingsSec{padding:11px 14px;border-bottom:1px solid var(--line)}
+.settingsSec h4{font-family:'Cinzel',serif;color:var(--gold2);font-size:12px;letter-spacing:1px;margin-bottom:9px}
+.setRow{display:flex;align-items:center;gap:10px;min-height:34px;font-size:12px}
+.setRow>label:first-child{width:130px;color:var(--text)}
+.setRow input[type=range]{flex:1;accent-color:#b38a3d}
+.setVal{width:38px;text-align:right;color:var(--gold2);font-size:11px}
+.bindGrid{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center}
+.bindGrid span{font-size:12px;color:var(--text)}
+.bindBtn{min-width:118px;background:#181109;border:1px solid var(--line2);color:var(--gold2);padding:6px 8px;font-size:11px;text-align:center}
+.bindBtn:hover{border-color:var(--gold)}
+.bindBtn.listening{border-color:#d8b24a;color:#fff0b8;animation:bindPulse .8s infinite alternate}
+@keyframes bindPulse{from{box-shadow:0 0 0 #d8b24a00}to{box-shadow:0 0 12px #d8b24a66}}
+.settingsHint{font-size:10px;color:var(--dim);line-height:1.55;margin-top:8px}
+.settingsBtns{display:flex;gap:8px;justify-content:flex-end;padding-top:10px}
+
 #clock{font-size:10px;color:var(--dim)}
 #questPanel{position:absolute;top:200px;right:16px;width:210px;font-size:11px}
 #questPanel .q{background:rgba(15,12,8,.82);border:1px solid var(--line);border-left:2px solid var(--gold);padding:6px 8px;margin-bottom:5px}
@@ -177,7 +195,7 @@ html.mobile-ui #miniWrap{top:48px;right:max(8px,env(safe-area-inset-right))}html
 html.mobile-ui #questPanel{top:140px;right:max(8px,env(safe-area-inset-right));width:min(170px,25vw);font-size:9px}html.mobile-ui #questPanel .q{padding:4px 6px;margin-bottom:3px}html.mobile-ui #questPanel .q b{font-size:9px}
 html.mobile-ui #chatWrap{left:max(8px,env(safe-area-inset-left));bottom:112px;width:min(300px,42vw)}html.mobile-ui #chatLog{max-height:82px;font-size:9.5px}html.mobile-ui #chatIn{font-size:16px;padding:5px 7px}
 html.mobile-ui #chatTab{bottom:138px}
-html.mobile-ui #skillbar{bottom:max(7px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);transform-origin:bottom center}html.mobile-ui #xpThin{width:min(330px,42dvw)}html.mobile-ui #moneyTag{bottom:52px;font-size:9px}html.mobile-ui #slots{gap:4px}html.mobile-ui .slot{width:46px;height:46px;touch-action:manipulation}html.mobile-ui .slot .key{display:none}html.mobile-ui .slot .sp{font-size:8px}
+html.mobile-ui #settingsBtn{display:none}html.mobile-ui #settingsPanel{display:none!important}html.mobile-ui #skillbar{bottom:max(7px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);transform-origin:bottom center}html.mobile-ui #xpThin{width:min(330px,42dvw)}html.mobile-ui #moneyTag{bottom:52px;font-size:9px}html.mobile-ui #slots{gap:4px}html.mobile-ui .slot{width:46px;height:46px;touch-action:manipulation}html.mobile-ui .slot .key{display:none}html.mobile-ui .slot .sp{font-size:8px}
 html.mobile-ui .panel{max-width:calc(100dvw - 20px);max-height:calc(100dvh - 20px);overflow:auto}html.mobile-ui #invPanel,html.mobile-ui #charPanel,html.mobile-ui #shopPanel,html.mobile-ui #upgPanel,html.mobile-ui #mapPanel{top:50%;left:50%;transform:translate(-50%,-50%)}html.mobile-ui #dlgPanel{bottom:max(8px,env(safe-area-inset-bottom));width:min(520px,92dvw)}html.mobile-ui #mapCv{width:min(72dvh,72dvw);height:min(72dvh,72dvw)}html.mobile-ui #announce{top:60px}html.mobile-ui #announce div{font-size:17px}html.mobile-ui #zoneTitle h2{font-size:26px}
 /* Mobil giriş ekranı: tarayıcı çubukları açıkken bile düğme ekranda kalır. */
 html.mobile-ui #intro{align-items:flex-start;overflow:auto;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
@@ -335,6 +353,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
   <div id="miniWrap" class="ia">
     <canvas id="mini" width="150" height="150"></canvas>
     <div id="miniReg">—</div><div id="clock">—</div>
+    <button id="settingsBtn" title="Ayarlar">⚙</button>
   </div>
   <div id="questPanel"></div>
   <div id="chatWrap" class="ia">
@@ -381,6 +400,22 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 </div>
 
 <div class="panel" id="mapPanel"><h3>DÜNYA HARİTASI</h3><button class="x" data-close="mapPanel">✕</button><canvas id="mapCv" width="420" height="420"></canvas></div>
+<div class="panel" id="settingsPanel">
+  <h3>AYARLAR</h3><button class="x" data-close="settingsPanel">✕</button>
+  <div class="settingsSec">
+    <h4>SES</h4>
+    <div class="setRow"><label>Ana Ses</label><input id="setMaster" type="range" min="0" max="100" step="1"><span id="setMasterV" class="setVal"></span></div>
+    <div class="setRow"><label>Efektler</label><input id="setSfx" type="range" min="0" max="100" step="1"><span id="setSfxV" class="setVal"></span></div>
+    <div class="setRow"><label>Ortam Sesi</label><input id="setAmbient" type="range" min="0" max="100" step="1"><span id="setAmbientV" class="setVal"></span></div>
+    <div class="setRow"><label>Sessiz</label><input id="setMute" type="checkbox"></div>
+  </div>
+  <div class="settingsSec">
+    <h4>PC KONTROLLERİ</h4>
+    <div id="bindGrid" class="bindGrid"></div>
+    <div class="settingsHint">Bir komutun karşısındaki tuşa bas, sonra yeni klavye tuşuna veya Mouse 3 / Mouse 4 / Mouse 5'e bas. Mouse 1 ve Mouse 2 dünya kontrolü için ayrılmıştır. Aynı tuş başka komuttaysa yeni komuta taşınır.</div>
+    <div class="settingsBtns"><button class="abtn" id="resetBinds">VARSAYILANLAR</button></div>
+  </div>
+</div>
 <div class="panel" id="cloudPanel">
   <h3>BULUT HESABI</h3><button class="x" data-close="cloudPanel">✕</button>
   <div class="bd">
@@ -430,7 +465,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.13 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.14 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -450,10 +485,105 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
+// ---------- V4.14 ayarlar / yeniden tuş atama ----------
+const SETTINGS_KEY='goktasi_settings_v1';
+const DEFAULT_BINDS={
+  skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
+  attack:'Space',potHp:'KeyQ',potSp:'KeyE',inventory:'KeyI',character:'KeyC',map:'KeyM',target:'Tab'
+};
+const BIND_LABELS={
+  skill1:'Skill 1 — Yalım',skill2:'Skill 2 — Fırtına Daru',skill3:'Skill 3 — Gök Çağrısı',
+  skill4:'Skill 4 — Toprak Zırhı',skill5:'Skill 5 — Kurt Ruhu',attack:'Normal saldırı',
+  potHp:'Can iksiri',potSp:'Ruh iksiri',inventory:'Çanta',character:'Karakter',map:'Harita',target:'En yakın hedef'
+};
+function defaultSettings(){return {audio:{master:100,sfx:100,ambient:100,mute:false},binds:{...DEFAULT_BINDS}};}
+function loadGameSettings(){
+  const d=defaultSettings();
+  try{
+    const s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null');
+    if(s?.audio)Object.assign(d.audio,s.audio);
+    if(s?.binds)Object.assign(d.binds,s.binds);
+  }catch(e){}
+  d.audio.master=clamp(Number(d.audio.master)||0,0,100);
+  d.audio.sfx=clamp(Number(d.audio.sfx)||0,0,100);
+  d.audio.ambient=clamp(Number(d.audio.ambient)||0,0,100);
+  d.audio.mute=!!d.audio.mute;
+  return d;
+}
+const GAME_SETTINGS=loadGameSettings();
+function saveGameSettings(){
+  try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(GAME_SETTINGS));}catch(e){}
+  applyAudioSettings();refreshSkillKeyLabels();
+}
+function prettyBind(code){
+  if(!code)return '—';
+  if(/^Mouse[345]$/.test(code))return code.replace('Mouse','Mouse ');
+  const map={Space:'Boşluk',Tab:'Tab',Escape:'Esc',Enter:'Enter',ShiftLeft:'Sol Shift',ShiftRight:'Sağ Shift',
+    ControlLeft:'Sol Ctrl',ControlRight:'Sağ Ctrl',AltLeft:'Sol Alt',AltRight:'Sağ Alt',
+    ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
+  if(map[code])return map[code];
+  if(/^Key[A-Z]$/.test(code))return code.slice(3);
+  if(/^Digit[0-9]$/.test(code))return code.slice(5);
+  return code.replace('Numpad','Num ');
+}
+function bindActionFor(code){
+  return Object.keys(GAME_SETTINGS.binds).find(k=>GAME_SETTINGS.binds[k]===code)||null;
+}
+function runBoundAction(action){
+  if(!started||P.dead)return false;
+  if(action?.startsWith('skill')){castSkill(Number(action.slice(5))-1);return true;}
+  if(action==='attack'){manualSword();return true;}
+  if(action==='potHp'){usePotion(0);return true;}
+  if(action==='potSp'){usePotion(1);return true;}
+  if(action==='inventory'){togglePanel('invPanel');renderInv();return true;}
+  if(action==='character'){togglePanel('charPanel');renderChar();return true;}
+  if(action==='map'){togglePanel('mapPanel');drawBigMap();return true;}
+  if(action==='target'){nearestTarget();return true;}
+  return false;
+}
+let rebindingAction=null;
+function setBinding(action,code){
+  if(!action||!code)return;
+  // Mouse 1/2 dünyaya tıklama/hedefleme için ayrılmış.
+  if(code==='Mouse1'||code==='Mouse2'){toast('Mouse 1 ve Mouse 2 dünya kontrolü için ayrılmış');return;}
+  for(const k of Object.keys(GAME_SETTINGS.binds)){
+    if(k!==action&&GAME_SETTINGS.binds[k]===code)GAME_SETTINGS.binds[k]='';
+  }
+  GAME_SETTINGS.binds[action]=code;rebindingAction=null;saveGameSettings();renderSettings();
+}
+function refreshSkillKeyLabels(){
+  const slots=document.querySelectorAll('#slots .slot[data-i]');
+  slots.forEach((el,i)=>{const k=el.querySelector('.key');if(k)k.textContent=prettyBind(GAME_SETTINGS.binds['skill'+(i+1)]);});
+  const pots=document.querySelectorAll('#slots .slot[data-p]');
+  pots.forEach((el,i)=>{const k=el.querySelector('.key');if(k)k.textContent=prettyBind(GAME_SETTINGS.binds[i===0?'potHp':'potSp']);});
+}
+function renderSettings(){
+  const ids=[['setMaster','master'],['setSfx','sfx'],['setAmbient','ambient']];
+  ids.forEach(([id,k])=>{const el=$(id),v=$(id+'V');if(el){el.value=GAME_SETTINGS.audio[k];v.textContent=Math.round(GAME_SETTINGS.audio[k])+'%';}});
+  if($('setMute'))$('setMute').checked=GAME_SETTINGS.audio.mute;
+  const grid=$('bindGrid');if(!grid)return;grid.innerHTML='';
+  Object.keys(BIND_LABELS).forEach(action=>{
+    const lab=document.createElement('span');lab.textContent=BIND_LABELS[action];
+    const b=document.createElement('button');b.className='bindBtn'+(rebindingAction===action?' listening':'');
+    b.textContent=rebindingAction===action?'Bir tuşa bas…':prettyBind(GAME_SETTINGS.binds[action]);
+    b.onclick=()=>{rebindingAction=action;renderSettings();};
+    grid.append(lab,b);
+  });
+}
+function openSettings(){if(IS_MOBILE_UI)return;togglePanel('settingsPanel');if($('settingsPanel').classList.contains('on'))renderSettings();}
+
 // ---------- ses ----------
-let AC=null,mGain=null;
-function initAudio(){ if(AC)return; try{ AC=new (window.AudioContext||window.webkitAudioContext)();
-  mGain=AC.createGain(); mGain.gain.value=.32; mGain.connect(AC.destination);
+let AC=null,mGain=null,sfxGain=null,ambientGain=null;
+function applyAudioSettings(){
+  if(!mGain)return;
+  const muted=!!GAME_SETTINGS.audio.mute;
+  mGain.gain.value=muted?0:(GAME_SETTINGS.audio.master/100)*.32;
+  if(sfxGain)sfxGain.gain.value=GAME_SETTINGS.audio.sfx/100;
+  if(ambientGain)ambientGain.gain.value=GAME_SETTINGS.audio.ambient/100;
+}
+function initAudio(){ if(AC){if(AC.state==='suspended')AC.resume().catch(()=>{});applyAudioSettings();return;} try{ AC=new (window.AudioContext||window.webkitAudioContext)();
+  mGain=AC.createGain();sfxGain=AC.createGain();ambientGain=AC.createGain();
+  sfxGain.connect(mGain);ambientGain.connect(mGain);mGain.connect(AC.destination);applyAudioSettings();
   // rüzgar
   const len=AC.sampleRate*2, buf=AC.createBuffer(1,len,AC.sampleRate), d=buf.getChannelData(0);
   for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
@@ -462,18 +592,18 @@ function initAudio(){ if(AC)return; try{ AC=new (window.AudioContext||window.web
   const g=AC.createGain(); g.gain.value=.045;
   const lfo=AC.createOscillator(); lfo.frequency.value=.13; const lg=AC.createGain(); lg.gain.value=.02;
   lfo.connect(lg); lg.connect(g.gain); lfo.start();
-  src.connect(f); f.connect(g); g.connect(mGain); src.start();
+  src.connect(f); f.connect(g); g.connect(ambientGain); src.start();
 }catch(e){} }
 function tone(f0,f1,dur,type,vol,when=0){ if(!AC)return; const t=AC.currentTime+when;
   const o=AC.createOscillator(),g=AC.createGain(); o.type=type; o.frequency.setValueAtTime(f0,t);
   o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);
   g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
-  o.connect(g); g.connect(mGain); o.start(t); o.stop(t+dur+.02);}
+  o.connect(g); g.connect(sfxGain||mGain); o.start(t); o.stop(t+dur+.02);}
 function noiseHit(dur,vol,freq){ if(!AC)return; const t=AC.currentTime;
   const n=AC.createBufferSource(),len=AC.sampleRate*dur,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);
   for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
   n.buffer=b; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq;
-  const g=AC.createGain(); g.gain.value=vol; n.connect(f);f.connect(g);g.connect(mGain);n.start(t);}
+  const g=AC.createGain(); g.gain.value=vol; n.connect(f);f.connect(g);g.connect(sfxGain||mGain);n.start(t);}
 const SFX={
   hit(){tone(160,60,.09,'square',.16);noiseHit(.06,.14,900);},
   swing(){noiseHit(.12,.08,1600);},
@@ -1082,10 +1212,10 @@ function slotHTML(ic,key,sp){return `<img src="${ic}">${key?`<span class="key">$
 function buildSkillbar(){
   const w=$('slots');w.innerHTML='';
   SKILLS.forEach((s,i)=>{const d=document.createElement('div');d.className='slot';d.dataset.i=i;
-    d.innerHTML=slotHTML(SKIC[s.ic],s.key,s.sp);d.title=s.n+' — '+s.d;w.appendChild(d);
+    d.innerHTML=slotHTML(SKIC[s.ic],prettyBind(GAME_SETTINGS.binds['skill'+(i+1)]),s.sp);d.title=s.n+' — '+s.d;w.appendChild(d);
     d.onclick=()=>castSkill(i);});
   ['pot0','pot1'].forEach((ic,i)=>{const d=document.createElement('div');d.className='slot';d.dataset.p=i;
-    d.style.marginLeft='10px';d.innerHTML=slotHTML(SKIC[ic],i===0?'Q':'E');d.title=i===0?'Can İksiri':'Ruh İksiri';
+    d.style.marginLeft='10px';d.innerHTML=slotHTML(SKIC[ic],prettyBind(GAME_SETTINGS.binds[i===0?'potHp':'potSp']));d.title=i===0?'Can İksiri':'Ruh İksiri';
     w.appendChild(d);d.onclick=()=>usePotion(i);});
 }
 function itemTipHTML(id,up){
@@ -1462,6 +1592,11 @@ function skillAimAngle(){
 }
 addEventListener('keydown',e=>{
   initAudio();
+  if(rebindingAction){
+    e.preventDefault();e.stopPropagation();
+    if(e.code==='Escape'){rebindingAction=null;renderSettings();return;}
+    setBinding(rebindingAction,e.code);return;
+  }
   if(document.activeElement===chatIn){
     if(e.key==='Enter'){const v=chatIn.value.trim();
       if(v){chatIn.value='';sendOnlineChat(v);}
@@ -1472,18 +1607,33 @@ addEventListener('keydown',e=>{
   keys[e.code]=true;
   if(!started)return;
   if(e.key==='Enter'){chatIn.focus();e.preventDefault();return;}
-  if(e.key>='1'&&e.key<='5')castSkill(+e.key-1);
-  if(e.code==='KeyQ')usePotion(0);
-  if(e.code==='KeyE')usePotion(1);
-  if(e.code==='KeyI'){togglePanel('invPanel');renderInv();}
-  if(e.code==='KeyC'){togglePanel('charPanel');renderChar();}
-  if(e.code==='KeyM'){togglePanel('mapPanel');drawBigMap();}
-  if(e.code==='Tab'){e.preventDefault();nearestTarget();}
-  if(e.code==='Space'){e.preventDefault();manualSword();}
+  const action=bindActionFor(e.code);
+  if(action){
+    // tuş basılı tutulduğunda panel/skill spamini engelle
+    if(!e.repeat){if(action==='target'||action==='attack'||action.startsWith('skill'))e.preventDefault();runBoundAction(action);}
+    return;
+  }
   if(e.code==='Escape')closePanels();
 });
 addEventListener('keyup',e=>keys[e.code]=false);
 addEventListener('mousemove',e=>mouse={x:e.clientX,y:e.clientY});
+addEventListener('mousedown',e=>{
+  const code='Mouse'+(e.button+1);
+  if(rebindingAction){
+    if(e.button===0||e.button===2){e.preventDefault();e.stopPropagation();toast('Ekstra mouse tuşlarından birini kullan: Mouse 3 / 4 / 5');return;}
+    e.preventDefault();e.stopPropagation();setBinding(rebindingAction,code);return;
+  }
+  if(IS_MOBILE_UI||e.button<1)return;
+  const action=bindActionFor(code);
+  if(action&&started){
+    e.preventDefault();e.stopPropagation();initAudio();runBoundAction(action);
+  }
+},true);
+addEventListener('auxclick',e=>{
+  const code='Mouse'+(e.button+1);
+  if(bindActionFor(code)||rebindingAction)e.preventDefault();
+},true);
+
 cv.addEventListener('mousedown',e=>{
   initAudio();if(!started||P.dead)return;
   lastInput=performance.now();
@@ -1491,6 +1641,7 @@ cv.addEventListener('mousedown',e=>{
   const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
   const wx=cam.x+(sx-rect.width/2)/zoom,wy=cam.y+(sy-rect.height/2)/zoom;
   if(e.button===2){e.preventDefault();return;}
+  if(e.button!==0)return;
   // NPC: yalnızca gerçekten NPC'nin üstüne tıklanınca konuş.
   for(const n of npcs){if(dst(wx,wy,n.x,n.y-14)<30){P.target=null;P.stoneT=null;P.tx=P.x;P.ty=P.y;openDialog(n);return;}}
   // Göktaşı: tıklanınca hedefle, yanına git ve otomatik vur.
@@ -1549,6 +1700,14 @@ function maybeBotReply(v){
 function togglePanel(id){const p=$(id);const on=!p.classList.contains('on');closePanels();if(on)p.classList.add('on');}
 function closePanels(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));}
 document.querySelectorAll('.x').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('on'));
+
+$('settingsBtn').onclick=()=>{initAudio();openSettings();};
+[['setMaster','master'],['setSfx','sfx'],['setAmbient','ambient']].forEach(([id,k])=>{
+  $(id).addEventListener('input',e=>{GAME_SETTINGS.audio[k]=Number(e.target.value);saveGameSettings();renderSettings();});
+});
+$('setMute').addEventListener('change',e=>{GAME_SETTINGS.audio.mute=!!e.target.checked;saveGameSettings();renderSettings();});
+$('resetBinds').onclick=()=>{GAME_SETTINGS.binds={...DEFAULT_BINDS};rebindingAction=null;saveGameSettings();renderSettings();toast('Kontroller varsayılana döndü');};
+
 let shopNPC=null,shopTab='buy';
 function openDialog(n){
   const dlg=$('dlgPanel');dlg.classList.add('on');
@@ -2335,7 +2494,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.13 ONLINE OYUNCULAR ----------
+// ---------- V4.14 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2511,7 +2670,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.13 KAYIT SEÇİMİ
+  V4.14 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -2950,7 +3109,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.13: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.14: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
@@ -2977,7 +3136,7 @@ function frame(ts){
 makeTiles();makeObjSprites();makeBuildings();makeSkillIcons();
 SKILLS.forEach(s=>{});['hpk','hpb','spk'].forEach(()=>{});
 bakeWorld();placeObjects();spawnAll();spawnBots();initStones();initNPCs();bakeBigMap();
-buildSkillbar();initIntro();
+buildSkillbar();refreshSkillKeyLabels();renderSettings();initIntro();
 // intro arka planı canlı dünya: bot 0'ı köye çağır
 bots[0].x=VILLAGE.x-300;bots[0].y=VILLAGE.y-200;cam.x=introCam.x;cam.y=introCam.y;
 addChat('Kam Bilge','Çan üç kez çaldı. Göktaşları yine kıpırdandı.','sys');
