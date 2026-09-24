@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.9.6 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.9.7 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2223,14 +2223,31 @@ function placeObjects(){
   }
 }
 // ---------- kayıt: GÖKTAŞI V4.9.4 / Zatoi bulut senkronizasyonu ----------
-const SAVE_KEY='goktasi_kayit1';
-const LOCAL_BACKUPS_KEY='goktasi_local_backups_v2';
+const SAVE_KEY='goktasi_kayit1'; // yalnızca eski sürüm uyumluluğu
+const LOCAL_BACKUPS_KEY='goktasi_local_backups_v2'; // yalnızca eski sürüm uyumluluğu
+const ACCOUNT_SAVE_PREFIX='goktasi_kayit1_user_';
+const ACCOUNT_BACKUPS_PREFIX='goktasi_local_backups_v2_user_';
+
+function activeAccountId(){
+  return String(accountUser?.id||accountUser?.userId||'').trim();
+}
+function activeSaveKey(){
+  const id=activeAccountId();
+  return id?ACCOUNT_SAVE_PREFIX+id:SAVE_KEY;
+}
+function activeBackupsKey(){
+  const id=activeAccountId();
+  return id?ACCOUNT_BACKUPS_PREFIX+id:LOCAL_BACKUPS_KEY;
+}
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
 const ZATOI_AUTH_TOKEN_KEY='zatoi_auth_token_v1';
 const ZATOI_AUTH_USER_KEY='zatoi_auth_user_v1';
 const MAX_LOCAL_BACKUPS=12;
 let cloudAuth=null,cloudReady=false,cloudVerified=false,cloudBusy=false,cloudDirty=false,cloudTimer=0;
 let accountUser=null,cloudRevision=0,cloudSaveVersion=0;
+let activeZatoiToken='';
+let activeZatoiUserId='';
+let accountSwitchBusy=false;
 
 function saveFingerprint(d){
   if(!d||d.v!==1)return '';
@@ -2254,10 +2271,10 @@ function applySaveData(d){
   P.tx=P.x;P.ty=P.y; return true;
 }
 function readLocalRaw(){
-  try{const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');return d?.v===1?d:null;}catch(e){return null;}
+  try{const d=JSON.parse(localStorage.getItem(activeSaveKey())||'null');return d?.v===1?d:null;}catch(e){return null;}
 }
 function readLocalBackups(){
-  try{const a=JSON.parse(localStorage.getItem(LOCAL_BACKUPS_KEY)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}
+  try{const a=JSON.parse(localStorage.getItem(activeBackupsKey())||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}
 }
 function pushLocalBackup(data,reason='auto'){
   if(!data||data.v!==1)return;
@@ -2266,12 +2283,12 @@ function pushLocalBackup(data,reason='auto'){
   if(a[0]&&saveFingerprint(a[0].data)===fp)return;
   a.unshift({at:Date.now(),reason,data});
   a=a.slice(0,MAX_LOCAL_BACKUPS);
-  try{localStorage.setItem(LOCAL_BACKUPS_KEY,JSON.stringify(a));}catch(e){}
+  try{localStorage.setItem(activeBackupsKey(),JSON.stringify(a));}catch(e){}
 }
 function saveLocal(data,reason='auto'){
   const next=data||makeSaveData(),old=readLocalRaw();
   if(old&&saveFingerprint(old)!==saveFingerprint(next))pushLocalBackup(old,reason);
-  try{localStorage.setItem(SAVE_KEY,JSON.stringify(next));return true;}catch(e){return false;}
+  try{localStorage.setItem(activeSaveKey(),JSON.stringify(next));return true;}catch(e){return false;}
 }
 function save(){
   if(!started)return;
@@ -2307,7 +2324,7 @@ function readZatoiSession(){
   return {token,storedUser};
 }
 function clearGameCloudState(){
-  cloudAuth=null;accountUser=null;cloudVerified=false;cloudReady=false;cloudRevision=0;cloudSaveVersion=0;cloudDirty=false;
+  cloudAuth=null;accountUser=null;cloudVerified=false;cloudReady=false;cloudRevision=0;cloudSaveVersion=0;cloudDirty=false;activeZatoiToken='';activeZatoiUserId='';
 }
 function progressSummary(d){
   return `${d?.name||'Karakter'} · Lv ${Number(d?.lvl)||1} · EXP ${Math.floor(Number(d?.exp)||0)}`;
@@ -2315,7 +2332,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.9.6 KAYIT SEÇİMİ
+  V4.9.7 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -2497,8 +2514,10 @@ async function initCloudSave(showMessage=false){
   try{
     const me=await apiFetch('/auth/me');
     accountUser=me.user||null;
-    cloudVerified=!!accountUser?.id;
+    cloudVerified=!!(accountUser?.id||accountUser?.userId);
     if(!cloudVerified)throw new Error('Zatoi kullanıcı kimliği alınamadı.');
+    activeZatoiToken=s.token;
+    activeZatoiUserId=String(accountUser.id||accountUser.userId||'');
     await reconcileInitialCloud(showMessage);
     updateAccountUI();
     startOnlineChat();
@@ -2604,6 +2623,37 @@ document.addEventListener('click',e=>{
 });
 const accountCheckBtn=$('accountCheckBtn');
 if(accountCheckBtn)accountCheckBtn.dataset.goktasiHandled='1';
+
+async function detectZatoiAccountSwitch(){
+  if(accountSwitchBusy)return;
+  const s=readZatoiSession();
+  const token=s?.token||'';
+
+  // İlk doğrulama henüz bitmediyse initCloudSave ilgilenecek.
+  if(!activeZatoiToken)return;
+  if(token===activeZatoiToken)return;
+
+  accountSwitchBusy=true;
+  cloudReady=false;
+  cloudDirty=false;
+  clearTimeout(cloudTimer);
+
+  // Eski karakter yalnızca eski hesabın cihaz anahtarına yazılır.
+  if(started&&activeZatoiUserId){
+    try{saveLocal(makeSaveData(),'hesap-degisimi-oncesi');}catch(e){}
+  }
+
+  toast('Zatoi hesabı değişti · oyun yeni hesaba geçiriliyor');
+  setTimeout(()=>location.reload(),250);
+}
+addEventListener('storage',e=>{
+  if(e.key===ZATOI_AUTH_TOKEN_KEY||e.key===ZATOI_AUTH_USER_KEY)detectZatoiAccountSwitch();
+});
+addEventListener('focus',detectZatoiAccountSwitch);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')detectZatoiAccountSwitch();
+});
+setInterval(detectZatoiAccountSwitch,2000);
 
 addEventListener('beforeunload',()=>{if(started)saveLocal(makeSaveData(),'sayfa-kapanis');});
 setInterval(save,15000);
