@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.9.5 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.9.6 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2313,77 +2313,121 @@ function progressSummary(d){
   return `${d?.name||'Karakter'} · Lv ${Number(d?.lvl)||1} · EXP ${Math.floor(Number(d?.exp)||0)}`;
 }
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
-function isClearlyAhead(a,b){
-  if(!a||!b)return false;
-  const al=Number(a.lvl)||1,bl=Number(b.lvl)||1;
-  if(al!==bl)return al>bl;
-  const aq=Number(a.qN)||0,bq=Number(b.qN)||0;
-  if(aq!==bq)return aq>bq;
-  const at=Number(a.playT)||0,bt=Number(b.playT)||0;
-  return at>bt+120;
+
+/*
+  V4.9.6 KAYIT SEÇİMİ
+  Kullanıcıya cihaz/bulut seçimi sorulmaz.
+  Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
+  level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
+  -> kesin oyun süresi -> kayıt zamanı.
+*/
+function saveProgress(d){
+  d=(d&&d.v===1)?d:{};
+  return {
+    lvl:Math.max(1,Number(d.lvl)||1),
+    qStep:Math.max(0,Number(d.qStep)||0),
+    playT:Math.max(0,Number(d.playT)||0),
+    exp:Math.max(0,Number(d.exp)||0),
+    qN:Math.max(0,Number(d.qN)||0),
+    savedAt:Math.max(0,Number(d.savedAt)||0)
+  };
+}
+function compareSaveProgress(a,b){
+  const A=saveProgress(a),B=saveProgress(b);
+  if(A.lvl!==B.lvl)return A.lvl>B.lvl?1:-1;
+  if(A.qStep!==B.qStep)return A.qStep>B.qStep?1:-1;
+  if(Math.abs(A.playT-B.playT)>120)return A.playT>B.playT?1:-1;
+  if(A.exp!==B.exp)return A.exp>B.exp?1:-1;
+  if(A.qN!==B.qN)return A.qN>B.qN?1:-1;
+  if(A.playT!==B.playT)return A.playT>B.playT?1:-1;
+  if(A.savedAt!==B.savedAt)return A.savedAt>B.savedAt?1:-1;
+  return 0;
+}
+function bestSaveCandidate(candidates){
+  let best=null;
+  for(const c of candidates){
+    if(!c?.data||c.data.v!==1)continue;
+    if(!best||compareSaveProgress(c.data,best.data)>0)best=c;
+  }
+  return best;
+}
+function collectLocalCandidates(){
+  const a=[];
+  const main=readLocalRaw();
+  if(main)a.push({source:'local-current',data:main,saved_at:Number(main.savedAt)||0});
+  for(const b of readLocalBackups()){
+    if(b?.data?.v===1)a.push({
+      source:'local-backup',
+      data:b.data,
+      saved_at:Number(b.at)||Number(b.data.savedAt)||0
+    });
+  }
+  return a;
+}
+async function fetchCloudCandidates(){
+  const r=await apiFetch('/save-candidates');
+  const list=Array.isArray(r.candidates)?r.candidates.filter(c=>c?.data?.v===1):[];
+
+  // expected_save_version daima mevcut ana bulut satırının sürümüdür.
+  const current=list.find(c=>c.source==='cloud-current');
+  cloudSaveVersion=Number(current?.save_version)||0;
+
+  for(const c of list){
+    cloudRevision=Math.max(Number(c?.data?.syncRev)||0,cloudRevision||0);
+  }
+  return list;
 }
 async function fetchCloudSave(){
-  const r=await apiFetch('/load');
-  if(!r.found||!r.save?.data)return null;
-  const d=r.save.data;
-  if(!d||d.v!==1)throw new Error('Bulut kayıt biçimi geçersiz.');
-  cloudSaveVersion=Number(r.save.save_version)||0;
-  cloudRevision=Math.max(Number(d.syncRev)||0,cloudRevision||0);
-  return {data:d,meta:r.save};
+  const list=await fetchCloudCandidates();
+  const best=bestSaveCandidate(list);
+  return best?{data:best.data,meta:best}:null;
 }
 async function reconcileInitialCloud(showMessage=false){
-  const remote=await fetchCloudSave();
-  const local=readLocalRaw();
-  if(!remote){
+  /*
+    Önce bütün adayları topluyoruz. cloudReady bu işlem bitmeden açılmaz;
+    dolayısıyla eski/düşük yerel kayıt başlangıç sırasında buluta yazılamaz.
+  */
+  cloudReady=false;
+  cloudDirty=false;
+
+  const localCandidates=collectLocalCandidates();
+  const cloudCandidates=await fetchCloudCandidates();
+  const all=[...localCandidates,...cloudCandidates];
+  const best=bestSaveCandidate(all);
+
+  if(!best){
     cloudSaveVersion=0;
     cloudReady=true;
-    if(local&&started){cloudDirty=true;scheduleCloudSave();}
     return true;
   }
-  const rd=remote.data;
-  if(!local){
-    saveLocal(rd,'buluttan-ilk-yukleme');
-    refreshContinueButton();
-    if(showMessage)toast('Bulut kaydı bulundu: '+progressSummary(rd));
-    cloudReady=true;
-    return true;
+
+  const oldLocal=readLocalRaw();
+  const cloudCurrent=cloudCandidates.find(c=>c.source==='cloud-current')||null;
+
+  // Seçilmeyen mevcut kayıtları kurtarma amacıyla yerelde koru.
+  if(oldLocal&&!isSameSave(oldLocal,best.data)){
+    pushLocalBackup(oldLocal,'otomatik-secim-oncesi');
   }
-  if(isSameSave(local,rd)){
-    cloudReady=true;
-    return true;
+  if(cloudCurrent?.data&&!isSameSave(cloudCurrent.data,best.data)){
+    pushLocalBackup(cloudCurrent.data,'bulut-ana-kaydi-koruma');
   }
-  // Açıkça daha ileride olan kayıt otomatik seçilir; diğeri yerel yedeğe alınır.
-  if(isClearlyAhead(rd,local)){
-    pushLocalBackup(local,'bulut-oncesi-cihaz-kaydi');
-    saveLocal(rd,'buluttan-geri-yukleme');
-    refreshContinueButton();
-    if(started)applySaveData(rd);
-    if(showMessage)toast('Daha ilerideki bulut kaydı yüklendi: '+progressSummary(rd));
-    cloudReady=true;
-    return true;
-  }
-  if(isClearlyAhead(local,rd)){
-    pushLocalBackup(rd,'bulut-kaydi-koruma');
-    // Cihaz kaydı açıkça ilerideyse bulut sürümünü biliyoruz; sonraki kayıt sürüm korumalı yazılır.
-    cloudReady=true;
+
+  // En ilerideki kayıt sessizce ana cihaz kaydı olur.
+  saveLocal(best.data,'otomatik-en-iyi-kayit');
+  refreshContinueButton();
+  if(started)applySaveData(best.data);
+
+  cloudRevision=Math.max(Number(best.data.syncRev)||0,cloudRevision||0);
+  cloudReady=true;
+
+  // Bulut ana kayıt en iyi kayıt değilse güvenli şekilde eşitle.
+  if(!cloudCurrent||!isSameSave(cloudCurrent.data,best.data)){
     cloudDirty=true;
     scheduleCloudSave();
-    if(showMessage)toast('Daha ilerideki cihaz kaydı korunuyor ve bulutla eşitlenecek');
-    return true;
   }
-  // Belirsiz durumda otomatik ezme yok.
-  pushLocalBackup(rd,'belirsiz-bulut-kaydi');
-  const useCloud=confirm('Cihaz ve bulut kayıtları farklı.\n\nBULUT: '+progressSummary(rd)+'\nCİHAZ: '+progressSummary(local)+'\n\nTamam = bulut kaydını kullan\nİptal = cihaz kaydını koru (bulut yazma kilitli kalır)');
-  if(useCloud){
-    pushLocalBackup(local,'bulut-secimi-oncesi-cihaz');
-    saveLocal(rd,'kullanici-bulut-secimi');
-    refreshContinueButton();
-    if(started)applySaveData(rd);
-    cloudReady=true;
-    return true;
-  }
-  cloudReady=false;
-  return false;
+
+  if(showMessage)toast('Kayıt senkronize edildi · '+progressSummary(best.data));
+  return true;
 }
 async function cloudSave(showMessage=false){
   if(!cloudReady||cloudBusy)return false;
@@ -2407,13 +2451,30 @@ async function cloudSave(showMessage=false){
     updateCloudPanel();
     return true;
   }catch(e){
-    if(e.status===409&&e.code==='SAVE_CONFLICT'){
+    if(e.status===409&&(e.code==='SAVE_CONFLICT'||e.code==='SAVE_REGRESSION')){
       cloudReady=false;cloudDirty=false;
       try{
-        const remote=await fetchCloudSave();
-        if(remote?.data)pushLocalBackup(remote.data,'cakisma-bulut-kaydi');
+        const cloudCandidates=await fetchCloudCandidates();
+        const localCandidates=collectLocalCandidates();
+        const best=bestSaveCandidate([...localCandidates,...cloudCandidates]);
+        if(best?.data){
+          const oldLocal=readLocalRaw();
+          if(oldLocal&&!isSameSave(oldLocal,best.data))pushLocalBackup(oldLocal,'sunucu-koruma-oncesi');
+          saveLocal(best.data,'sunucu-korumali-senkron');
+          if(started)applySaveData(best.data);
+          refreshContinueButton();
+          cloudReady=true;
+          const current=cloudCandidates.find(c=>c.source==='cloud-current');
+          if(!current||!isSameSave(current.data,best.data)){
+            cloudDirty=true;
+            scheduleCloudSave();
+          }
+          toast('Kayıt güvenli şekilde senkronize edildi');
+          updateCloudPanel();
+          return true;
+        }
       }catch(_e){}
-      toast('Bulut kaydı başka cihazda değişmiş. Otomatik üzerine yazma durduruldu.');
+      toast('Kayıt güvenliği nedeniyle senkronizasyon bekletildi');
       updateCloudPanel();
       return false;
     }
