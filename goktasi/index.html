@@ -1,73 +1,3 @@
-
-Loading older messages…
-devam
-
-30s düşündü
-
-
-Tamam dostum, V4.14 Ayarlar sistemi hazır.
-
-Sağdaki minimapin yanına ⚙ Ayarlar ekledim. İçeride ana ses, efekt sesi, ortam sesi ve tamamen sessize alma var. Ayrıca PC kontrollerini istediğin gibi değiştirebiliyorsun.
-
-Skill 1–5'in yanında normal saldırı, can/ruh iksiri, çanta, karakter, harita ve hedef seçme tuşları da değiştirilebilir. Mouse 3 / Mouse 4 / Mouse 5 gibi ekstra mouse tuşları da atanabiliyor. Aynı tuş başka bir komuttaysa eski komuttan kaldırılıp yenisine geçiyor.
-
-Ayarlar cihazda ayrıca saklanıyor; karakter/cloud save sistemine karışmıyor. Mobil kontroller de ayrı kaldı. Skill barındaki 1 2 3 4 5 yazıları da atadığın yeni tuşa göre otomatik değişiyor.
-
-JS syntax kontrolü geçti. Bunu V4.13'ün yerine deploy edebilirsin. 
-
-
-GOKTASI_V4_14_SETTINGS_KEYBIND_MOUSE_AUDIO.txt
-Belge
-skill 1 in olayı nedir
-
-6s düşündü
-Skill 1 dostum, Yalım. Temel amacı tek hedefe güçlü ve hızlı bir saldırı yapmak.
-
-Yani skill düzenini kabaca şöyle düşünmüştük: 1 = tek hedef saldırısı, 2 = çevresel alan hasarı, 3 = nişangâh yönüne şimşek, 4–5 ise destek/güçlendirme tarafında.
-
-Ama bence Skill 1 şu an biraz normal saldırının güçlendirilmiş hali gibi kalıyor; kendine özgü bir özelliği pek yok. İstersen onu daha karakteristik yapabiliriz. Mesela kılıçtan ileri doğru kısa bir ateş yarığı/dalgası çıkarıp önündeki düşmana yüksek hasar verebilir. Böylece 1, 2 ve 3 birbirinden gerçekten farklı hissedilir.
-
-tamam benim nişangahım düşman üstünde iken yakın saldırı skill veya bir şeye basıyorsam ona odaklanıp saldırsın. hedef yok uyarısı vermesin
-
-
-
-Aynen dostum, istediğin mantığa çevirdim.
-
-Artık nişangâh düşmanın üzerindeyken Skill 1'e bastığında, ayrıca hedef kilitlemeni beklemiyor. O düşmanı otomatik odaklayıp saldırıyor. Normal yakın saldırıda da nişangâhtaki yakın düşman öncelikli.
-
-Nişangâhta uygun düşman yoksa da artık gereksiz “Hedef yok” uyarısı çıkmıyor ve Skill 1'in ruhu/cooldown'u boşa gitmiyor.
-
-V4.14'teki ayarlar, özel tuş atama, ekstra mouse tuşları ve ses ayarları korunuyor. JS kontrolü de geçti. 
-
-
-GOKTASI_V4_15_CROSSHAIR_MELEE_TARGETING.txt
-Belge
-saldırı yapıyor ama hasar vermiyor
-
-
-Evet dostum, sorunu buldum. Hedef seçiliyordu ve saldırı animasyonu oynuyordu ama normal yakın saldırının gerçek hasar menzili eski 64 değerinde kalmıştı. Bu yüzden bazı mesafelerde vuruyor gibi görünüp hasar işlemiyordu.
-
-Bunu düzelttim. Artık nişangâh gerçekten düşmanın üzerindeyse onu doğrudan algılıyor ve yakın saldırı menzilindeyse hasar kesin uygulanıyor. Yakın saldırının gerçek menzilini de görüntüyle daha uyumlu olacak şekilde 92 yaptım.
-
-V4.15 ve önceki sistemler korunuyor. JS syntax kontrolü geçti. 
-
-
-GOKTASI_V4_16_CROSSHAIR_MELEE_DAMAGE_FIX.txt
-Belge
-sadece yakınlar değil şimşekde öyleydi
-
-Aynen dostum, şimdi anladım. Sen sadece yakın saldırıyı değil, nişangâhla kullanılan saldırıların genel mantığını söylüyordun.
-
-Şimşeği de düzelttim: artık hedef kilitlemek gerekmiyor. Nişangâh nereye bakıyorsa şimşek gerçekten o yöne gidiyor ve çizgisinin değdiği bütün düşmanlar hasar alıyor. Örneğin arkada ikinci kurt da aynı şimşek hattındaysa o da hasar yiyecek.
-
-Skill 2'nin çevresindeki herkese hasar verme sistemi de aynen korunuyor. JS kontrolü geçti. 
-
-
-GOKTASI_V4_17_CROSSHAIR_ALL_ATTACK_TARGETING_FIX.txt
-Belge
-
-
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -401,6 +331,8 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 </style>
+<!-- GOKTASI BUILD: V4.19 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.19 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -482,7 +414,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
   <div class="settingsSec">
     <h4>PC KONTROLLERİ</h4>
     <div id="bindGrid" class="bindGrid"></div>
-    <div class="settingsHint">Bir komutun karşısındaki tuşa bas, sonra yeni klavye tuşuna veya Mouse 3 / Mouse 4 / Mouse 5'e bas. Mouse 1 ve Mouse 2 dünya kontrolü için ayrılmıştır. Aynı tuş başka komuttaysa yeni komuta taşınır.</div>
+    <div class="settingsHint">Bir komutun karşısındaki tuşa bas, sonra istediğin klavye veya mouse tuşuna bas. Sol tık, sağ tık ve ekstra mouse tuşları dahil atanabilir. Atanan fiziksel tuş oyun içinde yalnızca o komutu çalıştırır; tarayıcının geri/ileri veya sağ tık menüsü çalıştırılmaz. Aynı tuş başka komuttaysa yeni komuta taşınır.</div>
     <div class="settingsBtns"><button class="abtn" id="resetBinds">VARSAYILANLAR</button></div>
   </div>
 </div>
@@ -535,7 +467,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.17 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.19 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -555,7 +487,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.17 ayarlar / yeniden tuş atama ----------
+// ---------- V4.19 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -614,8 +546,7 @@ function runBoundAction(action){
 let rebindingAction=null;
 function setBinding(action,code){
   if(!action||!code)return;
-  // Mouse 1/2 dünyaya tıklama/hedefleme için ayrılmış.
-  if(code==='Mouse1'||code==='Mouse2'){toast('Mouse 1 ve Mouse 2 dünya kontrolü için ayrılmış');return;}
+  // Bir fiziksel tuş yalnızca TEK oyun eylemine ait olabilir.
   for(const k of Object.keys(GAME_SETTINGS.binds)){
     if(k!==action&&GAME_SETTINGS.binds[k]===code)GAME_SETTINGS.binds[k]='';
   }
@@ -1746,22 +1677,52 @@ addEventListener('keydown',e=>{
 });
 addEventListener('keyup',e=>keys[e.code]=false);
 addEventListener('mousemove',e=>mouse={x:e.clientX,y:e.clientY});
+function mouseBindCode(button){
+  return ({0:'Mouse1',2:'Mouse2',1:'Mouse3',3:'Mouse4',4:'Mouse5'})[button]||('Mouse'+(button+1));
+}
 addEventListener('mousedown',e=>{
-  const code='Mouse'+(e.button+1);
+  const code=mouseBindCode(e.button);
   if(rebindingAction){
-    if(e.button===0||e.button===2){e.preventDefault();e.stopPropagation();toast('Ekstra mouse tuşlarından birini kullan: Mouse 3 / 4 / 5');return;}
-    e.preventDefault();e.stopPropagation();setBinding(rebindingAction,code);return;
+    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    setBinding(rebindingAction,code);return;
   }
-  if(IS_MOBILE_UI||e.button<1)return;
+  if(IS_MOBILE_UI)return;
   const action=bindActionFor(code);
-  if(action&&started){
-    e.preventDefault();e.stopPropagation();initAudio();runBoundAction(action);
+  if(action){
+    // Atanmış mouse tuşunun varsayılan oyun/tarayıcı davranışını tamamen sahiplen.
+    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    if(started){initAudio();runBoundAction(action);}
   }
+},true);
+addEventListener('mouseup',e=>{
+  if(IS_MOBILE_UI)return;
+  const code=mouseBindCode(e.button);
+  if(bindActionFor(code)){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();}
+},true);
+addEventListener('click',e=>{
+  if(IS_MOBILE_UI)return;
+  const code=mouseBindCode(e.button);
+  if(bindActionFor(code)){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();}
 },true);
 addEventListener('auxclick',e=>{
-  const code='Mouse'+(e.button+1);
+  const code=mouseBindCode(e.button);
+  if(bindActionFor(code)||rebindingAction){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();}
+},true);
+addEventListener('contextmenu',e=>{
+  if(IS_MOBILE_UI)return;
+  if(bindActionFor('Mouse2')||rebindingAction){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();}
+},true);
+addEventListener('pointerdown',e=>{
+  if(IS_MOBILE_UI||e.pointerType!=='mouse')return;
+  const code=mouseBindCode(e.button);
   if(bindActionFor(code)||rebindingAction)e.preventDefault();
 },true);
+addEventListener('pointerup',e=>{
+  if(IS_MOBILE_UI||e.pointerType!=='mouse')return;
+  const code=mouseBindCode(e.button);
+  if(bindActionFor(code))e.preventDefault();
+},true);
+
 
 cv.addEventListener('mousedown',e=>{
   initAudio();if(!started||P.dead)return;
@@ -1769,7 +1730,12 @@ cv.addEventListener('mousedown',e=>{
   const rect=cv.getBoundingClientRect();
   const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
   const wx=cam.x+(sx-rect.width/2)/zoom,wy=cam.y+(sy-rect.height/2)/zoom;
-  if(e.button===2){e.preventDefault();return;}
+  if(e.button===2){
+    e.preventDefault();
+    // Sağ tık bir komuta atanmışsa global input sistemi bu olayı zaten sahiplenir.
+    // Atanmamışsa eski dünya davranışını bozma.
+    return;
+  }
   if(e.button!==0)return;
   // NPC: yalnızca gerçekten NPC'nin üstüne tıklanınca konuş.
   for(const n of npcs){if(dst(wx,wy,n.x,n.y-14)<30){P.target=null;P.stoneT=null;P.tx=P.x;P.ty=P.y;openDialog(n);return;}}
@@ -2629,7 +2595,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.17 ONLINE OYUNCULAR ----------
+// ---------- V4.19 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2805,7 +2771,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.17 KAYIT SEÇİMİ
+  V4.19 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3244,7 +3210,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.17: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.19: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
@@ -3278,5 +3244,4 @@ addChat('Kam Bilge','Çan üç kez çaldı. Göktaşları yine kıpırdandı.','
 requestAnimationFrame(frame);
 </script>
 </body>
-  
 </html>
