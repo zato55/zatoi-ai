@@ -331,10 +331,12 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 </style>
-<!-- GOKTASI BUILD: V4.21 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.21 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
-<!-- GOKTASI BUILD: V4.21 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
-<!-- GOKTASI BUILD: V4.21 - YOL TASLARI / HIZLI SEYAHAT -->
+<!-- GOKTASI BUILD: V4.23 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.23 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.23 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.23 - YOL TASLARI / HIZLI SEYAHAT -->
+<!-- GOKTASI BUILD: V4.23 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
+<!-- GOKTASI BUILD: V4.23 - SATIS EKRANI TAM ESYA DETAYLARI -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -469,7 +471,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.21 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.23 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -489,7 +491,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.21 ayarlar / yeniden tuş atama ----------
+// ---------- V4.23 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -643,9 +645,9 @@ const ITEMS={
   celikgogus:{n:'Çelik Göğüslük',t:'armor',lv:12,def:11,price:950,sell:280,ic:'armor',c:'#9aa3ab',rar:0,d:'Yüzükoyun durur.'},
   ayazkaftan:{n:'Ayaz Kaftanı',t:'armor',lv:19,def:17,price:2400,sell:720,ic:'armor',c:'#c9d8e4',rar:1,d:'Vadide dokundu.'},
   erlikzirh:{n:'Erlik Gömleği',t:'armor',lv:28,def:25,price:5200,sell:1800,ic:'armor',c:'#4a4a58',rar:2,d:'Aşağıdan yukarıya.'},
-  kurtdisikolye:{n:'Kurt Dişi Kolye',t:'trinket',lv:8,crit:7,price:600,sell:170,ic:'amulet',c:'#e8e0cf',rar:1,d:'Sürünün hatırası.',crit:7},
-  aytasi:{n:'Ay Taşı Yüzüğü',t:'trinket',lv:15,spr:4,price:1400,sell:420,ic:'ring',c:'#b8d4ea',rar:1,d:'Ruhunu serin tutar.'},
-  dagnefesi:{n:'Dağ Nefesi',t:'trinket',lv:22,hp:220,price:3000,sell:900,ic:'amulet',c:'#c9b28a',rar:2,d:'Yükseklerden iner.'},
+  kurtdisikolye:{n:'Kurt Dişi Kolye',t:'trinket',lv:8,crit:7,price:600,sell:170,ic:'amulet',c:'#e8e0cf',rar:1,d:'Kritik şansı +%7.'},
+  aytasi:{n:'Ay Taşı Yüzüğü',t:'trinket',lv:15,spr:4,price:1400,sell:420,ic:'ring',c:'#b8d4ea',rar:1,d:'Ruh yenilenmesi +4.'},
+  dagnefesi:{n:'Dağ Nefesi',t:'trinket',lv:22,hp:220,price:3000,sell:900,ic:'amulet',c:'#c9b28a',rar:2,d:'Maksimum Can +220.'},
   kirikyuz:{n:'Kırık Yüz Maskesi',t:'trinket',lv:30,pow:12,price:20000,sell:7000,ic:'mask',c:'#d86a3a',rar:3,d:'Onu giyen, yüzünü unutur. +%12 hasar.'},
   hpk:{n:'Küçük Can İksiri',t:'use',heal:120,price:25,sell:8,ic:'potion',c:'#c0392b',rar:0,d:'Acıyı erteler.'},
   hpb:{n:'Büyük Can İksiri',t:'use',heal:400,price:70,sell:22,ic:'potion2',c:'#e74c3c',rar:0,d:'Yarayı unutturur.'},
@@ -1764,7 +1766,14 @@ cv.addEventListener('mousedown',e=>{
   P.tx=clamp(wx,16,WORLD-16);P.ty=clamp(wy,16,WORLD-16);
 });
 cv.addEventListener('contextmenu',e=>e.preventDefault());
-addEventListener('wheel',e=>{if(!started)return;zoom=clamp(zoom-e.deltaY*.0009,.7,1.6);},{passive:true});
+addEventListener('wheel',e=>{
+  if(!started)return;
+  // Panel/menü açıkken veya imleç UI üzerindeyken tekerlek dünyayı zoomlamaz.
+  // Böylece mağaza/envanter/görev listeleri doğal şekilde kaydırılır.
+  const ui=e.target.closest?.('.panel,#hud,#chat,#mobileHud,#settingsPanel');
+  if(ui)return;
+  zoom=clamp(zoom-e.deltaY*.0009,.7,1.6);
+},{passive:true});
 function nearestTarget(){
   let best=null,bd=460;
   mobs.forEach(m=>{if(m.hp>0){const d=dst(P.x,P.y,m.x,m.y);if(d<bd){bd=d;best=m;}}});
@@ -1884,6 +1893,12 @@ function openShop(n){
 }
  $('tabBuy').onclick=()=>{shopTab='buy';$('tabBuy').classList.add('on');$('tabSell').classList.remove('on');renderShop();};
  $('tabSell').onclick=()=>{shopTab='sell';$('tabSell').classList.add('on');$('tabBuy').classList.remove('on');renderShop();};
+const _shopListEl=$('shopList');
+if(_shopListEl){
+  _shopListEl.style.maxHeight='min(62vh,560px)';
+  _shopListEl.style.overflowY='auto';
+  _shopListEl.style.overscrollBehavior='contain';
+}
 function renderShop(){
   const L=$('shopList');L.innerHTML='';
   if(shopTab==='buy'){
@@ -1891,8 +1906,18 @@ function renderShop(){
     list.forEach(id=>{const it=ITEMS[id];
       const d=document.createElement('div');d.className='srow2';
       const needLv=Math.max(1,Number(it.lv)||1),locked=P.lvl<needLv;
-      const stat=it.dmg?'Hasar '+it.dmg:it.def?'Savunma '+it.def:it.heal?'+'+it.heal+' can':it.crit?'Kritik +%'+it.crit:it.d||'';
-      d.innerHTML=`<img src="${makeIcon(id)}"><div class="info"><b>${it.n}</b><span>${stat}${it.lv?` · <strong style="color:${locked?'#e06a50':'#8fae5a'}">Lv ${needLv} gerekli</strong>`:''}</span></div><span class="pr">${fmt(it.price)}</span>`;
+      const bonuses=[];
+      if(it.dmg)bonuses.push('Hasar '+it.dmg);
+      if(it.def)bonuses.push('Savunma '+it.def);
+      if(it.hp)bonuses.push('Maks. Can +'+it.hp);
+      if(it.crit)bonuses.push('Kritik +%'+it.crit);
+      if(it.pow)bonuses.push('Hasar +%'+it.pow);
+      if(it.spr)bonuses.push('Ruh yenileme +'+it.spr);
+      if(it.heal)bonuses.push('Can yeniler +'+it.heal);
+      if(it.mana)bonuses.push('Ruh yeniler +'+it.mana);
+      const stat=bonuses.join(' · ');
+      const desc=(it.d&&it.d!==stat)?it.d:'';
+      d.innerHTML=`<img src="${makeIcon(id)}"><div class="info"><b>${it.n}</b><span>${stat||desc}${stat&&desc?`<small style="display:block;color:#8e8576;margin-top:2px">${desc}</small>`:''}${it.lv?` · <strong style="color:${locked?'#e06a50':'#8fae5a'}">Lv ${needLv} gerekli</strong>`:''}</span></div><span class="pr">${fmt(it.price)}</span>`;
       const b=document.createElement('button');b.className='abtn';b.textContent=locked?'Lv '+needLv:'Al';
       b.disabled=P.money<it.price||locked;
       b.onclick=()=>{if(locked){toast('Bu eşya için Lv '+needLv+' gerekli');return;}if(P.money>=it.price&&invFree()){P.money-=it.price;addItem(id,1);SFX.coin();toast(it.n+' aldın');renderShop();updateBars();}else if(!invFree())toast('Çanta dolu');};
@@ -1900,7 +1925,21 @@ function renderShop(){
   }else{
     P.inv.forEach((s,i)=>{if(!s)return;const it=ITEMS[s.id];const sp=Math.round((it.sell||0)*(s.n||1));
       const d=document.createElement('div');d.className='srow2';
-      d.innerHTML=`<img src="${makeIcon(s.id)}"><div class="info"><b>${it.n}${s.up?' +'+s.up:''}${s.n>1?' x'+s.n:''}</b><span>${RARC[it.rar||0]}</span></div><span class="pr">${fmt(sp)}</span>`;
+      const bonuses=[];
+      if(it.dmg)bonuses.push('Hasar '+it.dmg);
+      if(it.def)bonuses.push('Savunma '+it.def);
+      if(it.hp)bonuses.push('Maks. Can +'+it.hp);
+      if(it.crit)bonuses.push('Kritik +%'+it.crit);
+      if(it.pow)bonuses.push('Hasar +%'+it.pow);
+      if(it.spr)bonuses.push('Ruh yenileme +'+it.spr);
+      if(it.heal)bonuses.push('Can yeniler +'+it.heal);
+      if(it.mana)bonuses.push('Ruh yeniler +'+it.mana);
+      if(s.up)bonuses.push('Geliştirme +'+s.up);
+      const stat=bonuses.join(' · ');
+      const desc=it.d||'';
+      const level=it.lv?`<strong style="color:#8fae5a">Lv ${it.lv}</strong>`:'';
+      const detail=[RARC[it.rar||0],level,stat].filter(Boolean).join(' · ');
+      d.innerHTML=`<img src="${makeIcon(s.id)}"><div class="info"><b>${it.n}${s.up?' +'+s.up:''}${s.n>1?' x'+s.n:''}</b><span>${detail}${desc?`<small style="display:block;color:#8e8576;margin-top:2px">${desc}</small>`:''}</span></div><span class="pr">${fmt(sp)}</span>`;
       const b=document.createElement('button');b.className='abtn warn';b.textContent='Sat';
       b.onclick=()=>{P.money+=sp;P.inv[i]=null;SFX.coin();renderShop();renderInv();updateBars();};
       d.appendChild(b);L.appendChild(d);});
@@ -1989,7 +2028,7 @@ function drawMini(){
   $('miniReg').textContent=REGN[rg].n;
   $('clock').textContent=(isNight()?'Gece':'Gündüz')+' — '+(hour()<10?'0':'')+hour()+':00 • Önerilen '+REGN[rg].lv;
 }
-// ---------- V4.21 YOL TAŞLARI / HIZLI SEYAHAT ----------
+// ---------- V4.23 YOL TAŞLARI / HIZLI SEYAHAT ----------
 const FAST_TRAVEL_POINTS=[
   {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
   {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
@@ -2659,7 +2698,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.21 ONLINE OYUNCULAR ----------
+// ---------- V4.23 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2835,7 +2874,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.21 KAYIT SEÇİMİ
+  V4.23 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3274,7 +3313,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.21: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.23: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
