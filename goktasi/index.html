@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.12 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.13 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -1338,20 +1338,31 @@ function castSkill(i){
     if(!m||m.hp<=0){toast('Hedef yok');P.sp+=S.sp;P.cds[i]=0;return;}
     P.swingT=.28;SFX.skill();dealToMob(m,plDmg(2.2));}
   else if(i===1){SFX.skill();
-    const radius=155;let hitCount=0;
+    const radius=155;
+    // Hedef kilidinden tamamen bağımsız: o anda fiziksel çemberin içinde olan HER canlı mob vurulur.
+    const victims=mobs.filter(m=>m.hp>0&&!m.dead&&dst(P.x,P.y,m.x,m.y)<=radius+m.r);
     fxs.push({type:'ring',x:P.x,y:P.y,t:0,dur:.65,r0:18,r1:radius,c:'rgba(232,207,143,'});
     fxs.push({type:'ring',x:P.x,y:P.y,t:0,dur:.45,r0:10,r1:radius*.72,c:'rgba(127,212,255,'});
-    mobs.forEach(m=>{if(m.hp>0&&!m.dead&&dst(P.x,P.y,m.x,m.y)<=radius+m.r){hitCount++;dealToMob(m,plDmg(1.5));}});
-    floats.push({x:P.x,y:P.y-54,txt:hitCount?('Fırtına Daru · '+hitCount+' hedef'):'Fırtına Daru · hedef yok',c:hitCount?'#ffe39a':'#aeb8bd',t:0,dur:1.15,big:!!hitCount});
-    if(hitCount)shakeT=Math.max(shakeT,.12);
+    victims.forEach(m=>{
+      fxs.push({type:'ring',x:m.x,y:m.y,t:0,dur:.28,r0:4,r1:24,c:'rgba(255,224,102,'});
+      dealToMob(m,plDmg(1.5));
+    });
+    floats.push({x:P.x,y:P.y-54,txt:victims.length?('Fırtına Daru · '+victims.length+' hedef'):'Fırtına Daru · hedef yok',c:victims.length?'#ffe39a':'#aeb8bd',t:0,dur:1.15,big:!!victims.length});
+    if(victims.length)shakeT=Math.max(shakeT,.12);
   }
   else if(i===2){SFX.skill();
-    let ang=P.dir>0?0:Math.PI;const m=P.target;if(m)ang=Math.atan2(m.y-P.y,m.x-P.x);
+    // Gök Çağrısı hedef kilidini YOK SAYAR; nişangâh/fare veya mobil yönüne ateş eder.
+    const ang=skillAimAngle();
+    P.dir=Math.cos(ang)>=0?1:-1;
     fxs.push({type:'bolt',x:P.x,y:P.y,ang,t:0,dur:.35});
-    mobs.forEach(mm=>{if(mm.hp<=0)return;
+    let hitCount=0;
+    mobs.forEach(mm=>{if(mm.hp<=0||mm.dead)return;
       const dx=mm.x-P.x,dy=mm.y-P.y,proj=dx*Math.cos(ang)+dy*Math.sin(ang);
       const perp=Math.abs(-dx*Math.sin(ang)+dy*Math.cos(ang));
-      if(proj>0&&proj<250&&perp<42+mm.r)dealToMob(mm,plDmg(2));});}
+      if(proj>0&&proj<280&&perp<38+mm.r){hitCount++;dealToMob(mm,plDmg(2));}
+    });
+    floats.push({x:P.x,y:P.y-54,txt:hitCount?('Gök Çağrısı · '+hitCount+' hedef'):'Gök Çağrısı',c:'#9fd8ff',t:0,dur:.9});
+  }
   else if(i===3){P.buffDef=10;SFX.up();toast('Toprak Zırhı');
     for(let k=0;k<14;k++)parts.push({x:P.x+rnd(-14,14),y:P.y+rnd(-6,6),vx:rnd(-15,15),vy:rnd(-50,-20),g:-10,t:0,dur:.8,c:'#a98a56',r:rnd(1.5,3)});}
   else if(i===4){P.buffAtk=10;P.buffSpd=10;SFX.up();toast('Kurt Ruhu uyandı');
@@ -1417,6 +1428,7 @@ function joyMove(e){
   let x=e.clientX-cx,y=e.clientY-cy;const lim=r.width*.32,d=Math.hypot(x,y)||1;
   if(d>lim){x=x/d*lim;y=y/d*lim;}
   mobileJoy.x=x/lim;mobileJoy.y=y/lim;
+  if(Math.hypot(mobileJoy.x,mobileJoy.y)>.12){mobileAimX=mobileJoy.x;mobileAimY=mobileJoy.y;}
   joyKnob.style.transform=`translate(${x}px,${y}px)`;
   if(Math.hypot(mobileJoy.x,mobileJoy.y)>.12){P.target=null;P.stoneT=null;P.tx=P.x;P.ty=P.y;$('targetBar').style.display='none';lastInput=performance.now();}
 }
@@ -1436,6 +1448,18 @@ cv.addEventListener('pointerdown',e=>{
 
 // ---------- girdi ----------
 const keys={};let mouse={x:0,y:0};
+let mobileAimX=1,mobileAimY=0;
+function skillAimAngle(){
+  if(IS_MOBILE_UI){
+    const d=Math.hypot(mobileAimX,mobileAimY)||1;
+    return Math.atan2(mobileAimY/d,mobileAimX/d);
+  }
+  const rect=cv.getBoundingClientRect();
+  const sx=mouse.x-rect.left,sy=mouse.y-rect.top;
+  const wx=cam.x+(sx-rect.width/2)/zoom,wy=cam.y+(sy-rect.height/2)/zoom;
+  if(Number.isFinite(wx)&&Number.isFinite(wy)&&Math.hypot(wx-P.x,wy-P.y)>3)return Math.atan2(wy-P.y,wx-P.x);
+  return P.dir>0?0:Math.PI;
+}
 addEventListener('keydown',e=>{
   initAudio();
   if(document.activeElement===chatIn){
@@ -2311,7 +2335,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.12 ONLINE OYUNCULAR ----------
+// ---------- V4.13 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2487,7 +2511,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.12 KAYIT SEÇİMİ
+  V4.13 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -2926,7 +2950,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.12: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.13: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
