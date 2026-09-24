@@ -1,3 +1,73 @@
+
+Loading older messages…
+devam
+
+30s düşündü
+
+
+Tamam dostum, V4.14 Ayarlar sistemi hazır.
+
+Sağdaki minimapin yanına ⚙ Ayarlar ekledim. İçeride ana ses, efekt sesi, ortam sesi ve tamamen sessize alma var. Ayrıca PC kontrollerini istediğin gibi değiştirebiliyorsun.
+
+Skill 1–5'in yanında normal saldırı, can/ruh iksiri, çanta, karakter, harita ve hedef seçme tuşları da değiştirilebilir. Mouse 3 / Mouse 4 / Mouse 5 gibi ekstra mouse tuşları da atanabiliyor. Aynı tuş başka bir komuttaysa eski komuttan kaldırılıp yenisine geçiyor.
+
+Ayarlar cihazda ayrıca saklanıyor; karakter/cloud save sistemine karışmıyor. Mobil kontroller de ayrı kaldı. Skill barındaki 1 2 3 4 5 yazıları da atadığın yeni tuşa göre otomatik değişiyor.
+
+JS syntax kontrolü geçti. Bunu V4.13'ün yerine deploy edebilirsin. 
+
+
+GOKTASI_V4_14_SETTINGS_KEYBIND_MOUSE_AUDIO.txt
+Belge
+skill 1 in olayı nedir
+
+6s düşündü
+Skill 1 dostum, Yalım. Temel amacı tek hedefe güçlü ve hızlı bir saldırı yapmak.
+
+Yani skill düzenini kabaca şöyle düşünmüştük: 1 = tek hedef saldırısı, 2 = çevresel alan hasarı, 3 = nişangâh yönüne şimşek, 4–5 ise destek/güçlendirme tarafında.
+
+Ama bence Skill 1 şu an biraz normal saldırının güçlendirilmiş hali gibi kalıyor; kendine özgü bir özelliği pek yok. İstersen onu daha karakteristik yapabiliriz. Mesela kılıçtan ileri doğru kısa bir ateş yarığı/dalgası çıkarıp önündeki düşmana yüksek hasar verebilir. Böylece 1, 2 ve 3 birbirinden gerçekten farklı hissedilir.
+
+tamam benim nişangahım düşman üstünde iken yakın saldırı skill veya bir şeye basıyorsam ona odaklanıp saldırsın. hedef yok uyarısı vermesin
+
+
+
+Aynen dostum, istediğin mantığa çevirdim.
+
+Artık nişangâh düşmanın üzerindeyken Skill 1'e bastığında, ayrıca hedef kilitlemeni beklemiyor. O düşmanı otomatik odaklayıp saldırıyor. Normal yakın saldırıda da nişangâhtaki yakın düşman öncelikli.
+
+Nişangâhta uygun düşman yoksa da artık gereksiz “Hedef yok” uyarısı çıkmıyor ve Skill 1'in ruhu/cooldown'u boşa gitmiyor.
+
+V4.14'teki ayarlar, özel tuş atama, ekstra mouse tuşları ve ses ayarları korunuyor. JS kontrolü de geçti. 
+
+
+GOKTASI_V4_15_CROSSHAIR_MELEE_TARGETING.txt
+Belge
+saldırı yapıyor ama hasar vermiyor
+
+
+Evet dostum, sorunu buldum. Hedef seçiliyordu ve saldırı animasyonu oynuyordu ama normal yakın saldırının gerçek hasar menzili eski 64 değerinde kalmıştı. Bu yüzden bazı mesafelerde vuruyor gibi görünüp hasar işlemiyordu.
+
+Bunu düzelttim. Artık nişangâh gerçekten düşmanın üzerindeyse onu doğrudan algılıyor ve yakın saldırı menzilindeyse hasar kesin uygulanıyor. Yakın saldırının gerçek menzilini de görüntüyle daha uyumlu olacak şekilde 92 yaptım.
+
+V4.15 ve önceki sistemler korunuyor. JS syntax kontrolü geçti. 
+
+
+GOKTASI_V4_16_CROSSHAIR_MELEE_DAMAGE_FIX.txt
+Belge
+sadece yakınlar değil şimşekde öyleydi
+
+Aynen dostum, şimdi anladım. Sen sadece yakın saldırıyı değil, nişangâhla kullanılan saldırıların genel mantığını söylüyordun.
+
+Şimşeği de düzelttim: artık hedef kilitlemek gerekmiyor. Nişangâh nereye bakıyorsa şimşek gerçekten o yöne gidiyor ve çizgisinin değdiği bütün düşmanlar hasar alıyor. Örneğin arkada ikinci kurt da aynı şimşek hattındaysa o da hasar yiyecek.
+
+Skill 2'nin çevresindeki herkese hasar verme sistemi de aynen korunuyor. JS kontrolü geçti. 
+
+
+GOKTASI_V4_17_CROSSHAIR_ALL_ATTACK_TARGETING_FIX.txt
+Belge
+
+
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -465,7 +535,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.15 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.17 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -485,7 +555,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.15 ayarlar / yeniden tuş atama ----------
+// ---------- V4.17 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -1460,6 +1530,22 @@ function playerAttack(){
   P.pendT=0;
 }
 function meleeAimTarget(maxRange=190,conePx=48){
+  // PC: nişangâh gerçekten mobun üstündeyse doğrudan onu seç.
+  if(!IS_MOBILE_UI){
+    const rect=cv.getBoundingClientRect();
+    const sx=mouse.x-rect.left,sy=mouse.y-rect.top;
+    const wx=cam.x+(sx-rect.width/2)/zoom,wy=cam.y+(sy-rect.height/2)/zoom;
+    let exact=null,exactD=1e9;
+    mobs.forEach(m=>{
+      if(m.hp<=0||m.dead)return;
+      const pd=dst(P.x,P.y,m.x,m.y);
+      const pointerD=dst(wx,wy,m.x,m.y);
+      const hitR=Math.max(22,(m.r||0)+16);
+      if(pd<=maxRange+(m.r||0)&&pointerD<=hitR&&pointerD<exactD){exact=m;exactD=pointerD;}
+    });
+    if(exact)return exact;
+  }
+  // Mobil / nişangâh tam merkezde değilse yön konisi.
   let ang=skillAimAngle(),best=null,bestScore=1e9;
   const ca=Math.cos(ang),sa=Math.sin(ang);
   mobs.forEach(m=>{
@@ -1510,15 +1596,29 @@ function castSkill(i){
     if(victims.length)shakeT=Math.max(shakeT,.12);
   }
   else if(i===2){SFX.skill();
-    // Gök Çağrısı hedef kilidini YOK SAYAR; nişangâh/fare veya mobil yönüne ateş eder.
-    const ang=skillAimAngle();
+    // Gök Çağrısı: PC'de nişangâhın gösterdiği dünya noktasına doğru ateş eder.
+    // Kilitli hedef gerekmez; çizginin değdiği TÜM canlı moblar hasar alır.
+    let ang=skillAimAngle();
+    if(!IS_MOBILE_UI){
+      const rect=cv.getBoundingClientRect();
+      const sx=mouse.x-rect.left,sy=mouse.y-rect.top;
+      const wx=cam.x+(sx-rect.width/2)/zoom,wy=cam.y+(sy-rect.height/2)/zoom;
+      if(Number.isFinite(wx)&&Number.isFinite(wy)&&Math.hypot(wx-P.x,wy-P.y)>3)
+        ang=Math.atan2(wy-P.y,wx-P.x);
+    }
     P.dir=Math.cos(ang)>=0?1:-1;
     fxs.push({type:'bolt',x:P.x,y:P.y,ang,t:0,dur:.35});
+    const range=360,beamHalfWidth=46;
     let hitCount=0;
-    mobs.forEach(mm=>{if(mm.hp<=0||mm.dead)return;
-      const dx=mm.x-P.x,dy=mm.y-P.y,proj=dx*Math.cos(ang)+dy*Math.sin(ang);
+    mobs.forEach(mm=>{
+      if(mm.hp<=0||mm.dead)return;
+      const dx=mm.x-P.x,dy=mm.y-P.y;
+      const proj=dx*Math.cos(ang)+dy*Math.sin(ang);
       const perp=Math.abs(-dx*Math.sin(ang)+dy*Math.cos(ang));
-      if(proj>0&&proj<280&&perp<38+mm.r){hitCount++;dealToMob(mm,plDmg(2));}
+      if(proj>=0&&proj<=range+(mm.r||0)&&perp<=beamHalfWidth+(mm.r||0)){
+        hitCount++;
+        dealToMob(mm,plDmg(2));
+      }
     });
     floats.push({x:P.x,y:P.y-54,txt:hitCount?('Gök Çağrısı · '+hitCount+' hedef'):'Gök Çağrısı',c:'#9fd8ff',t:0,dur:.9});
   }
@@ -1695,14 +1795,18 @@ function manualSword(){
   lastInput=performance.now();
   // Yakın saldırıda nişangâhın üstündeki düşman önceliklidir.
   // Nişangâhta düşman yoksa mevcut kilit / yakındaki düşman mantığı devam eder.
-  let m=focusMeleeAim(86);
-  if(!m)m=P.target&&P.target.hp>0&&!P.target.dead?P.target:null;
-  if(!m||dst(P.x,P.y,m.x,m.y)>64+(m.r||0)){
-    m=null;let bd=72;
+  const meleeHitRange=92;
+  let aimed=focusMeleeAim(meleeHitRange);
+  let m=aimed||(P.target&&P.target.hp>0&&!P.target.dead?P.target:null);
+  if(!m||dst(P.x,P.y,m.x,m.y)>meleeHitRange+(m.r||0)){
+    m=null;let bd=meleeHitRange;
     mobs.forEach(mm=>{if(mm.hp>0&&!mm.dead){const d=dst(P.x,P.y,mm.x,mm.y);if(d<bd+(mm.r||0)){bd=d;m=mm;}}});
   }
   P.atkCD=1/(1.05+P.stat.c*.012);P.swingT=.28;SFX.swing();
-  if(m){P.target=m;P.stoneT=null;P.dir=m.x>=P.x?1:-1;$('targetBar').style.display='block';dealToMob(m,plDmg());return;}
+  if(m&&dst(P.x,P.y,m.x,m.y)<=meleeHitRange+(m.r||0)){
+    P.target=m;P.stoneT=null;P.dir=m.x>=P.x?1:-1;$('targetBar').style.display='block';
+    dealToMob(m,plDmg());return;
+  }
   // Yakındaki göktaşına da kılıçla vurulabilir.
   const st=stones.find(ss=>ss.alive&&dst(P.x,P.y,ss.x,ss.y)<78);
   if(st){P.stoneT=st;P.target=null;P.dir=st.x>=P.x?1:-1;st.hp-=plDmg(1);}
@@ -2525,7 +2629,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.15 ONLINE OYUNCULAR ----------
+// ---------- V4.17 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2701,7 +2805,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.15 KAYIT SEÇİMİ
+  V4.17 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3140,7 +3244,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.15: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.17: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
