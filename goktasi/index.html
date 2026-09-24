@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.9.7 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.9.8 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -2233,11 +2233,11 @@ function activeAccountId(){
 }
 function activeSaveKey(){
   const id=activeAccountId();
-  return id?ACCOUNT_SAVE_PREFIX+id:SAVE_KEY;
+  return id?ACCOUNT_SAVE_PREFIX+id:null;
 }
 function activeBackupsKey(){
   const id=activeAccountId();
-  return id?ACCOUNT_BACKUPS_PREFIX+id:LOCAL_BACKUPS_KEY;
+  return id?ACCOUNT_BACKUPS_PREFIX+id:null;
 }
 const CLOUD_API='https://goktasi-save.fbboytr.workers.dev';
 const ZATOI_AUTH_TOKEN_KEY='zatoi_auth_token_v1';
@@ -2271,13 +2271,17 @@ function applySaveData(d){
   P.tx=P.x;P.ty=P.y; return true;
 }
 function readLocalRaw(){
-  try{const d=JSON.parse(localStorage.getItem(activeSaveKey())||'null');return d?.v===1?d:null;}catch(e){return null;}
+  const key=activeSaveKey();
+  if(!key)return null;
+  try{const d=JSON.parse(localStorage.getItem(key)||'null');return d?.v===1?d:null;}catch(e){return null;}
 }
 function readLocalBackups(){
-  try{const a=JSON.parse(localStorage.getItem(activeBackupsKey())||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}
+  const key=activeBackupsKey();
+  if(!key)return [];
+  try{const a=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}
 }
 function pushLocalBackup(data,reason='auto'){
-  if(!data||data.v!==1)return;
+  if(!activeAccountId()||!data||data.v!==1)return;
   let a=readLocalBackups();
   const fp=saveFingerprint(data);
   if(a[0]&&saveFingerprint(a[0].data)===fp)return;
@@ -2286,6 +2290,7 @@ function pushLocalBackup(data,reason='auto'){
   try{localStorage.setItem(activeBackupsKey(),JSON.stringify(a));}catch(e){}
 }
 function saveLocal(data,reason='auto'){
+  if(!activeAccountId())return false;
   const next=data||makeSaveData(),old=readLocalRaw();
   if(old&&saveFingerprint(old)!==saveFingerprint(next))pushLocalBackup(old,reason);
   try{localStorage.setItem(activeSaveKey(),JSON.stringify(next));return true;}catch(e){return false;}
@@ -2332,7 +2337,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.9.7 KAYIT SEÇİMİ
+  V4.9.8 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -2519,6 +2524,7 @@ async function initCloudSave(showMessage=false){
     activeZatoiToken=s.token;
     activeZatoiUserId=String(accountUser.id||accountUser.userId||'');
     await reconcileInitialCloud(showMessage);
+    refreshContinueButton();
     updateAccountUI();
     startOnlineChat();
     return true;
@@ -2545,10 +2551,25 @@ function updateAccountUI(){
 }
 function openAccountPanel(){updateAccountUI();$('accountPanel').classList.add('on');}
 function refreshContinueButton(){
-  const cb=$('contBtn'),d=readLocalRaw();
+  const cb=$('contBtn');
   if(!cb)return;
-  if(!d){cb.style.display='none';return;}
-  cb.style.display='block';cb.textContent='Devam et — '+d.name+' (Lv '+d.lvl+')';
+  const d=(cloudVerified&&activeAccountId())?readLocalRaw():null;
+  if(!d||!String(d.name||'').trim()){
+    cb.style.display='none';
+    cb.onclick=null;
+    return;
+  }
+  cb.style.display='block';
+  cb.textContent='Devam et — '+d.name+' (Lv '+d.lvl+')';
+  cb.onclick=()=>{
+    const own=readLocalRaw();
+    if(!cloudVerified||!activeAccountId()||!own){
+      toast('Bu Zatoi hesabında kayıtlı karakter yok');
+      refreshContinueButton();
+      return;
+    }
+    if(load())begin(false);
+  };
 }
 function cloudStatusText(){
   if(cloudVerified&&accountUser){
@@ -2671,20 +2692,42 @@ function initIntro(){
     d.innerHTML=`<b>${s.n}</b><span>${s.d}</span>`;
     d.onclick=()=>{selSoy=s.k;document.querySelectorAll('.soy').forEach(e=>e.classList.remove('on'));d.classList.add('on');SFX.click();};
     w.appendChild(d);});
-  if(localStorage.getItem(SAVE_KEY)){
-    const cb=$('contBtn');cb.style.display='block';
-    try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));
-      cb.textContent='Devam et — '+d.name+' (Lv '+d.lvl+')';}catch(e){}
-    cb.onclick=()=>{if(load())begin(false);};
-  }
-  $('startBtn').onclick=()=>{if(localStorage.getItem(SAVE_KEY)&&!confirm('Yeni kayıt eskisinin üstüne yazacak. Devam?'))return;
-    begin(true);};
+
+  // Devam Et yalnızca doğrulanmış mevcut Zatoi hesabının kendi kaydı için görünür.
+  refreshContinueButton();
+
+  $('startBtn').onclick=async()=>{
+    if(!cloudVerified||!activeAccountId()){
+      const ok=await initCloudSave(true);
+      if(!ok||!cloudVerified||!activeAccountId()){
+        toast('Önce Zatoi hesabını doğrula');
+        return;
+      }
+    }
+
+    // Bu hesabın karakteri varsa yeni karakterle sessizce üzerine yazma.
+    const own=readLocalRaw();
+    if(own){
+      toast('Bu Zatoi hesabında zaten kayıtlı karakter var');
+      refreshContinueButton();
+      return;
+    }
+
+    const nm=$('nameIn').value.trim();
+    if(!nm){
+      toast('Karakter adını yaz');
+      $('nameIn').focus();
+      return;
+    }
+    begin(true);
+  };
 }
 function begin(fresh){
   initAudio();
   if(fresh){
-    let nm=$('nameIn').value.trim();
-    if(!nm)nm=pick(['Eren','Asha','Korgan','Bilge','Toygar','Selin','Tamar','Kaya']);
+    const nm=$('nameIn').value.trim();
+    if(!cloudVerified||!activeAccountId()){toast('Önce Zatoi hesabını doğrula');return;}
+    if(!nm){toast('Karakter adını yaz');$('nameIn').focus();return;}
     P.name=nm;P.soy=selSoy;
     if(selSoy==='kurt')P.stat.g+=6;else if(selSoy==='dag')P.stat.b+=6;else P.stat.c+=6;
     P.hp=maxHP();P.sp=maxSP();
