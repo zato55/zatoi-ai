@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.9.9 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.10 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -1630,6 +1630,7 @@ function drawMini(){
     if(px<0||py<0||px>S||py>S)return;mctx.fillStyle=c;mctx.beginPath();mctx.arc(px,py,r,0,TAU);mctx.fill();};
   mobs.forEach(m=>{if(m.hp>0&&!m.boss)dot(m.x,m.y,'#b8443a',1.6);});
   bots.forEach(b=>dot(b.x,b.y,'#6fa8c9',2));
+  onlinePlayers.forEach(p=>dot(p.x,p.y,'#7fd4ff',2.8));
   stones.forEach(s=>{if(s.alive)dot(s.x,s.y-10,'#9fd8e8',3);});
   npcs.forEach(n=>dot(n.x,n.y,'#e0b84b',2));
   // yön oku
@@ -1652,6 +1653,7 @@ function drawBigMap(){
   g.drawImage(mapBase,0,0,420,420);
   const sc=420/WORLD;
   npcs.forEach(n=>{g.fillStyle='#e0b84b';g.fillRect(n.x*sc-1.5,n.y*sc-1.5,3,3);});
+  onlinePlayers.forEach(p=>{g.fillStyle='#7fd4ff';g.beginPath();g.arc(p.x*sc,p.y*sc,2.5,0,TAU);g.fill();});
   stones.forEach(s=>{if(s.alive){g.fillStyle='#9fd8e8';g.beginPath();g.arc(s.x*sc,s.y*sc,3,0,TAU);g.fill();}});
   g.fillStyle='#fff';g.beginPath();g.arc(P.x*sc,P.y*sc,4,0,TAU);g.fill();
   g.strokeStyle='#fff';g.strokeRect(P.x*sc-6,P.y*sc-6,12,12);
@@ -2103,6 +2105,20 @@ function render(){
     const tw=ctx.measureText(nm).width;ctx.fillRect(b.x-tw/2-3,b.y-52,tw+6,14);
     ctx.fillStyle='#a8cfe8';ctx.fillText(nm,b.x,b.y-41);
   }}));
+  onlinePlayers.forEach(p=>{
+    if(Math.abs(p.x-cam.x)<vw/2/zoom+100&&Math.abs(p.y-cam.y)<vh/2/zoom+140){
+      draws.push({y:p.y,f:()=>{
+        drawHuman(ctx,p);
+        ctx.font='800 11px Manrope';ctx.textAlign='center';
+        const nm=p.name+'  Lv '+p.lvl;
+        const tw=ctx.measureText(nm).width;
+        ctx.fillStyle='rgba(10,18,24,.72)';ctx.fillRect(p.x-tw/2-5,p.y-55,tw+10,16);
+        ctx.fillStyle='#7fd4ff';ctx.fillText(nm,p.x,p.y-43);
+        ctx.font='700 9px Manrope';ctx.fillStyle='#b8ddec';
+        if(p.accountName)ctx.fillText('@'+p.accountName,p.x,p.y-31);
+      }});
+    }
+  });
   npcs.forEach(n=>draws.push({y:n.y,f:()=>{
     drawHuman(ctx,{x:n.x,y:n.y,dir:1,wt:0,mv:false,swingT:0,pal:n.pal,w:n.w,wc:n.wc});
     ctx.font='700 11px Manrope';ctx.textAlign='center';
@@ -2249,6 +2265,95 @@ let activeZatoiToken='';
 let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
+
+// ---------- V4.10 ONLINE OYUNCULAR ----------
+const ONLINE_PRESENCE_SEND_MS=900;
+const ONLINE_PRESENCE_FETCH_MS=900;
+const ONLINE_PRESENCE_STALE_MS=16000;
+let onlinePlayers=new Map();
+let presenceSendAt=0,presenceFetchAt=0,presenceBusy=false,presenceLastX=NaN,presenceLastY=NaN;
+
+function onlinePlayerPalette(id){
+  // Diğer oyuncuları NPC/botlardan ayıran sabit görünüm.
+  return {skin:'#c9a074',hair:'#2e2418',cloth:'#365f78',cloth2:'#294858',boot:'#2e2620',belt:'#b58b3a'};
+}
+async function sendPresence(force=false){
+  if(!started||!cloudVerified||!cloudReady||!P.name||document.hidden)return;
+  const now=Date.now();
+  if(!force&&now-presenceSendAt<ONLINE_PRESENCE_SEND_MS)return;
+  presenceSendAt=now;
+  presenceLastX=P.x;presenceLastY=P.y;
+  try{
+    await apiFetch('/presence/update',{
+      method:'POST',
+      body:JSON.stringify({
+        character_name:P.name,
+        level:P.lvl,
+        x:P.x,
+        y:P.y,
+        direction:P.dir>0?'right':'left'
+      })
+    });
+  }catch(e){}
+}
+async function fetchPresence(){
+  if(!started||!cloudVerified||presenceBusy||document.hidden)return;
+  const now=Date.now();
+  if(now-presenceFetchAt<ONLINE_PRESENCE_FETCH_MS)return;
+  presenceFetchAt=now;presenceBusy=true;
+  try{
+    const r=await apiFetch('/presence/list');
+    const seen=new Set();
+    for(const q of (r.players||[])){
+      const id=String(q.user_id||''); if(!id)continue;
+      seen.add(id);
+      const tx=Number(q.x),ty=Number(q.y);
+      if(!Number.isFinite(tx)||!Number.isFinite(ty))continue;
+      let p=onlinePlayers.get(id);
+      if(!p){
+        p={id,x:tx,y:ty,tx,ty,dir:q.direction==='left'?-1:1,wt:0,mv:false,
+          name:String(q.character_name||q.username||'Oyuncu').slice(0,24),
+          accountName:String(q.username||'').slice(0,40),lvl:Number(q.level)||1,
+          pal:onlinePlayerPalette(id),w:'sword',wc:'#9a8f7d',swingT:0,lastSeen:now};
+        onlinePlayers.set(id,p);
+      }else{
+        p.tx=tx;p.ty=ty;p.dir=q.direction==='left'?-1:1;
+        p.name=String(q.character_name||q.username||'Oyuncu').slice(0,24);
+        p.accountName=String(q.username||'').slice(0,40);
+        p.lvl=Number(q.level)||1;p.lastSeen=now;
+      }
+    }
+    for(const [id,p] of onlinePlayers){
+      if(!seen.has(id)&&now-p.lastSeen>ONLINE_PRESENCE_STALE_MS)onlinePlayers.delete(id);
+    }
+  }catch(e){}
+  finally{presenceBusy=false;}
+}
+function updateOnlinePlayers(dt){
+  const now=Date.now();
+  for(const [id,p] of onlinePlayers){
+    if(now-p.lastSeen>ONLINE_PRESENCE_STALE_MS){onlinePlayers.delete(id);continue;}
+    const ox=p.x,oy=p.y;
+    // Ağ güncellemeleri arasında yumuşak hareket.
+    const k=1-Math.exp(-dt*9);
+    p.x+=(p.tx-p.x)*k;p.y+=(p.ty-p.y)*k;
+    p.mv=Math.hypot(p.x-ox,p.y-oy)>.02;
+    if(p.mv)p.wt+=dt*9;
+  }
+}
+function leavePresence(){
+  if(!cloudVerified||!cloudAuth?.token)return;
+  // keepalive ile sayfa kapanırken de mümkün olduğunca temizle.
+  try{
+    fetch(CLOUD_API+'/presence/leave',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+cloudAuth.token,'Content-Type':'application/json'},
+      body:'{}',keepalive:true
+    });
+  }catch(e){}
+}
+window.addEventListener('pagehide',leavePresence);
+
 function saveFingerprint(d){
   if(!d||d.v!==1)return '';
   const copy={...d}; delete copy.savedAt; delete copy.syncRev;
@@ -2337,7 +2442,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.9.9 KAYIT SEÇİMİ
+  V4.10 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -2769,7 +2874,7 @@ let lastTS=0;
 function frame(ts){
   const dt=clamp((ts-lastTS)/1000,0,.05);lastTS=ts;
   worldT+=dt;
-  if(started){updPlayer(dt);updBots(dt);updStones(dt);}
+  if(started){updPlayer(dt);updBots(dt);updStones(dt);updateOnlinePlayers(dt);sendPresence();fetchPresence();}
   updMobs(dt);
   updWorldFx(dt);
   // kamera
