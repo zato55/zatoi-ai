@@ -430,7 +430,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.10 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.11 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -1163,6 +1163,38 @@ function questTargetName(q){
   if(q.t==='talk'){const n=npcs.find(x=>x.k===q.m);return n?n.n:'Konuş';}
   return q.m||'';
 }
+function questTargetPoint(q){
+  if(!q)return null;
+  if(q.t==='talk'){
+    const n=npcs.find(x=>x.k===q.m);return n?{x:n.x,y:n.y,label:n.n}:null;
+  }
+  let mobKey=q.t==='hunt'?q.m:null;
+  if(q.t==='col'){
+    // Malzemenin hangi yaratıklardan düştüğünü mevcut drop tablosundan bul.
+    for(const [k,drops] of Object.entries(DROPS)){
+      if((drops||[]).some(d=>d[0]===q.m)){mobKey=k;break;}
+    }
+  }
+  if(mobKey){
+    const candidates=mobs.filter(m=>m.k===mobKey&&!m.dead&&m.hp>0);
+    if(candidates.length){
+      let best=candidates[0],bd=dst(P.x,P.y,best.x,best.y);
+      for(const m of candidates){const d=dst(P.x,P.y,m.x,m.y);if(d<bd){best=m;bd=d;}}
+      return {x:best.x,y:best.y,label:MOBS[mobKey]?.n||questTargetName(q),mobKey};
+    }
+    const reg=MOBS[mobKey]?.reg;
+    const regionStone=STONE_POS.find(s=>s.r===reg);
+    if(regionStone)return {x:regionStone.x,y:regionStone.y,label:REGN[reg]?.n||questTargetName(q),mobKey};
+  }
+  return null;
+}
+function questGuideText(q){
+  const p=questTargetPoint(q);if(!p)return 'Hedef konumu bilinmiyor';
+  const d=Math.round(dst(P.x,P.y,p.x,p.y));
+  const dx=p.x-P.x,dy=p.y-P.y;
+  const dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'Doğu':'Batı'):(dy>0?'Güney':'Kuzey');
+  return `${p.label} · ${dir} · ~${d}m`;
+}
 function questChapter(step=P.qStep){
   return CHAPTERS.find(c=>step>=c.from&&step<=c.to)||null;
 }
@@ -1171,7 +1203,7 @@ function renderQuest(){
   const w=$('questPanel');
   let h='';
   if(P.qActive){const q=P.qActive,cur=q.t==='col'?countItem(q.m):P.qN,ch=!q.rep?questChapter(P.qStep):null;
-    h+=`<div class="q">${ch?`<small style="opacity:.62">${ch.n}</small>`:''}<b>${q.rep?"Kam'ın Avı":q.n}</b><span>${questTargetName(q)} <span class="prog">${Math.min(cur,q.c)}/${q.c}</span></span></div>`;
+    h+=`<div class="q">${ch?`<small style="opacity:.62">${ch.n}</small>`:''}<b>${q.rep?"Kam'ın Avı":q.n}</b><span>${questTargetName(q)} <span class="prog">${Math.min(cur,q.c)}/${q.c}</span></span><small style="display:block;margin-top:3px;color:#e8cf8f">◆ ${questGuideText(q)}</small></div>`;
   }
   w.innerHTML=h;
 }
@@ -1249,7 +1281,7 @@ function mobHitTarget(m){
     if(P.dead||m.dead||m.hp<=0){m.target=null;return;}
     // V4.1: Görünmeyen/uzakta kalmış yaratık oyuncuya hasar veremez.
     // Hasar anında gerçek konum tekrar doğrulanır; eski hedef kilidi tek başına yeterli değildir.
-    const hitRange=34+m.r;
+    const hitRange=22+m.r;
     const liveDist=dst(m.x,m.y,P.x,P.y);
     if(liveDist>hitRange){
       if(liveDist>360)m.target=null;
@@ -1258,7 +1290,9 @@ function mobHitTarget(m){
     const red=armorDef()/(armorDef()+90);
     const d=Math.max(1,m.dmg*(1-red)*rnd(.85,1.15));
     P.hp-=d;P.lastHit=worldT;P.hurtT=.5;SFX.hurt();
-    floats.push({x:P.x,y:P.y-36,txt:Math.round(d),c:'#e06a50',t:0,dur:.8});
+    P.dir=m.x>=P.x?1:-1;
+    fxs.push({type:'ring',x:m.x,y:m.y,t:0,dur:.22,r0:5,r1:22,c:'rgba(224,106,80,'});
+    floats.push({x:P.x,y:P.y-36,txt:'-'+Math.round(d)+'  '+MOBS[m.k].n,c:'#ff7058',t:0,dur:1.05,big:true});
     if(P.hp<=0)playerDie(m);
   }else{
     tgt.hp-=m.dmg*rnd(.8,1.2);
@@ -1268,14 +1302,14 @@ function mobHitTarget(m){
   }
 }
 function playerDie(killer){
-  P.dead=true;P.deadT=4;P.hp=0;SFX.die();
+  shakeT=0;P.dead=true;P.deadT=4;P.hp=0;SFX.die();
   const kexp=Math.min(P.exp,Math.floor(expNeed(P.lvl)*.02));P.exp-=kexp;
   $('death').classList.add('on');
   $('deathTxt').textContent=(killer?('« '+MOBS[killer.k].n+' » seni yere serdi. '):'')+'Ruhun Ağıt Han\'a çekiliyor… ('+fmt(kexp)+' tecrübe kaybetti)';
   if(killer&&killer.boss)addChat('',P.name+', Kırık Yüzlü\'nün gölgesine düştü.','ev');
 }
 function respawn(){
-  P.dead=false;$('death').classList.remove('on');
+  shakeT=0;P.dead=false;$('death').classList.remove('on');
   P.x=7500;P.y=7760;P.tx=P.x;P.ty=P.y;
   P.hp=Math.round(maxHP()*.5);P.sp=maxSP();P.target=null;P.stoneT=null;
   mobs.forEach(m=>{if(m.target===P)m.target=null;});
@@ -1302,8 +1336,13 @@ function castSkill(i){
     if(!m||m.hp<=0){toast('Hedef yok');P.sp+=S.sp;P.cds[i]=0;return;}
     P.swingT=.28;SFX.skill();dealToMob(m,plDmg(2.2));}
   else if(i===1){SFX.skill();
-    fxs.push({type:'ring',x:P.x,y:P.y,t:0,dur:.5,r0:16,r1:120,c:'rgba(232,207,143,'});
-    mobs.forEach(m=>{if(m.hp>0&&dst(P.x,P.y,m.x,m.y)<125+m.r)dealToMob(m,plDmg(1.5));});}
+    const radius=155;let hitCount=0;
+    fxs.push({type:'ring',x:P.x,y:P.y,t:0,dur:.65,r0:18,r1:radius,c:'rgba(232,207,143,'});
+    fxs.push({type:'ring',x:P.x,y:P.y,t:0,dur:.45,r0:10,r1:radius*.72,c:'rgba(127,212,255,'});
+    mobs.forEach(m=>{if(m.hp>0&&!m.dead&&dst(P.x,P.y,m.x,m.y)<=radius+m.r){hitCount++;dealToMob(m,plDmg(1.5));}});
+    floats.push({x:P.x,y:P.y-54,txt:hitCount?('Fırtına Daru · '+hitCount+' hedef'):'Fırtına Daru · hedef yok',c:hitCount?'#ffe39a':'#aeb8bd',t:0,dur:1.15,big:!!hitCount});
+    if(hitCount)shakeT=Math.max(shakeT,.12);
+  }
   else if(i===2){SFX.skill();
     let ang=P.dir>0?0:Math.PI;const m=P.target;if(m)ang=Math.atan2(m.y-P.y,m.x-P.x);
     fxs.push({type:'bolt',x:P.x,y:P.y,ang,t:0,dur:.35});
@@ -1546,10 +1585,12 @@ function renderShop(){
     const list=shopNPC.role==='shopW'?SHOPW:shopNPC.role==='shopA'?SHOPA:SHOPP;
     list.forEach(id=>{const it=ITEMS[id];
       const d=document.createElement('div');d.className='srow2';
-      d.innerHTML=`<img src="${makeIcon(id)}"><div class="info"><b>${it.n}</b><span>${it.dmg?'Hasar '+it.dmg:it.def?'Savunma '+it.def:it.heal?'+'+it.heal+' can':it.crit?'Kritik +%'+it.crit:it.d||''}</span></div><span class="pr">${fmt(it.price)}</span>`;
-      const b=document.createElement('button');b.className='abtn';b.textContent='Al';
-      b.disabled=P.money<it.price;
-      b.onclick=()=>{if(P.money>=it.price&&invFree()){P.money-=it.price;addItem(id,1);SFX.coin();toast(it.n+' aldın');renderShop();updateBars();}else if(!invFree())toast('Çanta dolu');};
+      const needLv=Math.max(1,Number(it.lv)||1),locked=P.lvl<needLv;
+      const stat=it.dmg?'Hasar '+it.dmg:it.def?'Savunma '+it.def:it.heal?'+'+it.heal+' can':it.crit?'Kritik +%'+it.crit:it.d||'';
+      d.innerHTML=`<img src="${makeIcon(id)}"><div class="info"><b>${it.n}</b><span>${stat}${it.lv?` · <strong style="color:${locked?'#e06a50':'#8fae5a'}">Lv ${needLv} gerekli</strong>`:''}</span></div><span class="pr">${fmt(it.price)}</span>`;
+      const b=document.createElement('button');b.className='abtn';b.textContent=locked?'Lv '+needLv:'Al';
+      b.disabled=P.money<it.price||locked;
+      b.onclick=()=>{if(locked){toast('Bu eşya için Lv '+needLv+' gerekli');return;}if(P.money>=it.price&&invFree()){P.money-=it.price;addItem(id,1);SFX.coin();toast(it.n+' aldın');renderShop();updateBars();}else if(!invFree())toast('Çanta dolu');};
       d.appendChild(b);L.appendChild(d);});
   }else{
     P.inv.forEach((s,i)=>{if(!s)return;const it=ITEMS[s.id];const sp=Math.round((it.sell||0)*(s.n||1));
@@ -1631,6 +1672,7 @@ function drawMini(){
   mobs.forEach(m=>{if(m.hp>0&&!m.boss)dot(m.x,m.y,'#b8443a',1.6);});
   bots.forEach(b=>dot(b.x,b.y,'#6fa8c9',2));
   onlinePlayers.forEach(p=>dot(p.x,p.y,'#7fd4ff',2.8));
+  if(P.qActive){const qp=questTargetPoint(P.qActive);if(qp){dot(qp.x,qp.y,'#ffe066',4);}}
   stones.forEach(s=>{if(s.alive)dot(s.x,s.y-10,'#9fd8e8',3);});
   npcs.forEach(n=>dot(n.x,n.y,'#e0b84b',2));
   // yön oku
@@ -1654,6 +1696,7 @@ function drawBigMap(){
   const sc=420/WORLD;
   npcs.forEach(n=>{g.fillStyle='#e0b84b';g.fillRect(n.x*sc-1.5,n.y*sc-1.5,3,3);});
   onlinePlayers.forEach(p=>{g.fillStyle='#7fd4ff';g.beginPath();g.arc(p.x*sc,p.y*sc,2.5,0,TAU);g.fill();});
+  if(P.qActive){const qp=questTargetPoint(P.qActive);if(qp){g.fillStyle='#ffe066';g.beginPath();g.arc(qp.x*sc,qp.y*sc,5,0,TAU);g.fill();g.strokeStyle='#fff3a0';g.strokeRect(qp.x*sc-7,qp.y*sc-7,14,14);}}
   stones.forEach(s=>{if(s.alive){g.fillStyle='#9fd8e8';g.beginPath();g.arc(s.x*sc,s.y*sc,3,0,TAU);g.fill();}});
   g.fillStyle='#fff';g.beginPath();g.arc(P.x*sc,P.y*sc,4,0,TAU);g.fill();
   g.strokeStyle='#fff';g.strokeRect(P.x*sc-6,P.y*sc-6,12,12);
@@ -1790,7 +1833,7 @@ function updMobs(dt){
         moveEnt(m,Math.cos(a)*M.sp*dt,Math.sin(a)*M.sp*dt,M.r-3);
         m.dir=Math.cos(a)>=0?1:-1;m.wt+=dt*8;
       }
-      else if(tgd>26+m.r){const a=Math.atan2(tg.y-m.y,tg.x-m.x);
+      else if(tgd>18+m.r){const a=Math.atan2(tg.y-m.y,tg.x-m.x);
         moveEnt(m,Math.cos(a)*M.sp*dt,Math.sin(a)*M.sp*dt,M.r-3);
         m.dir=Math.cos(a)>=0?1:-1;m.wt+=dt*8;m.atkCD=Math.max(0,m.atkCD-dt);}
       else{m.atkCD-=dt;
@@ -2065,7 +2108,7 @@ function darkness(){
 function render(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.fillStyle='#0d0b08';ctx.fillRect(0,0,vw,vh);
-  const shx=shakeT>0?rnd(-6,6)*shakeT:0,shy=shakeT>0?rnd(-6,6)*shakeT:0;
+  const allowShake=started&&!P.dead;const shx=allowShake&&shakeT>0?rnd(-6,6)*shakeT:0,shy=allowShake&&shakeT>0?rnd(-6,6)*shakeT:0;
   ctx.save();
   ctx.translate(vw/2,vh/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x+shx,-cam.y+shy);
   // tile
@@ -2266,7 +2309,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.10 ONLINE OYUNCULAR ----------
+// ---------- V4.11 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2442,7 +2485,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.10 KAYIT SEÇİMİ
+  V4.11 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
