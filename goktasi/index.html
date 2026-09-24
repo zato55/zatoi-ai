@@ -465,7 +465,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.14 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.15 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -485,7 +485,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.14 ayarlar / yeniden tuş atama ----------
+// ---------- V4.15 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -1459,13 +1459,42 @@ function playerAttack(){
   dealToMob(m,plDmg());
   P.pendT=0;
 }
+function meleeAimTarget(maxRange=190,conePx=48){
+  let ang=skillAimAngle(),best=null,bestScore=1e9;
+  const ca=Math.cos(ang),sa=Math.sin(ang);
+  mobs.forEach(m=>{
+    if(m.hp<=0||m.dead)return;
+    const dx=m.x-P.x,dy=m.y-P.y;
+    const proj=dx*ca+dy*sa;
+    if(proj<=0||proj>maxRange+(m.r||0))return;
+    const perp=Math.abs(-dx*sa+dy*ca);
+    const allowance=conePx+(m.r||0);
+    if(perp>allowance)return;
+    const score=perp*4+proj*.12;
+    if(score<bestScore){bestScore=score;best=m;}
+  });
+  return best;
+}
+function focusMeleeAim(maxRange=190){
+  const aimed=meleeAimTarget(maxRange);
+  if(aimed){
+    P.target=aimed;P.stoneT=null;P.dir=aimed.x>=P.x?1:-1;
+    $('targetBar').style.display='block';
+  }
+  return aimed;
+}
 function castSkill(i){
   if(P.dead||P.cds[i]>0)return;
   const S=SKILLS[i];
   if(P.sp<S.sp){toast('Ruh yetersiz');return;}
   P.sp-=S.sp;P.cds[i]=S.cd;
-  if(i===0){const m=P.target;
-    if(!m||m.hp<=0){toast('Hedef yok');P.sp+=S.sp;P.cds[i]=0;return;}
+  if(i===0){
+    // Yakın saldırı skill'i: nişangâh bir düşmanın üstündeyse önce onu odakla.
+    // Böylece ayrıca hedef kilitlemek gerekmez.
+    let m=focusMeleeAim(190);
+    if(!m&&P.target&&P.target.hp>0&&!P.target.dead&&dst(P.x,P.y,P.target.x,P.target.y)<=190+(P.target.r||0))m=P.target;
+    if(!m){P.sp+=S.sp;P.cds[i]=0;return;}
+    P.target=m;P.stoneT=null;P.dir=m.x>=P.x?1:-1;$('targetBar').style.display='block';
     P.swingT=.28;SFX.skill();dealToMob(m,plDmg(2.2));}
   else if(i===1){SFX.skill();
     const radius=155;
@@ -1664,8 +1693,10 @@ function nearestTarget(){
 function manualSword(){
   if(!started||P.dead||P.atkCD>0)return;
   lastInput=performance.now();
-  // Space her zaman kılıcı sallar. Yakında hedef varsa hasar verir.
-  let m=P.target&&P.target.hp>0?P.target:null;
+  // Yakın saldırıda nişangâhın üstündeki düşman önceliklidir.
+  // Nişangâhta düşman yoksa mevcut kilit / yakındaki düşman mantığı devam eder.
+  let m=focusMeleeAim(86);
+  if(!m)m=P.target&&P.target.hp>0&&!P.target.dead?P.target:null;
   if(!m||dst(P.x,P.y,m.x,m.y)>64+(m.r||0)){
     m=null;let bd=72;
     mobs.forEach(mm=>{if(mm.hp>0&&!mm.dead){const d=dst(P.x,P.y,mm.x,mm.y);if(d<bd+(mm.r||0)){bd=d;m=mm;}}});
@@ -2494,7 +2525,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.14 ONLINE OYUNCULAR ----------
+// ---------- V4.15 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2670,7 +2701,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.14 KAYIT SEÇİMİ
+  V4.15 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3109,7 +3140,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.14: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.15: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
