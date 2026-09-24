@@ -1160,10 +1160,10 @@ html.mobile-ui #introLoading{top:61%!important;min-height:110px!important}
 #intro #contBtn:hover{
   filter:brightness(1.08)!important;
 }
-\n/* =========================================================\n   V4.41 — ARKA PLANDA BASILI BUTON IZLERINI KAPAT\n   Gercek HTML butonlari artik tamamen opak. Arkadaki referans\n   gorselin buton/ikon/ok detaylari bunlarin icinden gorunmez.\n   ========================================================= */\n#intro #cloudBtn{\n  background:linear-gradient(180deg,#17130c 0%,#090908 58%,#0d0b08 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    inset 0 0 24px rgba(216,165,61,.055),\n    0 8px 22px rgba(0,0,0,.38)!important;\n}\n#intro #contBtn{\n  background:linear-gradient(180deg,#4b2d0d 0%,#34200c 44%,#171006 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    0 0 0 1px rgba(255,211,104,.18),\n    0 0 25px rgba(239,166,42,.34),\n    inset 0 0 30px rgba(235,169,54,.12)!important;\n}\n/* Pseudo ikonlar da gercek butonun ust katmaninda kalsin. */\n#intro #cloudBtn::before,#intro #cloudBtn::after,\n#intro #contBtn::before,#intro #contBtn::after{z-index:2!important}\n#intro #cloudBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n}\n#intro #contBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n  box-shadow:\n    0 0 0 1px rgba(255,221,132,.28),\n    0 0 34px rgba(255,181,49,.52),\n    inset 0 0 34px rgba(235,169,54,.18)!important;\n}\n
+\n/* =========================================================\n   V4.41.1 — ARKA PLANDA BASILI BUTON IZLERINI KAPAT\n   Gercek HTML butonlari artik tamamen opak. Arkadaki referans\n   gorselin buton/ikon/ok detaylari bunlarin icinden gorunmez.\n   ========================================================= */\n#intro #cloudBtn{\n  background:linear-gradient(180deg,#17130c 0%,#090908 58%,#0d0b08 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    inset 0 0 24px rgba(216,165,61,.055),\n    0 8px 22px rgba(0,0,0,.38)!important;\n}\n#intro #contBtn{\n  background:linear-gradient(180deg,#4b2d0d 0%,#34200c 44%,#171006 100%)!important;\n  opacity:1!important;\n  isolation:isolate!important;\n  box-shadow:\n    0 0 0 1px rgba(255,211,104,.18),\n    0 0 25px rgba(239,166,42,.34),\n    inset 0 0 30px rgba(235,169,54,.12)!important;\n}\n/* Pseudo ikonlar da gercek butonun ust katmaninda kalsin. */\n#intro #cloudBtn::before,#intro #cloudBtn::after,\n#intro #contBtn::before,#intro #contBtn::after{z-index:2!important}\n#intro #cloudBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n}\n#intro #contBtn:hover{\n  transform:translateX(-50%)!important;\n  filter:brightness(1.08)!important;\n  box-shadow:\n    0 0 0 1px rgba(255,221,132,.28),\n    0 0 34px rgba(255,181,49,.52),\n    inset 0 0 34px rgba(235,169,54,.18)!important;\n}\n
 
 /* =========================================================
-   V4.41 — TEMİZ FANTASTİK ARKA PLAN + GERÇEK HTML/CSS UI
+   V4.41.1 — TEMİZ FANTASTİK ARKA PLAN + GERÇEK HTML/CSS UI
    Arka planda logo/yazı/buton YOK. Tüm arayüz kodla çizilir.
    ========================================================= */
 #intro{
@@ -1379,7 +1379,7 @@ html.mobile-ui #introKeys{margin-top:8px!important;width:auto!important}
 html.mobile-ui #introKeys::before{font-size:8px!important;white-space:normal!important}
 
 
-/* V4.41 — ESKİ HOVER TRANSFORM KURALINI KESİN OLARAK EZ */
+/* V4.41.1 — ESKİ HOVER TRANSFORM KURALINI KESİN OLARAK EZ */
 html body #intro #introBox #cloudBtn:hover,
 html body #intro #introBox #contBtn:hover,
 html body #intro #introBox #startBtn:hover,
@@ -1402,7 +1402,7 @@ html body #intro #introBox #startBtn:hover{
 }
 
 
-/* V4.41 — PC ÇANTA KONUMU */
+/* V4.41.1 — PC ÇANTA KONUMU */
 html:not(.mobile-ui) #invPanel{
   top:50%!important;
   left:50%!important;
@@ -1416,6 +1416,71 @@ html:not(.mobile-ui) #invPanel{
   z-index:5!important;
   pointer-events:auto!important;
   cursor:pointer!important;
+}
+
+
+/* =========================================================
+   V4.41.1 — GİRİŞ EKRANI TEK-DURUM MAKİNESİ
+   loading / signedout / new / continue aynı anda ASLA görünmez.
+   Bu blok dosyanın en sonunda olduğundan eski !important katmanlarını da ezer.
+   ========================================================= */
+html[data-intro-mode] #introLoading,
+html[data-intro-mode] #signedOutBox,
+html[data-intro-mode] #newCharBox,
+html[data-intro-mode] #cloudBtn,
+html[data-intro-mode] #contBtn{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+html[data-intro-mode="loading"] #introLoading{
+  display:flex!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+html[data-intro-mode="signedout"] #signedOutBox{
+  display:block!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+html[data-intro-mode="new"] #newCharBox{
+  display:flex!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+html[data-intro-mode="new"] #cloudBtn{
+  display:block!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+html[data-intro-mode="continue"] #cloudBtn,
+html[data-intro-mode="continue"] #contBtn{
+  display:block!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+
+/* Yeni karakter modunda eski/boş devam butonu kesinlikle çizilmez. */
+html[data-intro-mode="new"] #contBtn,
+html[data-intro-mode="continue"] #newCharBox,
+html[data-intro-mode="continue"] #signedOutBox,
+html[data-intro-mode="signedout"] #newCharBox,
+html[data-intro-mode="signedout"] #cloudBtn,
+html[data-intro-mode="signedout"] #contBtn{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+/* Start butonu sadece newCharBox ile birlikte yaşar; eski genel buton CSS'si onu dışarı taşıyamaz. */
+#newCharBox #startBtn{
+  position:relative!important;
+  left:auto!important;
+  top:auto!important;
+  transform:none!important;
+  display:block!important;
+  margin:14px auto 0!important;
 }
 
 </style>
@@ -1440,11 +1505,12 @@ html:not(.mobile-ui) #invPanel{
 <!-- GOKTASI BUILD: V4.38 - REFERANS GORSELE UYUMLU GIRIS / V4.35 MOTOR KORUNDU -->
 <!-- GOKTASI BUILD: V4.38 - REFERANS GIRIS TASARIMI / SIYAH PANEL KALDIRILDI -->
 <!-- GOKTASI BUILD: V4.38 - HEDEF UI KODLA / FANTASTIK BUTONLAR -->
-<!-- GOKTASI BUILD: V4.41 - ARKA BUTON IZLERI OPAK KATMAN FIX -->
-<!-- GOKTASI BUILD: V4.41 - TEMIZ ARKAPLAN + KOD UI -->
-<!-- GOKTASI BUILD: V4.41 - HOVER TRANSFORM KESIN FIX -->
-<!-- GOKTASI BUILD: V4.41 - CANTA KONUM + KAPATMA FIX -->
-<!-- GOKTASI BUILD: V4.41 - GOKTASI ANA SISTEM + TAM KOD AUDIT -->
+<!-- GOKTASI BUILD: V4.41.1 - ARKA BUTON IZLERI OPAK KATMAN FIX -->
+<!-- GOKTASI BUILD: V4.41.1 - TEMIZ ARKAPLAN + KOD UI -->
+<!-- GOKTASI BUILD: V4.41.1 - HOVER TRANSFORM KESIN FIX -->
+<!-- GOKTASI BUILD: V4.41.1 - CANTA KONUM + KAPATMA FIX -->
+<!-- GOKTASI BUILD: V4.41.1 - GOKTASI ANA SISTEM + TAM KOD AUDIT -->
+<!-- GOKTASI BUILD: V4.41.1 - GIRIS DURUM MAKINESI FIX -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -1598,7 +1664,7 @@ html:not(.mobile-ui) #invPanel{
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.41 temiz arka plan + kod arayüzü
+   Tek dosyalık açık dünya aksiyon-RPG — V4.41.1 temiz arka plan + kod arayüzü
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -3037,7 +3103,7 @@ function maybeBotReply(v){
 function togglePanel(id){const p=$(id);const on=!p.classList.contains('on');closePanels();if(on)p.classList.add('on');}
 function closePanels(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));}
 document.querySelectorAll('.x').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('on'));
-// V4.41: panel kapatma için güvenli event delegation.
+// V4.41.1: panel kapatma için güvenli event delegation.
 // Dinamik/yeniden çizilen panel olsa bile X kesin çalışır; tıklama oyuna düşmez.
 document.addEventListener('click',e=>{
   const b=e.target.closest?.('.x[data-close]');
@@ -4384,6 +4450,7 @@ async function initCloudSave(showMessage=false){
     clearGameCloudState();
     if(showMessage)toast(e.status===401?'Zatoi oturumu geçersiz — Zatoi AI’da yeniden giriş yap':'Zatoi hesabı/bulut doğrulanamadı');
     updateAccountUI();
+    setIntroMode('signedout');
     return false;
   }
 }
@@ -4402,13 +4469,20 @@ function updateAccountUI(){
 }
 function openAccountPanel(){updateAccountUI();$('accountPanel').classList.add('on');}
 function setIntroMode(mode){
-  const signedOut=$('signedOutBox'),newBox=$('newCharBox'),cb=$('contBtn'),cloud=$('cloudBtn');
-  // Önce modları belirle, en son ready sınıfını aç. Böylece tek kare yanlış içerik oluşmaz.
+  const root=document.documentElement;
+  const valid=new Set(['loading','signedout','new','continue']);
+  if(!valid.has(mode))mode='loading';
+
+  // Tek kaynak: giriş modu. CSS ve JS artık birbirine karşı display zorlamaz.
+  root.dataset.introMode=mode;
+  root.classList.toggle('goktasi-intro-ready',mode!=='loading');
+
+  const signedOut=$('signedOutBox'),newBox=$('newCharBox'),cb=$('contBtn'),cloud=$('cloudBtn'),loading=$('introLoading');
+  if(loading)loading.style.display=mode==='loading'?'flex':'none';
   if(signedOut)signedOut.style.display=mode==='signedout'?'block':'none';
   if(newBox)newBox.style.display=mode==='new'?'flex':'none';
   if(cb)cb.style.display=mode==='continue'?'block':'none';
-  if(cloud)cloud.style.display=mode==='signedout'?'none':'block';
-  document.documentElement.classList.add('goktasi-intro-ready');
+  if(cloud)cloud.style.display=(mode==='new'||mode==='continue')?'block':'none';
 }
 function refreshContinueButton(){
   const cb=$('contBtn');
@@ -4421,8 +4495,9 @@ function refreshContinueButton(){
     return;
   }
 
-  // Oturum var ama sunucu doğrulaması henüz tamamlanmadıysa yanlış ekran gösterme.
+  // Oturum var ama sunucu doğrulaması henüz tamamlanmadıysa yalnız yükleme ekranı.
   if(!cloudVerified||!activeAccountId()){
+    setIntroMode('loading');
     return;
   }
 
@@ -4566,8 +4641,8 @@ const SOYS=[{k:'kurt',n:'Kurt Soyu',d:'+6 Güç — sürünün dişi, savaşın 
 let selSoy='kurt';
 function initIntro(){
   const w=$('soys');
-  document.documentElement.classList.remove('goktasi-intro-ready');
-  // İlk karede hiçbir hesap-bağımlı akış gösterilmez; doğru mod aşağıda belirlenir.
+  // İlk kare: yalnız yükleme. Hesap sonucu gelmeden karakter oluşturma/devam butonu görünmez.
+  setIntroMode('loading');
   w.style.display='flex';
 
   const loginBtn=$('zatoiLoginBtn');
