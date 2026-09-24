@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.1 PANEL X + SHOP SELL TAB FIX -->
+<!-- GOKTASI V4.47.2 PANEL INTERACTION HARD FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1591,7 +1591,7 @@ html:not(.mobile-ui) #skillbar .slot{
   transform:none!important;
   width:34px!important;
   height:34px!important;
-  z-index:2147483000!important;
+  z-index:1000!important;
   display:grid!important;
   place-items:center!important;
   pointer-events:auto!important;
@@ -1605,16 +1605,16 @@ html:not(.mobile-ui) #skillbar .slot{
 .panel.on > button.x[data-close]{
   pointer-events:auto!important;
   touch-action:manipulation!important;
-  z-index:2147483646!important;
+  z-index:1002!important;
 }
 #shopPanel.on .tabs{
   position:relative!important;
-  z-index:2147483001!important;
+  z-index:1000!important;
   pointer-events:auto!important;
 }
 #shopPanel.on .tabs button{
   position:relative!important;
-  z-index:2147483002!important;
+  z-index:1001!important;
   pointer-events:auto!important;
   touch-action:manipulation!important;
   cursor:pointer!important;
@@ -3326,6 +3326,48 @@ function bindPanelCloseButtons(){
   });
 }
 bindPanelCloseButtons();
+
+/* =========================================================
+   V4.47.2 — PANEL ETKİLEŞİM KESİN FIX
+   Bazı input katmanlarında event.target yanlış elemana düşebildiği için
+   X ve mağaza sekmelerini sadece target'a bağlamıyoruz. Açık paneldeki
+   butonların gerçek ekran koordinatlarını kontrol ediyoruz.
+   ========================================================= */
+function pointInsideRect(x,y,r){
+  return !!r && x>=r.left && x<=r.right && y>=r.top && y<=r.bottom;
+}
+document.addEventListener('pointerdown',e=>{
+  if(e.button!=null && e.button!==0)return;
+
+  // Açık panellerin X düğmeleri: hedef element ne olursa olsun koordinattan kapat.
+  const panels=[...document.querySelectorAll('.panel.on')];
+  for(let i=panels.length-1;i>=0;i--){
+    const p=panels[i];
+    const x=p.querySelector(':scope > button.x[data-close]');
+    if(x && pointInsideRect(e.clientX,e.clientY,x.getBoundingClientRect())){
+      e.preventDefault();
+      e.stopPropagation();
+      closePanelByButton(x,e);
+      return;
+    }
+  }
+
+  // Mağaza SATIN AL / SAT sekmeleri.
+  const shop=$('shopPanel');
+  if(shop?.classList.contains('on')){
+    const buy=$('tabBuy'),sell=$('tabSell');
+    if(buy && pointInsideRect(e.clientX,e.clientY,buy.getBoundingClientRect())){
+      e.preventDefault();e.stopPropagation();
+      setShopTab('buy');
+      return;
+    }
+    if(sell && pointInsideRect(e.clientX,e.clientY,sell.getBoundingClientRect())){
+      e.preventDefault();e.stopPropagation();
+      setShopTab('sell');
+      return;
+    }
+  }
+},true);
 
 $('settingsBtn').onclick=()=>{initAudio();openSettings();};
 [['setMaster','master'],['setSfx','sfx'],['setAmbient','ambient']].forEach(([id,k])=>{
