@@ -331,7 +331,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 
-/* V4.34 — Mağaza satırlarının panel dışına taşmasını engelle */
+/* V4.35 — Mağaza satırlarının panel dışına taşmasını engelle */
 #shopPanel{
   overflow:hidden !important;
   max-height:calc(100vh - 110px) !important;
@@ -374,7 +374,7 @@ html.mobile-ui #shopPanel{
 }
 
 
-/* V4.34 — Demirci menüsü okunabilirlik */
+/* V4.35 — Demirci menüsü okunabilirlik */
 #dlgPanel #dlgBtns{
   display:flex;
   flex-wrap:wrap;
@@ -388,7 +388,7 @@ html.mobile-ui #shopPanel{
 }
 
 
-/* V4.34 — KARAKTER SINIFI SECIMI GORUNURLUK FIX */
+/* V4.35 — KARAKTER SINIFI SECIMI GORUNURLUK FIX */
 #introBox .soys{
   display:flex !important;
   visibility:visible !important;
@@ -428,7 +428,7 @@ html.mobile-ui #introBox .soy{
 }
 
 
-/* V4.34 — giriş akışı: mevcut karakter ile yeni karakter ekranı birbirinden ayrıdır */
+/* V4.35 — giriş akışı: mevcut karakter ile yeni karakter ekranı birbirinden ayrıdır */
 #newCharBox{display:flex;flex-direction:column;align-items:center;width:100%}
 #contBtn{
   margin:18px auto 0 !important;
@@ -447,7 +447,7 @@ html.mobile-ui #introBox .soy{
 html.mobile-ui #contBtn{min-width:min(330px,72dvw);padding:10px 18px !important;font-size:11px !important}
 
 
-/* V4.34 — girişte yanlış ekranın anlık görünmesini (FOUC) engelle */
+/* V4.35 — girişte yanlış ekranın anlık görünmesini (FOUC) engelle */
 html:not(.goktasi-intro-ready) #newCharBox,
 html:not(.goktasi-intro-ready) #contBtn,
 html:not(.goktasi-intro-ready) #cloudBtn{
@@ -460,7 +460,7 @@ html.goktasi-intro-ready #cloudBtn{
 }
 
 
-/* V4.34 — Zatoi oturumu olmayan oyuncu için ayrı giriş kapısı */
+/* V4.35 — Zatoi oturumu olmayan oyuncu için ayrı giriş kapısı */
 #signedOutBox{
   width:min(470px,88vw);
   margin:4px auto 2px;
@@ -505,7 +505,7 @@ html.mobile-ui .loginGateText{font-size:10px;line-height:1.4;margin-bottom:8px}
 html.mobile-ui #zatoiLoginBtn,html.mobile-ui #zatoiRecheckBtn{padding:8px 12px;font-size:10px;margin-top:5px}
 
 
-/* V4.34 — ilk kareden itibaren tek doğru giriş durumu */
+/* V4.35 — ilk kareden itibaren tek doğru giriş durumu */
 #introLoading{
   display:flex;
   min-height:150px;
@@ -532,7 +532,7 @@ html:not(.goktasi-intro-ready) #cloudBtn{
 html.goktasi-intro-ready #introLoading{display:none !important;}
 
 
-/* V4.34 — GÖKTAŞI temalı bekleme ekranı */
+/* V4.35 — GÖKTAŞI temalı bekleme ekranı */
 #introLoading{display:flex;min-height:210px;align-items:center;justify-content:center;flex-direction:column;width:100%;gap:9px}
 .meteorLoader{position:relative;width:70px;height:70px;margin-bottom:5px}
 .meteorCore{position:absolute;left:50%;top:50%;width:25px;height:25px;transform:translate(-50%,-50%) rotate(45deg);background:linear-gradient(135deg,#f0d28a,#9b6c24 48%,#35210d);border:1px solid #e2bd64;box-shadow:0 0 12px rgba(222,177,76,.45),0 0 30px rgba(139,91,27,.18);animation:meteorPulse 1.15s ease-in-out infinite alternate}
@@ -547,23 +547,24 @@ html.goktasi-intro-ready #introLoading{display:none !important;}
 html.mobile-ui #introLoading{min-height:130px;gap:5px}html.mobile-ui .meteorLoader{width:50px;height:50px;margin-bottom:2px}html.mobile-ui .meteorCore{width:19px;height:19px}html.mobile-ui .introLoadingTitle{font-size:11px;letter-spacing:2px}html.mobile-ui .introLoadingText{font-size:9px!important}
 
 </style>
-<!-- GOKTASI BUILD: V4.34 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.34 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
-<!-- GOKTASI BUILD: V4.34 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
-<!-- GOKTASI BUILD: V4.34 - YOL TASLARI / HIZLI SEYAHAT -->
-<!-- GOKTASI BUILD: V4.34 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
-<!-- GOKTASI BUILD: V4.34 - SATIS EKRANI TAM ESYA DETAYLARI -->
-<!-- GOKTASI BUILD: V4.34 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
-<!-- GOKTASI BUILD: V4.34 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
-<!-- GOKTASI BUILD: V4.34 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
-<!-- GOKTASI BUILD: V4.34 - DUSMAN AGGRO / GOKTASI MUHAFIZ AI FIX -->
-<!-- GOKTASI BUILD: V4.34 - GOKTASI ANA SISTEMI / NADIRLIK / BOLGESEL LOOT -->
-<!-- GOKTASI BUILD: V4.34 - SINIF SECIMI GORUNURLUK FIX -->
-<!-- GOKTASI BUILD: V4.34 - GIRIS AKISI / STATIK SINIF KARTLARI -->
-<!-- GOKTASI BUILD: V4.34 - INTRO FLASH / FOUC FIX -->
-<!-- GOKTASI BUILD: V4.34 - ZATOI GIRIS KAPISI / 3 DURUMLU INTRO -->
-<!-- GOKTASI BUILD: V4.34 - ILK YUKLEME / SINIF FLASH KESIN FIX -->
-<!-- GOKTASI BUILD: V4.34 - TEMALI BEKLEME EKRANI -->
+<!-- GOKTASI BUILD: V4.35 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.35 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.35 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.35 - YOL TASLARI / HIZLI SEYAHAT -->
+<!-- GOKTASI BUILD: V4.35 - MAGAZA ACIKLAMA + UI SCROLL / WORLD ZOOM FIX -->
+<!-- GOKTASI BUILD: V4.35 - SATIS EKRANI TAM ESYA DETAYLARI -->
+<!-- GOKTASI BUILD: V4.35 - MAGAZA PANEL TASMA / IC SCROLL FIX -->
+<!-- GOKTASI BUILD: V4.35 - MAGAZA TEKRAR EDEN ACIKLAMA TEMIZLIGI -->
+<!-- GOKTASI BUILD: V4.35 - DEMIRCI ARAYUZU ACIKLAYICI MENÜ -->
+<!-- GOKTASI BUILD: V4.35 - DUSMAN AGGRO / GOKTASI MUHAFIZ AI FIX -->
+<!-- GOKTASI BUILD: V4.35 - GOKTASI ANA SISTEMI / NADIRLIK / BOLGESEL LOOT -->
+<!-- GOKTASI BUILD: V4.35 - SINIF SECIMI GORUNURLUK FIX -->
+<!-- GOKTASI BUILD: V4.35 - GIRIS AKISI / STATIK SINIF KARTLARI -->
+<!-- GOKTASI BUILD: V4.35 - INTRO FLASH / FOUC FIX -->
+<!-- GOKTASI BUILD: V4.35 - ZATOI GIRIS KAPISI / 3 DURUMLU INTRO -->
+<!-- GOKTASI BUILD: V4.35 - ILK YUKLEME / SINIF FLASH KESIN FIX -->
+<!-- GOKTASI BUILD: V4.35 - TEMALI BEKLEME EKRANI -->
+<!-- GOKTASI BUILD: V4.35 - SPAWNMOB KRITIK RUNTIME / DUNYA RENDER FIX -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -717,7 +718,7 @@ html.mobile-ui #introLoading{min-height:130px;gap:5px}html.mobile-ui .meteorLoad
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.34 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.35 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -737,7 +738,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.34 ayarlar / yeniden tuş atama ----------
+// ---------- V4.35 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -1321,9 +1322,10 @@ function mobBase(k){const M=MOBS[k],lv=M.lv;
   return{hp:Math.floor((30+lv*22)*M.hpm),dmg:4+lv*2.4*M.dmgm,exp:15+Math.pow(lv,1.5)*12};}
 function spawnMob(k,x,y,home){
   const M=MOBS[k],b=mobBase(k);
-  mobs.push({id:uid++,k,x,y,hx:home?home.x:x,hy:home?home.y:y,hp:b.hp,maxhp:b.hp,dmg:b.dmg,exp:b.exp,
-    st:'idle',wx:x,wy:y,dir:1,wt:0,atkCD:0,hitT:0,target:null,respT:0,leashT:0,wT:rnd(1,4),flee:false,boss:M.boss});
-  return m;
+  const mob={id:uid++,k,x,y,hx:home?home.x:x,hy:home?home.y:y,hp:b.hp,maxhp:b.hp,dmg:b.dmg,exp:b.exp,
+    st:'idle',wx:x,wy:y,dir:1,wt:0,atkCD:0,hitT:0,target:null,respT:0,leashT:0,wT:rnd(1,4),flee:false,boss:M.boss};
+  mobs.push(mob);
+  return mob;
 }
 function spawnAll(){
   const zoneMob={ova:['kurt','kurt','toprak','toprak','domuz','bozkurt'],orman:['karga','karga','orumcek','orumcek','kurt'],
@@ -1372,7 +1374,7 @@ function botChat(){
   const b=pick(alive);
   addChat(b.name+(b.guild?` [${b.guild}]`:''),pick(CHAT_POOL).replace('Veryrık',''),'bt');
 }
-// ---------- V4.34 GÖKTAŞI ANA SİSTEMİ ----------
+// ---------- V4.35 GÖKTAŞI ANA SİSTEMİ ----------
 const STONE_TIERS=[
   {id:'siradan',n:'GÖKTAŞI',rar:0,w:66,hp:1,guard:1,exp:1,money:1,c:'#79bed5'},
   {id:'islenmis',n:'PARLAYAN GÖKTAŞI',rar:1,w:25,hp:1.35,guard:1.35,exp:1.35,money:1.35,c:'#79d9e8'},
@@ -2368,7 +2370,7 @@ function drawMini(){
   $('miniReg').textContent=REGN[rg].n;
   $('clock').textContent=(isNight()?'Gece':'Gündüz')+' — '+(hour()<10?'0':'')+hour()+':00 • Önerilen '+REGN[rg].lv;
 }
-// ---------- V4.34 YOL TAŞLARI / HIZLI SEYAHAT ----------
+// ---------- V4.35 YOL TAŞLARI / HIZLI SEYAHAT ----------
 const FAST_TRAVEL_POINTS=[
   {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
   {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
@@ -2541,7 +2543,7 @@ function updMobs(dt){
     const dP=dst(m.x,m.y,P.x,P.y);
     if(dP>1700){m.target=null;continue;}
     const M=MOBS[m.k];
-    // V4.34 aggro: düşmanlar artık oyuncunun neredeyse üstüne basmasını beklemez.
+    // V4.35 aggro: düşmanlar artık oyuncunun neredeyse üstüne basmasını beklemez.
     // Göktaşı muhafızları daha geniş bir alanı korur.
     if(!m.target){
       const baseAggro=M.ag?Math.max(285,Number(M.aggro)||0):0;
@@ -3046,7 +3048,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.34 ONLINE OYUNCULAR ----------
+// ---------- V4.35 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -3222,7 +3224,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.34 KAYIT SEÇİMİ
+  V4.35 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3721,7 +3723,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.34: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.35: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
