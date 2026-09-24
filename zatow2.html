@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ZATO EVRENİ · GENESIS — v0.1.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090c09; --panel:#0f130e; --panel2:#141a12;
+  --line:#222b1f; --line2:#2f3b29;
+  --text:#d2dcc9; --dim:#8b987f; --faint:#5a6652;
+  --green:#8fd97a; --amber:#e2b558; --red:#e2695a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font:12.5px/1.45 'JetBrains Mono',monospace}
+#app{display:flex;flex-direction:column;height:100%}
+
+/* ---- üst bar ---- */
+header{display:flex;align-items:center;gap:12px;padding:7px 14px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:nowrap}
+.brand{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.brand h1{font:700 15px 'Space Grotesk',sans-serif;letter-spacing:.05em}
+.brand .sub{color:var(--faint);font-size:10px;letter-spacing:.22em}
+.ver{border:1px solid var(--line2);color:var(--dim);padding:1px 7px;border-radius:3px;font-size:10px;white-space:nowrap}
+.chips{display:flex;gap:7px;margin-left:4px}
+.chip{border:1px solid var(--line);background:var(--panel2);padding:3px 9px;border-radius:3px;font-size:10.5px;color:var(--dim);white-space:nowrap}
+.chip b{color:var(--text);font-weight:500;margin-left:6px}
+.spacer{flex:1}
+#seedLbl{color:var(--faint);font-size:10px}
+.ctrl{display:flex;gap:5px;align-items:center}
+button{font:inherit;font-size:11.5px;color:var(--dim);background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:4px 9px;cursor:pointer}
+button:hover{color:var(--text);border-color:var(--line2)}
+button.on{color:#0c130a;background:var(--green);border-color:var(--green);font-weight:700}
+button.icon{padding:4px 8px;display:flex;align-items:center}
+button svg{display:block}
+
+/* ---- ana yerleşim ---- */
+main{flex:1;display:flex;min-height:0}
+#stage{flex:1;position:relative;min-width:0}
+#world{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+.legend{position:absolute;left:10px;bottom:10px;display:flex;gap:16px;font-size:10.5px;color:var(--dim);pointer-events:none;background:rgba(9,12,9,.65);padding:4px 9px;border-radius:3px;border:1px solid var(--line)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+
+#side{width:304px;flex-shrink:0;border-left:1px solid var(--line);background:var(--panel);overflow-y:auto}
+.sec{padding:10px 12px;border-bottom:1px solid var(--line)}
+.sec h2{font-size:10px;letter-spacing:.2em;color:var(--faint);font-weight:500;margin-bottom:8px}
+.kvs{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.kv{display:flex;justify-content:space-between;gap:6px;border-bottom:1px dashed var(--line);padding:2px 0}
+.kv span{color:var(--dim)}
+.kv b{font-weight:500}
+.kv b.g{color:var(--green)} .kv b.r{color:var(--red)} .kv b.a{color:var(--amber)}
+.bar{height:6px;background:#1a2117;border-radius:3px;overflow:hidden;margin:4px 0 8px}
+.bar i{display:block;height:100%;background:var(--green)}
+.selHead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sw{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.selHead b{font-size:13px}
+.tag{font-size:10px;color:var(--dim);border:1px solid var(--line2);padding:0 5px;border-radius:3px}
+.empty{color:var(--faint);font-size:11px;padding:4px 0}
+#logList{display:flex;flex-direction:column;gap:3px;font-size:10.5px}
+.le{padding:2px 6px;border-left:2px solid var(--line2);color:var(--dim)}
+.le b{color:var(--text);font-weight:500}
+.le.birth{border-color:var(--green)} .le.birth b{color:var(--green)}
+.le.death{border-color:var(--red)} .le.death b{color:var(--red)}
+.note{color:var(--faint);font-size:10.5px;line-height:1.55;padding:10px 12px}
+.note em{color:var(--amber);font-style:normal}
+
+/* ---- yok oluş raporu ---- */
+#extOverlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,7,5,.8)}
+#extOverlay.show{display:flex}
+.extCard{width:540px;max-width:93%;max-height:90%;overflow:auto;background:var(--panel);border:1px solid var(--red);border-radius:4px;padding:18px 20px}
+.extCard h2{font:700 16px 'Space Grotesk',sans-serif;color:var(--red);letter-spacing:.08em}
+.extCard .sub2{color:var(--faint);font-size:11px;margin:2px 0 14px}
+.extBlock{margin-bottom:13px}
+.extBlock h3{font-size:10px;letter-spacing:.18em;color:var(--faint);font-weight:500;margin-bottom:5px}
+.extCard ul{list-style:none}
+.extCard li{padding:3px 0 3px 13px;position:relative;color:var(--amber);font-size:11.5px}
+.extCard li::before{content:'»';position:absolute;left:0;color:var(--faint)}
+/* Dar ekranlarda kontrol çubuğu taşmaz; dünya ve panel ayrı kaydırılır. */
+:root{--faint:#94a38a}
+#app{height:100dvh}
+header{flex-wrap:wrap;gap:8px}
+.ctrl{flex-wrap:wrap}
+button:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.note{color:var(--dim)}
+@media(max-width:760px){
+ main{flex-direction:column;overflow:auto}
+ #stage{flex:none;height:52dvh;min-height:280px}
+ #side{width:100%;border-left:0;border-top:1px solid var(--line);overflow:visible}
+ header{padding:8px}.brand .sub{display:none}.brand h1{font-size:13px}
+ .chips{order:3;width:100%;flex-wrap:wrap;margin:0}.chip{flex:1;padding:3px 5px}
+ .ctrl{width:100%}button{min-height:36px}.legend{gap:8px;font-size:9px}
+ #seedLbl{margin-left:auto}.spacer{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="brand"><h1>ZATO EVRENİ</h1><span class="sub">GENESIS</span><span class="ver">v0.1.1 · temel ekosistem</span></div>
+  <div class="chips">
+    <span class="chip">GÜN<b id="hDay">0.0</b></span>
+    <span class="chip">POPÜLASYON<b id="hPop">0</b></span>
+    <span class="chip">BESİN<b id="hFood">0</b></span>
+    <span class="chip">MAKS NESİL<b id="hGen">0</b></span>
+  </div>
+  <div class="spacer"></div>
+  <span id="seedLbl">tohum —</span>
+  <div class="ctrl">
+    <button class="icon" id="btnPause" title="Duraklat / Devam (Boşluk)">
+      <svg id="icPause" width="10" height="12" viewBox="0 0 10 12"><rect x="1" y="1" width="3" height="10" fill="currentColor"/><rect x="6" y="1" width="3" height="10" fill="currentColor"/></svg>
+      <svg id="icPlay" width="10" height="12" viewBox="0 0 10 12" style="display:none"><path d="M1 1 L9 6 L1 11 Z" fill="currentColor"/></svg>
+    </button>
+    <button class="spd on" data-s="1">1×</button>
+    <button class="spd" data-s="5">5×</button>
+    <button class="spd" data-s="20">20×</button>
+    <button class="spd" data-s="100">100×</button>
+    <button class="spd" data-s="500">500×</button>
+    <button id="btnReport">RAPOR İNDİR</button><button id="btnReplay">AYNI TOHUM</button>
+    <button id="btnNew">YENİ EVREN</button>
+  </div>
+</header>
+<main>
+  <div id="stage">
+    <canvas id="world"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#7fca68"></i>besin</span>
+      <span><i class="dot" style="background:hsl(210 60% 58%)"></i>zato — renk = soy çizgisi</span>
+    </div>
+
+    <div id="extOverlay">
+      <div class="extCard">
+        <h2>KARA KUTU · EVREN SONU</h2>
+        <div class="sub2">Popülasyon 0'a ulaştı. Tüm veriler bu andaki haliyle donduruldu; artık hiçbir istatistik değişmiyor.</div>
+        <div class="extBlock"><h3>EVREN</h3>
+          <div class="kvs">
+            <div class="kv"><span>süre</span><b id="eDur">—</b></div>
+            <div class="kv"><span>tohum</span><b id="eSeed">—</b></div>
+            <div class="kv"><span>zirve nüfus</span><b id="ePeak">—</b></div>
+            <div class="kv"><span>maks nesil</span><b id="eGen">—</b></div>
+          </div>
+        </div>
+        <div class="extBlock"><h3>POPÜLASYON & ÜREME</h3>
+          <div class="kvs">
+            <div class="kv"><span>toplam doğum</span><b id="eBirths">—</b></div>
+            <div class="kv"><span>ölüm · açlık</span><b id="eDh">—</b></div>
+            <div class="kv"><span>ölüm · yaşlılık</span><b id="eDo">—</b></div>
+            <div class="kv"><span>ilk kez üreyen</span><b id="eFirst">—</b></div>
+            <div class="kv"><span>tekrar üreyen</span><b id="eRep">—</b></div>
+            <div class="kv"><span>ort. ebeveyn yaşı</span><b id="ePAge">—</b></div>
+          </div>
+        </div>
+        <div class="extBlock"><h3>EKOLOJİ</h3>
+          <div class="kvs">
+            <div class="kv"><span>üretilen besin</span><b id="eFs">—</b></div>
+            <div class="kv"><span>tüketilen</span><b id="eFe">—</b></div>
+            <div class="kv"><span>solan</span><b id="eFw">—</b></div>
+            <div class="kv"><span>kalan</span><b id="eFl">—</b></div>
+          </div>
+        </div>
+        <div class="extBlock"><h3>ÇÖKÜŞ GÖZLEMLERİ</h3><ul id="eDiag"></ul></div>
+        <div class="btnRow"><button id="btnNew2">YENİ EVREN BAŞLAT</button></div>
+      </div>
+    </div>
+  </div>
+
+  <aside id="side">
+    <div class="sec"><h2>CANLI DURUM</h2>
+      <div class="kvs">
+        <div class="kv"><span>popülasyon</span><b id="sPop">0</b></div>
+        <div class="kv"><span>besin</span><b id="sFood">0</b></div>
+        <div class="kv"><span>zirve</span><b id="sPeak">0</b></div>
+        <div class="kv"><span>doğum</span><b id="sBirths" class="g">0</b></div>
+        <div class="kv"><span>ölüm · açlık</span><b id="sDh" class="r">0</b></div>
+        <div class="kv"><span>ölüm · yaşlılık</span><b id="sDo">0</b></div>
+        <div class="kv"><span>maks nesil</span><b id="sGen" class="g">0</b></div>
+        <div class="kv"><span>ort. ebeveyn yaşı</span><b id="sAvg">—</b></div>
+      </div>
+    </div>
+    <div class="sec"><h2>SEÇİLİ ZATO</h2><div id="selBody"></div></div>
+    <div class="sec"><h2>OLAY GÜNLÜĞÜ</h2><div id="logList"></div></div>
+    <div class="note"><em>v0.1.1 notu:</em> Besin arama henüz ÖĞRENİLMİŞ bir davranış değil — geçici bir refleks (görüş alanındaki besine yönelme). Sonraki aşamada bu refleks değerlendirilip yerine algı → karar → eylem → sonuç → ödül döngüsüyle deneyimle öğrenme gelecek. Bu sürüm yaşam simülasyonudur; öğrenen yapay zekâ değildir. Rapor indir araştırma özeti verir; sayfa kapanınca koşu kaybolur. Arka planda simülasyon bekler. Hız düğmeleri hedef hızdır, ağır yükte daha yavaş ilerleyebilir.</div>
+  </aside>
+</main>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   ZATO EVRENİ · GENESIS — v0.1.1 "Temel Ekosistem"
+   ---------------------------------------------------------------------
+   Mimarî (sonraki sürümlerde bu modülerlik korunacak):
+     CFG          : tüm denge sabitleri (tek yerden ayarlanır)
+     mulberry32   : tohumlanabilir rastgelelik -> aynı tohum = aynı evren
+     SpatialHash  : besin sorguları için uzamsal indeks (performans)
+     Food/Zato    : ekoloji ve birey; Zato güncellemesi asla atlanmaz
+     World        : tick döngüsü, besin üretimi, ölüm/doğum defteri
+     render/UI    : adaptif çizim (yüksek hızda sadeleşir, hesap çıplak kalmaz)
+
+   Bu sürümde BİLİNÇLİ olarak olmayanlar: öğrenme, hafıza, su,
+   sosyal öğrenme, kara kutu. Bunlar v0.2+ planında.
+   ===================================================================== */
+
+/* ---------------- 0) YARDIMCILAR ---------------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const TAU=Math.PI*2;
+let seed=0, rng=Math.random;                 // tüm dünya rastgeleliği tohumdan gelir
+const rr=(a,b)=>a+rng()*(b-a);
+const ri=(a,b)=>Math.floor(rr(a,b+1));
+const gauss=()=>{let u=0,v=0;while(!u)u=rng();while(!v)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v)};
+const $=id=>document.getElementById(id);
+
+/* ---------------- 1) YAPILANDIRMA ---------------- */
+const CFG={
+  TICKS_PER_DAY:60,
+  WORLD_W:1500, WORLD_H:950,
+  FOOD:{
+    spawnChance:0.5,      // tick başına çıkma olasılığı (~30 besin/gün) — NÜFUSA BAĞLI DEĞİL
+    maxItems:360,         // dünyanın üretim sınırı (ekolojik taşıma kapasitesi; gizli nüfus kuralı değildir)
+    energyMin:18, energyMax:34,
+    growDays:3,           // filiz -> olgun besin
+    witherDays:14,        // tüketilmeyen besin solar
+    r:2.4,
+    clusterProb:0.45,     // yeni besin bazen mevcut besinin yakınına düşer (bitki örtüsü yamaları)
+    clusterDist:70,
+  },
+  ZATO:{
+    startCount:14,
+    startEnergy:[55,85], maxEnergy:100,
+    baseDrain:0.10,       // tick başına temel yakım
+    moveDrain:0.055,      // piksel başına hareket yakımı (verimlilik genine bölünür)
+    hungerAt:78,          // bu eşiğin altında besin aramaya başlar
+    adultAge:14,          // gün
+    elderFrac:0.8,        // ömrün %80'inden sonra yaşlı
+    repro:{energyMin:68, cooldownDays:5, chance:0.0035, cost:42, babyEnergy:30},
+    genes:{ // [min, max] — mutasyon bu aralıklara kırpılır
+      speed:      [0.45,2.10],
+      vision:     [40,170],
+      efficiency: [0.75,1.30],
+      maxAge:     [45,95],
+      size:       [2.3,4.6],
+    },
+    mutateProb:0.7, mutateSigma:0.07, hueSigma:9,
+  },
+  DECIDE_INTERVAL:10,     // reaksiyon gecikmesi: her tick yeniden karar vermez
+  SPEEDS:[1,5,20,100,500],
+};
+const W=CFG.WORLD_W, H=CFG.WORLD_H;
+
+/* ---------------- 2) UZAMSAL İNDEKS ---------------- */
+class SpatialHash{
+  constructor(cell){this.cell=cell;this.m=new Map();}
+  _k(cx,cy){return cx+","+cy;}
+  insert(o){const k=this._k((o.x/this.cell)|0,(o.y/this.cell)|0);let a=this.m.get(k);if(!a){a=[];this.m.set(k,a);}a.push(o);o._hk=k;}
+  remove(o){const a=this.m.get(o._hk);if(a){const i=a.indexOf(o);if(i>=0){a[i]=a[a.length-1];a.pop();if(!a.length)this.m.delete(o._hk);}}}
+  query(x,y,r,cb){
+    const c=this.cell,x0=Math.floor((x-r)/c),x1=Math.floor((x+r)/c),y0=Math.floor((y-r)/c),y1=Math.floor((y+r)/c);
+    for(let cx=x0;cx<=x1;cx++)for(let cy=y0;cy<=y1;cy++){
+      const a=this.m.get(this._k(cx,cy));
+      if(a)for(let i=0;i<a.length;i++)cb(a[i]);
+    }
+  }
+}
+
+/* ---------------- 3) KÜRESEL DURUM ---------------- */
+let world=null, stats=null, selected=null;
+let foodIdC=1, zatoIdC=1;
+const events=[];    // olay günlüğü (halka tampon)
+const effects=[];   // görsel efektler (simülasyonu etkilemez)
+
+/* ---------------- 4) BESİN ---------------- */
+function spawnFood(nx,ny){
+  const F=CFG.FOOD;
+  let x,y;
+  if(nx!==undefined){x=clamp(nx+gauss()*F.clusterDist*0.5,5,W-5);y=clamp(ny+gauss()*F.clusterDist*0.5,5,H-5);}
+  else{x=rr(6,W-6);y=rr(6,H-6);}
+  const f={id:foodIdC++,x,y,target:rr(F.energyMin,F.energyMax),age:0,dead:false};
+  f.energy=f.target*0.25; // filiz olarak doğar, zamanla büyür
+  world.food.push(f);
+  world.foodHash.insert(f);
+  stats.foodSpawned++;
+}
+
+/* ---------------- 5) GENETİK ---------------- */
+function founderGenes(){
+  const g={};
+  for(const k in CFG.ZATO.genes){const[mn,mx]=CFG.ZATO.genes[k];g[k]=rr(mn,mx);}
+  return g;
+}
+// Yavruya YALNIZCA genler geçer; hiçbir deneyim/hafıza aktarılmaz (v0.1.1'de hafıza zaten yok).
+function mutateGenes(g){
+  const out={};
+  for(const k in CFG.ZATO.genes){
+    const[mn,mx]=CFG.ZATO.genes[k];
+    let v=g[k];
+    if(rng()<CFG.ZATO.mutateProb)v*=(1+gauss()*CFG.ZATO.mutateSigma);
+    out[k]=clamp(v,mn,mx);
+  }
+  return out;
+}
+
+/* ---------------- 6) ZATO ---------------- */
+class Zato{
+  constructor(x,y,genes,gen,energy,hue){
+    this.id=zatoIdC++;
+    this.x=x;this.y=y;
+    this.heading=rr(0,TAU);
+    this.gen=gen;
+    this.genes=genes;
+    this.hue=hue;                 // soy çizgisi rengi (yavruya hafifçe kayarak geçer)
+    this.energy=energy;
+    this.age=0;                   // tick
+    this.alive=true;
+    this.target=null;
+    this.decideIn=ri(0,CFG.DECIDE_INTERVAL);
+    this.reproCooldown=CFG.ZATO.repro.cooldownDays*CFG.TICKS_PER_DAY;
+    this.children=0;
+    this.parentId=null;
+    this.lastEat=-9999;
+    this.state='gezinme';
+  }
+  get day(){return this.age/CFG.TICKS_PER_DAY;}
+  radius(){return this.genes.size*(0.55+0.45*Math.min(1,this.day/CFG.ZATO.adultAge));}
+  stage(){
+    const d=this.day,ad=CFG.ZATO.adultAge;
+    if(d<ad*0.55)return 'yavru';
+    if(d<ad)return 'genç';
+    if(d/this.genes.maxAge>=CFG.ZATO.elderFrac)return 'yaşlı';
+    return 'olgun';
+  }
+  stageSpeedFactor(){
+    const d=this.day,ad=CFG.ZATO.adultAge;
+    if(d<ad*0.55)return 0.6;
+    if(d<ad)return 0.85;
+    if(d/this.genes.maxAge>=CFG.ZATO.elderFrac)return 0.72;
+    return 1;
+  }
+  /* v0.1.1 GEÇİCİ REFLEKS: acıkınca görüş alanındaki en yakın besine yönel.
+     Bu, öğrenmenin YERİNE GEÇEN bir yer tutucudur; v0.2'de silinecek.
+     Kusurlu bırakıldı: sınırlı dönüş hızı + açısal gürültü, yeniden karar
+     gecikmesi -> "kusursuz görmek" yok. */
+  decide(w){
+    this.target=null;
+    if(this.energy>=CFG.ZATO.hungerAt)return;
+    const v=this.genes.vision;
+    let best=null,bd=Infinity;
+    w.foodHash.query(this.x,this.y,v,f=>{
+      if(f.dead)return;
+      const dx=f.x-this.x,dy=f.y-this.y,d2=dx*dx+dy*dy;
+      if(d2<bd&&d2<=v*v){bd=d2;best=f;}
+    });
+    if(best)this.target=best;
+  }
+  update(w){
+    if(!this.alive)return;
+    this.age++;
+    if(this.reproCooldown>0)this.reproCooldown--;
+    // karar (reaksiyon gecikmesiyle)
+    if(this.decideIn<=0||(this.target&&this.target.dead)){
+      this.decide(w);
+      this.decideIn=CFG.DECIDE_INTERVAL;
+    }else this.decideIn--;
+    // hareket
+    const g=this.genes;
+    const lazy=this.energy>88?0.45:1; // doygunken tembellik: enerjiyi koru (basit refleks)
+    const sp=g.speed*this.stageSpeedFactor()*lazy;
+    if(this.target&&!this.target.dead){
+      const want=Math.atan2(this.target.y-this.y,this.target.x-this.x);
+      let d=want-this.heading;
+      while(d>Math.PI)d-=TAU; while(d<-Math.PI)d+=TAU;
+      this.heading+=clamp(d,-0.14,0.14)+gauss()*0.04;
+    }else{
+      this.heading+=gauss()*0.22; // gezinme: rastgele salınım
+    }
+    this.x+=Math.cos(this.heading)*sp;
+    this.y+=Math.sin(this.heading)*sp;
+    // sınırlardan yansıma
+    if(this.x<5){this.x=5;this.heading=Math.PI-this.heading;}
+    else if(this.x>W-5){this.x=W-5;this.heading=Math.PI-this.heading;}
+    if(this.y<5){this.y=5;this.heading=-this.heading;}
+    else if(this.y>H-5){this.y=H-5;this.heading=-this.heading;}
+    // metabolizma: temel + hareket, verimlilik geni yakımı düşürür
+    this.energy-=(CFG.ZATO.baseDrain+sp*CFG.ZATO.moveDrain)/g.efficiency;
+    // yeme (temas ile)
+    this.tryEat(w);
+
+    // ölüm koşulları
+    if(this.energy<=0){this.energy=0;this.die(w,'aclik');return;}
+    if(this.day>=g.maxAge){this.die(w,'yaslilik');return;}
+    this.tryReproduce(w);
+    // gösterim amaçlı durum etiketi
+    if(this.target&&!this.target.dead)this.state='hedef: besin #'+this.target.id;
+    else if(w.tickNo-this.lastEat<12)this.state='yeme / sindirme';
+    else if(this.energy>88)this.state='doygun gezinme';
+    else if(this.energy<CFG.ZATO.hungerAt)this.state='aç — besin arıyor';
+    else this.state='gezinme';
+  }
+  tryEat(w){
+    const reach=this.radius()+CFG.FOOD.r+2.5;
+    let best=null,bd=Infinity;
+    w.foodHash.query(this.x,this.y,reach,f=>{
+      if(f.dead)return;
+      const dx=f.x-this.x,dy=f.y-this.y,d2=dx*dx+dy*dy;
+      if(d2<bd){bd=d2;best=f;}
+    });
+    if(best&&bd<=reach*reach){
+      this.energy=Math.min(CFG.ZATO.maxEnergy,this.energy+best.energy);
+      this.lastEat=w.tickNo;
+      this.target=null;
+      best.dead=true;
+      w.foodHash.remove(best);
+      const i=w.food.indexOf(best);
+      if(i>=0){w.food[i]=w.food[w.food.length-1];w.food.pop();}
+      stats.foodEaten++;
+      addEffect(this.x,this.y,0,'eat');
+    }
+  }
+  tryReproduce(w){
+    const R=CFG.ZATO.repro;
+    if(this.day<CFG.ZATO.adultAge)return;
+    if(this.reproCooldown>0)return;
+    if(this.energy<R.energyMin)return;
+    if(rng()>=R.chance)return;
+    this.energy-=R.cost;                       // üreme pahalıdır
+    this.reproCooldown=R.cooldownDays*CFG.TICKS_PER_DAY;
+    const bg=mutateGenes(this.genes);
+    const bh=((this.hue+gauss()*CFG.ZATO.hueSigma)%360+360)%360;
+    const baby=new Zato(clamp(this.x+rr(-14,14),6,W-6),clamp(this.y+rr(-14,14),6,H-6),bg,this.gen+1,R.babyEnergy,bh);
+    baby.parentId=this.id;
+    w.newborns.push(baby);
+    if(this.children===0)stats.firstRepro++;else stats.repeatRepro++;
+    this.children++;
+    stats.births++;stats.parentAgeSum+=this.day;stats.parentAgeN++;
+    stats.lastBirthDay=w.day();
+    if(baby.gen>stats.maxGen)stats.maxGen=baby.gen;
+    addEffect(baby.x,baby.y,bh,'birth');
+    w.log(`doğum: #${baby.id} (N${baby.gen}) ← ebeveyn #${this.id} · yaşı ${this.day.toFixed(1)}`,'birth');
+  }
+  die(w,cause){
+    this.alive=false;
+    stats.deaths[cause]=(stats.deaths[cause]||0)+1;
+    w.deathLog.push({cause,day:w.day()});
+    if(w.deathLog.length>600)w.deathLog.shift();
+    addEffect(this.x,this.y,this.hue,'death');
+    w.log(`ölüm: #${this.id} — ${cause==='aclik'?'AÇLIK':'YAŞLILIK'} · ${this.day.toFixed(1)} gün · N${this.gen}`,'death');
+  }
+}
+
+/* ---------------- 7) DÜNYA ---------------- */
+class World{
+  constructor(){
+    this.tickNo=0;
+    this.food=[];this.zatos=[];this.newborns=[];
+    this.foodHash=new SpatialHash(64);
+    this.frozen=false;this.started=true;
+    this.deathLog=[];
+  }
+  day(){return this.tickNo/CFG.TICKS_PER_DAY;}
+  log(m,t){events.push({d:this.day(),m,t});if(events.length>80)events.splice(0,events.length-80);}
+  tick(){
+    if(this.frozen)return;               // yok oluş sonrası: HİÇBİR hesap çalışmaz
+    this.tickNo++;
+    const F=CFG.FOOD;
+    // besin üretimi — yalnızca dünyanın kendi ritmi, nüfusa bakılmaksızın
+    if(this.food.length<F.maxItems&&rng()<F.spawnChance){
+      if(this.food.length>0&&rng()<F.clusterProb){
+        const s=this.food[(rng()*this.food.length)|0];
+        spawnFood(s.x,s.y);
+      }else spawnFood();
+    }
+    // besin: büyüme + solma
+    for(let i=this.food.length-1;i>=0;i--){
+      const f=this.food[i];
+      f.age++;
+      if(f.energy<f.target)f.energy=Math.min(f.target,f.energy+f.target*0.75/(F.growDays*CFG.TICKS_PER_DAY));
+      if(f.age>F.witherDays*CFG.TICKS_PER_DAY){
+        f.dead=true;this.foodHash.remove(f);
+        this.food[i]=this.food[this.food.length-1];this.food.pop();
+        stats.foodWithered++;
+      }
+    }
+    // zatolar — her birey her tick hesaplanır; fizik/yaşam adımı ASLA atlanmaz
+    this.newborns.length=0;
+    for(let i=this.zatos.length-1;i>=0;i--){
+      const z=this.zatos[i];
+      z.update(this);
+      if(!z.alive){
+        this.zatos[i]=this.zatos[this.zatos.length-1];this.zatos.pop();
+        if(selected===z)selected=null;
+      }
+    }
+    for(let i=0;i<this.newborns.length;i++)this.zatos.push(this.newborns[i]);
+    // istatistik
+    if(this.zatos.length>stats.peakPop)stats.peakPop=this.zatos.length;
+    // yok oluş
+    if(this.zatos.length===0)this.extinct();
+  }
+  extinct(){
+    this.log('YOK OLUŞ — evren verileri bu tick ile donduruldu','death');
+    this.frozen=true;
+    updatePanels();
+    showExtinction();
+  }
+}
+
+/* ---------------- 8) EVREN KURULUMU ---------------- */
+function initWorld(s){
+  seed=(s===undefined)?((Math.random()*0xFFFFFFFF)>>>0):(s>>>0);
+  accumulator=0;lastFrame=null;paused=false;syncPause();
+  rng=mulberry32(seed);
+  foodIdC=1;zatoIdC=1;
+  events.length=0;effects.length=0;selected=null;
+  stats={births:0,deaths:{},peakPop:0,maxGen:0,foodSpawned:0,foodEaten:0,foodWithered:0,
+         firstRepro:0,repeatRepro:0,parentAgeSum:0,parentAgeN:0,lastBirthDay:-1};
+  world=new World();
+  for(let i=0;i<170;i++)spawnFood();          // ekolojik başlangıç stoğu
+  for(let i=0;i<CFG.ZATO.startCount;i++){
+    world.zatos.push(new Zato(rr(80,W-80),rr(80,H-80),founderGenes(),0,rr(...CFG.ZATO.startEnergy),rr(0,360)));
+  }
+  stats.peakPop=world.zatos.length;
+  world.log(`evren kuruldu · tohum #${seed.toString(16).padStart(8,'0')} · ${CFG.ZATO.startCount} kurucu`,'sys');
+  $('extOverlay').classList.remove('show');
+  $('seedLbl').textContent='tohum #'+seed.toString(16).padStart(8,'0');
+  updatePanels();
+}
+
+/* ---------------- 9) YOK OLUŞ RAPORU ---------------- */
+function buildDiagnosis(){
+  const d=world.day(),items=[];
+  const rec=world.deathLog.filter(e=>d-e.day<=2);
+  const h=rec.filter(e=>e.cause==='aclik').length;
+  const o=rec.filter(e=>e.cause==='yaslilik').length;
+  const fl=world.food.length;
+  if(h>0&&o>0)items.push(`Son 2 günde ${h} açlık + ${o} yaşlılık ölümü: karma çöküş.`);
+  else if(h>0){
+    items.push(`Son 2 günde ${h} açlık ölümü — baskın ölüm nedeni açlık.`);
+    if(fl<12)items.push(`Kalan besin yalnız ${fl}: az stok gözlendi; üretim/tüketim dengesini tek başına kanıtlamaz.`);
+    else items.push(`Kalan besin ${fl} adet: besin kaldı; erişim ve hareket maliyeti olası etkenlerdir.`);
+  }else if(o>0)items.push('Son 2 gündeki ölümler yaşlılıktan; bu gözlem tek başına üremenin neden durduğunu açıklamaz.');
+  const since=d-stats.lastBirthDay;
+  if(stats.births>0&&since>3)items.push(`Son doğumdan beri ${since.toFixed(1)} gün geçti — popülasyon yenilenemiyor.`);
+  if(!items.length)items.push('Belirgin ölüm kümesi yok — yavaş sönme.');
+  items.push('Not: v0.1.1 tanısı kaba heuristiktir; tam çöküş analizi kara kutu sürümünde gelir.');
+  return items;
+}
+function showExtinction(){
+  $('eDur').textContent=world.day().toFixed(1)+' gün · '+world.tickNo+' tick';
+  $('eSeed').textContent='#'+seed.toString(16).padStart(8,'0');
+  $('ePeak').textContent=stats.peakPop;
+  $('eGen').textContent=stats.maxGen;
+  $('eBirths').textContent=stats.births;
+  $('eDh').textContent=stats.deaths.aclik||0;
+  $('eDo').textContent=stats.deaths.yaslilik||0;
+  $('eFirst').textContent=stats.firstRepro;
+  $('eRep').textContent=stats.repeatRepro;
+  $('ePAge').textContent=stats.parentAgeN?(stats.parentAgeSum/stats.parentAgeN).toFixed(1)+' gün':'—';
+  $('eFs').textContent=stats.foodSpawned;
+  $('eFe').textContent=stats.foodEaten;
+  $('eFw').textContent=stats.foodWithered;
+  $('eFl').textContent=world.food.length;
+  $('eDiag').innerHTML=buildDiagnosis().map(t=>`<li>${t}</li>`).join('');
+  $('extOverlay').classList.add('show');
+}
+
+/* ---------------- 10) ÇİZİM (adaptif) ---------------- */
+const canvas=$('world'),ctx=canvas.getContext('2d');
+const view={s:1,ox:0,oy:0};
+function addEffect(x,y,hue,kind){if(effects.length>=60)effects.shift();effects.push({x,y,hue,kind,t:performance.now()});}
+function render(){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const cw=canvas.clientWidth,ch=canvas.clientHeight;
+  if(canvas.width!==Math.round(cw*dpr)||canvas.height!==Math.round(ch*dpr)){
+    canvas.width=Math.round(cw*dpr);canvas.height=Math.round(ch*dpr);
+  }
+  if(!cw||!ch)return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cw,ch);
+  const s=Math.min(cw/W,ch/H)*0.985;
+  const ox=(cw-W*s)/2,oy=(ch-H*s)/2;
+  view.s=s;view.ox=ox;view.oy=oy;
+  ctx.translate(ox,oy);ctx.scale(s,s);
+  // zemin
+  ctx.fillStyle='#0d110c';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#1d2618';ctx.lineWidth=1;ctx.strokeRect(0.5,0.5,W-1,H-1);
+  // efektler (yalnızca görsel)
+  const now=performance.now();
+  for(let i=effects.length-1;i>=0;i--){
+    const e=effects[i],a=(now-e.t)/500;
+    if(a>=1){effects.splice(i,1);continue;}
+    const r0=e.kind==='eat'?3:5,r1=e.kind==='eat'?11:17;
+    ctx.beginPath();ctx.arc(e.x,e.y,r0+a*(r1-r0),0,TAU);
+    if(e.kind==='death')ctx.strokeStyle=`rgba(226,105,90,${(1-a)*0.55})`;
+    else if(e.kind==='eat')ctx.strokeStyle=`rgba(140,220,130,${(1-a)*0.5})`;
+    else ctx.strokeStyle=`hsla(${e.hue|0},60%,62%,${(1-a)*0.6})`;
+    ctx.lineWidth=1.2/s;ctx.stroke();
+  }
+  // besin
+  for(const f of world.food){
+    const ripe=f.energy>=f.target*0.999;
+    ctx.fillStyle=ripe?'#7fca68':'#4a7a41';
+    ctx.beginPath();ctx.arc(f.x,f.y,ripe?2.4:1.7,0,TAU);ctx.fill();
+  }
+  // zatolar — yüksek hızda / kalabalıkta sade çizim (hesap değil, yalnız çizim sadeleşir)
+  const simple=speed>=100||world.zatos.length>280;
+  for(const z of world.zatos){
+    const baby=z.day<CFG.ZATO.adultAge*0.55;
+    ctx.fillStyle=`hsl(${z.hue|0} ${baby?45:62}% ${baby?72:58}%)`;
+    ctx.beginPath();ctx.arc(z.x,z.y,z.radius(),0,TAU);ctx.fill();
+    if(!simple){ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=0.8/s;ctx.stroke();}
+  }
+  // seçili zato: görüş alanı + hedef + işaret halkası
+  if(selected&&selected.alive){
+    const z=selected;
+    ctx.setLineDash([5,5]);
+    ctx.strokeStyle='rgba(230,240,220,.28)';ctx.lineWidth=1/s;
+    ctx.beginPath();ctx.arc(z.x,z.y,z.genes.vision,0,TAU);ctx.stroke();
+    ctx.setLineDash([]);
+    if(z.target&&!z.target.dead){
+      ctx.strokeStyle='rgba(230,240,220,.3)';
+      ctx.beginPath();ctx.moveTo(z.x,z.y);ctx.lineTo(z.target.x,z.target.y);ctx.stroke();
+    }
+    ctx.strokeStyle='#e8f0e0';ctx.lineWidth=1.4/s;
+    ctx.beginPath();ctx.arc(z.x,z.y,z.radius()+4,0,TAU);ctx.stroke();
+  }
+}
+
+/* ---------------- 11) PANELLER (200ms'de bir güncellenir) ---------------- */
+const row=(k,v)=>`<div class="kv"><span>${k}</span><b>${v}</b></div>`;
+function setKV(id,v,cls){const el=$(id);el.textContent=v;if(cls!==undefined)el.className=cls;}
+function updatePanels(){
+  if(!world)return;
+  $('hDay').textContent=world.day().toFixed(1);
+  $('hPop').textContent=world.zatos.length;
+  $('hFood').textContent=world.food.length;
+  $('hGen').textContent=stats.maxGen;
+  setKV('sPop',world.zatos.length);
+  setKV('sFood',world.food.length);
+  setKV('sPeak',stats.peakPop);
+  setKV('sBirths',stats.births,'g');
+  setKV('sDh',stats.deaths.aclik||0,'r');
+  setKV('sDo',stats.deaths.yaslilik||0);
+  setKV('sGen',stats.maxGen,'g');
+  setKV('sAvg',stats.parentAgeN?(stats.parentAgeSum/stats.parentAgeN).toFixed(1)+' gün':'—');
+  // seçili zato
+  const box=$('selBody');
+  if(!selected||!selected.alive){
+    if(selected&&!selected.alive)selected=null;
+    box.innerHTML='<div class="empty">Bir Zato\'ya tıkla — kimlik, genetik ve durumu burada listelenir.</div>';
+  }else{
+    const z=selected;
+    const ep=Math.round(clamp(z.energy/CFG.ZATO.maxEnergy,0,1)*100);
+    box.innerHTML=
+      `<div class="selHead"><span class="sw" style="background:hsl(${z.hue|0} 60% 58%)"></span><b>ZATO #${z.id}</b><span class="tag">N${z.gen}</span></div>`+
+      row('yaş',z.day.toFixed(1)+' gün · '+z.stage())+
+      row('nesil',z.gen)+row('ebeveyn',z.parentId===null?'kurucu':'#'+z.parentId)+
+      row('durum',z.state)+
+      `<div class="kv"><span>enerji</span><b class="${ep<30?'r':ep<60?'a':'g'}">${z.energy.toFixed(1)} / ${CFG.ZATO.maxEnergy}</b></div>`+
+      `<div class="bar"><i style="width:${ep}%"></i></div>`+
+      row('yavru sayısı',z.children)+
+      row('hedef',(z.target&&!z.target.dead)?('besin #'+z.target.id):'yok')+
+      `<div class="kvs" style="margin-top:8px">`+
+      row('hız geni',z.genes.speed.toFixed(2))+
+      row('görüş',z.genes.vision.toFixed(0)+' px')+
+      row('verim','×'+z.genes.efficiency.toFixed(2))+
+      row('ömür payı',z.genes.maxAge.toFixed(0)+' gün')+
+      row('boyut',z.genes.size.toFixed(1))+
+      row('soy tonu',(z.hue|0)+'°')+
+      `</div>`;
+  }
+  // günlük
+  let html='';const n=Math.min(9,events.length);
+  for(let i=events.length-1;i>=events.length-n;i--){
+    const e=events[i];
+    html+=`<div class="le ${e.t}"><b>G${e.d.toFixed(1)}</b> · ${e.m}</div>`;
+  }
+  $('logList').innerHTML=html||'<div class="empty">—</div>';
+}
+
+/* ---------------- 12) GİRDİLER ---------------- */
+let speed=1,paused=false;
+function setSpeed(v){if(!CFG.SPEEDS.includes(v))return;accumulator=0;lastFrame=null;speed=v;document.querySelectorAll('.spd').forEach(b=>b.classList.toggle('on',+b.dataset.s===v));}
+function togglePause(){
+  if(world.frozen)return;
+  paused=!paused;accumulator=0;lastFrame=null;syncPause();
+}
+function syncPause(){
+  $('btnPause').setAttribute('aria-label',paused?'Devam et':'Duraklat');
+  $('btnPause').setAttribute('aria-pressed',String(paused));
+  $('icPause').style.display=paused?'none':'block';
+  $('icPlay').style.display=paused?'block':'none';
+}
+document.querySelectorAll('.spd').forEach(b=>b.addEventListener('click',()=>setSpeed(+b.dataset.s)));
+ $('btnPause').addEventListener('click',togglePause);
+ $('btnNew').addEventListener('click',()=>restart());
+ $('btnNew2').addEventListener('click',()=>restart());
+window.addEventListener('keydown',e=>{
+  if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.target.closest('input,textarea,select,button,[contenteditable]'))return;
+  if(e.code==='Space'){e.preventDefault();togglePause();}
+  else if(e.key>='1'&&e.key<='5')setSpeed(CFG.SPEEDS[+e.key-1]);
+});
+canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const wx=(e.clientX-rect.left-view.ox)/view.s;
+  const wy=(e.clientY-rect.top-view.oy)/view.s;
+  const tol=(14/view.s)**2;
+  let best=null,bd=tol;
+  for(const z of world.zatos){
+    const d2=(z.x-wx)**2+(z.y-wy)**2;
+    if(d2<bd){bd=d2;best=z;}
+  }
+  selected=best;
+  updatePanels();
+});
+
+/* ---------------- 13) ANA DÖNGÜ ---------------- */
+// Sabit zaman adımı: 1× = saniyede 60 tick. Ağır yükte hedef hız düşer;
+// yaşam adımları atlanmaz, sınırsız iş kuyruğu oluşturulmaz.
+let accumulator=0,lastFrame=null,lastPanels=0;
+function frame(now){
+  const elapsed=lastFrame===null?0:Math.min(250,Math.max(0,now-lastFrame));
+  lastFrame=now;
+  if(!document.hidden&&!paused&&!world.frozen){
+    accumulator=Math.min(accumulator+elapsed*60*speed/1000,60*speed/4);
+    const start=performance.now();let n=0;
+    while(accumulator>=1){
+      world.tick();accumulator--;n++;
+      if(world.frozen){accumulator=0;break;}
+      if(n%8===0&&performance.now()-start>=8)break;
+    }
+  }else accumulator=0;
+  if(!document.hidden){
+    render();
+    if(now-lastPanels>=200){updatePanels();lastPanels=now;}
+  }
+  requestAnimationFrame(frame);
+}
+document.addEventListener('visibilitychange',()=>{lastFrame=null;accumulator=0;});
+function restart(s){
+  if(!world.frozen&&!confirm('Yeni evren mevcut koşuyu sıfırlar. Önce raporu indirebilirsin. Devam edilsin mi?'))return;
+  initWorld(s);
+}
+function exportReport(){
+  const report={version:'0.1.1',seed,seedHex:seed.toString(16).padStart(8,'0'),
+    tick:world.tickNo,days:world.day(),frozen:world.frozen,config:CFG,
+    population:world.zatos.length,foodRemaining:world.food.length,stats,
+    balances:{population:CFG.ZATO.startCount+stats.births-(stats.deaths.aclik||0)-(stats.deaths.yaslilik||0)-world.zatos.length,
+      food:stats.foodSpawned-stats.foodEaten-stats.foodWithered-world.food.length},
+    recentEvents:events,recentDeaths:world.deathLog,
+    note:'Bu bir araştırma özeti; kayıt dosyası değildir. Öğrenme sistemi yoktur. Aynı tohum yalnız aynı sürüm ve ayarlarla yeniden üretilebilir.'};
+  const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));
+  const a=document.createElement('a');a.href=url;a.download='zato-genesis-'+report.seedHex+'-tick-'+world.tickNo+'.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$('btnReport').addEventListener('click',exportReport);
+$('btnReplay').addEventListener('click',()=>restart(seed));
+
+/* ---------------- BAŞLAT ---------------- */
+initWorld();
+setSpeed(1);
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
