@@ -331,8 +331,9 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 </style>
-<!-- GOKTASI BUILD: V4.19 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.19 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.20 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.20 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.20 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -467,7 +468,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.19 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.20 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -487,7 +488,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.19 ayarlar / yeniden tuş atama ----------
+// ---------- V4.20 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -656,13 +657,17 @@ const ITEMS={
   kumkristal:{n:'Kum Kristali',t:'mat',sell:15,ic:'crystal',c:'#e8dfc0',rar:0,d:'Çölün gözyaşı.'},
   ayaztom:{n:'Ayaz Tomurcuğu',t:'mat',sell:19,ic:'flower',c:'#bcd8f0',rar:0,d:'Karda açan tek şey.'},
   balcik:{n:'Koyu Balçık',t:'mat',sell:22,ic:'goo',c:'#6a7d3a',rar:0,d:'Yapışır, anlatır.'},
-  ulakgozu:{n:'Ulak Gözü',t:'mat',sell:32,ic:'eye',c:'#b03030',rar:1,d:'Hâlâ seni izliyor.'}
+  ulakgozu:{n:'Ulak Gözü',t:'mat',sell:32,ic:'eye',c:'#b03030',rar:1,d:'Hâlâ seni izliyor.'},
+  bozpost:{n:'Boz Post',t:'mat',sell:18,ic:'tooth',c:'#9b9488',rar:1,d:'Kavruk Ova’nın sert rüzgârını taşır.'},
+  kirikcan:{n:'Kırık Çan Mührü',t:'trinket',lv:9,crit:5,price:1200,sell:360,ic:'amulet',c:'#d5b56d',rar:2,d:'Ovadaki susturulmuş çanın parçası. Kritik +%5.'}
 };
 const RARC=['sıradan','işlenmiş','kadim','efsane'];
 const MOBS={
   kurt:{n:'Kavruk Kurt',lv:2,hpm:1,dmgm:.9,sp:95,ag:0,r:13,mk:'wolf',pal:['#7d7468','#5c554c'],reg:'ova'},
   toprak:{n:'Çürük Toprak',lv:3,hpm:1.3,dmgm:.8,sp:42,ag:1,r:13,mk:'blob',pal:['#5e7030','#46551f'],reg:'ova'},
   domuz:{n:'Yaban Domuzu',lv:4,hpm:1.6,dmgm:1.1,sp:70,ag:0,r:14,mk:'boar',pal:['#6b4a33','#4c3323'],reg:'ova'},
+  bozkurt:{n:'Boz Yeleli',lv:6,hpm:1.75,dmgm:1.18,sp:108,ag:1,r:15,mk:'wolf',pal:['#8b857c','#514d48'],reg:'ova'},
+  boynuzlu:{n:'Kırık Boynuz',lv:9,hpm:5.8,dmgm:1.55,sp:76,ag:1,r:23,mk:'boar',pal:['#7b4b32','#2f211a'],reg:'ova'},
   karga:{n:'Gölge Kargası',lv:8,hpm:.8,dmgm:1,sp:130,ag:1,r:11,mk:'crow',pal:['#26262c','#141418'],reg:'orman'},
   orumcek:{n:'Ağ Örümceği',lv:10,hpm:1.2,dmgm:1.1,sp:80,ag:1,r:13,mk:'spider',pal:['#3a3230','#241f1d'],reg:'orman'},
   akrep:{n:'Kum Akrebi',lv:14,hpm:1.5,dmgm:1.2,sp:75,ag:1,r:14,mk:'scorp',pal:['#9a7b3f','#6e5527'],reg:'tuz'},
@@ -675,6 +680,8 @@ const MOBS={
 };
 const DROPS={
   kurt:[['kurtdisi_m',.7,[1,2]]],toprak:[['balcik',.3,[1,1]]],domuz:[['azma',.75,[1,2]]],
+  bozkurt:[['kurtdisi_m',.85,[1,2]],['bozpost',.55,[1,1]]],
+  boynuzlu:[['azma',1,[2,4]],['bozpost',1,[2,3]],['gokatesi',.25,[1,1]]],
   karga:[['ayaztom',.15,[1,1]]],orumcek:[['cevher',.25,[1,2]]],akrep:[['kumkristal',.55,[1,2]]],
   tuzhayalet:[['kumkristal',.4,[1,2]],['hpk',.15,[1,1]]],ayazkurt:[['kurtdisi_m',.6,[1,2]],['hpk',.1,[1,1]]],
   kemik:[['cevher',.4,[1,2]],['spk',.12,[1,1]]],saz:[['balcik',.6,[1,2]]],
@@ -690,7 +697,7 @@ const SKILLS=[
   {n:'Kurt Ruhu',key:'5',cd:36,sp:24,ic:'sk5',d:'10 saniye hız +%30, hasar +%25.'}
 ];
 const CHAPTERS=[
-  {n:'I — Çanın Sesi',from:1,to:8},{n:'II — Sarı Ormanın Gölgesi',from:9,to:16},
+  {n:'I — Kırık Çan · Kavruk Ova',from:1,to:8},{n:'II — Sarı Ormanın Gölgesi',from:9,to:16},
   {n:'III — Tuzdaki İzler',from:17,to:24},{n:'IV — Ayazın Altındaki Kemik',from:25,to:32},
   {n:'V — Kara Bataklığın Nefesi',from:33,to:40},{n:"VI — Erlik'in Ağzı",from:41,to:48}
 ];
@@ -701,9 +708,9 @@ const CHAIN=[
   {n:'Çürük Çorba',d:'Çürük Toprak ova’ya yayılıyor. On tanesini temizle.',t:'hunt',m:'toprak',c:10,rw:{exp:520,mo:140,pts:2}},
   {n:'Örsün Dili',d:'Demirci Baturhan seni bekliyor. Önce onun sözünü dinle.',t:'talk',m:'baturhan',c:1,rw:{exp:140,mo:220}},
   {n:'Diş ve Demir',d:'Baturhan, çeliği sınamak için sekiz Kurt Dişi istiyor.',t:'col',m:'kurtdisi_m',c:8,rw:{exp:480,mo:260}},
-  {n:'Ovanın Boynuzu',d:'Domuz sürüsü yolu kapattı. On iki Yaban Domuzu devir.',t:'hunt',m:'domuz',c:12,rw:{exp:700,mo:300}},
-  {n:'Toprağın Ateşi',d:'Çürük Toprakların içinden on Balçık çıkarıp getir.',t:'col',m:'balcik',c:10,rw:{exp:820,mo:350,it:[['hpb',2]]}},
-  {n:'Çandan Uzaklaş',d:'Ovada son kez on sekiz Kavruk Kurt avla; sonra ormana giden yol açılacak.',t:'hunt',m:'kurt',c:18,rw:{exp:1100,mo:500,pts:2}},
+  {n:'Ovanın Boynuzu',d:'Domuz sürüsü çanın doğu yolunu kapattı. On iki Yaban Domuzu devir.',t:'hunt',m:'domuz',c:12,rw:{exp:700,mo:300}},
+  {n:'Boz Yeleliler',d:'Çanın sesi değişti. Ovada ortaya çıkan Boz Yelelilerden on tanesini indir; Kam bunun tesadüf olmadığını düşünüyor.',t:'hunt',m:'bozkurt',c:10,rw:{exp:1050,mo:420,it:[['hpb',2]],pts:1}},
+  {n:'Kırık Çanın Efendisi',d:'Kavruk Ova’nın güneydoğusunda Kırık Boynuz dolaşıyor. Onu devir ve çanın üzerindeki baskıyı kır.',t:'hunt',m:'boynuzlu',c:1,rw:{exp:1800,mo:900,pts:2,it:[['kirikcan',1],['gokatesi',1]]}},
 
   {n:'Gölge Avı',d:'Sarı Orman kargalarla doldu. On iki gölge kes.',t:'hunt',m:'karga',c:12,rw:{exp:950,mo:320,it:[['kurtdisikolye',1]]}},
   {n:'Ağın İlk Düğümü',d:'Ormanın içindeki Ağ Örümceklerinden on tanesini temizle.',t:'hunt',m:'orumcek',c:10,rw:{exp:1150,mo:420}},
@@ -1064,7 +1071,7 @@ function spawnMob(k,x,y,home){
     st:'idle',wx:x,wy:y,dir:1,wt:0,atkCD:0,hitT:0,target:null,respT:0,leashT:0,wT:rnd(1,4),flee:false,boss:M.boss});
 }
 function spawnAll(){
-  const zoneMob={ova:['kurt','kurt','toprak','toprak','domuz'],orman:['karga','karga','orumcek','orumcek','kurt'],
+  const zoneMob={ova:['kurt','kurt','toprak','toprak','domuz','bozkurt'],orman:['karga','karga','orumcek','orumcek','kurt'],
     tuz:['akrep','akrep','tuzhayalet'],ayaz:['ayazkurt','ayazkurt','kemik','kemik'],batak:['saz','saz','karga','saz'],mağara:['ulak']};
   const counts={ova:36,orman:40,tuz:34,ayaz:36,batak:30,mağara:18};
   let seed=777;
@@ -1084,7 +1091,9 @@ function spawnAll(){
       spawnMob(zoneMob[z][sr()*zoneMob[z].length|0],x,y);placed++;
     }
   }
-  // boss
+  // Bölüm I mini-boss: köyden yeterince uzakta, Kavruk Ova içinde sabit karşılaşma.
+  spawnMob('boynuzlu',VILLAGE.x+1280,VILLAGE.y+920,{x:VILLAGE.x+1280,y:VILLAGE.y+920});
+  // ana boss
   spawnMob('boss',MC.x,MC.y-420);
 }
 // ---------- botlar ----------
@@ -1397,6 +1406,10 @@ function killMob(m){
     (DROPS[m.k]||[]).forEach(([id,ch,[a,b]])=>{
       if(Math.random()<ch)drops.push({x:m.x+rnd(-24,24),y:m.y+rnd(-20,20),it:id,n:irnd(a,b),t:0});});
     if(Math.random()<.04)drops.push({x:m.x+rnd(-20,20),y:m.y,ht:1,it:pick(['hpk','hpb','spk']),n:1,t:0});
+    if(m.k==='boynuzlu'){
+      announce('KIRIK BOYNUZ DEVRİLDİ');SFX.gong();
+      addChat('',P.name+', Kavruk Ova’daki Kırık Boynuz’u devirdi.','ev');
+    }
     if(m.k==='boss'){
       announce('KIRIK YÜZLÜ DEVRİLDİ');SFX.gong();
       addChat('',P.name+', Kırık Yüzlü\'yü devirdi. Çağ bir soluk aldı.','ev');
@@ -1849,10 +1862,15 @@ function questUI(mk){
 }
 function questTurn(){
   const q=P.qActive;
+  const finishedStep=P.qStep;
   if(q.t==='col')remItem(q.m,q.c);
   giveReward(q.rw);
   if(!q.rep)P.qStep++;
   else P.qRep++;
+  if(!q.rep&&finishedStep===8){
+    announce('BÖLÜM I TAMAMLANDI — KIRIK ÇAN');
+    addChat('',P.name+' Kırık Boynuz’u devirip Kavruk Ova’daki çanın sesini özgür bıraktı. Sarı Orman yolu açıldı.','ev');
+  }
   P.qActive=null;P.qN=0;
   SFX.up();toast('Görev tamamlandı');
   addChat('',P.name+' bir görevi teslim etti.','sys');
@@ -2595,7 +2613,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.19 ONLINE OYUNCULAR ----------
+// ---------- V4.20 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2771,7 +2789,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.19 KAYIT SEÇİMİ
+  V4.20 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3210,7 +3228,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.19: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.20: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
