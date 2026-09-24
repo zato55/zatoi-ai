@@ -1040,7 +1040,7 @@ html.mobile-ui #introKeys::before{font-size:8px!important;white-space:normal!imp
 
 
 /* =========================================================
-   V4.39 — HEDEF GİRİŞ EKRANI
+   V4.39.1 — HEDEF GİRİŞ EKRANI + HOVER SABİT
    Kullanıcının verdiği hedef görsel sabit sahne olarak kullanılır;
    hesap/devam işlevleri gerçek HTML düğmeleridir.
    ========================================================= */
@@ -1143,6 +1143,23 @@ html.mobile-ui #cloudBtn{top:57%!important;width:min(430px,72dvw)!important;heig
 html.mobile-ui #contBtn{top:67%!important;width:min(500px,78dvw)!important;height:62px!important;font-size:15px!important}
 html.mobile-ui #introLoading{top:61%!important;min-height:110px!important}
 @media (max-aspect-ratio:4/3){#intro::before{background-size:cover!important}}
+
+/* =========================================================
+   V4.39.1 — GİRİŞ BUTONU HOVER KONUM FIX
+   Eski hover kuralındaki translateY, merkezleme translateX değerini
+   eziyordu. Hover artık düğmenin geometrisini değiştirmez.
+   ========================================================= */
+#intro #cloudBtn:hover,
+#intro #contBtn:hover,
+#intro #startBtn:hover,
+#intro #zatoiLoginBtn:hover,
+#intro #zatoiRecheckBtn:hover{
+  transform:translateX(-50%)!important;
+}
+#intro #cloudBtn:hover,
+#intro #contBtn:hover{
+  filter:brightness(1.08)!important;
+}
 </style>
 <!-- GOKTASI BUILD: V4.38 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
 <!-- GOKTASI BUILD: V4.38 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
