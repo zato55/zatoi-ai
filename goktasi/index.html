@@ -331,9 +331,10 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 }
 
 </style>
-<!-- GOKTASI BUILD: V4.20 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
-<!-- GOKTASI BUILD: V4.20 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
-<!-- GOKTASI BUILD: V4.20 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.21 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
+<!-- GOKTASI BUILD: V4.21 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
+<!-- GOKTASI BUILD: V4.21 - BOLUM I KIRIK CAN / KAVRUK OVA GENISLETME -->
+<!-- GOKTASI BUILD: V4.21 - YOL TASLARI / HIZLI SEYAHAT -->
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -402,7 +403,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
   <div class="bd"><div id="upgList"></div><div id="upgInfo">Eşya seç.</div><button class="abtn" id="upgBtn" disabled>ATEŞLE</button></div>
 </div>
 
-<div class="panel" id="mapPanel"><h3>DÜNYA HARİTASI</h3><button class="x" data-close="mapPanel">✕</button><canvas id="mapCv" width="420" height="420"></canvas></div>
+<div class="panel" id="mapPanel"><h3>DÜNYA HARİTASI</h3><button class="x" data-close="mapPanel">✕</button><canvas id="mapCv" width="420" height="420"></canvas><div id="fastTravel" style="margin-top:10px;border-top:1px solid var(--line2);padding-top:9px"><div style="font:700 12px Cinzel,serif;color:var(--gold2);margin-bottom:7px">YOL TAŞLARI — HIZLI SEYAHAT</div><div id="fastTravelBtns" style="display:flex;flex-wrap:wrap;gap:6px"></div><div style="font-size:10px;color:var(--muted);margin-top:7px">Bir bölgeye ilk kez ulaştığında yol taşı açılır. Savaş sırasında ışınlanamazsın.</div></div></div>
 <div class="panel" id="settingsPanel">
   <h3>AYARLAR</h3><button class="x" data-close="settingsPanel">✕</button>
   <div class="settingsSec">
@@ -468,7 +469,7 @@ html.mobile-ui #introBox h1{font-size:clamp(28px,7dvh,52px);letter-spacing:8px;m
 'use strict';
 /* ============================================================
    GÖKTAŞI — Kırık Çağ'ın Sonunda
-   Tek dosyalık açık dünya aksiyon-RPG — V4.20 Zatoi online oyuncu sohbeti
+   Tek dosyalık açık dünya aksiyon-RPG — V4.21 Zatoi online oyuncu sohbeti
 ============================================================ */
 // ---------- yardımcılar ----------
 const TAU=Math.PI*2;
@@ -488,7 +489,7 @@ function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
 function fbm(x,y,o=3){let a=0,amp=1,f=1,t=0;for(let i=0;i<o;i++){a+=vnoise(x*f,y*f)*amp;t+=amp;amp*=.5;f*=2;}return a/t;}
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 
-// ---------- V4.20 ayarlar / yeniden tuş atama ----------
+// ---------- V4.21 ayarlar / yeniden tuş atama ----------
 const SETTINGS_KEY='goktasi_settings_v1';
 const DEFAULT_BINDS={
   skill1:'Digit1',skill2:'Digit2',skill3:'Digit3',skill4:'Digit4',skill5:'Digit5',
@@ -1988,6 +1989,49 @@ function drawMini(){
   $('miniReg').textContent=REGN[rg].n;
   $('clock').textContent=(isNight()?'Gece':'Gündüz')+' — '+(hour()<10?'0':'')+hour()+':00 • Önerilen '+REGN[rg].lv;
 }
+// ---------- V4.21 YOL TAŞLARI / HIZLI SEYAHAT ----------
+const FAST_TRAVEL_POINTS=[
+  {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
+  {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
+  {id:'orman',n:'Sarı Orman',x:3900,y:7400,need:9},
+  {id:'tuz',n:'Tuz Çölü',x:11100,y:7900,need:17},
+  {id:'ayaz',n:'Ayaz Vadisi',x:7000,y:2750,need:25},
+  {id:'batak',n:'Kara Bataklık',x:7700,y:11300,need:33},
+  {id:'magara',n:"Erlik'in Ağzı",x:MC.x,y:3450,need:41}
+];
+function fastTravelUnlocked(p){
+  // qStep tabanlı açılış eski ve yeni kayıtlarla uyumlu; ayrıca bulunduğun bölgeyi hemen kullanabilirsin.
+  const here=regionAt(P.x,P.y);
+  return p.id==='koy'||P.qStep>=p.need||
+    (p.id==='ova'&&here==='ova')||(p.id==='orman'&&here==='orman')||(p.id==='tuz'&&here==='tuz')||
+    (p.id==='ayaz'&&here==='ayaz')||(p.id==='batak'&&here==='batak')||(p.id==='magara'&&here==='mağara');
+}
+function inCombatForTravel(){
+  return !!(P.dead||P.hurtT>0||mobs.some(m=>!m.dead&&m.hp>0&&m.target===P&&dst(m.x,m.y,P.x,P.y)<430));
+}
+function renderFastTravel(){
+  const w=$('fastTravelBtns'); if(!w)return;
+  w.innerHTML=FAST_TRAVEL_POINTS.map(p=>{
+    const open=fastTravelUnlocked(p);
+    return `<button class="btn" data-travel="${p.id}" ${open?'':'disabled'} style="font-size:10px;padding:7px 9px">${open?'✦ ':'🔒 '}${p.n}</button>`;
+  }).join('');
+}
+function fastTravelTo(id){
+  const p=FAST_TRAVEL_POINTS.find(x=>x.id===id);
+  if(!p||!fastTravelUnlocked(p)){toast('Bu yol taşı henüz açılmadı.');return;}
+  if(inCombatForTravel()){toast('Savaş sırasında ışınlanamazsın.');return;}
+  P.target=null;P.stoneT=null;$('targetBar').style.display='none';
+  P.x=p.x;P.y=p.y;P.tx=p.x;P.ty=p.y;
+  cam.x=p.x;cam.y=p.y;
+  closePanels();
+  announce('YOL TAŞI — '+p.n.toUpperCase());
+  toast(p.n+' bölgesine ışınlandın.');
+  save();
+}
+$('fastTravelBtns').addEventListener('click',e=>{
+  const b=e.target.closest('[data-travel]'); if(!b||b.disabled)return;
+  fastTravelTo(b.dataset.travel);
+});
 let mapBase=null;
 function bakeBigMap(){
   mapBase=mkc(MW,MW);const g=mapBase.getContext('2d');
@@ -1995,11 +2039,13 @@ function bakeBigMap(){
     g.fillStyle=MMCOL[TT[ty*MW+tx]];g.fillRect(tx,ty,1,1);}
 }
 function drawBigMap(){
+  renderFastTravel();
   const g=$('mapCv').getContext('2d');
   g.drawImage(mapBase,0,0,420,420);
   const sc=420/WORLD;
   npcs.forEach(n=>{g.fillStyle='#e0b84b';g.fillRect(n.x*sc-1.5,n.y*sc-1.5,3,3);});
   onlinePlayers.forEach(p=>{g.fillStyle='#7fd4ff';g.beginPath();g.arc(p.x*sc,p.y*sc,2.5,0,TAU);g.fill();});
+  FAST_TRAVEL_POINTS.forEach(p=>{if(!fastTravelUnlocked(p))return;g.fillStyle='#d9b75d';g.beginPath();g.arc(p.x*sc,p.y*sc,3.2,0,TAU);g.fill();g.strokeStyle='#fff0a8';g.strokeRect(p.x*sc-4.5,p.y*sc-4.5,9,9);});
   if(P.qActive){const qp=questTargetPoint(P.qActive);if(qp){g.fillStyle='#ffe066';g.beginPath();g.arc(qp.x*sc,qp.y*sc,5,0,TAU);g.fill();g.strokeStyle='#fff3a0';g.strokeRect(qp.x*sc-7,qp.y*sc-7,14,14);}}
   stones.forEach(s=>{if(s.alive){g.fillStyle='#9fd8e8';g.beginPath();g.arc(s.x*sc,s.y*sc,3,0,TAU);g.fill();}});
   g.fillStyle='#fff';g.beginPath();g.arc(P.x*sc,P.y*sc,4,0,TAU);g.fill();
@@ -2613,7 +2659,7 @@ let activeZatoiUserId='';
 let accountSwitchBusy=false;
 
 
-// ---------- V4.20 ONLINE OYUNCULAR ----------
+// ---------- V4.21 ONLINE OYUNCULAR ----------
 const ONLINE_PRESENCE_SEND_MS=900;
 const ONLINE_PRESENCE_FETCH_MS=900;
 const ONLINE_PRESENCE_STALE_MS=16000;
@@ -2789,7 +2835,7 @@ function progressSummary(d){
 function isSameSave(a,b){return !!a&&!!b&&saveFingerprint(a)===saveFingerprint(b);}
 
 /*
-  V4.20 KAYIT SEÇİMİ
+  V4.21 KAYIT SEÇİMİ
   Kullanıcıya cihaz/bulut seçimi sorulmaz.
   Bütün geçerli adaylar aynı ilerleme kuralıyla karşılaştırılır:
   level -> ana görev -> belirgin oyun süresi -> EXP -> aktif görev ilerlemesi
@@ -3228,7 +3274,7 @@ function frame(ts){
     // Başlangıç ekranında savaş/meteor/boss olayları çalışmaz; arka plan sakin ve sabittir.
     shakeT=0;P.hurtT=0;
   }
-  // V4.20: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
+  // V4.21: kamera artık intro/ölüm sırasında botlar arasında kare kare atlamaz.
   let cx,cy,snapCamera=false;
   if(!started){cx=introCam.x;cy=introCam.y;}
   else if(P.dead){cx=deathCam.x;cy=deathCam.y;}
