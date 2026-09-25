@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.8 HIDDEN UI POINTER LEAK ROOT FIX -->
+<!-- GOKTASI V4.47.9 CANVAS GHOST HITBOX ALLOWLIST FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1734,6 +1734,29 @@ button.x[data-close] > *{
   pointer-events:auto;
 }
 
+
+/* =========================================================
+   V4.47.9 — PC OYUN ALANI POINTER ALLOW-LIST
+   Canvas üstünde yalnızca aşağıdaki gerçek UI bölgeleri tıklama alır.
+   ========================================================= */
+html:not(.mobile-ui) #hud,
+html:not(.mobile-ui) #topL,
+html:not(.mobile-ui) #targetBar,
+html:not(.mobile-ui) #announce,
+html:not(.mobile-ui) #zoneTitle,
+html:not(.mobile-ui) #questPanel,
+html:not(.mobile-ui) #hints,
+html:not(.mobile-ui) #hurtFx{
+  pointer-events:none!important;
+}
+html:not(.mobile-ui) #chatWrap,
+html:not(.mobile-ui) #chatTab,
+html:not(.mobile-ui) #skillbar,
+html:not(.mobile-ui) #miniWrap,
+html:not(.mobile-ui) .panel.on{
+  pointer-events:auto!important;
+}
+
 </style>
 <!-- GOKTASI BUILD: V4.38 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
 <!-- GOKTASI BUILD: V4.38 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
@@ -3311,41 +3334,32 @@ addEventListener('pointerup',e=>{
 },true);
 
 
-// V4.47.8 — CANVAS ÜSTÜ GÖRÜNMEZ KATMAN TEMİZLEYİCİ
-let forwardingWorldPointer=false;
-document.addEventListener('pointerdown',e=>{
-  if(forwardingWorldPointer||!started||P.dead)return;
-  if(document.querySelector('.panel.on'))return;
-
-  const stack=document.elementsFromPoint(e.clientX,e.clientY);
-  const top=stack[0];
-  if(!top||top===cv||isActuallyInteractiveUI(top))return;
-
-  // Canvas'ın üzerinde kalan fakat aktif UI olmayan bir DOM katmanı tıklamayı çalıyorsa
-  // o katmanı pasifleştir. Sonraki gerçek mouse olayı doğrudan canvas'a ulaşır.
-  if(stack.includes(cv)){
-    const cs=getComputedStyle(top);
-    const rect=top.getBoundingClientRect();
-    const invisible=cs.display==='none'||cs.visibility==='hidden'||Number(cs.opacity)===0||
-      rect.width===0||rect.height===0||top.closest?.('.panel:not(.on)');
-    if(invisible||cs.cursor==='pointer'){
-      top.style.pointerEvents='none';
-      console.warn('[GÖKTAŞI] Canvas üstündeki hatalı hitbox pasifleştirildi:',top.id||top.className||top.tagName);
-    }
-  }
-},true);
-
-
+// V4.47.9 — CANVAS ÜSTÜ HAYALET HITBOX KÖK TEMİZLEYİCİ
+// Önceki sürüm yalnızca görünmez/pointer cursor katmanlarını temizliyordu.
+// Artık canvas önündeki TÜM izinsiz DOM katmanları allow-list mantığıyla temizlenir.
 document.addEventListener('pointermove',e=>{
   if(!started||document.querySelector('.panel.on'))return;
-  const stack=document.elementsFromPoint(e.clientX,e.clientY);
-  if(!stack.includes(cv))return;
-  const top=stack[0];
-  if(top&&top!==cv&&!isActuallyInteractiveUI(top)){
-    const cs=getComputedStyle(top);
-    if(cs.cursor==='pointer' && (top.closest?.('.panel:not(.on)') || cs.visibility==='hidden' || Number(cs.opacity)===0)){
-      top.style.pointerEvents='none';
-    }
+  purgeGhostHitboxAt(e.clientX,e.clientY);
+},true);
+
+document.addEventListener('pointerdown',e=>{
+  if(!started||P.dead||document.querySelector('.panel.on'))return;
+  const changed=purgeGhostHitboxAt(e.clientX,e.clientY);
+
+  // Katman tam tıklama anında yakalandıysa mevcut fiziksel olay o elemana gitmiş olabilir.
+  // Aynı koordinatta canvas artık en üstteyse dünya tıklamasını bir kez kendimiz çalıştır.
+  if(changed && document.elementFromPoint(e.clientX,e.clientY)===cv && e.button===0){
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    cv.dispatchEvent(new MouseEvent('mousedown',{
+      clientX:e.clientX,
+      clientY:e.clientY,
+      button:0,
+      bubbles:false,
+      cancelable:true,
+      view:window
+    }));
   }
 },true);
 
@@ -3553,14 +3567,37 @@ document.querySelectorAll('.panel,#intro,#death').forEach(el=>
   uiHitObserver.observe(el,{attributes:true,attributeFilter:['class']})
 );
 
-// Oyun alanında "el" imleci oluşuyorsa hangi HTML elemanının sebep olduğunu bulup
-// görünmez/kapalı UI ise tıklamayı dünyaya bırak.
+// V4.47.9 — Oyun dünyasının üstünde yalnızca gerçekten etkileşimli UI kalabilir.
+// NPC/düşman/göktaşı canvas üzerinde çizilir; bunların üzerinde DOM "el" imleci
+// görülmesi kesin olarak hayalet bir HTML hitbox'ı olduğu anlamına gelir.
 function isActuallyInteractiveUI(el){
   if(!el||el===cv||el===document.body||el===document.documentElement)return false;
-  if(el.closest?.('.panel.on'))return true;
-  if(el.closest?.('#chatWrap,#chatTab,#mobileControls,#settingsBtn'))return true;
-  if(el.closest?.('#intro:not(.off),#death.on'))return true;
-  return false;
+  return !!el.closest?.(
+    '.panel.on,'+
+    '#chatWrap,#chatTab,#skillbar,#miniWrap,#mobileControls,'+
+    '#intro:not(.off),#death.on'
+  );
+}
+
+function purgeGhostHitboxAt(x,y){
+  let changed=false;
+  // Bir katmanı kapatınca altından başka hayalet katman çıkabileceği için birkaç tur tara.
+  for(let pass=0;pass<8;pass++){
+    const stack=document.elementsFromPoint(x,y);
+    if(!stack.includes(cv))break;
+    const top=stack[0];
+    if(!top||top===cv||isActuallyInteractiveUI(top))break;
+
+    // Canvas'ın önünde duran fakat allow-list'te olmayan DOM elemanı oyun dünyasına
+    // ait değildir. Hit-test'i tamamen kapat; görünümü değişmez.
+    top.style.setProperty('pointer-events','none','important');
+    changed=true;
+    console.warn(
+      '[GÖKTAŞI] Hayalet canvas hitbox kapatıldı:',
+      top.id||top.className||top.tagName
+    );
+  }
+  return changed;
 }
 document.addEventListener('pointerdown',e=>{
   if(e.button!=null && e.button!==0)return;
