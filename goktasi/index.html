@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.4 GLOBAL UI HITBOX + TOOLTIP FIX -->
+<!-- GOKTASI V4.47.5 NPC SCREEN HITBOX + POSITION LOCK FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -3251,6 +3251,7 @@ addEventListener('pointerup',e=>{
 
 cv.addEventListener('mousedown',e=>{
   initAudio();if(!started||P.dead)return;
+  if(performance.now()<npcInteractionLockUntil)return;
   // Açık panel varken dünya tıklaması işlenmez.
   if(document.querySelector('.panel.on'))return;
   lastInput=performance.now();
@@ -3264,14 +3265,27 @@ cv.addEventListener('mousedown',e=>{
     return;
   }
   if(e.button!==0)return;
-  // NPC: sprite + isim alanını kapsayan daha toleranslı seçim.
-  // Birden fazla NPC yakınsa tıklanan noktaya en yakın olan açılır.
-  let hitNPC=null,npcHitD=Infinity;
+  // V4.47.5 — NPC TIKLAMA / KONUM FIX
+  // NPC'yi dünya koordinatındaki küçük bir daireyle değil, ekranda gerçekten
+  // çizildiği sprite + isim alanının tamamıyla seç. Böylece isme/gövdeye
+  // tıklama zemine düşüp oyuncuyu yanlış NPC yönüne yürütmez.
+  let hitNPC=null,npcHitScore=Infinity;
   for(const n of npcs){
-    const d=dst(wx,wy,n.x,n.y-14);
-    if(d<46&&d<npcHitD){hitNPC=n;npcHitD=d;}
+    const nsx=(n.x-cam.x)*zoom+rect.width/2;
+    const nsy=(n.y-cam.y)*zoom+rect.height/2;
+
+    // Görünen NPC: isim etiketi + kafa/gövde/ayak alanı.
+    const halfW=Math.max(58,72*zoom);
+    const top=nsy-Math.max(72,82*zoom);
+    const bottom=nsy+Math.max(22,28*zoom);
+    if(sx>=nsx-halfW&&sx<=nsx+halfW&&sy>=top&&sy<=bottom){
+      const score=Math.hypot(sx-nsx,(sy-(nsy-24))*0.8);
+      if(score<npcHitScore){hitNPC=n;npcHitScore=score;}
+    }
   }
   if(hitNPC){
+    // NPC etkileşimi hiçbir koşulda oyuncunun dünya hedefini değiştirmez.
+    // Oyuncu tam bulunduğu koordinatta kilitlenir.
     P.target=null;P.stoneT=null;
     P.tx=P.x;P.ty=P.y;P.mv=false;
     lastInput=performance.now();
@@ -3442,7 +3456,10 @@ $('setMute').addEventListener('change',e=>{GAME_SETTINGS.audio.mute=!!e.target.c
 $('resetBinds').onclick=()=>{GAME_SETTINGS.binds={...DEFAULT_BINDS};rebindingAction=null;saveGameSettings();renderSettings();toast('Kontroller varsayılana döndü');};
 
 let shopNPC=null,shopTab='buy';
+let npcInteractionLockUntil=0;
 function openDialog(n){
+  // V4.47.5: aynı fiziksel tıklamanın panel açıldıktan sonra dünyaya düşmesini engelle.
+  npcInteractionLockUntil=performance.now()+280;
   // Etkileşim başlarken oyuncunun dünya hareketini tamamen bırak.
   P.target=null;P.stoneT=null;P.tx=P.x;P.ty=P.y;P.mv=false;
   const dlg=$('dlgPanel');dlg.classList.add('on');
