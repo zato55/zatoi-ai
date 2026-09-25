@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.50.1 PROFESYONEL DUNYA HARITASI -->
+<!-- GOKTASI V4.50.2 ISLEVSEL KOMPAKT DUNYA HARITASI -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -142,15 +142,17 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
 #upgPanel{top:90px;left:50%;transform:translateX(-50%);width:380px}
 #upgInfo{font-size:12px;line-height:1.7;margin:10px 0}
 #upgInfo b{color:var(--gold2)}
-#mapPanel{top:50%;left:50%;transform:translate(-50%,-50%);z-index:25;width:min(900px,92vw);max-height:92vh;overflow:auto;box-sizing:border-box;background:linear-gradient(180deg,#17130e 0%,#100d09 100%);box-shadow:0 18px 70px rgba(0,0,0,.72),0 0 0 1px rgba(202,166,88,.16)}
-#mapPanel>h3{padding:14px 58px 13px 18px;font-size:18px;letter-spacing:3px;border-bottom:1px solid #5b4723;background:linear-gradient(90deg,rgba(88,64,26,.22),transparent 58%)}
-#mapPanel>.x{top:9px;right:10px}
-#mapCv{display:block;width:min(760px,calc(92vw - 34px));height:auto;aspect-ratio:1/1;margin:14px auto 0;border:1px solid #6d5529;background:#0d0b08;box-shadow:0 8px 30px rgba(0,0,0,.42);image-rendering:auto}
-#fastTravel{margin:12px 16px 14px!important;padding-top:12px!important}
-#fastTravelBtns{gap:8px!important}
-#fastTravelBtns .btn{font-size:11px!important;padding:8px 11px!important;border-color:#554321;background:#1d1810}
+#mapPanel{top:50%;left:50%;transform:translate(-50%,-50%);z-index:25;width:min(760px,92vw);max-height:88vh;overflow:auto;box-sizing:border-box;background:linear-gradient(180deg,#17130e 0%,#100d09 100%);box-shadow:0 18px 70px rgba(0,0,0,.72),0 0 0 1px rgba(202,166,88,.16)}
+#mapPanel>h3{padding:11px 52px 10px 16px;font-size:16px;letter-spacing:2.5px;border-bottom:1px solid #5b4723;background:linear-gradient(90deg,rgba(88,64,26,.22),transparent 58%)}
+#mapPanel>.x{top:6px;right:8px}
+#mapCv{display:block;width:min(620px,calc(88vh - 205px),calc(92vw - 32px));height:auto;aspect-ratio:1/1;margin:10px auto 0;border:1px solid #6d5529;background:#0d0b08;box-shadow:0 7px 24px rgba(0,0,0,.4);image-rendering:auto}
+#fastTravel{margin:8px 12px 10px!important;padding-top:8px!important}
+#fastTravel>div:first-child{font-size:11px!important;margin-bottom:5px!important}
+#fastTravelBtns{gap:5px!important}
+#fastTravelBtns .btn{font-size:9.5px!important;padding:6px 8px!important;border-color:#554321;background:#1d1810}
 #fastTravelBtns .btn:not(:disabled):hover{border-color:#b99043;background:#292013}
 #fastTravelBtns .btn:disabled{opacity:.38}
+#fastTravel>div:last-child{font-size:9px!important;margin-top:5px!important}
 /* ölüm */
 #death{position:fixed;inset:0;background:rgba(6,2,1,.0);z-index:40;display:none;pointer-events:none;text-align:center}
 #death.on{display:block;pointer-events:auto}
@@ -4324,7 +4326,7 @@ function drawBigMap(){
     if(!rn[r]||r==='köy')return;
     const x=a.x*sc,y=a.y*sc;
     g.save();
-    g.font='700 15px Cinzel,serif';g.textAlign='center';g.textBaseline='middle';
+    g.font='700 13px Cinzel,serif';g.textAlign='center';g.textBaseline='middle';
     g.lineWidth=4;g.strokeStyle='rgba(15,12,8,.72)';g.strokeText(rn[r],x,y);
     g.fillStyle='rgba(245,226,183,.88)';g.fillText(rn[r],x,y);
     g.restore();
@@ -4365,8 +4367,11 @@ function drawBigMap(){
 
   drawMapPin(g,VILLAGE.x,VILLAGE.y,'#e0b84b','Ağıt Han',sc,1.05);
 
-  // Oyuncu konumu en belirgin işaret.
+  // Bulunduğun bölgeyi haritayı okumadan da anlayabilmek için oyuncu çevresinde konum halkası.
   const px=P.x*sc,py=P.y*sc;
+  g.save();g.strokeStyle='rgba(255,224,102,.48)';g.lineWidth=2;g.setLineDash([5,5]);
+  g.beginPath();g.arc(px,py,18,0,TAU);g.stroke();g.restore();
+  // Oyuncu konumu en belirgin işaret.
   g.save();g.translate(px,py);g.fillStyle='#fff';g.strokeStyle='#1b1308';g.lineWidth=2;
   g.beginPath();g.moveTo(0,-10);g.lineTo(7,8);g.lineTo(0,5);g.lineTo(-7,8);g.closePath();g.fill();g.stroke();g.restore();
   g.font='700 11px Cinzel,serif';g.textAlign='center';g.fillStyle='#fff';
@@ -4374,9 +4379,9 @@ function drawBigMap(){
 
   // Harita çerçevesi + sade lejant.
   g.strokeStyle='rgba(222,188,105,.7)';g.lineWidth=2;g.strokeRect(1,1,S-2,S-2);
-  g.fillStyle='rgba(12,10,7,.78)';g.fillRect(12,S-36,330,24);
+  g.fillStyle='rgba(12,10,7,.78)';g.fillRect(12,S-34,330,22);
   g.font='11px Arial,sans-serif';g.textAlign='left';g.fillStyle='#e8d9b8';
-  g.fillText('◆ Yol taşı   ✦ Göktaşı   ◎ Görev hedefi   ▲ Sen',22,S-20);
+  g.fillText('◆ Yol taşı   ✦ Göktaşı   ◎ Görev hedefi   ▲ Sen',22,S-19);
 }
 // ---------- HUD güncelle ----------
 function updateBars(){
