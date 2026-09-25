@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.48.5 SARI ORMAN SAFE LANDING CONNECTIVITY FIX -->
+<!-- GOKTASI V4.48.7 BOSS HP BAR FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -39,6 +39,9 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
 #targetBar{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:320px;text-align:center}
 #targetBar b{display:block;font-family:'Cinzel',serif;font-size:13px;color:#e8cf8f;text-shadow:0 1px 3px #000;margin-bottom:3px}
 #bossBar{width:460px}
+#targetBar.bossTarget{width:460px;z-index:40}
+#targetBar.bossTarget #tgtName{font-size:15px;color:#f0c46a;letter-spacing:1px}
+#targetBar.bossTarget #tgtBarW{height:16px;border-color:#9b6a32;box-shadow:0 0 10px rgba(184,68,58,.35)}
 #announce{position:absolute;top:120px;left:0;right:0;text-align:center;pointer-events:none}
 #announce div{font-family:'Cinzel',serif;font-weight:800;font-size:24px;color:var(--gold2);text-shadow:0 2px 10px #000,0 0 2px #000;opacity:0;letter-spacing:2px}
 #zoneTitle{position:absolute;top:34%;left:0;right:0;text-align:center;pointer-events:none}
@@ -4141,11 +4144,24 @@ function updateBars(){
     );
   }
   const m=P.target;
-  if(m&&m.hp>0){$('tgtName').textContent=MOBS[m.k].n+' — Lv '+MOBS[m.k].lv;
-    $('tgtF').style.width=clamp(m.hp/m.maxhp*100,0,100)+'%';}
-  else if(P.stoneT&&P.stoneT.alive){$('tgtName').textContent=stoneTier(P.stoneT).n;
-    $('tgtF').style.width=clamp(P.stoneT.hp/P.stoneT.max*100,0,100)+'%';}
-  else $('targetBar').style.display='none';
+  if(m&&m.hp>0){
+    const isBoss=!!m.boss;
+    $('targetBar').style.display='block';
+    $('targetBar').classList.toggle('bossTarget',isBoss);
+    $('tgtName').textContent=(isBoss?'BOSS — ':'')+MOBS[m.k].n+' — Lv '+MOBS[m.k].lv+
+      (isBoss?'  '+Math.ceil(m.hp)+' / '+Math.ceil(m.maxhp):'');
+    $('tgtF').style.width=clamp(m.hp/m.maxhp*100,0,100)+'%';
+  }
+  else if(P.stoneT&&P.stoneT.alive){
+    $('targetBar').classList.remove('bossTarget');
+    $('targetBar').style.display='block';
+    $('tgtName').textContent=stoneTier(P.stoneT).n;
+    $('tgtF').style.width=clamp(P.stoneT.hp/P.stoneT.max*100,0,100)+'%';
+  }
+  else{
+    $('targetBar').classList.remove('bossTarget');
+    $('targetBar').style.display='none';
+  }
 }
 let uiT=0;
 function updateHUD(dt){
@@ -4350,12 +4366,17 @@ function updMobs(dt){
       // boss zıplama
       if(m.boss){m.jumpT=(m.jumpT||0)-dt;
         if(m.jumpT<=0&&tgd<420){m.jumpT=6;
-          fxs.push({type:'warn',x:tg.x,y:tg.y,t:0,dur:.9,r:130});
+          // V4.48.6: Uyarı başladığı andaki merkez sabitlenir.
+          // Önceden tg çoğunlukla P olduğu için setTimeout çalıştığında tg.x/tg.y
+          // oyuncunun YENİ konumunu gösteriyor, böylece oyuncu çemberden kaçsa da
+          // hasar merkezi onu takip ediyordu.
+          const impactX=tg.x,impactY=tg.y,impactR=130;
+          fxs.push({type:'warn',x:impactX,y:impactY,t:0,dur:.9,r:impactR});
           setTimeout(()=>{if(m.hp<=0)return;
-            fxs.push({type:'ring',x:tg.x,y:tg.y,t:0,dur:.5,r0:20,r1:130,c:'rgba(192,86,60,'});
+            fxs.push({type:'ring',x:impactX,y:impactY,t:0,dur:.5,r0:20,r1:impactR,c:'rgba(192,86,60,'});
             shakeT=.4;
-            // V4.1: Boss alan saldırısı yalnızca boss hâlâ yakın/aktifse oyuncuya vurabilir.
-            if(!P.dead&&!m.dead&&m.hp>0&&dst(m.x,m.y,P.x,P.y)<520&&dst(P.x,P.y,tg.x,tg.y)<140){const red=armorDef()/(armorDef()+90);
+            // Görsel alan ile gerçek hasar alanı artık aynı sabit merkez ve aynı yarıçapı kullanır.
+            if(!P.dead&&!m.dead&&m.hp>0&&dst(m.x,m.y,P.x,P.y)<520&&dst(P.x,P.y,impactX,impactY)<=impactR){const red=armorDef()/(armorDef()+90);
               const d=Math.max(1,m.dmg*2.2*(1-red));P.hp-=d;P.lastHit=worldT;P.hurtT=.6;SFX.hurt();
               floats.push({x:P.x,y:P.y-36,txt:Math.round(d),c:'#e06a50',t:0,dur:.9});
               if(P.hp<=0)playerDie(m);}
