@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.6 CENTRAL TARGETING + ANTI-JUMP FIX -->
+<!-- GOKTASI V4.47.7 CHARACTER PLUS HITBOX FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1671,6 +1671,32 @@ button.x[data-close] > *{
 }
 .panel.on .bd,.panel.on .tabs,.panel.on .slist{
   pointer-events:auto!important;
+}
+
+
+/* =========================================================
+   V4.47.7 — KARAKTER + BUTONU / GENEL KÜÇÜK BUTON HITBOX FIX
+   ========================================================= */
+#charPanel.on{
+  z-index:2000!important;
+  isolation:isolate!important;
+  pointer-events:auto!important;
+}
+#charPanel .srow{
+  position:relative!important;
+  pointer-events:auto!important;
+}
+#charPanel .pbtn{
+  position:relative!important;
+  z-index:10!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  min-width:30px!important;
+  min-height:26px!important;
+  cursor:pointer!important;
+}
+#charPanel .pbtn > *{
+  pointer-events:none!important;
 }
 
 </style>
@@ -3430,6 +3456,22 @@ function pointInsideRect(x,y,r){
 }
 document.addEventListener('pointerdown',e=>{
   if(e.button!=null && e.button!==0)return;
+
+  // V4.47.7 — Karakter panelindeki + düğmeleri.
+  // event.target başka katmana düşse bile görünen düğmenin gerçek piksel alanını kullan.
+  const charPanel=$('charPanel');
+  if(charPanel?.classList.contains('on')){
+    const plusButtons=[...charPanel.querySelectorAll('button.pbtn')];
+    for(const b of plusButtons){
+      if(b.disabled)continue;
+      const r=b.getBoundingClientRect();
+      if(pointInsideRect(e.clientX,e.clientY,r)){
+        e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+        b.click();
+        return;
+      }
+    }
+  }
 
   // Açık panellerin X düğmeleri: hedef element ne olursa olsun koordinattan kapat.
   const panels=[...document.querySelectorAll('.panel.on')];
