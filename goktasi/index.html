@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.2 PANEL INTERACTION HARD FIX -->
+<!-- GOKTASI V4.47.3 SHOP ROW HITBOX FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1622,6 +1622,26 @@ html:not(.mobile-ui) #skillbar .slot{
 #shopPanel.on #shopList,
 #shopPanel.on #shopList *{
   pointer-events:auto!important;
+}
+
+/* V4.47.3 — mağaza tüm HUD/gameplay katmanlarının üstünde tek etkileşim katmanı */
+#shopPanel.on{
+  z-index:2000!important;
+  isolation:isolate!important;
+}
+#shopPanel.on #shopList{
+  position:relative!important;
+  z-index:2!important;
+}
+#shopPanel.on #shopList .srow2{
+  position:relative!important;
+  z-index:3!important;
+}
+#shopPanel.on #shopList .srow2 > button.abtn{
+  position:relative!important;
+  z-index:4!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
 }
 
 </style>
@@ -3352,19 +3372,35 @@ document.addEventListener('pointerdown',e=>{
     }
   }
 
-  // Mağaza SATIN AL / SAT sekmeleri.
+  // Mağaza SATIN AL / SAT sekmeleri + görünür AL/SAT butonları.
+  // V4.47.3: Bazı ekran katmanlarında üst satırlarda event.target yanlış elemana
+  // düşebiliyor. Butonları DOM hedefinden değil gerçek ekran dikdörtgeninden bul.
   const shop=$('shopPanel');
   if(shop?.classList.contains('on')){
     const buy=$('tabBuy'),sell=$('tabSell');
     if(buy && pointInsideRect(e.clientX,e.clientY,buy.getBoundingClientRect())){
-      e.preventDefault();e.stopPropagation();
+      e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
       setShopTab('buy');
       return;
     }
     if(sell && pointInsideRect(e.clientX,e.clientY,sell.getBoundingClientRect())){
-      e.preventDefault();e.stopPropagation();
+      e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
       setShopTab('sell');
       return;
+    }
+
+    const actionButtons=[...shop.querySelectorAll('#shopList .srow2 > button.abtn')];
+    for(const b of actionButtons){
+      if(b.disabled)continue;
+      const r=b.getBoundingClientRect();
+      // Yalnızca gerçekten panelin/listenin görünür alanında kalan butonu kabul et.
+      const lr=$('shopList').getBoundingClientRect();
+      const visible=r.bottom>lr.top && r.top<lr.bottom;
+      if(visible && pointInsideRect(e.clientX,e.clientY,r)){
+        e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+        b.click();
+        return;
+      }
     }
   }
 },true);
