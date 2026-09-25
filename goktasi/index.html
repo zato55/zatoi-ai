@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.5 NPC SCREEN HITBOX + POSITION LOCK FIX -->
+<!-- GOKTASI V4.47.6 CENTRAL TARGETING + ANTI-JUMP FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -3292,12 +3292,41 @@ cv.addEventListener('mousedown',e=>{
     openDialog(hitNPC);
     return;
   }
-  // Göktaşı: tıklanınca hedefle, yanına git ve otomatik vur.
-  for(const s of stones){if(s.alive&&dst(wx,wy,s.x,s.y-16)<52){P.stoneT=s;P.target=null;P.tx=s.x;P.ty=s.y;$('targetBar').style.display='block';SFX.click();return;}}
-  // Canavar: imlece en yakın canavarı seç.
+  // V4.47.6 — MERKEZİ HEDEFLEME
+  // Hedefe tıklamak ASLA ayrıca zemin yürüyüş hedefi üretmez.
+  // Hedef takip hareketini yalnızca updPlayer içindeki hedef sistemi yapar.
+  let hitStone=null,stoneScore=Infinity;
+  for(const s of stones){
+    if(!s.alive)continue;
+    const ssx=(s.x-cam.x)*zoom+rect.width/2;
+    const ssy=(s.y-16-cam.y)*zoom+rect.height/2;
+    const hit=Math.max(34,52*zoom);
+    const d=Math.hypot(sx-ssx,sy-ssy);
+    if(d<=hit&&d<stoneScore){hitStone=s;stoneScore=d;}
+  }
+  if(hitStone){
+    P.stoneT=hitStone;P.target=null;
+    P.tx=P.x;P.ty=P.y;P.mv=false;
+    $('targetBar').style.display='block';SFX.click();
+    return;
+  }
+
+  // Canavar: görünen sprite alanından seç; hedeflenince zemin komutu oluşturma.
   let best=null,bd=Infinity;
-  mobs.forEach(m=>{if(m.hp>0&&!m.dead){const d=dst(wx,wy,m.x,m.y-8);const hit=46+(m.r||0);if(d<hit&&d<bd){bd=d;best=m;}}});
-  if(best){P.target=best;P.stoneT=null;$('targetBar').style.display='block';P.tx=best.x;P.ty=best.y;return;}
+  mobs.forEach(m=>{
+    if(m.hp<=0||m.dead)return;
+    const msx=(m.x-cam.x)*zoom+rect.width/2;
+    const msy=(m.y-8-cam.y)*zoom+rect.height/2;
+    const hit=Math.max(30,(46+(m.r||0))*zoom);
+    const d=Math.hypot(sx-msx,sy-msy);
+    if(d<=hit&&d<bd){bd=d;best=m;}
+  });
+  if(best){
+    P.target=best;P.stoneT=null;
+    P.tx=P.x;P.ty=P.y;P.mv=false;
+    $('targetBar').style.display='block';SFX.click();
+    return;
+  }
   // Boş zemin: savaş hedefini bırak ve TAM tıklanan noktaya yürü.
   P.target=null;P.stoneT=null;$('targetBar').style.display='none';
   P.tx=clamp(wx,16,WORLD-16);P.ty=clamp(wy,16,WORLD-16);
@@ -3314,7 +3343,7 @@ addEventListener('wheel',e=>{
 function nearestTarget(){
   let best=null,bd=460;
   mobs.forEach(m=>{if(m.hp>0){const d=dst(P.x,P.y,m.x,m.y);if(d<bd){bd=d;best=m;}}});
-  if(best){P.target=best;P.stoneT=null;$('targetBar').style.display='block';P.tx=best.x;P.ty=best.y;SFX.click();}
+  if(best){P.target=best;P.stoneT=null;$('targetBar').style.display='block';P.tx=P.x;P.ty=P.y;P.mv=false;SFX.click();}
 }
 function manualSword(){
   if(!started||P.dead||P.atkCD>0)return;
@@ -3854,6 +3883,14 @@ function updPlayer(dt){
     P.target=null;P.stoneT=null;$('targetBar').style.display='none';
     P.tx=P.x+dx*100;P.ty=P.y+dy*100;lastInput=performance.now();
   }
+
+  // V4.47.6: düşman/göktaşı aktifken eski bir zemin tx/ty hedefi çalışamaz.
+  // Böylece karakter aynı karede iki farklı hareket sistemi tarafından çekilmez.
+  if(!dx&&!dy&&(P.target||P.stoneT)){
+    P.tx=P.x;P.ty=P.y;
+  }
+
+  const frameStartX=P.x,frameStartY=P.y;
   const dT=dst(P.x,P.y,P.tx,P.ty);
   P.mv=dT>4;
   if(P.mv){
@@ -3887,6 +3924,17 @@ function updPlayer(dt){
           fxs.push({type:'ring',x:s.x,y:s.y-14,t:0,dur:.8,r0:10,r1:150,c:'rgba(159,216,232,'});
           P.stoneT=null;
         }}}}
+  // V4.47.6 — tek güncelleme karesinde fiziksel olarak imkânsız konum sıçramasını engelle.
+  // Normal yürüme/savaş hareketi birkaç piksel/karedir; büyük sıçrama hedefleme hatasıdır.
+  const frameJump=Math.hypot(P.x-frameStartX,P.y-frameStartY);
+  if(frameJump>80){
+    P.x=frameStartX;P.y=frameStartY;
+    P.tx=P.x;P.ty=P.y;P.mv=false;
+    P.target=null;P.stoneT=null;
+    $('targetBar').style.display='none';
+    console.warn('[GÖKTAŞI] Geçersiz oyuncu konum sıçraması engellendi:',Math.round(frameJump));
+  }
+
   // otomatik toplama
   for(let i=drops.length-1;i>=0;i--){const d=drops[i];
     if(dst(P.x,P.y,d.x,d.y)<30)pickup(d,i);}
