@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.50.2 ISLEVSEL KOMPAKT DUNYA HARITASI -->
+<!-- GOKTASI V4.50.3 YENI ISLEVSEL DUNYA HARITASI -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -142,17 +142,26 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
 #upgPanel{top:90px;left:50%;transform:translateX(-50%);width:380px}
 #upgInfo{font-size:12px;line-height:1.7;margin:10px 0}
 #upgInfo b{color:var(--gold2)}
-#mapPanel{top:50%;left:50%;transform:translate(-50%,-50%);z-index:25;width:min(760px,92vw);max-height:88vh;overflow:auto;box-sizing:border-box;background:linear-gradient(180deg,#17130e 0%,#100d09 100%);box-shadow:0 18px 70px rgba(0,0,0,.72),0 0 0 1px rgba(202,166,88,.16)}
-#mapPanel>h3{padding:11px 52px 10px 16px;font-size:16px;letter-spacing:2.5px;border-bottom:1px solid #5b4723;background:linear-gradient(90deg,rgba(88,64,26,.22),transparent 58%)}
-#mapPanel>.x{top:6px;right:8px}
-#mapCv{display:block;width:min(620px,calc(88vh - 205px),calc(92vw - 32px));height:auto;aspect-ratio:1/1;margin:10px auto 0;border:1px solid #6d5529;background:#0d0b08;box-shadow:0 7px 24px rgba(0,0,0,.4);image-rendering:auto}
-#fastTravel{margin:8px 12px 10px!important;padding-top:8px!important}
-#fastTravel>div:first-child{font-size:11px!important;margin-bottom:5px!important}
-#fastTravelBtns{gap:5px!important}
-#fastTravelBtns .btn{font-size:9.5px!important;padding:6px 8px!important;border-color:#554321;background:#1d1810}
-#fastTravelBtns .btn:not(:disabled):hover{border-color:#b99043;background:#292013}
-#fastTravelBtns .btn:disabled{opacity:.38}
-#fastTravel>div:last-child{font-size:9px!important;margin-top:5px!important}
+#mapPanel{top:50%;left:50%;transform:translate(-50%,-50%);z-index:25;width:min(860px,94vw);height:min(620px,88vh);overflow:hidden;background:#100d09;border-color:#5b4723;box-shadow:0 22px 80px rgba(0,0,0,.72)}
+#mapPanel .mapHead{height:58px;display:flex;align-items:center;padding:0 62px 0 18px;border-bottom:1px solid #4d3c20;background:linear-gradient(90deg,#1b160e,#100d09)}
+#mapPanel .mapHead h3{position:static;border:0;padding:0;margin:0;font-size:17px;letter-spacing:2.8px}
+#mapSub{display:block;color:#776d5d;font-size:9.5px;margin-top:3px;letter-spacing:.5px}
+#mapPanel>.mapHead>.x{top:10px;right:10px}
+.mapLayout{height:calc(100% - 58px);display:grid;grid-template-columns:minmax(0,1fr) 230px}
+.mapStage{min-width:0;position:relative;display:flex;align-items:center;justify-content:center;padding:14px;background:#0b0907;border-right:1px solid #392d1a}
+#mapCv{display:block;width:min(100%,calc(88vh - 112px));height:auto;max-height:100%;aspect-ratio:1/1;border:1px solid #584722;background:#0b0907;box-shadow:0 8px 28px rgba(0,0,0,.48);cursor:default}
+.mapLegend{position:absolute;left:22px;bottom:19px;display:flex;gap:10px;padding:5px 8px;background:rgba(12,9,6,.84);border:1px solid rgba(190,151,70,.28);font-size:8.5px;color:#d8c69f;pointer-events:none}
+#mapInfo{padding:22px 18px;display:flex;flex-direction:column;background:linear-gradient(180deg,#17130d,#0f0c08)}
+.mapInfoEyebrow,.mapInfoLabel{font:700 9px Cinzel,serif;letter-spacing:1.8px;color:#776a50}
+#mapRegionName{font:700 18px Cinzel,serif;color:#e5c77e;margin:6px 0 4px;line-height:1.15}
+#mapRegionState{font-size:10px;color:#9d927e;min-height:28px;line-height:1.45}
+.mapInfoRule{height:1px;background:#332817;margin:16px 0}
+#mapQuestInfo{font-size:10.5px;color:#c7baa0;line-height:1.55;margin-top:7px;min-height:60px}
+#mapTravelState{font-size:11px;color:#cdb77d;margin:7px 0 10px}
+#mapTravelBtn{width:100%;padding:9px 8px}
+#mapTravelBtn:disabled{opacity:.35}
+#mapHint{margin-top:auto;padding-top:14px;color:#625b50;font-size:9px;line-height:1.45}
+
 /* ölüm */
 #death{position:fixed;inset:0;background:rgba(6,2,1,.0);z-index:40;display:none;pointer-events:none;text-align:center}
 #death.on{display:block;pointer-events:auto}
@@ -208,7 +217,7 @@ html.mobile-ui #questPanel{top:140px;right:max(8px,env(safe-area-inset-right));w
 html.mobile-ui #chatWrap{left:max(8px,env(safe-area-inset-left));bottom:112px;width:min(300px,42vw)}html.mobile-ui #chatLog{max-height:82px;font-size:9.5px}html.mobile-ui #chatIn{font-size:16px;padding:5px 7px}
 html.mobile-ui #chatTab{bottom:138px}
 html.mobile-ui #settingsBtn{display:none}html.mobile-ui #settingsPanel{display:none!important}html.mobile-ui #skillbar{bottom:max(7px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);transform-origin:bottom center}html.mobile-ui #xpThin{width:min(330px,42dvw)}html.mobile-ui #moneyTag{bottom:52px;font-size:9px}html.mobile-ui #slots{gap:4px}html.mobile-ui .slot{width:46px;height:46px;touch-action:manipulation}html.mobile-ui .slot .key{display:none}html.mobile-ui .slot .sp{font-size:8px}
-html.mobile-ui .panel{max-width:calc(100dvw - 20px);max-height:calc(100dvh - 20px);overflow:auto}html.mobile-ui #invPanel,html.mobile-ui #charPanel,html.mobile-ui #shopPanel,html.mobile-ui #upgPanel,html.mobile-ui #mapPanel{top:50%;left:50%;transform:translate(-50%,-50%)}html.mobile-ui #dlgPanel{bottom:max(8px,env(safe-area-inset-bottom));width:min(520px,92dvw)}html.mobile-ui #mapPanel{width:min(94dvw,760px)}html.mobile-ui #mapCv{width:min(68dvh,88dvw);height:auto;aspect-ratio:1/1}html.mobile-ui #announce{top:60px}html.mobile-ui #announce div{font-size:17px}html.mobile-ui #zoneTitle h2{font-size:26px}
+html.mobile-ui .panel{max-width:calc(100dvw - 20px);max-height:calc(100dvh - 20px);overflow:auto}html.mobile-ui #invPanel,html.mobile-ui #charPanel,html.mobile-ui #shopPanel,html.mobile-ui #upgPanel,html.mobile-ui #mapPanel{top:50%;left:50%;transform:translate(-50%,-50%)}html.mobile-ui #dlgPanel{bottom:max(8px,env(safe-area-inset-bottom));width:min(520px,92dvw)}html.mobile-ui #mapPanel{width:min(94dvw,760px);height:min(92dvh,580px)}html.mobile-ui .mapLayout{grid-template-columns:minmax(0,1fr) 190px}html.mobile-ui #mapCv{width:min(64dvh,62dvw);height:auto}html.mobile-ui #mapInfo{padding:12px 10px}html.mobile-ui #mapRegionName{font-size:14px}html.mobile-ui .mapLegend{display:none}html.mobile-ui #announce{top:60px}html.mobile-ui #announce div{font-size:17px}html.mobile-ui #zoneTitle h2{font-size:26px}
 /* Mobil giriş ekranı: tarayıcı çubukları açıkken bile düğme ekranda kalır. */
 html.mobile-ui #intro{align-items:flex-start;overflow:auto;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 html.mobile-ui #introBox{width:min(760px,94dvw);min-height:100dvh;box-sizing:border-box;padding:8px 18px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -1877,7 +1886,28 @@ html:not(.mobile-ui) .panel.on{
   <div class="bd"><div id="upgList"></div><div id="upgInfo">Eşya seç.</div><button class="abtn" id="upgBtn" disabled>ATEŞLE</button></div>
 </div>
 
-<div class="panel" id="mapPanel"><h3>DÜNYA HARİTASI</h3><button class="x" data-close="mapPanel">✕</button><canvas id="mapCv" width="420" height="420"></canvas><div id="fastTravel" style="margin-top:10px;border-top:1px solid var(--line2);padding-top:9px"><div style="font:700 12px Cinzel,serif;color:var(--gold2);margin-bottom:7px">YOL TAŞLARI — HIZLI SEYAHAT</div><div id="fastTravelBtns" style="display:flex;flex-wrap:wrap;gap:6px"></div><div style="font-size:10px;color:var(--muted);margin-top:7px">Bir bölgeye ilk kez ulaştığında yol taşı açılır. Savaş sırasında ışınlanamazsın.</div></div></div>
+<div class="panel" id="mapPanel">
+  <div class="mapHead"><div><h3>DÜNYA HARİTASI</h3><span id="mapSub">Ağıt Han ve çevre bölgeleri</span></div><button class="x" data-close="mapPanel">✕</button></div>
+  <div class="mapLayout">
+    <div class="mapStage">
+      <canvas id="mapCv" width="640" height="640"></canvas>
+      <div class="mapLegend"><span>▲ Sen</span><span>◎ Görev</span><span>◆ Yol Taşı</span></div>
+    </div>
+    <aside id="mapInfo">
+      <div class="mapInfoEyebrow">BÖLGE</div>
+      <h4 id="mapRegionName">AĞIT HAN</h4>
+      <div id="mapRegionState">Güvenli yerleşim</div>
+      <div class="mapInfoRule"></div>
+      <div class="mapInfoLabel">ANA GÖREV</div>
+      <div id="mapQuestInfo">Aktif görev bulunmuyor.</div>
+      <div class="mapInfoRule"></div>
+      <div class="mapInfoLabel">YOL TAŞI</div>
+      <div id="mapTravelState">Açık</div>
+      <button class="abtn" id="mapTravelBtn" data-travel="koy">SEYAHAT ET</button>
+      <div id="mapHint">Haritadaki bir bölge adına tıkla.</div>
+    </aside>
+  </div>
+</div>
 <div class="panel" id="settingsPanel">
   <h3>AYARLAR</h3><button class="x" data-close="settingsPanel">✕</button>
   <div class="settingsSec">
@@ -4238,151 +4268,114 @@ function fastTravelUnlocked(p){
 function inCombatForTravel(){
   return !!(P.dead||P.hurtT>0||mobs.some(m=>!m.dead&&m.hp>0&&m.target===P&&dst(m.x,m.y,P.x,P.y)<430));
 }
-function renderFastTravel(){
-  const w=$('fastTravelBtns'); if(!w)return;
-  w.innerHTML=FAST_TRAVEL_POINTS.map(p=>{
-    const open=fastTravelUnlocked(p);
-    return `<button class="btn" data-travel="${p.id}" ${open?'':'disabled'} style="font-size:10px;padding:7px 9px">${open?'✦ ':'🔒 '}${p.n}</button>`;
-  }).join('');
+const MAP_REGION_META={
+  koy:{n:'AĞIT HAN',r:'köy',desc:'Güvenli yerleşim · tüccarlar, demirci ve Kam Bilge'},
+  ova:{n:'KAVRUK OVA',r:'ova',desc:'Açık bozkır · ilk mühür izlerinin bulunduğu bölge'},
+  orman:{n:'SARI ORMAN',r:'orman',desc:'Ana Ağacın kök saldığı yoğun orman'},
+  tuz:{n:'TUZ ÇÖLÜ',r:'tuz',desc:'Eski yerleşimin tuz altında kaldığı beyaz çöl'},
+  ayaz:{n:'AYAZ VADİSİ',r:'ayaz',desc:'Eski nöbetçilerin ve donmuş mühürlerin vadisi'},
+  batak:{n:'KARA BATAKLIK',r:'batak',desc:'Geçmişin seslerini saklayan karanlık sazlık'},
+  magara:{n:"ERLİK'İN AĞZI",r:'mağara',desc:'Mühür zincirinin derinliklere açılan son kapısı'}
+};
+let mapSelectedRegion='koy';
+
+function mapPointFor(id){return FAST_TRAVEL_POINTS.find(p=>p.id===id);}
+function mapQuestBelongs(id){
+  const q=P.qActive;if(!q)return false;
+  const meta=MAP_REGION_META[id];if(!meta)return false;
+  if((q.t==='visit'||q.t==='stone')&&q.m===meta.r)return true;
+  if(q.t==='hunt'&&MOBS[q.m]?.reg===meta.r)return true;
+  return false;
 }
+function renderMapInfo(){
+  const id=mapSelectedRegion,meta=MAP_REGION_META[id],p=mapPointFor(id);
+  if(!meta||!p)return;
+  $('mapRegionName').textContent=meta.n;
+  $('mapRegionState').textContent=meta.desc;
+  const open=fastTravelUnlocked(p);
+  $('mapTravelState').textContent=open?'Yol taşı aktif.':'Henüz keşfedilmedi.';
+  const b=$('mapTravelBtn');
+  b.dataset.travel=id;b.disabled=!open;b.textContent=open?'SEYAHAT ET':'YOL TAŞI KİLİTLİ';
+  if(P.qActive&&mapQuestBelongs(id)){
+    $('mapQuestInfo').textContent=P.qActive.n+' — '+P.qActive.d;
+  }else if(P.qActive){
+    $('mapQuestInfo').textContent='Aktif ana görev bu bölgede değil.';
+  }else $('mapQuestInfo').textContent='Aktif görev bulunmuyor.';
+}
+function renderFastTravel(){renderMapInfo();}
 function fastTravelTo(id){
   const p=FAST_TRAVEL_POINTS.find(x=>x.id===id);
   if(!p||!fastTravelUnlocked(p)){toast('Bu yol taşı henüz açılmadı.');return;}
   if(inCombatForTravel()){toast('Savaş sırasında ışınlanamazsın.');return;}
   P.target=null;P.stoneT=null;$('targetBar').style.display='none';
-  // V4.48.5: hedef bölgenin içinde ve çevresinde hareket alanı olan bir nokta şart.
-  // Özellikle Sarı Orman'da tek başına collision=false olan ama etrafı kapalı cepler
-  // artık güvenli iniş sayılmaz.
   const wantedRegion=p.id==='koy'?'köy':(p.id==='magara'?'mağara':p.id);
   const safe=nearestWalkable(p.x,p.y,10,p.id==='orman'?900:480,wantedRegion);
   if(!safe){toast('Bu yol taşının güvenli iniş noktası bulunamadı.');return;}
   P.x=safe.x;P.y=safe.y;P.tx=safe.x;P.ty=safe.y;P.mv=false;
   cam.x=safe.x;cam.y=safe.y;
-  closePanels();
-  announce('YOL TAŞI — '+p.n.toUpperCase());
-  toast(p.n+' bölgesine ışınlandın.');
-  save();
+  closePanels();announce('YOL TAŞI — '+p.n.toUpperCase());toast(p.n+' bölgesine ışınlandın.');save();
 }
-$('fastTravelBtns').addEventListener('click',e=>{
-  const b=e.target.closest('[data-travel]'); if(!b||b.disabled)return;
-  fastTravelTo(b.dataset.travel);
+$('mapTravelBtn').addEventListener('click',e=>{
+  if(e.currentTarget.disabled)return;
+  fastTravelTo(e.currentTarget.dataset.travel);
 });
+
 let mapBase=null;
 function bakeBigMap(){
   mapBase=mkc(MW,MW);const g=mapBase.getContext('2d');
   for(let ty=0;ty<MW;ty++)for(let tx=0;tx<MW;tx++){
-    g.fillStyle=MMCOL[TT[ty*MW+tx]];g.fillRect(tx,ty,1,1);}
-}
-function mapRegionCentres(){
-  // Bölge etiketlerini mevcut dünya verisinden hesapla; harita değişse bile etiketler uyumlu kalır.
-  const acc={};
-  for(let ty=0;ty<MW;ty+=2)for(let tx=0;tx<MW;tx+=2){
-    const x=(tx+.5)*TILE,y=(ty+.5)*TILE,r=regionAt(x,y);
-    if(!r)continue;
-    const a=acc[r]||(acc[r]={x:0,y:0,n:0});
-    a.x+=x;a.y+=y;a.n++;
+    g.fillStyle=MMCOL[TT[ty*MW+tx]];g.fillRect(tx,ty,1,1);
   }
-  Object.values(acc).forEach(a=>{a.x/=a.n||1;a.y/=a.n||1;});
-  return acc;
 }
-let bigMapRegionCentres=null;
-function drawMapPin(g,x,y,c,label,sc,size=1){
-  const px=x*sc,py=y*sc;
+function drawMapLabel(g,p,label,open,selected,sc){
+  const x=p.x*sc,y=p.y*sc;
   g.save();
-  g.shadowColor='rgba(0,0,0,.65)';g.shadowBlur=5;
-  g.fillStyle=c;g.beginPath();g.arc(px,py,4.2*size,0,TAU);g.fill();
-  g.lineWidth=1.6*size;g.strokeStyle='#fff4c8';g.stroke();
-  if(label){
-    g.font=`700 ${Math.round(10*size)}px Cinzel,serif`;
-    g.textAlign='center';g.textBaseline='bottom';
-    const tw=g.measureText(label).width+12*size;
-    g.fillStyle='rgba(15,12,8,.78)';
-    g.fillRect(px-tw/2,py-24*size,tw,15*size);
-    g.fillStyle='#f0ddb0';g.fillText(label,px,py-11*size);
-  }
+  g.globalAlpha=open?1:.52;
+  if(selected){g.strokeStyle='#f0c85f';g.lineWidth=2.5;g.beginPath();g.arc(x,y,11,0,TAU);g.stroke();}
+  g.fillStyle=open?'#d9b75d':'#777064';
+  g.beginPath();g.arc(x,y,4.5,0,TAU);g.fill();
+  g.strokeStyle='#fff0b1';g.lineWidth=1;g.stroke();
+  g.font='700 10px Cinzel,serif';g.textAlign='center';g.textBaseline='bottom';
+  const tw=g.measureText(label).width+10;
+  g.fillStyle='rgba(13,10,7,.78)';g.fillRect(x-tw/2,y-24,tw,14);
+  g.fillStyle=open?'#e7d3a0':'#8f887c';g.fillText(label,x,y-12);
   g.restore();
 }
 function drawBigMap(){
-  renderFastTravel();
-  const cvm=$('mapCv'),g=cvm.getContext('2d');
-  // CSS büyüdüğünde bulanıklaşmaması için gerçek çizim çözünürlüğünü yükselt.
-  const S=760;
+  renderMapInfo();
+  const cvm=$('mapCv'),g=cvm.getContext('2d'),S=640;
   if(cvm.width!==S||cvm.height!==S){cvm.width=S;cvm.height=S;}
-  g.clearRect(0,0,S,S);
-  g.imageSmoothingEnabled=false;
-  g.drawImage(mapBase,0,0,S,S);
-  g.imageSmoothingEnabled=true;
-
+  g.clearRect(0,0,S,S);g.imageSmoothingEnabled=false;g.drawImage(mapBase,0,0,S,S);g.imageSmoothingEnabled=true;
   const sc=S/WORLD;
-  // Haritayı karartan katman yok. Yalnızca okunabilirlik için ince sınır/vinyet.
-  const vg=g.createRadialGradient(S/2,S/2,S*.28,S/2,S/2,S*.72);
-  vg.addColorStop(0,'rgba(0,0,0,0)');
-  vg.addColorStop(1,'rgba(0,0,0,.12)');
-  g.fillStyle=vg;g.fillRect(0,0,S,S);
 
-  if(!bigMapRegionCentres)bigMapRegionCentres=mapRegionCentres();
-  const rn={köy:'AĞIT HAN',ova:'KAVRUK OVA',orman:'SARI ORMAN',tuz:'TUZ ÇÖLÜ',ayaz:'AYAZ VADİSİ',batak:'KARA BATAKLIK',mağara:"ERLİK'İN AĞZI"};
-  Object.entries(bigMapRegionCentres).forEach(([r,a])=>{
-    if(!rn[r]||r==='köy')return;
-    const x=a.x*sc,y=a.y*sc;
-    g.save();
-    g.font='700 13px Cinzel,serif';g.textAlign='center';g.textBaseline='middle';
-    g.lineWidth=4;g.strokeStyle='rgba(15,12,8,.72)';g.strokeText(rn[r],x,y);
-    g.fillStyle='rgba(245,226,183,.88)';g.fillText(rn[r],x,y);
-    g.restore();
-  });
-
-  // Yol taşları: kilitli olanlar da haritada görünür, fakat soluk ve kilit işaretlidir.
-  FAST_TRAVEL_POINTS.forEach(p=>{
-    const open=fastTravelUnlocked(p),px=p.x*sc,py=p.y*sc;
-    g.save();
-    g.globalAlpha=open?1:.46;
-    g.strokeStyle=open?'#e8c86c':'#8d8473';g.lineWidth=2;
-    g.beginPath();g.arc(px,py,7,0,TAU);g.stroke();
-    g.fillStyle=open?'#f4d875':'#706a61';g.fillRect(px-2.5,py-2.5,5,5);
-    if(!open){g.font='12px sans-serif';g.textAlign='center';g.fillStyle='#d0c7b7';g.fillText('🔒',px,py-10);}
-    g.restore();
-  });
-
-  // NPC'ler küçük tutulur; dünya haritasında gereksiz nokta kalabalığı yapmaz.
-  npcs.forEach(n=>{g.fillStyle='#d9b75d';g.beginPath();g.arc(n.x*sc,n.y*sc,2.2,0,TAU);g.fill();});
-
-  stones.forEach(s=>{if(s.alive){
-    const z=stoneTier(s);g.save();g.fillStyle=z.c;g.shadowColor=z.c;g.shadowBlur=8;
-    g.beginPath();g.arc(s.x*sc,s.y*sc,4+z.rar*.7,0,TAU);g.fill();g.restore();
-  }});
-
-  onlinePlayers.forEach(p=>{g.fillStyle='#7fd4ff';g.beginPath();g.arc(p.x*sc,p.y*sc,3,0,TAU);g.fill();});
+  // Dünya haritasında yalnızca karar vermeye yarayan bilgiler bulunur.
+  FAST_TRAVEL_POINTS.forEach(p=>drawMapLabel(g,p,p.n,fastTravelUnlocked(p),mapSelectedRegion===p.id,sc));
 
   if(P.qActive){
     const qp=questTargetPoint(P.qActive);
     if(qp){
-      const qx=qp.x*sc,qy=qp.y*sc;
-      g.save();g.strokeStyle='#ffe066';g.lineWidth=3;g.shadowColor='#ffe066';g.shadowBlur=10;
-      g.beginPath();g.arc(qx,qy,10,0,TAU);g.stroke();
-      g.beginPath();g.moveTo(qx-14,qy);g.lineTo(qx+14,qy);g.moveTo(qx,qy-14);g.lineTo(qx,qy+14);g.stroke();
-      g.restore();
+      const x=qp.x*sc,y=qp.y*sc;
+      g.save();g.strokeStyle='#ffe066';g.lineWidth=3;g.shadowColor='#ffe066';g.shadowBlur=8;
+      g.beginPath();g.arc(x,y,9,0,TAU);g.stroke();g.restore();
     }
   }
 
-  drawMapPin(g,VILLAGE.x,VILLAGE.y,'#e0b84b','Ağıt Han',sc,1.05);
-
-  // Bulunduğun bölgeyi haritayı okumadan da anlayabilmek için oyuncu çevresinde konum halkası.
   const px=P.x*sc,py=P.y*sc;
-  g.save();g.strokeStyle='rgba(255,224,102,.48)';g.lineWidth=2;g.setLineDash([5,5]);
-  g.beginPath();g.arc(px,py,18,0,TAU);g.stroke();g.restore();
-  // Oyuncu konumu en belirgin işaret.
-  g.save();g.translate(px,py);g.fillStyle='#fff';g.strokeStyle='#1b1308';g.lineWidth=2;
-  g.beginPath();g.moveTo(0,-10);g.lineTo(7,8);g.lineTo(0,5);g.lineTo(-7,8);g.closePath();g.fill();g.stroke();g.restore();
-  g.font='700 11px Cinzel,serif';g.textAlign='center';g.fillStyle='#fff';
-  g.strokeStyle='rgba(0,0,0,.8)';g.lineWidth=3;g.strokeText('SEN',px,py-15);g.fillText('SEN',px,py-15);
+  g.save();g.translate(px,py);g.fillStyle='#fff';g.strokeStyle='#1a1208';g.lineWidth=2;
+  g.beginPath();g.moveTo(0,-9);g.lineTo(6,7);g.lineTo(0,4);g.lineTo(-6,7);g.closePath();g.fill();g.stroke();g.restore();
 
-  // Harita çerçevesi + sade lejant.
-  g.strokeStyle='rgba(222,188,105,.7)';g.lineWidth=2;g.strokeRect(1,1,S-2,S-2);
-  g.fillStyle='rgba(12,10,7,.78)';g.fillRect(12,S-34,330,22);
-  g.font='11px Arial,sans-serif';g.textAlign='left';g.fillStyle='#e8d9b8';
-  g.fillText('◆ Yol taşı   ✦ Göktaşı   ◎ Görev hedefi   ▲ Sen',22,S-19);
+  g.strokeStyle='rgba(215,178,89,.55)';g.lineWidth=2;g.strokeRect(1,1,S-2,S-2);
 }
+$('mapCv').addEventListener('click',e=>{
+  const r=e.currentTarget.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*640,sy=(e.clientY-r.top)/r.height*640;
+  const sc=640/WORLD;
+  let best=null,bd=34;
+  FAST_TRAVEL_POINTS.forEach(p=>{
+    const d=Math.hypot(sx-p.x*sc,sy-p.y*sc);
+    if(d<bd){bd=d;best=p;}
+  });
+  if(best){mapSelectedRegion=best.id;renderMapInfo();drawBigMap();}
+});
 // ---------- HUD güncelle ----------
 function updateBars(){
   $('hpF').style.width=clamp(P.hp/maxHP()*100,0,100)+'%';
