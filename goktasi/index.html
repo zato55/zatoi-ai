@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.9 CANVAS GHOST HITBOX ALLOWLIST FIX -->
+<!-- GOKTASI V4.48 MOB RADIUS + CHASE RANGE ROOT FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2552,10 +2552,25 @@ function invFree(){return P.inv.some(s=>!s);}
 // ---------- moblar ----------
 function mobBase(k){const M=MOBS[k],lv=M.lv;
   return{hp:Math.floor((30+lv*22)*M.hpm),dmg:4+lv*2.4*M.dmgm,exp:15+Math.pow(lv,1.5)*12};}
+function mobRadius(m){
+  const r=Number(m?.r);
+  if(Number.isFinite(r)&&r>0)return r;
+  const cfg=MOBS[m?.k];
+  return Number.isFinite(cfg?.r)?cfg.r:14;
+}
+function normalizeMobRadius(m){
+  if(m&&!Number.isFinite(Number(m.r)))m.r=mobRadius(m);
+  return m;
+}
 function spawnMob(k,x,y,home){
   const M=MOBS[k],b=mobBase(k);
+  // V4.48: M.r daha önce mob instance'ına hiç aktarılmıyordu.
+  // Bu yüzden m.r === undefined kalıyor; saldırı/takip menzilleri NaN oluyor ve
+  // oyuncu uzaktaki hedefe yaklaşmak yerine olduğu yerden saldırmaya çalışabiliyordu.
   const mob={id:uid++,k,x,y,hx:home?home.x:x,hy:home?home.y:y,hp:b.hp,maxhp:b.hp,dmg:b.dmg,exp:b.exp,
+    r:Number.isFinite(M.r)?M.r:14,
     st:'idle',wx:x,wy:y,dir:1,wt:0,atkCD:0,hitT:0,target:null,respT:0,leashT:0,wT:rnd(1,4),flee:false,boss:M.boss};
+  normalizeMobRadius(mob);
   mobs.push(mob);
   return mob;
 }
@@ -2995,7 +3010,7 @@ function mobHitTarget(m){
     if(P.dead||m.dead||m.hp<=0){m.target=null;return;}
     // V4.1: Görünmeyen/uzakta kalmış yaratık oyuncuya hasar veremez.
     // Hasar anında gerçek konum tekrar doğrulanır; eski hedef kilidi tek başına yeterli değildir.
-    const hitRange=22+m.r;
+    const hitRange=22+mobRadius(m);
     const liveDist=dst(m.x,m.y,P.x,P.y);
     if(liveDist>hitRange){
       if(liveDist>360)m.target=null;
@@ -3040,7 +3055,8 @@ function playerAttack(){
   const m=P.target;
   if(!m||m.hp<=0)return;
   const d=dst(P.x,P.y,m.x,m.y);
-  const range=38+(m.boss?m.r:0);
+  const mr=mobRadius(m);
+  const range=38+(m.boss?mr:0);
   if(d>range)return;
   if(P.atkCD>0)return;
   P.atkCD=1/(1.05+P.stat.c*.012);
@@ -3105,7 +3121,7 @@ function castSkill(i){
   else if(i===1){SFX.skill();
     const radius=155;
     // Hedef kilidinden tamamen bağımsız: o anda fiziksel çemberin içinde olan HER canlı mob vurulur.
-    const victims=mobs.filter(m=>m.hp>0&&!m.dead&&dst(P.x,P.y,m.x,m.y)<=radius+m.r);
+    const victims=mobs.filter(m=>m.hp>0&&!m.dead&&dst(P.x,P.y,m.x,m.y)<=radius+mobRadius(m));
     fxs.push({type:'ring',x:P.x,y:P.y,t:0,dur:.65,r0:18,r1:radius,c:'rgba(232,207,143,'});
     fxs.push({type:'ring',x:P.x,y:P.y,t:0,dur:.45,r0:10,r1:radius*.72,c:'rgba(127,212,255,'});
     victims.forEach(m=>{
@@ -4088,12 +4104,22 @@ function updPlayer(dt){
     if(dT<6){P.tx=P.x;P.ty=P.y;}
   }else P.walkT*=.8;
   // hedef takip
-  if(P.target&&P.target.hp>0){
-    const m=P.target,d=dst(P.x,P.y,m.x,m.y),range=38+m.r*.8;
-    if(d>range){const a=Math.atan2(m.y-P.y,m.x-P.x);
+  if(P.target&&P.target.hp>0&&!P.target.dead){
+    const m=P.target;
+    const mr=mobRadius(m);
+    const d=dst(P.x,P.y,m.x,m.y);
+    const range=38+mr*.8;
+    if(d>range){
+      const a=Math.atan2(m.y-P.y,m.x-P.x);
       smartMove(P,a,spd,10);
-      P.dir=m.x>=P.x?1:-1;P.mv=true;P.walkT+=dt*9;}
-    else playerAttack();
+      P.dir=m.x>=P.x?1:-1;P.mv=true;P.walkT+=dt*9;
+    }else{
+      P.tx=P.x;P.ty=P.y;
+      playerAttack();
+    }
+  }else if(P.target){
+    P.target=null;
+    $('targetBar').style.display='none';
   }
   if(P.stoneT){
     const s=P.stoneT;
@@ -4159,6 +4185,7 @@ function updPlayer(dt){
 function updMobs(dt){
   const t=worldT;
   for(let i=mobs.length-1;i>=0;i--){const m=mobs[i];
+    normalizeMobRadius(m);
     if(m.stoneGuard){
       const source=stones[m.stoneIndex];
       if(!source||!source.alive){mobs.splice(i,1);continue;}
@@ -4198,7 +4225,7 @@ function updMobs(dt){
         moveEnt(m,Math.cos(a)*M.sp*dt,Math.sin(a)*M.sp*dt,M.r-3);
         m.dir=Math.cos(a)>=0?1:-1;m.wt+=dt*8;
       }
-      else if(tgd>18+m.r){const a=Math.atan2(tg.y-m.y,tg.x-m.x);
+      else if(tgd>18+mobRadius(m)){const a=Math.atan2(tg.y-m.y,tg.x-m.x);
         moveEnt(m,Math.cos(a)*M.sp*dt,Math.sin(a)*M.sp*dt,M.r-3);
         m.dir=Math.cos(a)>=0?1:-1;m.wt+=dt*8;m.atkCD=Math.max(0,m.atkCD-dt);}
       else{m.atkCD-=dt;
@@ -4269,7 +4296,7 @@ function updBots(dt){
       const m=b.target;
       if(!m||m.hp<=0||m.dead){b.target=null;b.st='idle';b.tT=rnd(1,3);}
       else{const d=dst(b.x,b.y,m.x,m.y);
-        if(d>34+m.r){const a=Math.atan2(m.y-b.y,m.x-b.x);
+        if(d>34+mobRadius(m)){const a=Math.atan2(m.y-b.y,m.x-b.x);
           moveEnt(b,Math.cos(a)*135*dt,Math.sin(a)*135*dt,10);
           b.dir=m.x>=b.x?1:-1;b.mv=true;b.wt+=dt*8;}
         else{b.mv=false;
@@ -4348,7 +4375,7 @@ function drawWpn(g,w,c){
 function drawMob(g,m){
   const M=MOBS[m.k],tm=worldT;
   g.save();g.translate(m.x,m.y);
-  g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(0,2,m.r*.9,m.r*.35,0,0,TAU);g.fill();
+  g.fillStyle='rgba(0,0,0,.3)';g.beginPath();{const mr=mobRadius(m);g.ellipse(0,2,mr*.9,mr*.35,0,0,TAU);}g.fill();
   if(m.dir<0)g.scale(-1,1);
   const[c1,c2]=M.pal,w=m.wt;
   const lw=(x1,y1,x2,y2,ww,cc)=>{g.strokeStyle=cc;g.lineWidth=ww;g.lineCap='round';g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();g.lineCap='butt';};
@@ -4441,14 +4468,14 @@ function drawMob(g,m){
     g.save();g.translate(8,-16);g.rotate(-.5+Math.sin(tm*1.5)*.06);g.fillStyle='#4a4038';g.fillRect(0,-3,30,6);g.restore();
   }
   if(m.hitT>0){g.globalCompositeOperation='lighter';g.globalAlpha=m.hitT*4;
-    g.fillStyle='#fff';g.beginPath();g.arc(0,-m.r*.7,m.r*.9,0,TAU);g.fill();
+    {const mr=mobRadius(m);g.fillStyle='#fff';g.beginPath();g.arc(0,-mr*.7,mr*.9,0,TAU);g.fill();}
     g.globalAlpha=1;g.globalCompositeOperation='source-over';}
   g.restore();
   // can barı
   if(m.hp<m.maxhp&&!m.boss){
     const bw=30;
-    g.fillStyle='rgba(0,0,0,.6)';g.fillRect(m.x-bw/2,m.y-m.r-16,bw,4);
-    g.fillStyle='#9e2b25';g.fillRect(m.x-bw/2,m.y-m.r-16,bw*clamp(m.hp/m.maxhp,0,1),4);}
+    {const mr=mobRadius(m);g.fillStyle='rgba(0,0,0,.6)';g.fillRect(m.x-bw/2,m.y-mr-16,bw,4);
+    g.fillStyle='#9e2b25';g.fillRect(m.x-bw/2,m.y-mr-16,bw*clamp(m.hp/m.maxhp,0,1),4);}}
 }
 function drawStone(g,s){
   const pulse=.5+Math.sin(worldT*3+s.i)*.5,z=stoneTier(s),zc=z.c;
@@ -4520,7 +4547,7 @@ function render(){
   // hedef halkası
   if(P.target&&P.target.hp>0){const m=P.target;
     ctx.strokeStyle='rgba(232,207,143,.8)';ctx.lineWidth=2;
-    ctx.beginPath();ctx.ellipse(m.x,m.y+3,m.r+6,(m.r+6)*.45,0,0,TAU);ctx.stroke();}
+    {const mr=mobRadius(m);ctx.beginPath();ctx.ellipse(m.x,m.y+3,mr+6,(mr+6)*.45,0,0,TAU);ctx.stroke();}}
   // düşenler
   drops.forEach(d=>{
     const bob=Math.sin(worldT*4+d.x)*2;
