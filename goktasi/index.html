@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.51 HIKAYE OYNANIS SISTEMI -->
+<!-- GOKTASI V4.52 SINEMATIK HIKAYE VE BOSS KIMLIGI -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -124,6 +124,16 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
 #dlgPanel{bottom:120px;left:50%;transform:translateX(-50%);width:440px}
 #dlgName{font-family:'Cinzel',serif;color:var(--gold2);font-size:14px}
 #dlgText{font-size:13px;line-height:1.65;color:var(--text);padding:12px 14px;min-height:52px;font-style:italic}
+#storyScene{position:fixed;inset:0;z-index:95;display:none;align-items:flex-end;justify-content:center;pointer-events:none}
+#storyScene.on{display:flex;pointer-events:auto}
+#storyShade{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(0,0,0,.12),rgba(0,0,0,.76));animation:storyShadeIn .45s ease both}
+#storyCard{position:relative;width:min(720px,88vw);margin:0 0 7vh;padding:22px 26px 18px;background:linear-gradient(180deg,rgba(27,21,13,.97),rgba(12,10,7,.98));border:1px solid #7b5d2a;box-shadow:0 18px 80px #000;animation:storyCardIn .5s cubic-bezier(.2,.8,.2,1) both}
+#storyKicker{font:700 9px Cinzel,serif;letter-spacing:3px;color:#a98749}
+#storyTitle{font:700 22px Cinzel,serif;color:#ead39a;margin:7px 0 9px}
+#storyBody{font-size:13px;line-height:1.75;color:#d0c4ae;white-space:pre-line}
+#storyContinue{margin-top:14px;padding-top:10px;border-top:1px solid #392d1a;text-align:right;font:700 9px Cinzel,serif;letter-spacing:2px;color:#806f50}
+@keyframes storyShadeIn{from{opacity:0}to{opacity:1}}@keyframes storyCardIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+
 #dlgBtns{display:flex;gap:8px;padding:0 14px 12px;flex-wrap:wrap}
 .abtn{background:#241b0e;border:1px solid var(--line2);color:var(--gold2);padding:6px 14px;font-size:12px;font-weight:600}
 .abtn:hover{border-color:var(--gold);background:#2e2212}
@@ -1950,6 +1960,15 @@ html:not(.mobile-ui) .panel.on{
     </div>
   </div>
 </div>
+<div id="storyScene">
+  <div id="storyShade"></div>
+  <div id="storyCard">
+    <div id="storyKicker">KEŞİF</div>
+    <div id="storyTitle"></div>
+    <div id="storyBody"></div>
+    <div id="storyContinue">DEVAM ET</div>
+  </div>
+</div>
 <div id="death"><h2>RUHUN KIRILDI</h2><p id="deathTxt"></p></div>
 <div id="toasts"></div>
 <div id="tip"></div>
@@ -3153,6 +3172,42 @@ function questTargetName(q){
   if(q.t==='hold')return 'İnceleme noktası';
   return q.m||'';
 }
+const STORY_CLUES={
+  ova:["Toprakta metal olmayan ince bir çınlama var. Ses, köydeki çanın ritmini tekrar ediyor.","Ezilmiş otların arasında siyah cam parçaları dizilmiş. Bir hayvan izi değil; parçalar aynı yöne çevrilmiş.","Son izde toprağın altından sıcaklık geliyor. Kırık Boynuz bu noktayı koruyor olmalı."],
+  orman:["Sarı reçine yukarı değil, toprağın altına akmış. Kökler bir şeyi beslemiyor; çevreliyor.","Ağaç kabuğundaki çizgiler göktaşı damarlarıyla aynı biçimde. Orman taşı dışarı itmeye çalışıyor.","Üçüncü kök taşın etrafında düğümlenmiş. Ana Ağaç burada bilinçli bir set kurmuş."],
+  tuz:["Tuz kabuğunun altında düzgün kesilmiş bir yol taşı çıktı. Bu çöl bir zamanlar yerleşimdi.","İkinci işarette aynı çan sembolü var; fakat yüzlerce yıl daha eski.","Son levhada gökten düşen altı parça ve onları çevreleyen altı mühür çizilmiş."],
+  ayaz:["Buzun altında diz çökmüş bir nöbetçinin eli hâlâ mühür işaretini tutuyor.","İkinci izde kılıç yarası yok. Bu insanlar savaşta değil, görev başında donmuş.","Son işarette Ağıt Han'ın kurucu damgası var. Köyün hikâyesi buraya kadar uzanıyor."],
+  batak:["Çamura bastığında sana ait olmayan bir ayak sesi geri dönüyor.","İkinci yankıda bir çanın değil, bir çocuğun sesi duyuluyor; sözler seçilemiyor.","Son yankı tek bir isim bırakıyor: Yüzsüz Ata."],
+  mağara:["Duvar çizikleri rastgele değil. Her çizgi dışarıdaki bir mühüre karşılık geliyor.","Taşın içinden gelen yankı Kırık Yüzlü'nün nefesiyle aynı ritimde.","Son işaret bir uyarı: Kapı dışarıdakini içeri sokmak için değil, içeridekini susturmak için yapılmış."]
+};
+const STORY_HOLD_REVEAL={
+  ova:"Taşa yaklaştıkça çanın sesi kulaktan değil, zeminden geliyor. Gök parçası Ağıt Han'daki çanla aynı frekansta titreşiyor.",
+  orman:"Kökler birkaç saniyede bir göktaşına doğru kasılıyor. Ana Ağaç bozulmanın kaynağı değil; onu yerinde tutan canlı bir mühür.",
+  tuz:"Tuz levhasındaki çizgiler ışıkta birleşiyor: göktaşları daha önce de düşmüş. Eski halk bunu yaşamış ve kayıt bırakmış.",
+  ayaz:"Buz çözülürken nöbetçinin avucundaki işaret beliriyor. Mühür kırılmamış; biri içeriden sökmüş.",
+  batak:"Sazlar sustuğunda çamurun içinden eski bir konuşma yükseliyor. Köyün anlatmadığı bir geçmiş burada saklanmış.",
+  mağara:"Yankı kesildiğinde duvarın ardında ikinci bir vuruş duyuluyor. Kırık Yüzlü tek başına değil; bir şeyin kabuğu."
+};
+let storySceneTimer=0;
+function storyScene(kicker,title,body,auto=0){
+  const el=$('storyScene');$('storyKicker').textContent=kicker;$('storyTitle').textContent=title;$('storyBody').textContent=body;
+  el.classList.add('on');P.tx=P.x;P.ty=P.y;P.mv=false;
+  if(storySceneTimer)clearTimeout(storySceneTimer);
+  if(auto)storySceneTimer=setTimeout(()=>el.classList.remove('on'),auto);
+}
+$('storyScene').addEventListener('click',()=>{$('storyScene').classList.remove('on');});
+function storyPulseSound(strong=false){
+  try{
+    initAudio();
+    const ac=audioCtx;if(!ac)return;
+    const o=ac.createOscillator(),gain=ac.createGain();
+    o.type='sine';o.frequency.value=strong?164:123;
+    gain.gain.setValueAtTime(.0001,ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(strong?.055:.032,ac.currentTime+.03);
+    gain.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+(strong?.9:.55));
+    o.connect(gain);gain.connect(ac.destination);o.start();o.stop(ac.currentTime+(strong?.95:.6));
+  }catch(e){}
+}
 function storyQuestAnchor(reg,index=0){
   const id=reg==='köy'?'koy':(reg==='mağara'?'magara':reg);
   const fp=FAST_TRAVEL_POINTS.find(p=>p.id===id);
@@ -4103,7 +4158,15 @@ function questTurn(){
     announce('KIRIK ÇAĞ — ANA HİKÂYE TAMAMLANDI');
     addChat('',P.name+' gök çekirdeğinin döngüsünü kırdı ve Ağıt Han çanını son kez çaldırdı.','ev');
   }
+  const completedChapter=questChapter(finishedStep);
+  const completedTitle=q.n,completedDesc=q.d;
   P.qActive=null;P.qN=0;
+  if(!q.rep){
+    const chapterEnd=completedChapter&&finishedStep===completedChapter.to;
+    storyScene(chapterEnd?'FASIL TAMAMLANDI':'HİKÂYE İLERLEDİ',chapterEnd?completedChapter.n:completedTitle,
+      chapterEnd?('Bu bölüm kapandı. Öğrendiklerin bir sonraki bölgenin neden önemli olduğunu değiştirdi.\n\n'+completedDesc):
+                 ('Yaptığın iş kayda geçti.\n\n'+completedDesc));
+  }
   SFX.up();toast('Görev tamamlandı');
   addChat('',P.name+' bir görevi teslim etti.','sys');
   renderQuest();closePanels();updateBars();
@@ -4507,6 +4570,9 @@ function updPlayer(dt){
     if(qp&&dst(P.x,P.y,qp.x,qp.y)<54){
       P.qN++;
       fxs.push({type:'ring',x:qp.x,y:qp.y,t:0,dur:.7,r0:8,r1:70,c:'rgba(232,207,143,'});
+      const clue=(STORY_CLUES[P.qActive.m]||[])[Math.max(0,P.qN-1)]||'İşaret bir sonraki noktayı gösteriyor.';
+      storyPulseSound(P.qN>=P.qActive.c);
+      storyScene('KANIT BULUNDU','İz '+P.qN+' / '+P.qActive.c,clue);
       if(P.qN>=P.qActive.c){toast('İz çözüldü: '+P.qActive.n);SFX.up();}
       else toast('İz bulundu — sıradaki işaret ortaya çıktı.');
       renderQuest();
@@ -4522,6 +4588,8 @@ function updPlayer(dt){
       if(Math.floor(before)!==Math.floor(P.qN))renderQuest();
       if(before<P.qActive.c&&P.qN>=P.qActive.c){
         fxs.push({type:'ring',x:qp.x,y:qp.y,t:0,dur:1,r0:12,r1:110,c:'rgba(255,224,102,'});
+        storyPulseSound(true);
+        storyScene('İNCELEME TAMAMLANDI',P.qActive.n,STORY_HOLD_REVEAL[P.qActive.m]||'İnceleme yeni bir bağlantıyı ortaya çıkardı.');
         toast('İnceleme tamamlandı: '+P.qActive.n);SFX.up();renderQuest();
       }
     }
@@ -4552,7 +4620,7 @@ function updPlayer(dt){
     P.tx=P.x;P.ty=P.y;P.mv=false;
   }
 
-  const spd=(150+(P.buffSpd>0?45:0))*dt;
+  P.storySlow=Math.max(0,(P.storySlow||0)-dt);const spd=(150+(P.buffSpd>0?45:0)-(P.storySlow>0?55:0))*dt;
   if(!interactionPanelOpen){
     if(keys.KeyW)dy-=1;if(keys.KeyS)dy+=1;if(keys.KeyA)dx-=1;if(keys.KeyD)dx+=1;
     if(IS_MOBILE_UI){dx+=mobileJoy.x;dy+=mobileJoy.y;}
@@ -4658,6 +4726,30 @@ function updPlayer(dt){
   }
   P.afkT=(performance.now()-lastInput)/1000;
 }
+const BOSS_STYLE={
+  yankiboynuz:'charge',sarikok:'web',tuzbekci:'burst',donmuskam:'frost',sazana:'swamp',
+  karanlikulak:'burst',bozhan:'charge',agdokuyan:'web',tuzkral:'burst',aknobet:'frost',
+  batakkalbi:'swamp',yuzsuz:'burst',boss:'burst'
+};
+function bossSpecial(m,tg){
+  const st=BOSS_STYLE[m.k]||'burst',d=dst(m.x,m.y,tg.x,tg.y);
+  if(st==='charge'&&d<500){
+    const a=Math.atan2(tg.y-m.y,tg.x-m.x);fxs.push({type:'warn',x:m.x+Math.cos(a)*90,y:m.y+Math.sin(a)*90,t:0,dur:.55,r:70});
+    setTimeout(()=>{if(m.dead||m.hp<=0)return;moveEnt(m,Math.cos(a)*125,Math.sin(a)*125,mobRadius(m)-3);if(!P.dead&&dst(m.x,m.y,P.x,P.y)<75)mobHitTarget(m);},550);
+  }else if(st==='web'&&d<430){
+    const x=tg.x,y=tg.y;fxs.push({type:'warn',x,y,t:0,dur:.75,r:95});
+    setTimeout(()=>{if(m.dead||m.hp<=0)return;if(dst(P.x,P.y,x,y)<95){P.storySlow=2.2;P.tx=P.x;P.ty=P.y;floats.push({x:P.x,y:P.y-35,txt:'AĞA YAKALANDIN',c:'#d7bd78',t:0,dur:1});}},750);
+  }else if(st==='frost'&&d<460){
+    const x=tg.x,y=tg.y;fxs.push({type:'warn',x,y,t:0,dur:.9,r:115});
+    setTimeout(()=>{if(m.dead||m.hp<=0)return;if(dst(P.x,P.y,x,y)<115){P.sp=Math.max(0,P.sp-25);P.lastHit=worldT;floats.push({x:P.x,y:P.y-35,txt:'AYAZ',c:'#bfe3f2',t:0,dur:1});}},900);
+  }else if(st==='swamp'&&d<460){
+    const x=tg.x,y=tg.y;fxs.push({type:'warn',x,y,t:0,dur:1.1,r:125});
+    setTimeout(()=>{if(m.dead||m.hp<=0)return;if(dst(P.x,P.y,x,y)<125){const red=armorDef()/(armorDef()+90);P.hp-=Math.max(1,m.dmg*1.45*(1-red));P.lastHit=worldT;P.hurtT=.5;SFX.hurt();}},1100);
+  }else if(d<420){
+    const x=tg.x,y=tg.y;fxs.push({type:'warn',x,y,t:0,dur:.7,r:105});
+    setTimeout(()=>{if(m.dead||m.hp<=0)return;if(dst(P.x,P.y,x,y)<105){const red=armorDef()/(armorDef()+90);P.hp-=Math.max(1,m.dmg*1.7*(1-red));P.lastHit=worldT;P.hurtT=.5;SFX.hurt();}},700);
+  }
+}
 function updMobs(dt){
   const t=worldT;
   for(let i=mobs.length-1;i>=0;i--){const m=mobs[i];
@@ -4708,24 +4800,10 @@ function updMobs(dt){
         if(m.atkCD<=0){m.atkCD=m.boss?1.4:1.15;mobHitTarget(m);
           if(m.boss){shakeT=.3;fxs.push({type:'ring',x:m.x,y:m.y,t:0,dur:.4,r0:20,r1:70,c:'rgba(192,86,60,'});}
         }}
-      // boss zıplama
+      // V4.52 — bosslar artık aynı alan saldırısını kopyalamaz; kimliğine göre özel hamle kullanır.
       if(m.boss){m.jumpT=(m.jumpT||0)-dt;
-        if(m.jumpT<=0&&tgd<420){m.jumpT=6;
-          // V4.48.6: Uyarı başladığı andaki merkez sabitlenir.
-          // Önceden tg çoğunlukla P olduğu için setTimeout çalıştığında tg.x/tg.y
-          // oyuncunun YENİ konumunu gösteriyor, böylece oyuncu çemberden kaçsa da
-          // hasar merkezi onu takip ediyordu.
-          const impactX=tg.x,impactY=tg.y,impactR=130;
-          fxs.push({type:'warn',x:impactX,y:impactY,t:0,dur:.9,r:impactR});
-          setTimeout(()=>{if(m.hp<=0)return;
-            fxs.push({type:'ring',x:impactX,y:impactY,t:0,dur:.5,r0:20,r1:impactR,c:'rgba(192,86,60,'});
-            shakeT=.4;
-            // Görsel alan ile gerçek hasar alanı artık aynı sabit merkez ve aynı yarıçapı kullanır.
-            if(!P.dead&&!m.dead&&m.hp>0&&dst(m.x,m.y,P.x,P.y)<520&&dst(P.x,P.y,impactX,impactY)<=impactR){const red=armorDef()/(armorDef()+90);
-              const d=Math.max(1,m.dmg*2.2*(1-red));P.hp-=d;P.lastHit=worldT;P.hurtT=.6;SFX.hurt();
-              floats.push({x:P.x,y:P.y-36,txt:Math.round(d),c:'#e06a50',t:0,dur:.9});
-              if(P.hp<=0)playerDie(m);}
-          },900);}}
+        if(m.jumpT<=0&&tgd<500){m.jumpT=5.5+rnd(0,1.8);bossSpecial(m,tg);}
+      }
     }else{
       // gezinme
       if(m.st==='return'){const a=Math.atan2(m.hy-m.y,m.hx-m.x);
@@ -5067,6 +5145,26 @@ function render(){
       }});
     }
   });
+  // V4.52 — aktif hikâye kanıtı dünyada fiziksel olarak görünür.
+  if(P.qActive&&(P.qActive.t==='track'||P.qActive.t==='hold')){
+    const qp=questTargetPoint(P.qActive);
+    if(qp){
+      const pulse=.5+.5*Math.sin(worldT*4);
+      ctx.save();
+      ctx.strokeStyle=`rgba(232,207,143,${.45+.35*pulse})`;ctx.lineWidth=2;
+      ctx.beginPath();ctx.ellipse(qp.x,qp.y,18+6*pulse,9+3*pulse,0,0,TAU);ctx.stroke();
+      ctx.fillStyle=`rgba(232,207,143,${.12+.1*pulse})`;ctx.fill();
+      ctx.fillStyle='#d7bd78';
+      if(P.qActive.t==='track'){
+        ctx.beginPath();ctx.arc(qp.x-8,qp.y-3,3,0,TAU);ctx.arc(qp.x+2,qp.y+2,2.5,0,TAU);ctx.arc(qp.x+10,qp.y-4,2,0,TAU);ctx.fill();
+      }else{
+        ctx.fillRect(qp.x-9,qp.y-12,18,18);ctx.strokeStyle='#3a2d19';ctx.strokeRect(qp.x-9,qp.y-12,18,18);
+      }
+      ctx.font='700 10px Manrope';ctx.textAlign='center';ctx.fillStyle='#e8cf8f';
+      ctx.fillText(P.qActive.t==='track'?'KANIT':'İNCELE',qp.x,qp.y-24);
+      ctx.restore();
+    }
+  }
   npcs.forEach(n=>draws.push({y:n.y,f:()=>{
     drawHuman(ctx,{x:n.x,y:n.y,dir:1,wt:0,mv:false,swingT:0,pal:n.pal,w:n.w,wc:n.wc});
     ctx.font='700 11px Manrope';ctx.textAlign='center';
