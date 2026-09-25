@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.49 70+ SAATLIK 288 GOREV KAMPANYA -->
+<!-- GOKTASI V4.50 70 SAAT HIKAYE ODAKLI KAMPANYA -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2166,7 +2166,19 @@ const MOBS={
   kemik:{n:'Kemik Eren',lv:22,hpm:1.7,dmgm:1.35,sp:78,ag:1,r:14,mk:'skel',pal:['#d8d0bc','#a89f8a'],reg:'ayaz'},
   saz:{n:'Saz Gölgesi',lv:26,hpm:1.9,dmgm:1.4,sp:82,ag:1,r:15,mk:'ghost',pal:['#4a5a30','#2e3a1c'],reg:'batak'},
   ulak:{n:"Erlik Ulusu",lv:30,hpm:2.2,dmgm:1.5,sp:80,ag:1,r:16,mk:'herald',pal:['#2b2430','#191420'],reg:'mağara'},
-  boss:{n:'Kırık Yüzlü',lv:35,hpm:14,dmgm:2.4,sp:88,ag:1,r:34,mk:'boss',pal:['#241f26','#100d12'],reg:'mağara',boss:1}
+  boss:{n:'Kırık Yüzlü',lv:35,hpm:14,dmgm:2.4,sp:88,ag:1,r:34,mk:'boss',pal:['#241f26','#100d12'],reg:'mağara',boss:1},
+  yankiboynuz:{n:'Yankı Boynuz',lv:12,hpm:7,dmgm:1.55,sp:82,ag:1,r:25,mk:'boar',pal:['#75503b','#30251e'],reg:'ova',boss:1},
+  sarikok:{n:'Sarı Kök Bekçisi',lv:18,hpm:8,dmgm:1.65,sp:72,ag:1,r:27,mk:'spider',pal:['#756b2d','#302d19'],reg:'orman',boss:1},
+  tuzbekci:{n:'Ak Mühür Bekçisi',lv:25,hpm:9,dmgm:1.8,sp:70,ag:1,r:28,mk:'scorp',pal:['#d8cfaa','#756846'],reg:'tuz',boss:1},
+  donmuskam:{n:'Donmuş Kam',lv:32,hpm:10,dmgm:1.95,sp:78,ag:1,r:29,mk:'skel',pal:['#d6e5ee','#657684'],reg:'ayaz',boss:1},
+  sazana:{n:'Saz Ana',lv:40,hpm:11,dmgm:2.1,sp:80,ag:1,r:30,mk:'ghost',pal:['#536b38','#202b18'],reg:'batak',boss:1},
+  karanlikulak:{n:'Karanlık Ulak',lv:48,hpm:12,dmgm:2.25,sp:84,ag:1,r:31,mk:'herald',pal:['#3b2942','#130f17'],reg:'mağara',boss:1},
+  bozhan:{n:'Boz Han',lv:55,hpm:13,dmgm:2.35,sp:98,ag:1,r:30,mk:'wolf',pal:['#9a9389','#37332f'],reg:'ova',boss:1},
+  agdokuyan:{n:'Ağ Dokuyan',lv:62,hpm:14,dmgm:2.45,sp:88,ag:1,r:31,mk:'spider',pal:['#4b3e3a','#181515'],reg:'orman',boss:1},
+  tuzkral:{n:'Tuzsuz Kral',lv:68,hpm:15,dmgm:2.55,sp:78,ag:1,r:32,mk:'ghost',pal:['#eef0e5','#7f8275'],reg:'tuz',boss:1},
+  aknobet:{n:'Ak Nöbetçi',lv:74,hpm:16,dmgm:2.65,sp:88,ag:1,r:32,mk:'skel',pal:['#e8edf1','#727b83'],reg:'ayaz',boss:1},
+  batakkalbi:{n:'Bataklığın Kalbi',lv:82,hpm:17,dmgm:2.8,sp:86,ag:1,r:34,mk:'ghost',pal:['#6c7c3c','#222b17'],reg:'batak',boss:1},
+  yuzsuz:{n:'Yüzsüz Muhafız',lv:90,hpm:20,dmgm:3.0,sp:92,ag:1,r:36,mk:'boss',pal:['#352d38','#0c0a0d'],reg:'mağara',boss:1}
 };
 const DROPS={
   kurt:[['kurtdisi_m',.7,[1,2]]],toprak:[['balcik',.3,[1,1]]],domuz:[['azma',.75,[1,2]]],
@@ -2187,137 +2199,172 @@ const SKILLS=[
   {n:'Kurt Ruhu',key:'5',cd:36,sp:24,ic:'sk5',d:'10 saniye hız +%30, hasar +%25.'}
 ];
 const CHAPTERS=[
-  {n:'I — Kırık Çan · Kavruk Ova',from:1,to:8},{n:'II — Sarı Ormanın Gölgesi',from:9,to:16},
-  {n:'III — Tuzdaki İzler',from:17,to:24},{n:'IV — Ayazın Altındaki Kemik',from:25,to:32},
-  {n:'V — Kara Bataklığın Nefesi',from:33,to:40},{n:"VI — Erlik'in Ağzı",from:41,to:48}
+{n:"I — Çanın İçindeki Taş",from:1,to:8},
+{n:"II — Sarı Ormanın Çağrısı",from:9,to:16},
+{n:"III — Tuz Altındaki Şehir",from:17,to:24},
+{n:"IV — Ayazda Donan Yemin",from:25,to:32},
+{n:"V — Bataklığın Hafızası",from:33,to:40},
+{n:"VI — Erlik'in Ağzı",from:41,to:48},
+{n:"VII — Eve Dönen Gölge",from:49,to:56},
+{n:"VIII — Köklerin Altındaki Kapı",from:57,to:64},
+{n:"IX — Beyaz Yalan",from:65,to:72},
+{n:"X — Karda Kalan İsim",from:73,to:80},
+{n:"XI — Çamurdaki İhanet",from:81,to:88},
+{n:"XII — Yüzsüz Muhafız",from:89,to:96},
+{n:"XIII — Üçüncü Çan",from:97,to:104},
+{n:"XIV — Ana Ağacın Kararı",from:105,to:112},
+{n:"XV — Altı Parça",from:113,to:120},
+{n:"XVI — Soğuk Mühür",from:121,to:128},
+{n:"XVII — Son Hatıra",from:129,to:136},
+{n:"XVIII — Göğün Altındaki Yüz",from:137,to:144}
 ];
 const CHAIN=[
   null,
-  {n:'Kurt Hesabı',d:'Kavruk Ova’daki kurtlar sürüleri dağıttı. Altı tanesini avla.',t:'hunt',m:'kurt',c:6,rw:{exp:150,mo:60,it:[['kavruk',1]]}},
-  {n:'Azma Topla',d:'Yaban domuzlarının azması ilacıma lazım. Beş azma getir.',t:'col',m:'azma',c:5,rw:{exp:280,it:[['hpk',5]]}},
-  {n:'Çürük Çorba',d:'Çürük Toprak ova’ya yayılıyor. On tanesini temizle.',t:'hunt',m:'toprak',c:10,rw:{exp:520,mo:140,pts:2}},
-  {n:'Örsün Dili',d:'Demirci Baturhan seni bekliyor. Önce onun sözünü dinle.',t:'talk',m:'baturhan',c:1,rw:{exp:140,mo:220}},
-  {n:'Diş ve Demir',d:'Baturhan, çeliği sınamak için sekiz Kurt Dişi istiyor.',t:'col',m:'kurtdisi_m',c:8,rw:{exp:480,mo:260}},
-  {n:'Ovanın Boynuzu',d:'Domuz sürüsü çanın doğu yolunu kapattı. On iki Yaban Domuzu devir.',t:'hunt',m:'domuz',c:12,rw:{exp:700,mo:300}},
-  {n:'Boz Yeleliler',d:'Çanın sesi değişti. Ovada ortaya çıkan Boz Yelelilerden on tanesini indir; Kam bunun tesadüf olmadığını düşünüyor.',t:'hunt',m:'bozkurt',c:10,rw:{exp:1050,mo:420,it:[['hpb',2]],pts:1}},
-  {n:'Kırık Çanın Efendisi',d:'Kavruk Ova’nın güneydoğusunda Kırık Boynuz dolaşıyor. Onu devir ve çanın üzerindeki baskıyı kır.',t:'hunt',m:'boynuzlu',c:1,rw:{exp:1800,mo:900,pts:2,it:[['kirikcan',1],['gokatesi',1]]}},
-
-  {n:'Gölge Avı',d:'Sarı Orman kargalarla doldu. On iki gölge kes.',t:'hunt',m:'karga',c:12,rw:{exp:950,mo:320,it:[['kurtdisikolye',1]]}},
-  {n:'Ağın İlk Düğümü',d:'Ormanın içindeki Ağ Örümceklerinden on tanesini temizle.',t:'hunt',m:'orumcek',c:10,rw:{exp:1150,mo:420}},
-  {n:'Cevher Kokusu',d:'Örümcek yuvalarında kalan altı Demir Cevheri getir.',t:'col',m:'cevher',c:6,rw:{exp:900,mo:450}},
-  {n:'Kargaların Sessizliği',d:'Ormanın derininde on sekiz Gölge Kargası daha sustur.',t:'hunt',m:'karga',c:18,rw:{exp:1450,mo:600}},
-  {n:'Örümcek Yuvası',d:'Ağların kaynağına yaklaşmak için on altı Ağ Örümceği devir.',t:'hunt',m:'orumcek',c:16,rw:{exp:1750,mo:720,it:[['spk',3]]}},
-  {n:'Kurtların Göçü',d:'Ormana inen on iki Kavruk Kurtu avla.',t:'hunt',m:'kurt',c:12,rw:{exp:1300,mo:650}},
-  {n:'Demirciye Dönüş',d:'Baturhan’a dön. Ormanda bulduklarını görmesi gerek.',t:'talk',m:'baturhan',c:1,rw:{exp:500,mo:800}},
-  {n:'Kırıntı Avı',d:'Göktaşlarını kır. Üç Kırıntı getir; ateşi onlarda göreceksin.',t:'col',m:'kirinti',c:3,rw:{exp:1900,it:[['gokatesi',3]]}},
-
-  {n:'Çölün Kabuğu',d:'Tuz Çölü’nde on beş Kum Akrebi ez.',t:'hunt',m:'akrep',c:15,rw:{exp:2600,mo:900,it:[['tuzkirici',1]]}},
-  {n:'Kristal Borcu',d:'Akreplerden sekiz Kum Kristali topla.',t:'col',m:'kumkristal',c:8,rw:{exp:2100,mo:1000}},
-  {n:'Beyaz Gölge',d:'On Tuz Hayaletini dağıt.',t:'hunt',m:'tuzhayalet',c:10,rw:{exp:2800,mo:1100}},
-  {n:'Kumda İz',d:'Yirmi Kum Akrebi avla. Çölün ortasında bir yol aranıyor.',t:'hunt',m:'akrep',c:20,rw:{exp:3300,mo:1400}},
-  {n:'Susmayan Hayaletler',d:'On altı Tuz Hayaletini sustur.',t:'hunt',m:'tuzhayalet',c:16,rw:{exp:3900,mo:1600,it:[['hpb',3]]}},
-  {n:'Kristal Yığını',d:'On iki Kum Kristali getir.',t:'col',m:'kumkristal',c:12,rw:{exp:3000,mo:1800}},
-  {n:'Gök Ateşinin Bedeli',d:'İki Gök Ateşi getir. Baturhan bunları işleyecek.',t:'col',m:'gokatesi',c:2,rw:{exp:3500,mo:2000,pts:2}},
-  {n:'Ayaza Giden Yol',d:'Çöldeki son on sekiz Tuz Hayaletini dağıt.',t:'hunt',m:'tuzhayalet',c:18,rw:{exp:4500,mo:2200}},
-
-  {n:'Ayazı Kır',d:'Ayaz Vadisi’nde yürüyen kemikler var. Yirmi Kemik Eren devir.',t:'hunt',m:'kemik',c:20,rw:{exp:4400,it:[['ayazkaftan',1]]}},
-  {n:'Beyaz Diş',d:'On sekiz Ayaz Kurtu avla.',t:'hunt',m:'ayazkurt',c:18,rw:{exp:4700,mo:2400}},
-  {n:'Donmuş Hatıra',d:'Ayaz kurtlarından on Kurt Dişi getir.',t:'col',m:'kurtdisi_m',c:10,rw:{exp:3600,mo:2500}},
-  {n:'Kemik Yolu',d:'Yirmi beş Kemik Ereni yere ser.',t:'hunt',m:'kemik',c:25,rw:{exp:5600,mo:2800}},
-  {n:'Ayaz Sürüsü',d:'Yirmi beş Ayaz Kurtunu avla.',t:'hunt',m:'ayazkurt',c:25,rw:{exp:6000,mo:3000}},
-  {n:'Soğuk Demir',d:'On Demir Cevheri getir; ayaz çeliği için gerekli.',t:'col',m:'cevher',c:10,rw:{exp:4200,mo:3200}},
-  {n:'Kırık Nöbetçiler',d:'Otuz Kemik Eren devir.',t:'hunt',m:'kemik',c:30,rw:{exp:7200,mo:3500,pts:3}},
-  {n:'Bataklığa İniş',d:'Ayazın ardında kalan yirmi Ayaz Kurtunu temizle.',t:'hunt',m:'ayazkurt',c:20,rw:{exp:6500,mo:3800}},
-
-  {n:'Balçığın Efendisi',d:'Kara Bataklık’ta on beş Saz Gölgesi sustur.',t:'hunt',m:'saz',c:15,rw:{exp:7200,mo:2600,pts:3}},
-  {n:'Koyu Balçık',d:'Bataklıktan on iki Koyu Balçık getir.',t:'col',m:'balcik',c:12,rw:{exp:5200,mo:4000}},
-  {n:'Sazların Arasında',d:'Yirmi iki Saz Gölgesi avla.',t:'hunt',m:'saz',c:22,rw:{exp:8200,mo:4500}},
-  {n:'Bataklığın Karnı',d:'Yirmi sekiz Saz Gölgesi sustur.',t:'hunt',m:'saz',c:28,rw:{exp:9600,mo:5000}},
-  {n:'Çamurdaki Ateş',d:'Dört Göktaşı Kırıntısı getir.',t:'col',m:'kirinti',c:4,rw:{exp:7000,mo:5200,it:[['gokatesi',2]]}},
-  {n:'Son Saz',d:'Otuz iki Saz Gölgesi devir.',t:'hunt',m:'saz',c:32,rw:{exp:11000,mo:5800}},
-  {n:'Kamın Uyarısı',d:'Kam Bilge ile konuş. Erlik’in Ağzı hakkında söyleyecekleri var.',t:'talk',m:'kam',c:1,rw:{exp:3500,mo:6000}},
-  {n:'Ağza Giden Yol',d:'Bataklıktaki son yirmi beş Saz Gölgesini temizle.',t:'hunt',m:'saz',c:25,rw:{exp:10500,mo:6500,pts:3}},
-
-  {n:'Ulakların Gözü',d:'Erlik Uluslarından on tanesini devir.',t:'hunt',m:'ulak',c:10,rw:{exp:12000,mo:7000}},
-  {n:'Bakan Gözler',d:'Sekiz Ulak Gözü getir.',t:'col',m:'ulakgozu',c:8,rw:{exp:10000,mo:7500}},
-  {n:'Karanlığın Habercileri',d:'On sekiz Erlik Ulusunu sustur.',t:'hunt',m:'ulak',c:18,rw:{exp:14500,mo:8000}},
-  {n:'Gökten Kalan',d:'Altı Göktaşı Kırıntısı getir.',t:'col',m:'kirinti',c:6,rw:{exp:11000,mo:8500,it:[['gokatesi',4]]}},
-  {n:'Son Haber',d:'Yirmi beş Erlik Ulusunu devir.',t:'hunt',m:'ulak',c:25,rw:{exp:17500,mo:9000}},
-  {n:'Örsün Son Sözü',d:'Baturhan ile son kez konuş.',t:'talk',m:'baturhan',c:1,rw:{exp:5000,mo:9500}},
-  {n:'Kapının Önü',d:'Otuz Erlik Ulusunu temizle. Kırık Yüzlü’ye giden yol açılsın.',t:'hunt',m:'ulak',c:30,rw:{exp:21000,mo:10500,pts:4}},
-  {n:'Kırık Yüzlü',d:"Erlik'in Ağzı'nın dibinde oturan şey var. Bu çağın hesabını ona sor.",t:'hunt',m:'boss',c:1,rw:{exp:30000,mo:20000,it:[['kirikyuz',1]],pts:5}}
+  {n:"İşaret",d:"Ağıt Han'ın çanı gece kendi kendine çalar. Kam Bilge, sesin metalden değil toprağın altından geldiğini söyler.",t:"talk",m:"kam",c:1,rw:{exp:233,mo:125}},
+  {n:"İz Sür",d:"Kavruk Ova'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"ova",c:1,rw:{exp:350,mo:250}},
+  {n:"Bozulmuş Halka",d:"İzi örten kurt grubundan yalnızca gerekli olanları temizle. 4 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"kurt",c:4,rw:{exp:700,mo:250}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 azma getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"azma",c:3,rw:{exp:560,mo:275}},
+  {n:"İkinci İz",d:"Kanıt bizi toprak izlerine götürüyor. 3 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"toprak",c:3,rw:{exp:804,mo:287}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"ova",c:1,rw:{exp:630,mo:200}},
+  {n:"Bekçi",d:"İzlerin sonunda yankiboynuz anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"yankiboynuz",c:1,rw:{exp:1260,mo:425,pts:2}},
+  {n:"Yüzleşme",d:"Kırık Boynuz'un bedenine saplanan gök parçası, çanın eski mührüyle aynı işareti taşır.",t:"talk",m:"sirma",c:1,rw:{exp:770,mo:300,pts:1}},
+  {n:"İşaret",d:"Kırık mührün üstündeki sarı reçine yalnızca yıllardır kuruduğu sanılan Ana Ağaçtan gelir. Ormana gitmenin sebebi budur.",t:"talk",m:"sirma",c:1,rw:{exp:800,mo:385}},
+  {n:"İz Sür",d:"Sarı Orman'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"orman",c:1,rw:{exp:1200,mo:770}},
+  {n:"Bozulmuş Halka",d:"İzi örten karga grubundan yalnızca gerekli olanları temizle. 5 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"karga",c:5,rw:{exp:2400,mo:770}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 cevher getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"cevher",c:4,rw:{exp:1920,mo:847}},
+  {n:"İkinci İz",d:"Kanıt bizi orumcek izlerine götürüyor. 4 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"orumcek",c:4,rw:{exp:2760,mo:885}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"orman",c:1,rw:{exp:2160,mo:616}},
+  {n:"Bekçi",d:"İzlerin sonunda sarikok anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"sarikok",c:1,rw:{exp:4320,mo:1309,pts:2}},
+  {n:"Yüzleşme",d:"Ana Ağacın kökleri göktaşına doğru büyümektedir; orman hastalanmamış, bir şeyi tutmaya çalışmaktadır.",t:"talk",m:"toygar",c:1,rw:{exp:2640,mo:924,pts:1}},
+  {n:"İşaret",d:"Ana Ağacın köklerinde bulunan beyaz taş levha, Tuz Çölü'nde gömülü eski bir yerleşimin haritasıdır.",t:"talk",m:"baturhan",c:1,rw:{exp:1366,mo:645}},
+  {n:"İz Sür",d:"Tuz Çölü'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"tuz",c:1,rw:{exp:2050,mo:1290}},
+  {n:"Bozulmuş Halka",d:"İzi örten akrep grubundan yalnızca gerekli olanları temizle. 6 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"akrep",c:6,rw:{exp:4100,mo:1290}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 kumkristal getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"kumkristal",c:3,rw:{exp:3280,mo:1419}},
+  {n:"İkinci İz",d:"Kanıt bizi tuzhayalet izlerine götürüyor. 5 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"tuzhayalet",c:5,rw:{exp:4715,mo:1483}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"tuz",c:1,rw:{exp:3690,mo:1032}},
+  {n:"Bekçi",d:"İzlerin sonunda tuzbekci anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"tuzbekci",c:1,rw:{exp:7380,mo:2193,pts:2}},
+  {n:"Yüzleşme",d:"Harabelerdeki yazılar göktaşlarının ilk kez düşmediğini ve eski halkın göğü mühürlediğini anlatır.",t:"talk",m:"akca",c:1,rw:{exp:4510,mo:1548,pts:1}},
+  {n:"İşaret",d:"Tuz levhasındaki üç işaretten biri Ayaz Vadisi'ndedir. Oraya ulaşmadan mühür dizisinin nasıl çalıştığı anlaşılamaz.",t:"talk",m:"akca",c:1,rw:{exp:1933,mo:905}},
+  {n:"İz Sür",d:"Ayaz Vadisi'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"ayaz",c:1,rw:{exp:2900,mo:1810}},
+  {n:"Bozulmuş Halka",d:"İzi örten ayazkurt grubundan yalnızca gerekli olanları temizle. 4 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"ayazkurt",c:4,rw:{exp:5800,mo:1810}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 ayaztom getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"ayaztom",c:4,rw:{exp:4640,mo:1991}},
+  {n:"İkinci İz",d:"Kanıt bizi kemik izlerine götürüyor. 6 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"kemik",c:6,rw:{exp:6669,mo:2081}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"ayaz",c:1,rw:{exp:5220,mo:1448}},
+  {n:"Bekçi",d:"İzlerin sonunda donmuskam anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"donmuskam",c:1,rw:{exp:10440,mo:3077,pts:2}},
+  {n:"Yüzleşme",d:"Donmuş mezarlardaki nöbetçiler düşman değil, mührü korurken ölen eski muhafızlardır.",t:"talk",m:"baturhan",c:1,rw:{exp:6380,mo:2172,pts:1}},
+  {n:"İşaret",d:"Ayaz mühründe Ağıt Han'ın kurucusunun adı çıkar. Kam bu ismi tanır ama nedenini saklar; cevap Kara Bataklık'tadır.",t:"talk",m:"toygar",c:1,rw:{exp:2500,mo:1165}},
+  {n:"İz Sür",d:"Kara Bataklık'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"batak",c:1,rw:{exp:3750,mo:2330}},
+  {n:"Bozulmuş Halka",d:"İzi örten saz grubundan yalnızca gerekli olanları temizle. 5 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"saz",c:5,rw:{exp:7500,mo:2330}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 balcik getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"balcik",c:3,rw:{exp:6000,mo:2563}},
+  {n:"İkinci İz",d:"Kanıt bizi karga izlerine götürüyor. 3 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"karga",c:3,rw:{exp:8625,mo:2679}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"batak",c:1,rw:{exp:6750,mo:1864}},
+  {n:"Bekçi",d:"İzlerin sonunda sazana anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"sazana",c:1,rw:{exp:13500,mo:3961,pts:2}},
+  {n:"Yüzleşme",d:"Bataklık çamuru geçmişteki sesleri saklamaktadır. Köyün kuruluş hikâyesinin eksik anlatıldığı ortaya çıkar.",t:"talk",m:"kam",c:1,rw:{exp:8250,mo:2796,pts:1}},
+  {n:"İşaret",d:"Bataklıktaki yankılar ilk mührün mağaranın altında kırıldığını gösterir. Kırık Yüzlü bu kırığın bekçisidir.",t:"talk",m:"kam",c:1,rw:{exp:3066,mo:1425}},
+  {n:"İz Sür",d:"Erlik'in Ağzı'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"mağara",c:1,rw:{exp:4600,mo:2850}},
+  {n:"Bozulmuş Halka",d:"İzi örten ulak grubundan yalnızca gerekli olanları temizle. 6 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"ulak",c:6,rw:{exp:9200,mo:2850}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 ulakgozu getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"ulakgozu",c:4,rw:{exp:7360,mo:3135}},
+  {n:"İkinci İz",d:"Kanıt bizi ulak izlerine götürüyor. 4 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"ulak",c:4,rw:{exp:10580,mo:3277}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"mağara",c:1,rw:{exp:8280,mo:2280}},
+  {n:"Bekçi",d:"İzlerin sonunda karanlikulak anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"karanlikulak",c:1,rw:{exp:16560,mo:4845,pts:2}},
+  {n:"Yüzleşme",d:"Kırık Yüzlü yenildiğinde asıl tehdit ölmez; maskesinin içinde Ağıt Han çanının eksik yüzü bulunur.",t:"talk",m:"sirma",c:1,rw:{exp:10120,mo:3420,pts:1}},
+  {n:"İşaret",d:"Maskeyle köye dönüldüğünde çan susar. Ovada hayvanlar kaçmaya başlar; bu kez saldırmıyor, bir şeyden kaçıyorlardır.",t:"talk",m:"sirma",c:1,rw:{exp:3633,mo:1685}},
+  {n:"İz Sür",d:"Kavruk Ova'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"ova",c:1,rw:{exp:5450,mo:3370}},
+  {n:"Bozulmuş Halka",d:"İzi örten bozkurt grubundan yalnızca gerekli olanları temizle. 4 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"bozkurt",c:4,rw:{exp:10900,mo:3370}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 bozpost getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"bozpost",c:3,rw:{exp:8720,mo:3707}},
+  {n:"İkinci İz",d:"Kanıt bizi domuz izlerine götürüyor. 5 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"domuz",c:5,rw:{exp:12534,mo:3875}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"ova",c:1,rw:{exp:9810,mo:2696}},
+  {n:"Bekçi",d:"İzlerin sonunda bozhan anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"bozhan",c:1,rw:{exp:19620,mo:5729,pts:2}},
+  {n:"Yüzleşme",d:"Boz Han'ın boynundaki eski köy mührü, felaketin içeriden biri tarafından başlatıldığını kanıtlar.",t:"talk",m:"toygar",c:1,rw:{exp:11990,mo:4044,pts:1}},
+  {n:"İşaret",d:"Boz Han'ın mührü Ana Ağacın altında gizli ikinci kapıyı açar. Ormana dönüş artık ganimet için değil, kapının ardındaki kayıt içindir.",t:"talk",m:"baturhan",c:1,rw:{exp:4200,mo:1945}},
+  {n:"İz Sür",d:"Sarı Orman'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"orman",c:1,rw:{exp:6300,mo:3890}},
+  {n:"Bozulmuş Halka",d:"İzi örten orumcek grubundan yalnızca gerekli olanları temizle. 5 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"orumcek",c:5,rw:{exp:12600,mo:3890}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 cevher getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"cevher",c:4,rw:{exp:10080,mo:4279}},
+  {n:"İkinci İz",d:"Kanıt bizi karga izlerine götürüyor. 6 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"karga",c:6,rw:{exp:14489,mo:4473}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"orman",c:1,rw:{exp:11340,mo:3112}},
+  {n:"Bekçi",d:"İzlerin sonunda agdokuyan anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"agdokuyan",c:1,rw:{exp:22680,mo:6613,pts:2}},
+  {n:"Yüzleşme",d:"Ağ Dokuyan'ın koruduğu taş hafızada Kam Bilge'nin gençliğinde mühür heyetinde olduğu görülür.",t:"talk",m:"akca",c:1,rw:{exp:13860,mo:4668,pts:1}},
+  {n:"İşaret",d:"Kam gerçeğin yarısını bildiğini kabul eder: mühürler göktaşlarını durdurmak için değil, içlerindeki varlığı uyutmak için yapılmıştır.",t:"talk",m:"akca",c:1,rw:{exp:4766,mo:2205}},
+  {n:"İz Sür",d:"Tuz Çölü'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"tuz",c:1,rw:{exp:7150,mo:4410}},
+  {n:"Bozulmuş Halka",d:"İzi örten tuzhayalet grubundan yalnızca gerekli olanları temizle. 6 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"tuzhayalet",c:6,rw:{exp:14300,mo:4410}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 kumkristal getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"kumkristal",c:3,rw:{exp:11440,mo:4851}},
+  {n:"İkinci İz",d:"Kanıt bizi akrep izlerine götürüyor. 3 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"akrep",c:3,rw:{exp:16445,mo:5071}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"tuz",c:1,rw:{exp:12870,mo:3528}},
+  {n:"Bekçi",d:"İzlerin sonunda tuzkral anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"tuzkral",c:1,rw:{exp:25740,mo:7497,pts:2}},
+  {n:"Yüzleşme",d:"Tuzsuz Kral, eski mühürcülerin lideridir; hayalet hâli bile son anahtarı kimseye vermemeye yeminlidir.",t:"talk",m:"baturhan",c:1,rw:{exp:15730,mo:5292,pts:1}},
+  {n:"İşaret",d:"Tuzsuz Kral'ın anahtarında Baturhan'ın soy damgası vardır. Demircinin ailesi yüzyıllardır mühür parçalarını saklamıştır.",t:"talk",m:"toygar",c:1,rw:{exp:5333,mo:2465}},
+  {n:"İz Sür",d:"Ayaz Vadisi'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"ayaz",c:1,rw:{exp:8000,mo:4930}},
+  {n:"Bozulmuş Halka",d:"İzi örten kemik grubundan yalnızca gerekli olanları temizle. 4 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"kemik",c:4,rw:{exp:16000,mo:4930}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 ayaztom getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"ayaztom",c:4,rw:{exp:12800,mo:5423}},
+  {n:"İkinci İz",d:"Kanıt bizi ayazkurt izlerine götürüyor. 4 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"ayazkurt",c:4,rw:{exp:18400,mo:5669}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"ayaz",c:1,rw:{exp:14400,mo:3944}},
+  {n:"Bekçi",d:"İzlerin sonunda aknobet anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"aknobet",c:1,rw:{exp:28800,mo:8381,pts:2}},
+  {n:"Yüzleşme",d:"Ak Nöbetçi yenildiğinde Baturhan'ın babasının kayıp çekici bulunur ve gök metalinin nasıl parçalanacağı öğrenilir.",t:"talk",m:"kam",c:1,rw:{exp:17600,mo:5916,pts:1}},
+  {n:"İşaret",d:"Çekicin sapındaki yazı, mühürlerden birini Ağıt Han'dan birinin bilerek kırdığını söyler. İsim bataklık kayıtlarında saklıdır.",t:"talk",m:"kam",c:1,rw:{exp:5900,mo:2725}},
+  {n:"İz Sür",d:"Kara Bataklık'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"batak",c:1,rw:{exp:8850,mo:5450}},
+  {n:"Bozulmuş Halka",d:"İzi örten saz grubundan yalnızca gerekli olanları temizle. 5 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"saz",c:5,rw:{exp:17700,mo:5450}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 balcik getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"balcik",c:3,rw:{exp:14160,mo:5995}},
+  {n:"İkinci İz",d:"Kanıt bizi karga izlerine götürüyor. 5 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"karga",c:5,rw:{exp:20355,mo:6267}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"batak",c:1,rw:{exp:15930,mo:4360}},
+  {n:"Bekçi",d:"İzlerin sonunda batakkalbi anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"batakkalbi",c:1,rw:{exp:31860,mo:9265,pts:2}},
+  {n:"Yüzleşme",d:"Kayıtlar suçlunun Kam olmadığını, köyün ilk kurucusu 'Yüzsüz Ata' olduğunu gösterir.",t:"talk",m:"sirma",c:1,rw:{exp:19470,mo:6540,pts:1}},
+  {n:"İşaret",d:"Yüzsüz Ata'nın bedeni mağarada hâlâ mührü beslemektedir. Onu yenmeden son kapı açılamaz.",t:"talk",m:"sirma",c:1,rw:{exp:6466,mo:2985}},
+  {n:"İz Sür",d:"Erlik'in Ağzı'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"mağara",c:1,rw:{exp:9700,mo:5970}},
+  {n:"Bozulmuş Halka",d:"İzi örten ulak grubundan yalnızca gerekli olanları temizle. 6 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"ulak",c:6,rw:{exp:19400,mo:5970}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 ulakgozu getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"ulakgozu",c:4,rw:{exp:15520,mo:6567}},
+  {n:"İkinci İz",d:"Kanıt bizi ulak izlerine götürüyor. 6 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"ulak",c:6,rw:{exp:22310,mo:6865}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"mağara",c:1,rw:{exp:17460,mo:4776}},
+  {n:"Bekçi",d:"İzlerin sonunda yuzsuz anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"yuzsuz",c:1,rw:{exp:34920,mo:10149,pts:2}},
+  {n:"Yüzleşme",d:"Muhafız düşerken son gerçeği söyler: mühür kırılırsa gök susacak, fakat dünya içeridekini duyacaktır.",t:"talk",m:"toygar",c:1,rw:{exp:21340,mo:7164,pts:1}},
+  {n:"İşaret",d:"Köyde üçüncü kez çan çalar ve göktaşları aynı anda parlar. Artık amaç parçaları toplamak değil, rezonansı ölçmektir.",t:"talk",m:"baturhan",c:1,rw:{exp:7033,mo:3245}},
+  {n:"İz Sür",d:"Kavruk Ova'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"ova",c:1,rw:{exp:10550,mo:6490}},
+  {n:"Bozulmuş Halka",d:"İzi örten bozkurt grubundan yalnızca gerekli olanları temizle. 4 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"bozkurt",c:4,rw:{exp:21100,mo:6490}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 kirinti getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"kirinti",c:3,rw:{exp:16880,mo:7139}},
+  {n:"İkinci İz",d:"Kanıt bizi toprak izlerine götürüyor. 3 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"toprak",c:3,rw:{exp:24264,mo:7463}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"ova",c:1,rw:{exp:18990,mo:5192}},
+  {n:"Bekçi",d:"İzlerin sonunda yankiboynuz anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"yankiboynuz",c:1,rw:{exp:37980,mo:11033,pts:2}},
+  {n:"Yüzleşme",d:"Ovadaki eski çan taşı yeniden etkinleştirilir; mühürlerin birbirine sesle bağlı olduğu anlaşılır.",t:"talk",m:"akca",c:1,rw:{exp:23210,mo:7788,pts:1}},
+  {n:"İşaret",d:"Ana Ağaç iki yol gösterir: mühürleri eski hâline döndürmek ya da gök çekirdeğini parçalamak. İkisi de bedelsiz değildir.",t:"talk",m:"akca",c:1,rw:{exp:7600,mo:3505}},
+  {n:"İz Sür",d:"Sarı Orman'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"orman",c:1,rw:{exp:11400,mo:7010}},
+  {n:"Bozulmuş Halka",d:"İzi örten karga grubundan yalnızca gerekli olanları temizle. 5 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"karga",c:5,rw:{exp:22800,mo:7010}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 gokcevheri getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"gokcevheri",c:4,rw:{exp:18240,mo:7711}},
+  {n:"İkinci İz",d:"Kanıt bizi orumcek izlerine götürüyor. 4 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"orumcek",c:4,rw:{exp:26219,mo:8061}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"orman",c:1,rw:{exp:20520,mo:5608}},
+  {n:"Bekçi",d:"İzlerin sonunda sarikok anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"sarikok",c:1,rw:{exp:41040,mo:11917,pts:2}},
+  {n:"Yüzleşme",d:"Köklerin içindeki kayıt, gök çekirdeğinin parçalanırsa bölgelere dağılacağını gösterir.",t:"talk",m:"baturhan",c:1,rw:{exp:25080,mo:8412,pts:1}},
+  {n:"İşaret",d:"İlk çekirdek parçası Tuz Çölü'ndeki kristallerin içinde titreşir. Onu ayırmak için çevredeki koruyucu akım kesilmelidir.",t:"talk",m:"toygar",c:1,rw:{exp:8166,mo:3765}},
+  {n:"İz Sür",d:"Tuz Çölü'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"tuz",c:1,rw:{exp:12250,mo:7530}},
+  {n:"Bozulmuş Halka",d:"İzi örten akrep grubundan yalnızca gerekli olanları temizle. 6 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"akrep",c:6,rw:{exp:24500,mo:7530}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 yildizozu getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"yildizozu",c:3,rw:{exp:19600,mo:8283}},
+  {n:"İkinci İz",d:"Kanıt bizi tuzhayalet izlerine götürüyor. 5 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"tuzhayalet",c:5,rw:{exp:28174,mo:8659}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"tuz",c:1,rw:{exp:22050,mo:6024}},
+  {n:"Bekçi",d:"İzlerin sonunda tuzbekci anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"tuzbekci",c:1,rw:{exp:44100,mo:12801,pts:2}},
+  {n:"Yüzleşme",d:"Parça ele geçirildiğinde diğer beş parçanın konumu kısa süreliğine görünür.",t:"talk",m:"kam",c:1,rw:{exp:26950,mo:9036,pts:1}},
+  {n:"İşaret",d:"İkinci çekirdek parçası Ayaz Vadisi'nde zamanı yavaşlatmaktadır. Nöbetçilerin yeniden kalkmasının nedeni budur.",t:"talk",m:"kam",c:1,rw:{exp:8733,mo:4025}},
+  {n:"İz Sür",d:"Ayaz Vadisi'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"ayaz",c:1,rw:{exp:13100,mo:8050}},
+  {n:"Bozulmuş Halka",d:"İzi örten ayazkurt grubundan yalnızca gerekli olanları temizle. 4 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"ayazkurt",c:4,rw:{exp:26200,mo:8050}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 gokatesi getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"gokatesi",c:4,rw:{exp:20960,mo:8855}},
+  {n:"İkinci İz",d:"Kanıt bizi kemik izlerine götürüyor. 6 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"kemik",c:6,rw:{exp:30129,mo:9257}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"ayaz",c:1,rw:{exp:23580,mo:6440}},
+  {n:"Bekçi",d:"İzlerin sonunda donmuskam anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"donmuskam",c:1,rw:{exp:47160,mo:13685,pts:2}},
+  {n:"Yüzleşme",d:"Baturhan'ın çekici parçayı güvenli biçimde ayırır; fakat çekicin gök ateşiyle beslenmesi gerekir.",t:"talk",m:"sirma",c:1,rw:{exp:28820,mo:9660,pts:1}},
+  {n:"İşaret",d:"Bataklıktaki üçüncü parça geçmişin seslerini güçlendirir. Oyuncu, Yüzsüz Ata'nın mührü neden kırdığını öğrenir: içeride çocuğunun sesi vardı.",t:"talk",m:"sirma",c:1,rw:{exp:9300,mo:4285}},
+  {n:"İz Sür",d:"Kara Bataklık'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"batak",c:1,rw:{exp:13950,mo:8570}},
+  {n:"Bozulmuş Halka",d:"İzi örten saz grubundan yalnızca gerekli olanları temizle. 5 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"saz",c:5,rw:{exp:27900,mo:8570}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 3 balcik getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"balcik",c:3,rw:{exp:22320,mo:9427}},
+  {n:"İkinci İz",d:"Kanıt bizi karga izlerine götürüyor. 3 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"karga",c:3,rw:{exp:32084,mo:9855}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"batak",c:1,rw:{exp:25110,mo:6856}},
+  {n:"Bekçi",d:"İzlerin sonunda batakkalbi anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"batakkalbi",c:1,rw:{exp:50220,mo:14569,pts:2}},
+  {n:"Yüzleşme",d:"Felaketin kötülükten değil kayıptan doğduğu anlaşılır; final artık intikam değil, döngüyü bitirme meselesidir.",t:"talk",m:"toygar",c:1,rw:{exp:30690,mo:10284,pts:1}},
+  {n:"İşaret",d:"Altı bölgenin işaretleri tamamlanır. Erlik'in Ağzı son kez açılır; Kırık Yüzlü artık bir bekçi değil, çekirdeğin son kabuğudur.",t:"talk",m:"baturhan",c:1,rw:{exp:9866,mo:4545}},
+  {n:"İz Sür",d:"Erlik'in Ağzı'na git. Amaç av değil: çevredeki bozulmanın merkezini bul ve bölgeye ulaştığını doğrula.",t:"visit",m:"mağara",c:1,rw:{exp:14800,mo:9090}},
+  {n:"Bozulmuş Halka",d:"İzi örten ulak grubundan yalnızca gerekli olanları temizle. 6 tanesi yolu açmaya yeter; sürüyü yok etmek amaç değil.",t:"hunt",m:"ulak",c:6,rw:{exp:29600,mo:9090}},
+  {n:"Kanıt",d:"Kam'ın varsayımını sınamak için 4 ulakgozu getir. Malzeme, bölgedeki değişimin göktaşıyla bağını gösterecek.",t:"col",m:"ulakgozu",c:4,rw:{exp:23680,mo:9999}},
+  {n:"İkinci İz",d:"Kanıt bizi karanlikulak izlerine götürüyor. 4 tanesini etkisiz hâle getir; amaç kaynağa ulaşmak.",t:"hunt",m:"karanlikulak",c:4,rw:{exp:34040,mo:10453}},
+  {n:"Taşın Sesi",d:"Bölgedeki bir göktaşını parçala. Bu kez ganimet için değil; kırıldığı anda çıkan sesi çanın işaretiyle karşılaştırıyoruz.",t:"stone",m:"mağara",c:1,rw:{exp:26640,mo:7272}},
+  {n:"Bekçi",d:"İzlerin sonunda boss anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"boss",c:1,rw:{exp:53280,mo:15453,pts:2}},
+  {n:"Yüzleşme",d:"Son savaşın amacı yaratığı öldürmek değil, içindeki gök çekirdeğini susturup Ağıt Han'ın çanını son kez çaldırmaktır.",t:"talk",m:"akca",c:1,rw:{exp:32560,mo:10908,pts:1}}
 ];
-// ---------- V4.49 — 70+ SAAT HEDEFLİ UZUN KAMPANYA ----------
-// İlk 48 görev olduğu gibi korunur. Aşağıdaki 30 fasıl x 8 görev = 240 yeni ana görev.
-// Toplam ana görev: 288. İçerik mevcut dünyanın tüm bölgelerini döngüsel kullanır.
-// Süre oyuncu hızı/ekipmanına göre değişir; tasarım hedefi yaklaşık 70+ saatlik tam temizlemedir.
-const CAMPAIGN70_ARCS=[
-  {n:'VII — Küllerin Ardından',reg:'ova',a:'bozkurt',b:'domuz',mat:'bozpost'},
-  {n:'VIII — Ormanın İkinci Sesi',reg:'orman',a:'karga',b:'orumcek',mat:'cevher'},
-  {n:'IX — Tuzun Altındaki Yol',reg:'tuz',a:'akrep',b:'tuzhayalet',mat:'kumkristal'},
-  {n:'X — Donmuş Nöbet',reg:'ayaz',a:'kemik',b:'ayazkurt',mat:'kurtdisi_m'},
-  {n:'XI — Bataklığın Nabzı',reg:'batak',a:'saz',b:'karga',mat:'balcik'},
-  {n:"XII — Erlik'in Yankısı",reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
-  {n:'XIII — Çanın Külü',reg:'ova',a:'bozkurt',b:'toprak',mat:'bozpost'},
-  {n:'XIV — Sarı Yaprak Yemini',reg:'orman',a:'orumcek',b:'karga',mat:'cevher'},
-  {n:'XV — Kristal Fırtınası',reg:'tuz',a:'tuzhayalet',b:'akrep',mat:'kumkristal'},
-  {n:'XVI — Ayazın Hatırası',reg:'ayaz',a:'ayazkurt',b:'kemik',mat:'cevher'},
-  {n:'XVII — Kara Sazlar',reg:'batak',a:'saz',b:'saz',mat:'balcik'},
-  {n:'XVIII — Karanlık Ulak',reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
-  {n:'XIX — Ovanın Son Sürüsü',reg:'ova',a:'domuz',b:'bozkurt',mat:'azma'},
-  {n:'XX — Ağların Krallığı',reg:'orman',a:'orumcek',b:'karga',mat:'cevher'},
-  {n:'XXI — Beyaz Çöl',reg:'tuz',a:'akrep',b:'tuzhayalet',mat:'kumkristal'},
-  {n:'XXII — Kemik ve Kar',reg:'ayaz',a:'kemik',b:'ayazkurt',mat:'kurtdisi_m'},
-  {n:'XXIII — Çamurun Hafızası',reg:'batak',a:'saz',b:'karga',mat:'balcik'},
-  {n:"XXIV — Ağzın Derinliği",reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
-  {n:'XXV — Boz Fırtına',reg:'ova',a:'bozkurt',b:'domuz',mat:'bozpost'},
-  {n:'XXVI — Gölgenin Ağı',reg:'orman',a:'karga',b:'orumcek',mat:'cevher'},
-  {n:'XXVII — Tuz Tacı',reg:'tuz',a:'tuzhayalet',b:'akrep',mat:'kumkristal'},
-  {n:'XXVIII — Kuzeyin Dişi',reg:'ayaz',a:'ayazkurt',b:'kemik',mat:'kurtdisi_m'},
-  {n:'XXIX — Bataklık Tacı',reg:'batak',a:'saz',b:'saz',mat:'balcik'},
-  {n:'XXX — Kırık Kapı',reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
-  {n:'XXXI — Son Ova Yemini',reg:'ova',a:'bozkurt',b:'domuz',mat:'bozpost'},
-  {n:'XXXII — Son Orman Yemini',reg:'orman',a:'orumcek',b:'karga',mat:'cevher'},
-  {n:'XXXIII — Son Çöl Yemini',reg:'tuz',a:'akrep',b:'tuzhayalet',mat:'kumkristal'},
-  {n:'XXXIV — Son Ayaz Yemini',reg:'ayaz',a:'kemik',b:'ayazkurt',mat:'kurtdisi_m'},
-  {n:'XXXV — Son Bataklık Yemini',reg:'batak',a:'saz',b:'saz',mat:'balcik'},
-  {n:"XXXVI — Kırık Çağın Sonu",reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'}
-];
-const CAMPAIGN70_REGION_NAME={
-  ova:'Kavruk Ova',orman:'Sarı Orman',tuz:'Tuz Çölü',
-  ayaz:'Ayaz Vadisi',batak:'Kara Bataklık',mağara:"Erlik'in Ağzı"
-};
-(function buildCampaign70(){
-  let step=49;
-  CAMPAIGN70_ARCS.forEach((arc,idx)=>{
-    const arcNo=idx+7;
-    const start=step;
-    const zone=CAMPAIGN70_REGION_NAME[arc.reg];
-    const tier=Math.floor(idx/6);
-    const h1=42+idx*2, h2=48+idx*2, h3=56+idx*2, h4=64+idx*2;
-    const collect=12+Math.floor(idx*.8);
-    const rare=3+Math.floor(idx/4);
-    const expBase=18000+idx*2800;
-    const moneyBase=7000+idx*900;
-    const talker=idx%2===0?'kam':'baturhan';
-
-    CHAIN.push(
-      {n:`${arcNo}. Fasıl — Haber`,d:`${zone} yeniden hareketlendi. ${talker==='kam'?'Kam Bilge':'Baturhan'} ile konuş ve yeni seferi başlat.`,t:'talk',m:talker,c:1,rw:{exp:Math.round(expBase*.35),mo:Math.round(moneyBase*.35)}},
-      {n:`${arcNo}. Fasıl — İlk Temizlik`,d:`${zone} çevresindeki ${MOBS[arc.a].n} sürüsünü kır.`,t:'hunt',m:arc.a,c:h1,rw:{exp:expBase,mo:moneyBase}},
-      {n:`${arcNo}. Fasıl — Sefer Malzemesi`,d:`Sefer için ${collect} ${ITEMS[arc.mat].n} getir.`,t:'col',m:arc.mat,c:collect,rw:{exp:Math.round(expBase*.75),mo:Math.round(moneyBase*.9),it:idx%3===0?[['hpb',3]]:undefined}},
-      {n:`${arcNo}. Fasıl — İkinci Dalga`,d:`${zone} içinde ${h2} ${MOBS[arc.b].n} devir.`,t:'hunt',m:arc.b,c:h2,rw:{exp:Math.round(expBase*1.15),mo:Math.round(moneyBase*1.1)}},
-      {n:`${arcNo}. Fasıl — Uzun Av`,d:`Bölgenin direncini kırmak için ${h3} ${MOBS[arc.a].n} daha avla.`,t:'hunt',m:arc.a,c:h3,rw:{exp:Math.round(expBase*1.35),mo:Math.round(moneyBase*1.25),pts:(idx%3===2?2:1)}},
-      {n:`${arcNo}. Fasıl — Gökten Kalan İz`,d:`Göktaşlarından ${rare} Göktaşı Kırıntısı getir.`,t:'col',m:'kirinti',c:rare,rw:{exp:Math.round(expBase*.9),mo:Math.round(moneyBase*1.15),it:[['gokatesi',Math.min(2+Math.floor(idx/6),6)]]}},
-      {n:`${arcNo}. Fasıl — Son Hat`,d:`${zone} hattını güvene almak için ${h4} ${MOBS[arc.b].n} temizle.`,t:'hunt',m:arc.b,c:h4,rw:{exp:Math.round(expBase*1.6),mo:Math.round(moneyBase*1.45),pts:2}},
-      (arc.reg==='mağara'
-        ? {n:`${arcNo}. Fasıl — Kırık Yüzün Yankısı`,d:`Kırık Yüzlü yeniden uyandı. Onu devir ve bu faslı kapat.`,t:'hunt',m:'boss',c:1,rw:{exp:Math.round(expBase*2.2),mo:Math.round(moneyBase*2),pts:3,it:[['gokatesi',5]]}}
-        : {n:`${arcNo}. Fasıl — Bölgeyi Mühürle`,d:`${zone} içindeki son ${Math.round(h4*.75)} ${MOBS[arc.a].n} tehdidini temizle.`,t:'hunt',m:arc.a,c:Math.round(h4*.75),rw:{exp:Math.round(expBase*1.9),mo:Math.round(moneyBase*1.7),pts:3}})
-    );
-    step+=8;
-    CHAPTERS.push({n:arc.n,from:start,to:step-1});
-  });
-})();
-
 const REPQ=[{m:'ayazkurt',c:25},{m:'ulak',c:12},{m:'orumcek',c:25},{m:'tuzhayalet',c:20},{m:'saz',c:25},{m:'kemik',c:25},{m:'akrep',c:25}];
 const BOTNAMES=['Baybars','Tulpar','Kurtay','Alpagut','Toygarhan','Dorukay','Kırat','Batur','Akcaer','Sungur','Erdem'];
 const GUILDS=['Bozkurt','Gök Han','Kara Tül','Erenler','Ay Izı'];
@@ -2709,6 +2756,27 @@ function spawnAll(){
   spawnMob('boynuzlu',VILLAGE.x+1280,VILLAGE.y+920,{x:VILLAGE.x+1280,y:VILLAGE.y+920});
   // ana boss
   spawnMob('boss',MC.x,MC.y-420);
+
+  // V4.50 — hikâye bossları. Sabit rastgelelik ile kendi bölgelerinde güvenli nokta bulurlar.
+  const storyBosses=[
+    ['yankiboynuz','ova',101],['sarikok','orman',202],['tuzbekci','tuz',303],
+    ['donmuskam','ayaz',404],['sazana','batak',505],['karanlikulak','mağara',606],
+    ['bozhan','ova',707],['agdokuyan','orman',808],['tuzkral','tuz',909],
+    ['aknobet','ayaz',1001],['batakkalbi','batak',1102],['yuzsuz','mağara',1203]
+  ];
+  storyBosses.forEach(([k,reg,seed0])=>{
+    let ss=seed0,pt=null;
+    const rr=()=>{ss=(ss*1664525+1013904223)>>>0;return ss/4294967296;};
+    for(let tries=0;tries<7000&&!pt;tries++){
+      const x=80+rr()*(WORLD-160),y=80+rr()*(WORLD-160);
+      if(regionAt(x,y)!==reg)continue;
+      const ti=TT[(y/TILE|0)*MW+(x/TILE|0)];
+      if(ti===T_SU||ti===T_KAYA||ti===T_YOL||objBlock(x,y,36))continue;
+      if(Math.hypot(x-VILLAGE.x,y-VILLAGE.y)<1100)continue;
+      pt={x,y};
+    }
+    if(pt)spawnMob(k,pt.x,pt.y,pt);
+  });
 }
 // ---------- botlar ----------
 function spawnBots(){
@@ -2761,6 +2829,12 @@ function meteorDrop(x,y,it,n=1,spread=45){
   drops.push({x:x+rnd(-spread,spread),y:y+rnd(-spread*.7,spread*.7),it,n,t:0});
 }
 function rewardStone(s){
+  // V4.50: hikâye göktaşı görevi, yalnızca istenen bölgedeki taş kırılınca ilerler.
+  if(P.qActive&&P.qActive.t==='stone'&&P.qActive.m===s.r&&P.qN<P.qActive.c){
+    P.qN++;
+    if(P.qN>=P.qActive.c){toast('Görev tamamlandı: '+P.qActive.n);SFX.up();}
+    renderQuest();
+  }
   const z=stoneTier(s);
   const q=z.rar;
   const shards=irnd(3+q*2,5+q*3);
@@ -3000,10 +3074,16 @@ function questTargetName(q){
   if(q.t==='hunt'&&MOBS[q.m])return MOBS[q.m].n;
   if(q.t==='col'&&ITEMS[q.m])return ITEMS[q.m].n;
   if(q.t==='talk'){const n=npcs.find(x=>x.k===q.m);return n?n.n:'Konuş';}
+  if(q.t==='visit')return REGN[q.m]?.n||q.m;
+  if(q.t==='stone')return (REGN[q.m]?.n||q.m)+' göktaşı';
   return q.m||'';
 }
 function questTargetPoint(q){
   if(!q)return null;
+  if(q.t==='visit'||q.t==='stone'){
+    const s=STONE_POS.find(x=>x.r===q.m);
+    if(s)return {x:s.x,y:s.y,label:(REGN[q.m]?.n||q.m)+(q.t==='stone'?' göktaşı':'')};
+  }
   if(q.t==='talk'){
     const n=npcs.find(x=>x.k===q.m);return n?{x:n.x,y:n.y,label:n.n}:null;
   }
@@ -3921,13 +4001,12 @@ function questTurn(){
   if(!q.rep)P.qStep++;
   else P.qRep++;
   if(!q.rep&&finishedStep===8){
-    announce('BÖLÜM I TAMAMLANDI — KIRIK ÇAN');
-    addChat('',P.name+' Kırık Boynuz’u devirip Kavruk Ova’daki çanın sesini özgür bıraktı. Sarı Orman yolu açıldı.','ev');
+    announce('BÖLÜM I TAMAMLANDI — ÇANIN İÇİNDEKİ TAŞ');
+    addChat('',P.name+' ilk mührün izini ortaya çıkardı. Sarı Orman artık bir sonraki cevap.','ev');
   }
-  if(!q.rep&&P.qStep===CHAIN.length){
-    announce('KIRIK ÇAĞ TAMAMLANDI');
-    addChat('',P.name+' 288 ana görevin tamamını bitirdi. Kırık Çağ kapandı.','ev');
-    toast('Ana hikâye tamamlandı — serbest av açıldı.');
+  if(!q.rep&&P.qStep>=CHAIN.length){
+    announce('KIRIK ÇAĞ — ANA HİKÂYE TAMAMLANDI');
+    addChat('',P.name+' gök çekirdeğinin döngüsünü kırdı ve Ağıt Han çanını son kez çaldırdı.','ev');
   }
   P.qActive=null;P.qN=0;
   SFX.up();toast('Görev tamamlandı');
@@ -4261,6 +4340,12 @@ let lastInput=0;
 let walkableRecoveryT=0;
 function updPlayer(dt){
   if(P.dead){P.deadT-=dt;if(P.deadT<=0)respawn();return;}
+
+  // V4.50: keşif görevi. İstenen bölgeye gerçekten girildiğinde tamamlanır.
+  if(P.qActive&&P.qActive.t==='visit'&&P.qN<P.qActive.c&&regionAt(P.x,P.y)===P.qActive.m){
+    P.qN=P.qActive.c;
+    toast('Keşif tamamlandı: '+P.qActive.n);SFX.up();renderQuest();
+  }
 
   // Eski kayıt veya eski ışınlanmadan collider içinde kalmış oyuncuyu kurtar.
   walkableRecoveryT-=dt;
