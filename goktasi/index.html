@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.48.4 NORMAL ATTACK NEAREST MELEE PRIORITY FIX -->
+<!-- GOKTASI V4.48.5 SARI ORMAN SAFE LANDING CONNECTIVITY FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2335,15 +2335,32 @@ function smartMove(e,ang,step,r){
 function isWalkableForPlayer(x,y,r=10){
   return !solid(x,y)&&!objBlock(x,y,r);
 }
-function nearestWalkable(x,y,r=10,maxR=320){
-  if(isWalkableForPlayer(x,y,r))return {x,y};
+function hasTravelExit(x,y,r=10){
+  if(!isWalkableForPlayer(x,y,r))return false;
+
+  // V4.48.5: sadece ayakta durulabilen tek bir piksel yeterli değil.
+  // İniş noktasından gerçek oyuncu adımlarıyla dışarı çıkılabildiğini doğrula.
+  const dirs=[
+    [1,0],[-1,0],[0,1],[0,-1],
+    [.707,.707],[.707,-.707],[-.707,.707],[-.707,-.707]
+  ];
+  let open32=0,open64=0;
+  for(const [dx,dy] of dirs){
+    if(isWalkableForPlayer(x+dx*32,y+dy*32,r))open32++;
+    if(isWalkableForPlayer(x+dx*64,y+dy*64,r))open64++;
+  }
+  return open32>=3&&open64>=2;
+}
+function nearestWalkable(x,y,r=10,maxR=320,region=null){
+  if((!region||regionAt(x,y)===region)&&hasTravelExit(x,y,r))return {x,y};
   const step=16;
   for(let rad=step;rad<=maxR;rad+=step){
     const count=Math.max(16,Math.ceil(Math.PI*2*rad/step));
     for(let i=0;i<count;i++){
       const a=i/count*TAU;
       const nx=x+Math.cos(a)*rad,ny=y+Math.sin(a)*rad;
-      if(isWalkableForPlayer(nx,ny,r))return {x:nx,y:ny};
+      if(region&&regionAt(nx,ny)!==region)continue;
+      if(hasTravelExit(nx,ny,r))return {x:nx,y:ny};
     }
   }
   return null;
@@ -4066,7 +4083,11 @@ function fastTravelTo(id){
   if(!p||!fastTravelUnlocked(p)){toast('Bu yol taşı henüz açılmadı.');return;}
   if(inCombatForTravel()){toast('Savaş sırasında ışınlanamazsın.');return;}
   P.target=null;P.stoneT=null;$('targetBar').style.display='none';
-  const safe=nearestWalkable(p.x,p.y,10,360);
+  // V4.48.5: hedef bölgenin içinde ve çevresinde hareket alanı olan bir nokta şart.
+  // Özellikle Sarı Orman'da tek başına collision=false olan ama etrafı kapalı cepler
+  // artık güvenli iniş sayılmaz.
+  const wantedRegion=p.id==='koy'?'köy':(p.id==='magara'?'mağara':p.id);
+  const safe=nearestWalkable(p.x,p.y,10,p.id==='orman'?900:480,wantedRegion);
   if(!safe){toast('Bu yol taşının güvenli iniş noktası bulunamadı.');return;}
   P.x=safe.x;P.y=safe.y;P.tx=safe.x;P.ty=safe.y;P.mv=false;
   cam.x=safe.x;cam.y=safe.y;
@@ -4149,8 +4170,9 @@ function updPlayer(dt){
   walkableRecoveryT-=dt;
   if(walkableRecoveryT<=0){
     walkableRecoveryT=.8;
-    if(!isWalkableForPlayer(P.x,P.y,9)){
-      const safe=nearestWalkable(P.x,P.y,9,260);
+    if(!hasTravelExit(P.x,P.y,9)){
+      const rg=regionAt(P.x,P.y);
+      const safe=nearestWalkable(P.x,P.y,9,520,rg);
       if(safe){
         P.x=safe.x;P.y=safe.y;P.tx=P.x;P.ty=P.y;P.mv=false;
       }
