@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.48 MOB RADIUS + CHASE RANGE ROOT FIX -->
+<!-- GOKTASI V4.48.4 NORMAL ATTACK NEAREST MELEE PRIORITY FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2330,6 +2330,25 @@ function smartMove(e,ang,step,r){
   e.x=ox;e.y=oy;return false;
 }
 
+// V4.48.2 — ışınlanma hedefi su/kaya/obje içine denk gelirse en yakın
+// gerçekten yürünebilir noktayı bul. Normal hareket sistemine dokunmaz.
+function isWalkableForPlayer(x,y,r=10){
+  return !solid(x,y)&&!objBlock(x,y,r);
+}
+function nearestWalkable(x,y,r=10,maxR=320){
+  if(isWalkableForPlayer(x,y,r))return {x,y};
+  const step=16;
+  for(let rad=step;rad<=maxR;rad+=step){
+    const count=Math.max(16,Math.ceil(Math.PI*2*rad/step));
+    for(let i=0;i<count;i++){
+      const a=i/count*TAU;
+      const nx=x+Math.cos(a)*rad,ny=y+Math.sin(a)*rad;
+      if(isWalkableForPlayer(nx,ny,r))return {x:nx,y:ny};
+    }
+  }
+  return null;
+}
+
 // ---------- sprite üretimi ----------
 const TCOL={};
 function mkc(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
@@ -2830,7 +2849,11 @@ function itemTipHTML(id,up){
 const tip=$('tip');
 function showTip(html,x,y){tip.innerHTML=html;tip.style.display='block';
   tip.style.left=Math.min(x+14,vw-240)+'px';tip.style.top=Math.min(y+10,vh-160)+'px';}
-function hideTip(){tip.style.display='none';}
+function hideTip(){
+  tip.style.display='none';
+  tip.style.left='-9999px';
+  tip.style.top='-9999px';
+}
 function renderInv(){
   const g=$('invGrid');g.innerHTML='';
   P.inv.forEach((s,i)=>{const d=document.createElement('div');d.className='iSlot';
@@ -3056,7 +3079,10 @@ function playerAttack(){
   if(!m||m.hp<=0)return;
   const d=dst(P.x,P.y,m.x,m.y);
   const mr=mobRadius(m);
-  const range=38+(m.boss?mr:0);
+  // V4.48.2: takip ile normal saldırı aynı menzili kullanır.
+  // Önceden takip 38+mr*.8'de duruyor, normal saldırı normal moblarda 38 istiyordu;
+  // bazı büyük hayvanlarda oyuncu durup hiç vuramıyordu.
+  const range=38+mr*.8;
   if(d>range)return;
   if(P.atkCD>0)return;
   P.atkCD=1/(1.05+P.stat.c*.012);
@@ -3380,6 +3406,7 @@ document.addEventListener('pointerdown',e=>{
 },true);
 
 cv.addEventListener('mousedown',e=>{
+  hideTip();
   initAudio();if(!started||P.dead)return;
   if(performance.now()<npcInteractionLockUntil)return;
   // Açık panel varken dünya tıklaması işlenmez.
@@ -3441,15 +3468,32 @@ cv.addEventListener('mousedown',e=>{
     return;
   }
 
-  // Canavar: görünen sprite alanından seç; hedeflenince zemin komutu oluşturma.
+  // V4.48.1 — SADECE MOB TIKLAMA HITBOX DÜZELTMESİ
+  // Savaş, takip, hasar ve menzil koduna dokunulmaz.
+  // Görünen düşmanın gövdesi + isim etiketi tek tıklama alanı kabul edilir.
   let best=null,bd=Infinity;
   mobs.forEach(m=>{
     if(m.hp<=0||m.dead)return;
+    const mr=mobRadius(m);
     const msx=(m.x-cam.x)*zoom+rect.width/2;
-    const msy=(m.y-8-cam.y)*zoom+rect.height/2;
-    const hit=Math.max(30,(46+(m.r||0))*zoom);
-    const d=Math.hypot(sx-msx,sy-msy);
-    if(d<=hit&&d<bd){bd=d;best=m;}
+    const msy=(m.y-cam.y)*zoom+rect.height/2;
+
+    // Sprite gövdesi: yatayda yarıçapa göre, dikeyde kafa/gövde/ayak tamamı.
+    const halfW=Math.max(24,(mr+14)*zoom);
+    const bodyTop=msy-Math.max(42,(mr+30)*zoom);
+    const bodyBottom=msy+Math.max(18,(mr+10)*zoom);
+
+    // İsim/level etiketi gövdenin üstünde çiziliyor; onu da hedef alanına kat.
+    const labelHalfW=Math.max(48,(mr+38)*zoom);
+    const labelTop=bodyTop-Math.max(24,24*zoom);
+
+    const inBody=sx>=msx-halfW&&sx<=msx+halfW&&sy>=bodyTop&&sy<=bodyBottom;
+    const inLabel=sx>=msx-labelHalfW&&sx<=msx+labelHalfW&&sy>=labelTop&&sy<bodyTop;
+
+    if(inBody||inLabel){
+      const score=Math.hypot(sx-msx,(sy-(msy-12))*.75);
+      if(score<bd){bd=score;best=m;}
+    }
   });
   if(best){
     P.target=best;P.stoneT=null;
@@ -3478,20 +3522,52 @@ function nearestTarget(){
 function manualSword(){
   if(!started||P.dead||P.atkCD>0)return;
   lastInput=performance.now();
-  // Yakın saldırıda nişangâhın üstündeki düşman önceliklidir.
-  // Nişangâhta düşman yoksa mevcut kilit / yakındaki düşman mantığı devam eder.
+
+  // V4.48.3 — normal saldırı seçili hedef uzaktaysa boşa sallanmaz:
+  // hedefi korur ve mevcut merkezi takip sistemiyle yanına yürür.
   const meleeHitRange=92;
-  let aimed=focusMeleeAim(meleeHitRange);
-  let m=aimed||(P.target&&P.target.hp>0&&!P.target.dead?P.target:null);
-  if(!m||dst(P.x,P.y,m.x,m.y)>meleeHitRange+(m.r||0)){
-    m=null;let bd=meleeHitRange;
-    mobs.forEach(mm=>{if(mm.hp>0&&!mm.dead){const d=dst(P.x,P.y,mm.x,mm.y);if(d<bd+(mm.r||0)){bd=d;m=mm;}}});
+
+  // V4.48.4 — NORMAL SALDIRI ÖNCELİĞİ
+  // Kök sorun: focusMeleeAim() ilk çalıştığı için, oyuncunun dibindeki saldıran mob
+  // yerine mouse/nişangâh yönündeki başka bir mob seçilebiliyordu.
+  // Normal saldırıda önce fiziksel olarak kılıç menzilindeki EN YAKIN canlı mob seçilir.
+  let m=null,nearestD=Infinity;
+  mobs.forEach(mm=>{
+    if(mm.hp<=0||mm.dead)return;
+    const mr=mobRadius(mm);
+    const d=dst(P.x,P.y,mm.x,mm.y);
+    if(d<=meleeHitRange+mr&&d<nearestD){
+      nearestD=d;
+      m=mm;
+    }
+  });
+
+  // Yakında vurulabilir mob yoksa mevcut kilit korunur.
+  if(!m&&P.target&&P.target.hp>0&&!P.target.dead)m=P.target;
+
+  // O da yoksa nişangâhtaki uzaktaki hedef seçilip takip edilebilir.
+  if(!m)m=focusMeleeAim(190);
+
+  if(m){
+    const mr=mobRadius(m),d=dst(P.x,P.y,m.x,m.y);
+    P.target=m;P.stoneT=null;P.dir=m.x>=P.x?1:-1;
+    $('targetBar').style.display='block';
+
+    // Uzaksa cooldown/swing harcama; updPlayer hedefe yaklaşsın.
+    if(d>meleeHitRange+mr){
+      P.tx=P.x;P.ty=P.y;P.mv=false;
+      return;
+    }
+
+    P.atkCD=1/(1.05+P.stat.c*.012);
+    P.swingT=.28;SFX.swing();
+    dealToMob(m,plDmg());
+    return;
   }
+
+  // Hedef yoksa normal boş kılıç animasyonu.
   P.atkCD=1/(1.05+P.stat.c*.012);P.swingT=.28;SFX.swing();
-  if(m&&dst(P.x,P.y,m.x,m.y)<=meleeHitRange+(m.r||0)){
-    P.target=m;P.stoneT=null;P.dir=m.x>=P.x?1:-1;$('targetBar').style.display='block';
-    dealToMob(m,plDmg());return;
-  }
+
   // Yakındaki göktaşına da kılıçla vurulabilir.
   const st=stones.find(ss=>ss.alive&&dst(P.x,P.y,ss.x,ss.y)<78);
   if(st){P.stoneT=st;P.target=null;P.dir=st.x>=P.x?1:-1;$('targetBar').style.display='block';st.hp-=plDmg(1);}
@@ -3519,12 +3595,14 @@ function maybeBotReply(v){
 // ---------- paneller ----------
 function togglePanel(id){const p=$(id);const on=!p.classList.contains('on');closePanels();if(on)p.classList.add('on');}
 function closePanels(){
+  hideTip();
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   if(started){
     P.tx=P.x;P.ty=P.y;P.mv=false;
   }
 }
 function closePanelByButton(b,e){
+  hideTip();
   if(!b)return false;
   const id=b.dataset.close;
   const p=id?document.getElementById(id):null;
@@ -3988,8 +4066,10 @@ function fastTravelTo(id){
   if(!p||!fastTravelUnlocked(p)){toast('Bu yol taşı henüz açılmadı.');return;}
   if(inCombatForTravel()){toast('Savaş sırasında ışınlanamazsın.');return;}
   P.target=null;P.stoneT=null;$('targetBar').style.display='none';
-  P.x=p.x;P.y=p.y;P.tx=p.x;P.ty=p.y;
-  cam.x=p.x;cam.y=p.y;
+  const safe=nearestWalkable(p.x,p.y,10,360);
+  if(!safe){toast('Bu yol taşının güvenli iniş noktası bulunamadı.');return;}
+  P.x=safe.x;P.y=safe.y;P.tx=safe.x;P.ty=safe.y;P.mv=false;
+  cam.x=safe.x;cam.y=safe.y;
   closePanels();
   announce('YOL TAŞI — '+p.n.toUpperCase());
   toast(p.n+' bölgesine ışınlandın.');
@@ -4061,8 +4141,21 @@ function updateHUD(dt){
 }
 // ---------- güncelleme ----------
 let lastInput=0;
+let walkableRecoveryT=0;
 function updPlayer(dt){
   if(P.dead){P.deadT-=dt;if(P.deadT<=0)respawn();return;}
+
+  // Eski kayıt veya eski ışınlanmadan collider içinde kalmış oyuncuyu kurtar.
+  walkableRecoveryT-=dt;
+  if(walkableRecoveryT<=0){
+    walkableRecoveryT=.8;
+    if(!isWalkableForPlayer(P.x,P.y,9)){
+      const safe=nearestWalkable(P.x,P.y,9,260);
+      if(safe){
+        P.x=safe.x;P.y=safe.y;P.tx=P.x;P.ty=P.y;P.mv=false;
+      }
+    }
+  }
   P.playT+=dt;
   let dx=0,dy=0;
   const interactionPanelOpen=
