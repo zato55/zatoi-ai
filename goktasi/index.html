@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.52.3 HIKAYE KUTUSU TIKLAMA FIX -->
+<!-- GOKTASI V4.52.4 HIKAYE INCELEME GUVENLI ALAN FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2453,9 +2453,9 @@ const STORY_PLAY={
     // bazılarında ikinci av yerine inceleme. Böylece ardışık fasıl şablonu aynı kalmaz.
     const target=(arc%2===0?collect:huntB);
     if(target){
-      target.t='hold';target.m=reg;target.c=12;
+      target.t='hold';target.m=reg;target.c=7;
       target.n=arc<6?'Sessiz İnceleme':(arc<12?'Mührü Dinle':'Çekirdeği Dinle');
-      target.d=sp.hold+' 12 saniye boyunca işaretin yakınında kal. Uzaklaşırsan inceleme durur.';
+      target.d=sp.hold+' 7 saniye boyunca işaretin yakınında kal. Uzaklaşırsan inceleme durur.';
     }
   }
 })();
@@ -3224,12 +3224,42 @@ function storyQuestAnchor(reg,index=0){
   const id=reg==='köy'?'koy':(reg==='mağara'?'magara':reg);
   const fp=FAST_TRAVEL_POINTS.find(p=>p.id===id);
   const s=STONE_POS.find(x=>x.r===reg);
-  const bx=s?.x??fp?.x,by=s?.y??fp?.y;
-  if(!Number.isFinite(bx)||!Number.isFinite(by))return null;
-  const offsets=[[220,-120],[-180,190],[260,230],[0,0]];
-  const o=offsets[index%offsets.length];
-  const wanted=nearestWalkable(bx+o[0],by+o[1],9,520,reg);
-  return wanted||nearestWalkable(bx,by,9,520,reg)||{x:bx,y:by};
+  if(!fp&&!s)return null;
+
+  // V4.52.4: iz/inceleme görevleri savaş alanının içine konmaz.
+  // Merkez olarak göktaşı yerine yol taşı çevresi tercih edilir.
+  const bx=fp?.x??s.x,by=fp?.y??s.y;
+  const offsets=[
+    [150,-105],[-165,120],[190,145],[-115,-175],
+    [235,-35],[-225,45],[80,220],[-65,-225]
+  ];
+
+  // Boss yuvaları ve yoğun düşman doğum noktalarından uzak, yürünebilir bir nokta ara.
+  const safeEnough=(p)=>{
+    if(!p||regionAt(p.x,p.y)!==reg)return false;
+    let bossDist=Infinity,hostiles=0;
+    for(const m of mobs){
+      if(m.dead||m.hp<=0)continue;
+      const homeD=dst(p.x,p.y,m.hx??m.x,m.hy??m.y);
+      if(m.boss)bossDist=Math.min(bossDist,homeD);
+      else if(homeD<240)hostiles++;
+    }
+    return bossDist>520&&hostiles<=1;
+  };
+
+  for(let k=0;k<offsets.length;k++){
+    const o=offsets[(index+k)%offsets.length];
+    const p=nearestWalkable(bx+o[0],by+o[1],9,260,reg);
+    if(safeEnough(p))return p;
+  }
+
+  // Dinamik mob listesi henüz oluşmadıysa yine yol taşına yakın, bölge içinde kal.
+  for(let k=0;k<offsets.length;k++){
+    const o=offsets[(index+k)%offsets.length];
+    const p=nearestWalkable(bx+o[0],by+o[1],9,260,reg);
+    if(p&&regionAt(p.x,p.y)===reg)return p;
+  }
+  return nearestWalkable(bx,by,9,300,reg)||{x:bx,y:by};
 }
 function questTargetPoint(q){
   if(!q)return null;
@@ -4818,7 +4848,8 @@ function updMobs(dt){
       const aggroRange=Math.max(baseAggro,guardAggro);
       const playerOutsideVillage=regionAt(P.x,P.y)!=='köy';
       const guardingPlayer=m.stoneGuard&&dst(P.x,P.y,m.guardX||m.hx,m.guardY||m.hy)<460;
-      if(aggroRange>0&&dP<aggroRange&&!P.dead&&(playerOutsideVillage||guardingPlayer)){
+      const qSafe=P.qActive&&P.qActive.t==='hold'&&(()=>{const qp=questTargetPoint(P.qActive);return qp&&dst(P.x,P.y,qp.x,qp.y)<82;})();
+      if(aggroRange>0&&dP<aggroRange&&!P.dead&&!qSafe&&(playerOutsideVillage||guardingPlayer)){
         m.target=P;
         m.st='chase';
       }else{
@@ -4829,6 +4860,8 @@ function updMobs(dt){
     }
     if(m.target){
       const tg=m.target,tgd=dst(m.x,m.y,tg.x,tg.y);
+      const qSafeNow=tg===P&&P.qActive&&P.qActive.t==='hold'&&(()=>{const qp=questTargetPoint(P.qActive);return qp&&dst(P.x,P.y,qp.x,qp.y)<82;})();
+      if(qSafeNow&&!m.boss){m.target=null;m.st='return';continue;}
       // leash
       if(dst(m.x,m.y,m.hx,m.hy)>(m.stoneGuard?430:620)){m.target=null;m.st='return';m.hp=Math.min(m.maxhp,m.hp+m.maxhp*.3);}
       else if(tg===P&&(P.dead||tgd>(m.stoneGuard?900:820))){m.target=null;m.st='return';}
