@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.48.8 BOSS HP BAR COMBAT STATE FIX -->
+<!-- GOKTASI V4.49 70+ SAATLIK 288 GOREV KAMPANYA -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2247,6 +2247,77 @@ const CHAIN=[
   {n:'Kapının Önü',d:'Otuz Erlik Ulusunu temizle. Kırık Yüzlü’ye giden yol açılsın.',t:'hunt',m:'ulak',c:30,rw:{exp:21000,mo:10500,pts:4}},
   {n:'Kırık Yüzlü',d:"Erlik'in Ağzı'nın dibinde oturan şey var. Bu çağın hesabını ona sor.",t:'hunt',m:'boss',c:1,rw:{exp:30000,mo:20000,it:[['kirikyuz',1]],pts:5}}
 ];
+// ---------- V4.49 — 70+ SAAT HEDEFLİ UZUN KAMPANYA ----------
+// İlk 48 görev olduğu gibi korunur. Aşağıdaki 30 fasıl x 8 görev = 240 yeni ana görev.
+// Toplam ana görev: 288. İçerik mevcut dünyanın tüm bölgelerini döngüsel kullanır.
+// Süre oyuncu hızı/ekipmanına göre değişir; tasarım hedefi yaklaşık 70+ saatlik tam temizlemedir.
+const CAMPAIGN70_ARCS=[
+  {n:'VII — Küllerin Ardından',reg:'ova',a:'bozkurt',b:'domuz',mat:'bozpost'},
+  {n:'VIII — Ormanın İkinci Sesi',reg:'orman',a:'karga',b:'orumcek',mat:'cevher'},
+  {n:'IX — Tuzun Altındaki Yol',reg:'tuz',a:'akrep',b:'tuzhayalet',mat:'kumkristal'},
+  {n:'X — Donmuş Nöbet',reg:'ayaz',a:'kemik',b:'ayazkurt',mat:'kurtdisi_m'},
+  {n:'XI — Bataklığın Nabzı',reg:'batak',a:'saz',b:'karga',mat:'balcik'},
+  {n:"XII — Erlik'in Yankısı",reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
+  {n:'XIII — Çanın Külü',reg:'ova',a:'bozkurt',b:'toprak',mat:'bozpost'},
+  {n:'XIV — Sarı Yaprak Yemini',reg:'orman',a:'orumcek',b:'karga',mat:'cevher'},
+  {n:'XV — Kristal Fırtınası',reg:'tuz',a:'tuzhayalet',b:'akrep',mat:'kumkristal'},
+  {n:'XVI — Ayazın Hatırası',reg:'ayaz',a:'ayazkurt',b:'kemik',mat:'cevher'},
+  {n:'XVII — Kara Sazlar',reg:'batak',a:'saz',b:'saz',mat:'balcik'},
+  {n:'XVIII — Karanlık Ulak',reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
+  {n:'XIX — Ovanın Son Sürüsü',reg:'ova',a:'domuz',b:'bozkurt',mat:'azma'},
+  {n:'XX — Ağların Krallığı',reg:'orman',a:'orumcek',b:'karga',mat:'cevher'},
+  {n:'XXI — Beyaz Çöl',reg:'tuz',a:'akrep',b:'tuzhayalet',mat:'kumkristal'},
+  {n:'XXII — Kemik ve Kar',reg:'ayaz',a:'kemik',b:'ayazkurt',mat:'kurtdisi_m'},
+  {n:'XXIII — Çamurun Hafızası',reg:'batak',a:'saz',b:'karga',mat:'balcik'},
+  {n:"XXIV — Ağzın Derinliği",reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
+  {n:'XXV — Boz Fırtına',reg:'ova',a:'bozkurt',b:'domuz',mat:'bozpost'},
+  {n:'XXVI — Gölgenin Ağı',reg:'orman',a:'karga',b:'orumcek',mat:'cevher'},
+  {n:'XXVII — Tuz Tacı',reg:'tuz',a:'tuzhayalet',b:'akrep',mat:'kumkristal'},
+  {n:'XXVIII — Kuzeyin Dişi',reg:'ayaz',a:'ayazkurt',b:'kemik',mat:'kurtdisi_m'},
+  {n:'XXIX — Bataklık Tacı',reg:'batak',a:'saz',b:'saz',mat:'balcik'},
+  {n:'XXX — Kırık Kapı',reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'},
+  {n:'XXXI — Son Ova Yemini',reg:'ova',a:'bozkurt',b:'domuz',mat:'bozpost'},
+  {n:'XXXII — Son Orman Yemini',reg:'orman',a:'orumcek',b:'karga',mat:'cevher'},
+  {n:'XXXIII — Son Çöl Yemini',reg:'tuz',a:'akrep',b:'tuzhayalet',mat:'kumkristal'},
+  {n:'XXXIV — Son Ayaz Yemini',reg:'ayaz',a:'kemik',b:'ayazkurt',mat:'kurtdisi_m'},
+  {n:'XXXV — Son Bataklık Yemini',reg:'batak',a:'saz',b:'saz',mat:'balcik'},
+  {n:"XXXVI — Kırık Çağın Sonu",reg:'mağara',a:'ulak',b:'ulak',mat:'ulakgozu'}
+];
+const CAMPAIGN70_REGION_NAME={
+  ova:'Kavruk Ova',orman:'Sarı Orman',tuz:'Tuz Çölü',
+  ayaz:'Ayaz Vadisi',batak:'Kara Bataklık',mağara:"Erlik'in Ağzı"
+};
+(function buildCampaign70(){
+  let step=49;
+  CAMPAIGN70_ARCS.forEach((arc,idx)=>{
+    const arcNo=idx+7;
+    const start=step;
+    const zone=CAMPAIGN70_REGION_NAME[arc.reg];
+    const tier=Math.floor(idx/6);
+    const h1=42+idx*2, h2=48+idx*2, h3=56+idx*2, h4=64+idx*2;
+    const collect=12+Math.floor(idx*.8);
+    const rare=3+Math.floor(idx/4);
+    const expBase=18000+idx*2800;
+    const moneyBase=7000+idx*900;
+    const talker=idx%2===0?'kam':'baturhan';
+
+    CHAIN.push(
+      {n:`${arcNo}. Fasıl — Haber`,d:`${zone} yeniden hareketlendi. ${talker==='kam'?'Kam Bilge':'Baturhan'} ile konuş ve yeni seferi başlat.`,t:'talk',m:talker,c:1,rw:{exp:Math.round(expBase*.35),mo:Math.round(moneyBase*.35)}},
+      {n:`${arcNo}. Fasıl — İlk Temizlik`,d:`${zone} çevresindeki ${MOBS[arc.a].n} sürüsünü kır.`,t:'hunt',m:arc.a,c:h1,rw:{exp:expBase,mo:moneyBase}},
+      {n:`${arcNo}. Fasıl — Sefer Malzemesi`,d:`Sefer için ${collect} ${ITEMS[arc.mat].n} getir.`,t:'col',m:arc.mat,c:collect,rw:{exp:Math.round(expBase*.75),mo:Math.round(moneyBase*.9),it:idx%3===0?[['hpb',3]]:undefined}},
+      {n:`${arcNo}. Fasıl — İkinci Dalga`,d:`${zone} içinde ${h2} ${MOBS[arc.b].n} devir.`,t:'hunt',m:arc.b,c:h2,rw:{exp:Math.round(expBase*1.15),mo:Math.round(moneyBase*1.1)}},
+      {n:`${arcNo}. Fasıl — Uzun Av`,d:`Bölgenin direncini kırmak için ${h3} ${MOBS[arc.a].n} daha avla.`,t:'hunt',m:arc.a,c:h3,rw:{exp:Math.round(expBase*1.35),mo:Math.round(moneyBase*1.25),pts:(idx%3===2?2:1)}},
+      {n:`${arcNo}. Fasıl — Gökten Kalan İz`,d:`Göktaşlarından ${rare} Göktaşı Kırıntısı getir.`,t:'col',m:'kirinti',c:rare,rw:{exp:Math.round(expBase*.9),mo:Math.round(moneyBase*1.15),it:[['gokatesi',Math.min(2+Math.floor(idx/6),6)]]}},
+      {n:`${arcNo}. Fasıl — Son Hat`,d:`${zone} hattını güvene almak için ${h4} ${MOBS[arc.b].n} temizle.`,t:'hunt',m:arc.b,c:h4,rw:{exp:Math.round(expBase*1.6),mo:Math.round(moneyBase*1.45),pts:2}},
+      (arc.reg==='mağara'
+        ? {n:`${arcNo}. Fasıl — Kırık Yüzün Yankısı`,d:`Kırık Yüzlü yeniden uyandı. Onu devir ve bu faslı kapat.`,t:'hunt',m:'boss',c:1,rw:{exp:Math.round(expBase*2.2),mo:Math.round(moneyBase*2),pts:3,it:[['gokatesi',5]]}}
+        : {n:`${arcNo}. Fasıl — Bölgeyi Mühürle`,d:`${zone} içindeki son ${Math.round(h4*.75)} ${MOBS[arc.a].n} tehdidini temizle.`,t:'hunt',m:arc.a,c:Math.round(h4*.75),rw:{exp:Math.round(expBase*1.9),mo:Math.round(moneyBase*1.7),pts:3}})
+    );
+    step+=8;
+    CHAPTERS.push({n:arc.n,from:start,to:step-1});
+  });
+})();
+
 const REPQ=[{m:'ayazkurt',c:25},{m:'ulak',c:12},{m:'orumcek',c:25},{m:'tuzhayalet',c:20},{m:'saz',c:25},{m:'kemik',c:25},{m:'akrep',c:25}];
 const BOTNAMES=['Baybars','Tulpar','Kurtay','Alpagut','Toygarhan','Dorukay','Kırat','Batur','Akcaer','Sungur','Erdem'];
 const GUILDS=['Bozkurt','Gök Han','Kara Tül','Erenler','Ay Izı'];
@@ -2996,7 +3067,7 @@ function expGive(n){
   if(isNight())n=Math.round(n*1.15);
   P.exp+=n;
   floats.push({x:P.x,y:P.y-30,txt:'+'+Math.round(n)+' tecrübe',c:'#8fae5a',t:0,dur:1});
-  while(P.exp>=expNeed(P.lvl)&&P.lvl<60){
+  while(P.exp>=expNeed(P.lvl)&&P.lvl<100){
     P.exp-=expNeed(P.lvl);P.lvl++;P.pts+=3;P.hp=maxHP();P.sp=maxSP();
     SFX.lvl();
     for(let i=0;i<26;i++)parts.push({x:P.x,y:P.y-10,vx:Math.cos(i/26*TAU)*rnd(40,110),vy:Math.sin(i/26*TAU)*rnd(40,110)-40,g:-30,t:0,dur:rnd(.6,1.1),c:'#e8cf8f',r:rnd(1.5,3)});
@@ -3852,6 +3923,11 @@ function questTurn(){
   if(!q.rep&&finishedStep===8){
     announce('BÖLÜM I TAMAMLANDI — KIRIK ÇAN');
     addChat('',P.name+' Kırık Boynuz’u devirip Kavruk Ova’daki çanın sesini özgür bıraktı. Sarı Orman yolu açıldı.','ev');
+  }
+  if(!q.rep&&P.qStep===CHAIN.length){
+    announce('KIRIK ÇAĞ TAMAMLANDI');
+    addChat('',P.name+' 288 ana görevin tamamını bitirdi. Kırık Çağ kapandı.','ev');
+    toast('Ana hikâye tamamlandı — serbest av açıldı.');
   }
   P.qActive=null;P.qN=0;
   SFX.up();toast('Görev tamamlandı');
