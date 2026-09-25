@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.48.7 BOSS HP BAR FIX -->
+<!-- GOKTASI V4.48.8 BOSS HP BAR COMBAT STATE FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -4143,7 +4143,11 @@ function updateBars(){
       Object.assign(document.createElement('small'),{textContent:'Lv '+P.lvl})
     );
   }
-  const m=P.target;
+  // V4.48.8: Boss can barı yalnızca oyuncunun P.target seçimine bağlı kalmaz.
+  // Boss oyuncuyla savaşa girdiyse (m.target===P), oyuncu kaçarken/manuel hareket ederken
+  // P.target temizlense bile boss canı ekranda kalır.
+  const engagedBoss=mobs.find(x=>x.boss&&x.hp>0&&!x.dead&&x.target===P&&dst(P.x,P.y,x.x,x.y)<850);
+  const m=(P.target&&P.target.hp>0&&!P.target.dead)?P.target:engagedBoss;
   if(m&&m.hp>0){
     const isBoss=!!m.boss;
     $('targetBar').style.display='block';
