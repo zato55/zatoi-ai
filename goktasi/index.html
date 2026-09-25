@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.52 SINEMATIK HIKAYE VE BOSS KIMLIGI -->
+<!-- GOKTASI V4.52.1 SINEMATIK DEVAM BUTONU FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -131,7 +131,9 @@ button{font-family:'Manrope',sans-serif;cursor:pointer}
 #storyKicker{font:700 9px Cinzel,serif;letter-spacing:3px;color:#a98749}
 #storyTitle{font:700 22px Cinzel,serif;color:#ead39a;margin:7px 0 9px}
 #storyBody{font-size:13px;line-height:1.75;color:#d0c4ae;white-space:pre-line}
-#storyContinue{margin-top:14px;padding-top:10px;border-top:1px solid #392d1a;text-align:right;font:700 9px Cinzel,serif;letter-spacing:2px;color:#806f50}
+#storyContinue{display:block;width:100%;margin-top:14px;padding:12px 4px 2px;border:0;border-top:1px solid #392d1a;background:transparent;text-align:right;font:700 10px Cinzel,serif;letter-spacing:2px;color:#b79a5c;cursor:pointer;pointer-events:auto}
+#storyContinue:hover{color:#f0d58f;text-shadow:0 0 12px rgba(232,207,143,.28)}
+#storyScene,#storyShade,#storyCard,#storyContinue{pointer-events:auto!important}
 @keyframes storyShadeIn{from{opacity:0}to{opacity:1}}@keyframes storyCardIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 
 #dlgBtns{display:flex;gap:8px;padding:0 14px 12px;flex-wrap:wrap}
@@ -1966,7 +1968,7 @@ html:not(.mobile-ui) .panel.on{
     <div id="storyKicker">KEŞİF</div>
     <div id="storyTitle"></div>
     <div id="storyBody"></div>
-    <div id="storyContinue">DEVAM ET</div>
+    <button type="button" id="storyContinue">DEVAM ET</button>
   </div>
 </div>
 <div id="death"><h2>RUHUN KIRILDI</h2><p id="deathTxt"></p></div>
@@ -3195,7 +3197,16 @@ function storyScene(kicker,title,body,auto=0){
   if(storySceneTimer)clearTimeout(storySceneTimer);
   if(auto)storySceneTimer=setTimeout(()=>el.classList.remove('on'),auto);
 }
-$('storyScene').addEventListener('click',()=>{$('storyScene').classList.remove('on');});
+function closeStoryScene(){
+  const el=$('storyScene');
+  if(el)el.classList.remove('on');
+  if(storySceneTimer){clearTimeout(storySceneTimer);storySceneTimer=0;}
+}
+$('storyContinue').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();closeStoryScene();});
+$('storyContinue').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeStoryScene();});
+$('storyShade').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeStoryScene();});
+// ESC de güvenli çıkış sağlar.
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('storyScene')?.classList.contains('on')){e.preventDefault();closeStoryScene();}},true);
 function storyPulseSound(strong=false){
   try{
     initAudio();
