@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.50.3 YENI ISLEVSEL DUNYA HARITASI -->
+<!-- GOKTASI V4.50.4 YOL TASLARI DENGELI DAGILIM -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -4250,13 +4250,15 @@ function drawMini(){
 }
 // ---------- V4.38 YOL TAŞLARI / HIZLI SEYAHAT ----------
 const FAST_TRAVEL_POINTS=[
+  // V4.50.4 — yol taşları bölge merkezlerine/ana girişlerine dağıtıldı.
+  // Amaç: birbirine yığılma yerine her taşın gerçekten o bölgenin seyahat merkezi olması.
   {id:'koy',n:'Ağıt Han',x:VILLAGE.x,y:VILLAGE.y,need:0},
-  {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1180,y:VILLAGE.y+820,need:1},
-  {id:'orman',n:'Sarı Orman',x:3900,y:7400,need:9},
-  {id:'tuz',n:'Tuz Çölü',x:11100,y:7900,need:17},
-  {id:'ayaz',n:'Ayaz Vadisi',x:7000,y:2750,need:25},
-  {id:'batak',n:'Kara Bataklık',x:7700,y:11300,need:33},
-  {id:'magara',n:"Erlik'in Ağzı",x:MC.x,y:3450,need:41}
+  {id:'ova',n:'Kavruk Ova',x:VILLAGE.x+1850,y:VILLAGE.y+1050,need:1},
+  {id:'orman',n:'Sarı Orman',x:3000,y:7350,need:9},
+  {id:'tuz',n:'Tuz Çölü',x:11900,y:7900,need:17},
+  {id:'ayaz',n:'Ayaz Vadisi',x:6750,y:2050,need:25},
+  {id:'batak',n:'Kara Bataklık',x:7350,y:12100,need:33},
+  {id:'magara',n:"Erlik'in Ağzı",x:MC.x+650,y:3000,need:41}
 ];
 function fastTravelUnlocked(p){
   // qStep tabanlı açılış eski ve yeni kayıtlarla uyumlu; ayrıca bulunduğun bölgeyi hemen kullanabilirsin.
@@ -4309,7 +4311,7 @@ function fastTravelTo(id){
   if(inCombatForTravel()){toast('Savaş sırasında ışınlanamazsın.');return;}
   P.target=null;P.stoneT=null;$('targetBar').style.display='none';
   const wantedRegion=p.id==='koy'?'köy':(p.id==='magara'?'mağara':p.id);
-  const safe=nearestWalkable(p.x,p.y,10,p.id==='orman'?900:480,wantedRegion);
+  const safe=nearestWalkable(p.x,p.y,10,(p.id==='koy'?480:1100),wantedRegion);
   if(!safe){toast('Bu yol taşının güvenli iniş noktası bulunamadı.');return;}
   P.x=safe.x;P.y=safe.y;P.tx=safe.x;P.ty=safe.y;P.mv=false;
   cam.x=safe.x;cam.y=safe.y;
@@ -4369,7 +4371,7 @@ function drawBigMap(){
 $('mapCv').addEventListener('click',e=>{
   const r=e.currentTarget.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*640,sy=(e.clientY-r.top)/r.height*640;
   const sc=640/WORLD;
-  let best=null,bd=34;
+  let best=null,bd=38;
   FAST_TRAVEL_POINTS.forEach(p=>{
     const d=Math.hypot(sx-p.x*sc,sy-p.y*sc);
     if(d<bd){bd=d;best=p;}
