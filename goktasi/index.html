@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.3 SHOP ROW HITBOX FIX -->
+<!-- GOKTASI V4.47.4 GLOBAL UI HITBOX + TOOLTIP FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1642,6 +1642,35 @@ html:not(.mobile-ui) #skillbar .slot{
   z-index:4!important;
   pointer-events:auto!important;
   touch-action:manipulation!important;
+}
+
+
+/* =========================================================
+   V4.47.4 — GENEL UI HITBOX / POINTER ALGILAMA FIX
+   Görünen kutunun tamamı etkileşim alanıdır. İç görseller/yazılar
+   mouse hedefini parçalamaz; ana kutu hover/click olayını alır.
+   ========================================================= */
+.iSlot,.eqSlot,.slot,.srow2,.srow2 .abtn,
+.tabs button,button.x[data-close]{
+  pointer-events:auto!important;
+}
+.iSlot > img,.iSlot > .n,.iSlot > .up,
+.eqSlot > img,.eqSlot > em,
+.slot > img,.slot > .key,.slot > .cd,.slot > .sp,
+.srow2 > img,.srow2 .info,.srow2 .info *,
+.srow2 .pr,
+.tabs button > *,
+button.x[data-close] > *{
+  pointer-events:none!important;
+}
+.iSlot,.eqSlot,.slot,.srow2,.srow2 .abtn{
+  touch-action:manipulation;
+}
+.panel.on{
+  pointer-events:auto!important;
+}
+.panel.on .bd,.panel.on .tabs,.panel.on .slist{
+  pointer-events:auto!important;
 }
 
 </style>
