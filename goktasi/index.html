@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.47.7 CHARACTER PLUS HITBOX FIX -->
+<!-- GOKTASI V4.47.8 HIDDEN UI POINTER LEAK ROOT FIX -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1699,6 +1699,41 @@ button.x[data-close] > *{
   pointer-events:none!important;
 }
 
+
+/* =========================================================
+   V4.47.8 — GÖRÜNMEZ UI / POINTER SIZINTISI KÖK FIX
+   Kapalı/görünmez arayüz elemanları canvas üstünde hit-test alamaz.
+   ========================================================= */
+.panel:not(.on){
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.panel:not(.on) *{
+  pointer-events:none!important;
+}
+.panel.on{
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+#intro.off{
+  pointer-events:none!important;
+}
+#death:not(.on){
+  pointer-events:none!important;
+}
+#hud{
+  pointer-events:none!important;
+}
+#hud .ia,
+#hud .panel.on,
+#hud input,
+#hud button:not(:disabled),
+#chatWrap,
+#chatTab{
+  pointer-events:auto;
+}
+
 </style>
 <!-- GOKTASI BUILD: V4.38 - SOL/SAG/YAN MOUSE TUSLARI ATANABILIR; ATANAN TUS TEK GOREV CALISTIRIR -->
 <!-- GOKTASI BUILD: V4.38 - SAG TIK MOUSE2 DAHIL TAM MOUSE TUS ATAMA -->
@@ -3275,6 +3310,45 @@ addEventListener('pointerup',e=>{
   if(bindActionFor(code))e.preventDefault();
 },true);
 
+
+// V4.47.8 — CANVAS ÜSTÜ GÖRÜNMEZ KATMAN TEMİZLEYİCİ
+let forwardingWorldPointer=false;
+document.addEventListener('pointerdown',e=>{
+  if(forwardingWorldPointer||!started||P.dead)return;
+  if(document.querySelector('.panel.on'))return;
+
+  const stack=document.elementsFromPoint(e.clientX,e.clientY);
+  const top=stack[0];
+  if(!top||top===cv||isActuallyInteractiveUI(top))return;
+
+  // Canvas'ın üzerinde kalan fakat aktif UI olmayan bir DOM katmanı tıklamayı çalıyorsa
+  // o katmanı pasifleştir. Sonraki gerçek mouse olayı doğrudan canvas'a ulaşır.
+  if(stack.includes(cv)){
+    const cs=getComputedStyle(top);
+    const rect=top.getBoundingClientRect();
+    const invisible=cs.display==='none'||cs.visibility==='hidden'||Number(cs.opacity)===0||
+      rect.width===0||rect.height===0||top.closest?.('.panel:not(.on)');
+    if(invisible||cs.cursor==='pointer'){
+      top.style.pointerEvents='none';
+      console.warn('[GÖKTAŞI] Canvas üstündeki hatalı hitbox pasifleştirildi:',top.id||top.className||top.tagName);
+    }
+  }
+},true);
+
+
+document.addEventListener('pointermove',e=>{
+  if(!started||document.querySelector('.panel.on'))return;
+  const stack=document.elementsFromPoint(e.clientX,e.clientY);
+  if(!stack.includes(cv))return;
+  const top=stack[0];
+  if(top&&top!==cv&&!isActuallyInteractiveUI(top)){
+    const cs=getComputedStyle(top);
+    if(cs.cursor==='pointer' && (top.closest?.('.panel:not(.on)') || cs.visibility==='hidden' || Number(cs.opacity)===0)){
+      top.style.pointerEvents='none';
+    }
+  }
+},true);
+
 cv.addEventListener('mousedown',e=>{
   initAudio();if(!started||P.dead)return;
   if(performance.now()<npcInteractionLockUntil)return;
@@ -3453,6 +3527,40 @@ bindPanelCloseButtons();
    ========================================================= */
 function pointInsideRect(x,y,r){
   return !!r && x>=r.left && x<=r.right && y>=r.top && y<=r.bottom;
+}
+
+// V4.47.8: kapalı UI elemanlarının yanlışlıkla canvas üzerinde aktif kalmasını temizle.
+function sanitizeHiddenUIHitboxes(){
+  document.querySelectorAll('.panel:not(.on)').forEach(p=>{
+    p.style.pointerEvents='none';
+  });
+  const intro=$('intro');
+  if(intro?.classList.contains('off'))intro.style.pointerEvents='none';
+  const death=$('death');
+  if(death&&!death.classList.contains('on'))death.style.pointerEvents='none';
+}
+sanitizeHiddenUIHitboxes();
+
+// Panel sınıfları değiştikçe hit-test durumunu otomatik güncelle.
+const uiHitObserver=new MutationObserver(muts=>{
+  let needed=false;
+  for(const m of muts){
+    if(m.type==='attributes'&&m.attributeName==='class'){needed=true;break;}
+  }
+  if(needed)sanitizeHiddenUIHitboxes();
+});
+document.querySelectorAll('.panel,#intro,#death').forEach(el=>
+  uiHitObserver.observe(el,{attributes:true,attributeFilter:['class']})
+);
+
+// Oyun alanında "el" imleci oluşuyorsa hangi HTML elemanının sebep olduğunu bulup
+// görünmez/kapalı UI ise tıklamayı dünyaya bırak.
+function isActuallyInteractiveUI(el){
+  if(!el||el===cv||el===document.body||el===document.documentElement)return false;
+  if(el.closest?.('.panel.on'))return true;
+  if(el.closest?.('#chatWrap,#chatTab,#mobileControls,#settingsBtn'))return true;
+  if(el.closest?.('#intro:not(.off),#death.on'))return true;
+  return false;
 }
 document.addEventListener('pointerdown',e=>{
   if(e.button!=null && e.button!==0)return;
