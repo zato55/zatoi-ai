@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d0b08">
 <link rel="manifest" href="./manifest.json">
-<!-- GOKTASI V4.50.4 YOL TASLARI DENGELI DAGILIM -->
+<!-- GOKTASI V4.51 HIKAYE OYNANIS SISTEMI -->
 <title>GÖKTAŞI — Kırık Çağ'ın Sonunda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2404,6 +2404,40 @@ const CHAIN=[
   {n:"Bekçi",d:"İzlerin sonunda boss anahtarıyla işaretlenen bekçi duruyor. Onu yen; taşıdığı işaret bu faslın düğümünü çözecek.",t:"hunt",m:"boss",c:1,rw:{exp:53280,mo:15453,pts:2}},
   {n:"Yüzleşme",d:"Son savaşın amacı yaratığı öldürmek değil, içindeki gök çekirdeğini susturup Ağıt Han'ın çanını son kez çaldırmaktır.",t:"talk",m:"akca",c:1,rw:{exp:32560,mo:10908,pts:1}}
 ];
+// ---------- V4.51 — HİKÂYE OYNANIŞI ----------
+// 18 faslın her birinde aynı "git-kes-topla" dizisini kırar.
+// Her fasılın 3. adımı iz sürme, bazı 4/5. adımları araştırma veya alan inceleme olur.
+const STORY_PLAY={
+  ova:{track:'Çanın toprağa bıraktığı üç yankı izini sırayla bul.',hold:'Kırık taşın yanında kal ve titreşimi dinle.'},
+  orman:{track:'Sarı reçinenin kökler boyunca bıraktığı üç izi takip et.',hold:'Ana Ağacın sessiz kökünde kal ve hareketi gözle.'},
+  tuz:{track:'Tuz altındaki eski yol işaretlerini sırayla ortaya çıkar.',hold:'Harabe levhasının yanında kal ve yazının belirginleşmesini bekle.'},
+  ayaz:{track:'Donmuş nöbetçilerin bıraktığı üç mühür izini takip et.',hold:'Buz mührünün yanında kal; çözülürken işareti koru.'},
+  batak:{track:'Çamurun sakladığı üç yankı noktasını takip et.',hold:'Sazların sustuğu noktada kal ve geçmişin sesini dinle.'},
+  mağara:{track:'Mağaranın duvarındaki üç eski mühür izini takip et.',hold:'Kırık kapının önünde kal ve yankının yönünü çöz.'}
+};
+(function diversifyStoryQuests(){
+  for(let arc=0;arc<18;arc++){
+    const base=1+arc*8;
+    const visit=CHAIN[base+1], huntA=CHAIN[base+2], collect=CHAIN[base+3], huntB=CHAIN[base+4];
+    const reg=visit?.m,sp=STORY_PLAY[reg]; if(!sp)continue;
+
+    // Önceden ilk av olan adım artık çevresel iz sürme.
+    if(huntA){
+      huntA.t='track';huntA.m=reg;huntA.c=3;
+      huntA.n=arc<6?'İzleri Oku':(arc<12?'Eski İz':'Son İz');
+      huntA.d=sp.track+' Her iz bir sonrakini açacak; yaratık kesmek gerekmiyor.';
+    }
+
+    // Fasıl ritmini değiştir: bazı bölümlerde malzeme yerine sahada inceleme,
+    // bazılarında ikinci av yerine inceleme. Böylece ardışık fasıl şablonu aynı kalmaz.
+    const target=(arc%2===0?collect:huntB);
+    if(target){
+      target.t='hold';target.m=reg;target.c=12;
+      target.n=arc<6?'Sessiz İnceleme':(arc<12?'Mührü Dinle':'Çekirdeği Dinle');
+      target.d=sp.hold+' 12 saniye boyunca işaretin yakınında kal. Uzaklaşırsan inceleme durur.';
+    }
+  }
+})();
 const REPQ=[{m:'ayazkurt',c:25},{m:'ulak',c:12},{m:'orumcek',c:25},{m:'tuzhayalet',c:20},{m:'saz',c:25},{m:'kemik',c:25},{m:'akrep',c:25}];
 const BOTNAMES=['Baybars','Tulpar','Kurtay','Alpagut','Toygarhan','Dorukay','Kırat','Batur','Akcaer','Sungur','Erdem'];
 const GUILDS=['Bozkurt','Gök Han','Kara Tül','Erenler','Ay Izı'];
@@ -3115,10 +3149,31 @@ function questTargetName(q){
   if(q.t==='talk'){const n=npcs.find(x=>x.k===q.m);return n?n.n:'Konuş';}
   if(q.t==='visit')return REGN[q.m]?.n||q.m;
   if(q.t==='stone')return (REGN[q.m]?.n||q.m)+' göktaşı';
+  if(q.t==='track')return 'İz '+(Math.min(q.c,(P.qN||0)+1))+' / '+q.c;
+  if(q.t==='hold')return 'İnceleme noktası';
   return q.m||'';
+}
+function storyQuestAnchor(reg,index=0){
+  const id=reg==='köy'?'koy':(reg==='mağara'?'magara':reg);
+  const fp=FAST_TRAVEL_POINTS.find(p=>p.id===id);
+  const s=STONE_POS.find(x=>x.r===reg);
+  const bx=s?.x??fp?.x,by=s?.y??fp?.y;
+  if(!Number.isFinite(bx)||!Number.isFinite(by))return null;
+  const offsets=[[220,-120],[-180,190],[260,230],[0,0]];
+  const o=offsets[index%offsets.length];
+  const wanted=nearestWalkable(bx+o[0],by+o[1],9,520,reg);
+  return wanted||nearestWalkable(bx,by,9,520,reg)||{x:bx,y:by};
 }
 function questTargetPoint(q){
   if(!q)return null;
+  if(q.t==='track'){
+    const p=storyQuestAnchor(q.m,Math.min(q.c-1,Math.floor(P.qN||0)));
+    return p?{x:p.x,y:p.y,label:'Hikâye izi '+(Math.min(q.c,(P.qN||0)+1))+'/'+q.c}:null;
+  }
+  if(q.t==='hold'){
+    const p=storyQuestAnchor(q.m,3);
+    return p?{x:p.x,y:p.y,label:'İnceleme noktası'}:null;
+  }
   if(q.t==='visit'||q.t==='stone'){
     const s=STONE_POS.find(x=>x.r===q.m);
     if(s)return {x:s.x,y:s.y,label:(REGN[q.m]?.n||q.m)+(q.t==='stone'?' göktaşı':'')};
@@ -3161,7 +3216,8 @@ function renderQuest(){
   const w=$('questPanel');
   let h='';
   if(P.qActive){const q=P.qActive,cur=q.t==='col'?countItem(q.m):P.qN,ch=!q.rep?questChapter(P.qStep):null;
-    h+=`<div class="q">${ch?`<small style="opacity:.62">${ch.n}</small>`:''}<b>${q.rep?"Kam'ın Avı":q.n}</b><span>${questTargetName(q)} <span class="prog">${Math.min(cur,q.c)}/${q.c}</span></span><small style="display:block;margin-top:3px;color:#e8cf8f">◆ ${questGuideText(q)}</small></div>`;
+    const prog=q.t==='hold'?(Math.min(cur,q.c).toFixed(1)+'s / '+q.c+'s'):(Math.min(cur,q.c)+'/'+q.c);
+    h+=`<div class="q">${ch?`<small style="opacity:.62">${ch.n}</small>`:''}<b>${q.rep?"Kam'ın Avı":q.n}</b><span>${questTargetName(q)} <span class="prog">${prog}</span></span><small style="display:block;margin-top:3px;color:#e8cf8f">◆ ${questGuideText(q)}</small></div>`;
   }
   w.innerHTML=h;
 }
@@ -4285,7 +4341,7 @@ function mapPointFor(id){return FAST_TRAVEL_POINTS.find(p=>p.id===id);}
 function mapQuestBelongs(id){
   const q=P.qActive;if(!q)return false;
   const meta=MAP_REGION_META[id];if(!meta)return false;
-  if((q.t==='visit'||q.t==='stone')&&q.m===meta.r)return true;
+  if((q.t==='visit'||q.t==='stone'||q.t==='track'||q.t==='hold')&&q.m===meta.r)return true;
   if(q.t==='hunt'&&MOBS[q.m]?.reg===meta.r)return true;
   return false;
 }
@@ -4443,6 +4499,32 @@ function updPlayer(dt){
   if(P.qActive&&P.qActive.t==='visit'&&P.qN<P.qActive.c&&regionAt(P.x,P.y)===P.qActive.m){
     P.qN=P.qActive.c;
     toast('Keşif tamamlandı: '+P.qActive.n);SFX.up();renderQuest();
+  }
+
+  // V4.51: iz sürme — işaretler sırayla bulunur; pusula bir sonraki izi gösterir.
+  if(P.qActive&&P.qActive.t==='track'&&P.qN<P.qActive.c){
+    const qp=questTargetPoint(P.qActive);
+    if(qp&&dst(P.x,P.y,qp.x,qp.y)<54){
+      P.qN++;
+      fxs.push({type:'ring',x:qp.x,y:qp.y,t:0,dur:.7,r0:8,r1:70,c:'rgba(232,207,143,'});
+      if(P.qN>=P.qActive.c){toast('İz çözüldü: '+P.qActive.n);SFX.up();}
+      else toast('İz bulundu — sıradaki işaret ortaya çıktı.');
+      renderQuest();
+    }
+  }
+
+  // V4.51: saha incelemesi — oyuncu işaretin yanında gerçekten zaman geçirir.
+  // Hasar alırken ilerleme durur; uzaklaşınca birikim korunur ama artmaz.
+  if(P.qActive&&P.qActive.t==='hold'&&P.qN<P.qActive.c){
+    const qp=questTargetPoint(P.qActive);
+    if(qp&&dst(P.x,P.y,qp.x,qp.y)<72&&worldT-P.lastHit>1.2){
+      const before=P.qN;P.qN=Math.min(P.qActive.c,P.qN+dt);
+      if(Math.floor(before)!==Math.floor(P.qN))renderQuest();
+      if(before<P.qActive.c&&P.qN>=P.qActive.c){
+        fxs.push({type:'ring',x:qp.x,y:qp.y,t:0,dur:1,r0:12,r1:110,c:'rgba(255,224,102,'});
+        toast('İnceleme tamamlandı: '+P.qActive.n);SFX.up();renderQuest();
+      }
+    }
   }
 
   // Eski kayıt veya eski ışınlanmadan collider içinde kalmış oyuncuyu kurtar.
